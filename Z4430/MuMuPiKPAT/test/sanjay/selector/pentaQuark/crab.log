@@ -1,0 +1,71 @@
+DEBUG 2015-07-21 00:28:15,990: 	 Executing command: 'checkwrite'
+DEBUG 2015-07-21 00:28:15,991: 	 Found CRAB cache file /cmshome/cristella/.crab3
+DEBUG 2015-07-21 00:28:16,004: 	 Checking credentials
+DEBUG 2015-07-21 00:28:16,005: 	 Found proxy file /tmp/x509up_u50855
+DEBUG 2015-07-21 00:28:16,005: 	 Getting proxy life time left
+DEBUG 2015-07-21 00:28:16,709: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u50855 -timeleft
+ output : 1162
+
+ error: 
+ retcode : 0
+DEBUG 2015-07-21 00:28:17,413: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u50855 -actimeleft
+ output : 1161
+
+ error: 
+ retcode : 0
+DEBUG 2015-07-21 00:28:17,414: 	 Proxy valid for 00:19:22 hours
+DEBUG 2015-07-21 00:28:17,522: 	 Executing : 
+ command : openssl x509 -in ~/.globus/usercert.pem -subject -noout
+ output : subject= /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=lecriste/CN=716292/CN=Leonardo Cristella
+
+ error: WARNING: can't open config file: /build/dmwmbld/srv/state/dmwmbld/builds/comp_gcc481/w/tmp/BUILDROOT/ef35842be28ecca6d10195ea8182a5ac/build/dmwmbld/srv/state/dmwmbld/builds/comp_gcc481/w/slc6_amd64_gcc481/external/openssl/1.0.1p/ssl/openssl.cnf
+
+ retcode : 0
+DEBUG 2015-07-21 00:28:17,522: 	 Checking credentials
+DEBUG 2015-07-21 00:28:17,523: 	 Found proxy file /tmp/x509up_u50855
+DEBUG 2015-07-21 00:28:17,523: 	 Getting proxy life time left
+DEBUG 2015-07-21 00:28:18,126: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u50855 -timeleft
+ output : 1160
+
+ error: 
+ retcode : 0
+DEBUG 2015-07-21 00:28:18,731: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u50855 -actimeleft
+ output : 1160
+
+ error: 
+ retcode : 0
+DEBUG 2015-07-21 00:28:18,731: 	 Proxy valid for 00:19:20 hours
+DEBUG 2015-07-21 00:28:19,335: 	 Executing : 
+ command : env X509_USER_PROXY=/tmp/x509up_u50855 voms-proxy-info -fqan
+ output : /cms/Role=NULL/Capability=NULL
+
+ error: 
+ retcode : 0
+DEBUG 2015-07-21 00:28:19,336: 	 Command use: checkwrite
+DEBUG 2015-07-21 00:28:19,336: 	 Options use: ['--site=T2_CH_CERN', '--lfn', '/store/group/phys_muon/lecriste']
+DEBUG 2015-07-21 00:28:19,336: 	 Instance is None
+DEBUG 2015-07-21 00:28:19,336: 	 Server base url is None
+DEBUG 2015-07-21 00:28:19,368: 	 Service initialised ({'endpoint': 'https://cmsweb.cern.ch/phedex/datasvc/json/prod/', 'key': '/tmp/x509up_u50855', 'maxcachereuse': 24.0, 'cachepath': '/tmp/.wmcore_cache_6L9BS6/cmsweb.cern.ch', 'inputdata': {}, 'cert': '/tmp/x509up_u50855', 'timeout': 300, 'service_name': 'PhEDEx', 'requests': {'endpoint': 'https://cmsweb.cern.ch/phedex/datasvc/json/prod/', 'key': '/tmp/x509up_u50855', 'req_cache_path': '/tmp/.wmcore_cache_6L9BS6/cmsweb.cern.ch/.cache', 'cachepath': '/tmp/.wmcore_cache_6L9BS6/cmsweb.cern.ch', 'host': 'https://cmsweb.cern.ch/phedex/datasvc/json/prod/', 'cacheduration': 0, 'cert': '/tmp/x509up_u50855', 'accept_type': 'text/html', 'timeout': 300, 'deleteCacheOnExit': <WMCore.Services.Requests.TempDirectory instance at 0x2266a70>, 'endpoint_components': ParseResult(scheme='https', netloc='cmsweb.cern.ch', path='/phedex/datasvc/json/prod/', params='', query='', fragment=''), 'logger': <logging.Logger object at 0x2652590>, 'content_type': 'application/x-www-form-urlencoded', 'conn': <httplib2.Http object at 0x226a190>}, 'logger': <logging.Logger object at 0x2652590>, 'cacheduration': 0, 'method': None}):
+	 host: cmsweb.cern.ch, basepath: https://cmsweb.cern.ch/phedex/datasvc/json/prod/ (text/html)
+	 cache: /tmp/.wmcore_cache_6L9BS6/cmsweb.cern.ch (duration 0 hours, max reuse 24.0 hours)
+INFO 2015-07-21 00:28:19,368: 	 Validating LFN /store/group/phys_muon/lecriste...
+INFO 2015-07-21 00:28:19,368: 	 LFN /store/group/phys_muon/lecriste is valid.
+INFO 2015-07-21 00:28:19,417: 	 Will use `gfal-copy`, `gfal-rm` commands for checking write permissions
+INFO 2015-07-21 00:28:19,417: 	 Will check write permission in /store/group/phys_muon/lecriste on site T2_CH_CERN
+DEBUG 2015-07-21 00:28:19,472: 	 getData: 
+	url: lfn2pfn
+	data: {'node': ['T2_CH_CERN'], 'custodial': 'n', 'lfn': ['/store/group/phys_muon/lecriste/crab3checkwrite.0.tmp'], 'protocol': 'srmv2'}
+INFO 2015-07-21 00:28:20,520: 	 Attempting to copy (dummy) file crab3checkwrite.0.tmp to /store/group/phys_muon/lecriste on site T2_CH_CERN
+INFO 2015-07-21 00:28:20,523: 	 Executing command: env -i X509_USER_PROXY=/tmp/x509up_u50855 gfal-copy -v -t 180 file:///cmshome/cristella/work/Z_analysis/exclusive/clean_14ott/CMSSW_5_3_22/src/UserCode/MuMuPiKPAT/test/sanjay/selector/pentaQuark/crab3checkwrite.0.tmp 'srm://srm-eoscms.cern.ch:8443/srm/v2/server?SFN=/eos/cms/store/group/phys_muon/lecriste/crab3checkwrite.0.tmp'
+INFO 2015-07-21 00:28:20,523: 	 Please wait...
+INFO 2015-07-21 00:28:23,675: 	 Successfully copied file crab3checkwrite.0.tmp to /store/group/phys_muon/lecriste on site T2_CH_CERN
+INFO 2015-07-21 00:28:23,675: 	 Attempting to delete file srm://srm-eoscms.cern.ch:8443/srm/v2/server?SFN=/eos/cms/store/group/phys_muon/lecriste/crab3checkwrite.0.tmp from site T2_CH_CERN
+INFO 2015-07-21 00:28:23,676: 	 Executing command: env -i X509_USER_PROXY=/tmp/x509up_u50855 gfal-rm -v -t 180 'srm://srm-eoscms.cern.ch:8443/srm/v2/server?SFN=/eos/cms/store/group/phys_muon/lecriste/crab3checkwrite.0.tmp'
+INFO 2015-07-21 00:28:23,676: 	 Please wait...
+INFO 2015-07-21 00:28:25,143: 	 Successfully deleted file srm://srm-eoscms.cern.ch:8443/srm/v2/server?SFN=/eos/cms/store/group/phys_muon/lecriste/crab3checkwrite.0.tmp from site T2_CH_CERN
+INFO 2015-07-21 00:28:25,144: 	 Success: Able to write in /store/group/phys_muon/lecriste on site T2_CH_CERN
+INFO 2015-07-21 00:28:25,172: 	 Note: You cannot write to a site if you did not ask permission.

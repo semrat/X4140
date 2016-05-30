@@ -1,0 +1,52 @@
+DEBUG 2014-10-28 16:27:09,581: 	 Executing command: 'status'
+DEBUG 2014-10-28 16:27:09,583: 	 Found /cmshome/cristella/.crab3 file
+DEBUG 2014-10-28 16:27:09,594: 	 Checking credentials
+DEBUG 2014-10-28 16:27:09,594: 	 Found proxy file /tmp/x509up_u50855
+DEBUG 2014-10-28 16:27:09,594: 	 Getting proxy life time left
+DEBUG 2014-10-28 16:27:10,298: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u50855 -timeleft
+ output : 73134
+
+ error: 
+ retcode : 0
+DEBUG 2014-10-28 16:27:11,002: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u50855 -actimeleft
+ output : 73134
+
+ error: 
+ retcode : 0
+DEBUG 2014-10-28 16:27:11,002: 	 Proxy valid for 20:18:54 hours
+ERROR 2014-10-28 16:27:11,005: 	 Cannot find .requestcache file inside the working directory for task crab_20141028_161902
+ERROR 2014-10-28 16:27:11,005: 	 Caught exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/crab3/slc5_amd64_gcc461/cms/crabclient/3.3.10/bin/crab", line 179, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/crab3/slc5_amd64_gcc461/cms/crabclient/3.3.10/bin/crab", line 164, in __call__
+    self.cmd = sub_cmd(self.logger, args[1:])
+  File "/cvmfs/cms.cern.ch/crab3/slc5_amd64_gcc461/cms/crabclient/3.3.10/lib/python2.6/site-packages/CRABClient/Commands/SubCommand.py", line 241, in __init__
+    self.loadLocalCache()
+  File "/cvmfs/cms.cern.ch/crab3/slc5_amd64_gcc461/cms/crabclient/3.3.10/lib/python2.6/site-packages/CRABClient/Commands/SubCommand.py", line 345, in loadLocalCache
+    self.cachedinfo, self.logfile = loadCache(self.requestarea, self.logger)
+  File "/cvmfs/cms.cern.ch/crab3/slc5_amd64_gcc461/cms/crabclient/3.3.10/lib/python2.6/site-packages/CRABClient/client_utilities.py", line 386, in loadCache
+    raise CachefileNotFoundException( msg )
+CachefileNotFoundException: Cannot find .requestcache file inside the working directory for task crab_20141028_161902
+DEBUG 2014-10-28 16:33:36,236: 	 Executing command: 'kill'
+DEBUG 2014-10-28 16:33:36,249: 	 Found /cmshome/cristella/.crab3 file
+ERROR 2014-10-28 16:33:36,258: 	 ERROR: Task option is required.
+ERROR 2014-10-28 16:33:36,258: 	 Caught exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/crab3/slc5_amd64_gcc461/cms/crabclient/3.3.10/bin/crab", line 179, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/crab3/slc5_amd64_gcc461/cms/crabclient/3.3.10/bin/crab", line 164, in __call__
+    self.cmd = sub_cmd(self.logger, args[1:])
+  File "/cvmfs/cms.cern.ch/crab3/slc5_amd64_gcc461/cms/crabclient/3.3.10/lib/python2.6/site-packages/CRABClient/Commands/SubCommand.py", line 192, in __init__
+    self.validateOptions()
+  File "/cvmfs/cms.cern.ch/crab3/slc5_amd64_gcc461/cms/crabclient/3.3.10/lib/python2.6/site-packages/CRABClient/Commands/kill.py", line 50, in validateOptions
+    SubCommand.validateOptions(self)
+  File "/cvmfs/cms.cern.ch/crab3/slc5_amd64_gcc461/cms/crabclient/3.3.10/lib/python2.6/site-packages/CRABClient/Commands/SubCommand.py", line 461, in validateOptions
+    raise MissingOptionException('ERROR: Task option is required.')
+MissingOptionException: ERROR: Task option is required.
+DEBUG 2014-10-29 17:26:31,146: 	 Executing command: 'resubmit'
+DEBUG 2014-10-29 17:26:31,148: 	 Found /cmshome/cristella/.crab3 file
+DEBUG 2014-10-29 19:39:25,834: 	 Executing command: 'status'
+DEBUG 2014-10-29 19:39:25,835: 	 Found /cmshome/cristella/.crab3 file

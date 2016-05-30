@@ -1,0 +1,2622 @@
+// -*- C++ -*-
+//
+// Package:    MuMuPiKPAT
+// Class:      MuMuPiKPAT
+// 
+/**\class MuMuPiKPAT MuMuPiKPAT.cc myAnalyzers/PsiPrimePiKPAT/src/MuMuPiKPAT.cc
+ 
+   Description: <one line class summary>
+   Make rootTuple for JPsiPiPi reconstruction
+ 
+   Implementation:
+   <Notes on implementation>
+*/
+//
+// Original Author:  Keith Ulmer   keith.ulmer@colorado.edu
+//
+//
+
+
+// system include files
+#include <memory>
+
+// user include files
+#include "../interface/MuMuPiKPAT.h"
+#include "../interface/VertexReProducer.h"
+//#include "DataFormats/Candidate/interface/OverlapChecker.h"
+
+#include "FWCore/Framework/interface/Frameworkfwd.h"
+#include "FWCore/Framework/interface/EDAnalyzer.h"
+#include "FWCore/Framework/interface/Event.h"
+#include "FWCore/Framework/interface/MakerMacros.h"
+#include "CommonTools/Statistics/interface/ChiSquaredProbability.h"
+
+#include "FWCore/ServiceRegistry/interface/Service.h"
+#include "CommonTools/UtilAlgos/interface/TFileService.h"
+#include "DataFormats/Common/interface/Handle.h"
+#include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerReadoutRecord.h"
+#include "DataFormats/Common/interface/TriggerResults.h"
+#include "DataFormats/L1GlobalTrigger/interface/L1GtFdlWord.h"
+#include "FWCore/Common/interface/TriggerNames.h"
+
+#include "DataFormats/Candidate/interface/VertexCompositeCandidate.h"
+#include "FWCore/ParameterSet/interface/ParameterSet.h"
+//#include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"
+
+#include "RecoVertex/KinematicFitPrimitives/interface/MultiTrackKinematicConstraint.h"
+#include "RecoVertex/KinematicFit/interface/KinematicConstrainedVertexFitter.h"
+#include "RecoVertex/AdaptiveVertexFit/interface/AdaptiveVertexFitter.h"
+#include "RecoVertex/KinematicFit/interface/TwoTrackMassKinematicConstraint.h"
+
+#include "RecoVertex/VertexTools/interface/VertexDistanceXY.h"
+
+#include "TrackingTools/TransientTrack/interface/TransientTrackBuilder.h"
+#include "TrackingTools/Records/interface/TransientTrackRecord.h"
+#include "TrackingTools/TransientTrack/interface/TransientTrack.h"
+#include "MagneticField/Engine/interface/MagneticField.h"
+#include "TrackingTools/PatternTools/interface/TwoTrackMinimumDistance.h"
+#include "TrackingTools/IPTools/interface/IPTools.h"
+
+//#include "TrackingTools/Records/interface/TrackingComponentsRecord.h"
+
+#include "DataFormats/Common/interface/RefToBase.h"
+#include "DataFormats/Candidate/interface/ShallowCloneCandidate.h"
+#include "DataFormats/HepMCCandidate/interface/GenParticle.h"
+#include "DataFormats/Candidate/interface/CandMatchMap.h"
+#include "DataFormats/Math/interface/Error.h"
+#include "DataFormats/Math/interface/LorentzVector.h"
+#include "DataFormats/Math/interface/Point3D.h"
+#include "DataFormats/Math/interface/Vector3D.h"
+
+#include "DataFormats/PatCandidates/interface/Muon.h"
+#include "DataFormats/MuonReco/interface/MuonSelectors.h"
+#include "DataFormats/PatCandidates/interface/GenericParticle.h"
+
+#include "DataFormats/Common/interface/ValueMap.h"
+#include "DataFormats/TrackReco/interface/DeDxData.h"
+
+//for 53x 
+#include "Geometry/CaloGeometry/interface/CaloGeometry.h"
+#include "Geometry/Records/interface/CaloGeometryRecord.h"
+
+#include "TFile.h"
+#include "TTree.h"
+#include "TVector3.h"
+
+#include <vector>
+#include <utility>
+
+#include "TMath.h"
+#include "Math/VectorUtil.h"
+
+
+//
+// constants, enums and typedefs
+//
+
+typedef math::Error<3>::type CovarianceMatrix;
+
+const ParticleMass muon_mass = 0.10565837; //pdg mass
+const ParticleMass pion_mass = 0.13957018; //pdg mass
+const ParticleMass kaon_mass = 0.493667;
+ParticleMass Jpsi_mass = 3.096916;
+ParticleMass psi2S_mass = 3.686093;
+
+//Setting insignificant mass sigma to avoid singularities in the covariance matrix.
+float muon_sigma = muon_mass*1.e-6;				
+float pion_sigma = pion_mass*1.e-6;
+float kaon_sigma = kaon_mass*1.e-6;
+
+//
+// static data member definitions
+//
+
+//
+// constructors and destructor
+//
+MuMuPiKPAT::MuMuPiKPAT(const edm::ParameterSet& iConfig) :
+  hlTriggerResults_(iConfig.getUntrackedParameter<edm::InputTag>("HLTriggerResults",edm::InputTag("TriggerResults::HLT")) ),
+  inputGEN_(iConfig.getUntrackedParameter<edm::InputTag>("inputGEN",edm::InputTag("genParticles"))),
+  vtxSample(iConfig.getUntrackedParameter<std::string>("VtxSample",std::string("offlinePrimaryVertices"))), 
+  ///// li lascio ma ineffettivi
+  doMC(iConfig.getUntrackedParameter<bool>("DoMonteCarloTree", false)),
+  MCParticle( iConfig.getUntrackedParameter<int>("MonteCarloParticleId", 20443) ), //20443 X, 100443 Psi(2S), 9120443 X from B
+  ////////
+  doPsiPrimeMassConst( iConfig.getUntrackedParameter<bool>("DoPsiPrimeMassConstraint", true) ),
+
+  skipPsi2S(iConfig.getUntrackedParameter<bool>("SkipPsi2S", false)),
+
+  MuMinPixHits(iConfig.getUntrackedParameter<int>("MinNumMuPixHits", 0)),
+  MuMinSiHits(iConfig.getUntrackedParameter<int>("MinNumMuSiHits", 0)),
+  MuMaxNormChi(iConfig.getUntrackedParameter<double>("MaxMuNormChi2", 1000)),
+  MuMaxD0(iConfig.getUntrackedParameter<double>("MaxMuD0", 1000)),
+
+  JPsiMaxMass(iConfig.getUntrackedParameter<double>("MaxJPsiMass", 3.2)),
+  JPsiMinMass(iConfig.getUntrackedParameter<double>("MinJPsiMass", 2.7)),
+  PsiPrimeMinMass(iConfig.getUntrackedParameter<double>("MinPsiPrimeMass", 3.)),
+  PsiPrimeMaxMass(iConfig.getUntrackedParameter<double>("MaxPsiPrimeMass", 4.)),
+  
+  TrMinSiHits(iConfig.getUntrackedParameter<int>("MinNumTrSiHits", 0)),
+  TrMinPt(iConfig.getUntrackedParameter<double>("MinTrPt", 0)),
+  TrMaxNormChi2(iConfig.getUntrackedParameter<double>("MaxTrChi2NDF", 10)),
+
+  PsiPrimeTrackMaxDR(iConfig.getUntrackedParameter<double>("MaxPsiPrimeTrackDR", 1)),
+  TriggersForMatching_(iConfig.getUntrackedParameter<std::vector<std::string> >("TriggersForMatching")),
+  FiltersForMatching_(iConfig.getUntrackedParameter<std::vector<std::string> >("FiltersForMatching")),
+  resolveAmbiguity_(iConfig.getUntrackedParameter<bool>("resolvePileUpAmbiguity",true)),
+  addMuMulessPrimaryVertex_(iConfig.getUntrackedParameter<bool>("addMuMulessPrimaryVertex", true)),
+  // Z
+  ZTrackMaxDR(iConfig.getUntrackedParameter<double>("MaxZCandTrackDR", 1.1)),
+  UseZDR(iConfig.getUntrackedParameter<bool>("UseZDR", false)),
+  PsiPrimePiMinMass(iConfig.getUntrackedParameter<double>("MinPsiPrimePiMass", 0)),
+  PsiPrimePiMaxMass(iConfig.getUntrackedParameter<double>("MaxPsiPrimePiMass", 10)),
+  addZlessPrimaryVertex_(iConfig.getUntrackedParameter<bool>("addZlessPrimaryVertex", true)),
+
+  // X
+  XTrackMaxDR(iConfig.getUntrackedParameter<double>("MaxXCandTrackDR", 1.1)),
+  UseXDR(iConfig.getUntrackedParameter<bool>("UseXDR", false)),
+  PsiPrimePiPiMinMass(iConfig.getUntrackedParameter<double>("MinPsiPrimePiPiMass", 0)),
+  PsiPrimePiPiMaxMass(iConfig.getUntrackedParameter<double>("MaxPsiPrimePiPiMass", 10)),
+  addXlessPrimaryVertex_(iConfig.getUntrackedParameter<bool>("addXlessPrimaryVertex",true)),
+
+  // B0
+  B0TrackMaxDR(iConfig.getUntrackedParameter<double>("MaxB0CandTrackDR", 1.1)),
+  UseB0DR(iConfig.getUntrackedParameter<bool>("UseB0DR", false)),
+  PsiPrimePiKMinMass(iConfig.getUntrackedParameter<double>("MinPsiPrimePiKMass", 0)),
+  PsiPrimePiKMaxMass(iConfig.getUntrackedParameter<double>("MaxPsiPrimePiKMass", 10)),
+  addB0lessPrimaryVertex_(iConfig.getUntrackedParameter<bool>("addB0lessPrimaryVertex",true)),
+
+  Debug_(iConfig.getUntrackedParameter<bool>("Debug_Output",false)),
+  DeDxEstimator_(iConfig.getUntrackedParameter<std::string>("DeDxEstimator",std::string("dedxHarmonic2"))),
+
+  Z_One_Tree_(0),
+
+  runNum(0), evtNum(0), lumiNum(0),
+
+  trigRes(0), trigNames(0), L1TT(0), MatchTriggerNames(0), 
+
+  nMu(0), nPsiPrime(0), nB0(0), nZ(0), nX(0), 
+  priVtx_X(0), priVtx_Y(0), priVtx_Z(0), priVtx_XE(0), priVtx_YE(0), priVtx_ZE(0), priVtx_NormChi2(0), priVtx_Chi2(0), priVtx_CL(0), priVtx_tracks(0),  
+
+  // indices
+  mu1Idx(0), mu2Idx(0), jtype(0),
+  // Z
+  Z_psiPrimeIdx(0), Z_piIdx(0),
+  // X
+  X_psiPrimeIdx(0), X_pi1Idx(0), X_pi2Idx(0),
+  // B0
+  B0_psiPrimeIdx(0), B0_piIdx(0), B0_kIdx(0),   
+
+  // generic muons
+  muPx(0), muPy(0), muPz(0), muD0(0), muDz(0), muChi2(0), muNDF(0),
+  mufHits(0), muFirstBarrel(0), muFirstEndCap(0),
+  muDzVtx(0), muDxyVtx(0),
+  muPhits(0), muShits(0), muLayersTr(0), muLayersPix(0), muD0E(0), muDzVtxErr(0), muKey(0),
+  //muNDF(0), muGlNDF(0),muPhits(0), muShits(0), muGlMuHits(0), muType(0), muQual(0), 
+  muGlChi2(0), muGlNDF(0), muGlMuHits(0), muGlMatchedStation(0), muGlDzVtx(0), muGlDxyVtx(0),
+  muType(0), muQual(0),
+  muTrack(0), muCharge(0),
+
+  // generic tracks
+  trPx(0), trPy(0), trPz(0), trE(0),
+  trNDF(0), trPhits(0), trShits(0), trChi2(0),
+
+  trfHits(0), trFirstBarrel(0), trFirstEndCap(0),
+  trDzVtx(0), trDxyVtx(0),
+  trD0(0), trD0E(0), trCharge(0),
+  trQualityHighPurity(0), trQualityTight(0),
+
+  tr_nsigdedx(0), tr_dedx(0), tr_dedxMass(0), tr_theo(0), tr_sigma(0),
+
+  // Psi'
+  psiPrimeMass(0), psiPrimePx(0), psiPrimePy(0), psiPrimePz(0),
+  psiPrimeVtx_CL(0), psiPrimeVtx_Chi2(0), 
+  psiPrimeDecayVtx_X(0), psiPrimeDecayVtx_Y(0), psiPrimeDecayVtx_Z(0),
+  psiPrimeDecayVtx_XE(0), psiPrimeDecayVtx_YE(0), psiPrimeDecayVtx_ZE(0),
+  PsiPrimeMuonTrigMatch(0),
+  // muons after Psi' fit
+  mu1_MuMu_Px(0), mu1_MuMu_Py(0), mu1_MuMu_Pz(0), mu1_MuMu_Chi2(0), mu1_MuMu_NDF(0),
+  mu2_MuMu_Px(0), mu2_MuMu_Py(0), mu2_MuMu_Pz(0), mu2_MuMu_Chi2(0), mu2_MuMu_NDF(0),
+  // Primary Vertex with "MuMu correction"
+  PriVtxMuMuCorr_X(0), PriVtxMuMuCorr_Y(0), PriVtxMuMuCorr_Z(0), PriVtxMuMuCorr_EX(0), PriVtxMuMuCorr_EY(0), PriVtxMuMuCorr_EZ(0),
+  PriVtxMuMuCorr_Chi2(0), PriVtxMuMuCorr_CL(0), PriVtxMuMuCorr_tracks(0),
+
+  // Z 
+  MuMuPiMass(0), MuMuPiVtx_CL(0), MuMuPiVtx_Chi2(0), 
+  MuMuPiPx(0), MuMuPiPy(0), MuMuPiPz(0), MuMuPiPxE(0), MuMuPiPyE(0), MuMuPiPzE(0), 
+  MuMuPiDecayVtx_X(0), MuMuPiDecayVtx_Y(0), MuMuPiDecayVtx_Z(0), MuMuPiDecayVtx_XE(0), MuMuPiDecayVtx_YE(0), MuMuPiDecayVtx_ZE(0),
+  // Muons and pions/tracks after Z Cand fit
+  piPx_MuMuPi(0), piPy_MuMuPi(0), piPz_MuMuPi(0), piE_MuMuPi(0),
+  mu1Px_MuMuPi(0), mu1Py_MuMuPi(0), mu1Pz_MuMuPi(0), mu1E_MuMuPi(0),
+  mu2Px_MuMuPi(0), mu2Py_MuMuPi(0), mu2Pz_MuMuPi(0), mu2E_MuMuPi(0),
+  // Primary Vertex with largest Z_cos(alpha)
+  PriVtx_ZCosAlpha_X(0), PriVtx_ZCosAlpha_Y(0), PriVtx_ZCosAlpha_Z(0), PriVtx_ZCosAlpha_EX(0), PriVtx_ZCosAlpha_EY(0), PriVtx_ZCosAlpha_EZ(0),
+  PriVtx_ZCosAlpha_Chi2(0), PriVtx_ZCosAlpha_CL(0), PriVtx_ZCosAlpha_tracks(0),
+  // Primary Vertex with "Z correction"
+  PriVtxZCorr_X(0), PriVtxZCorr_Y(0), PriVtxZCorr_Z(0), PriVtxZCorr_EX(0), PriVtxZCorr_EY(0), PriVtxZCorr_EZ(0),
+  PriVtxZCorr_Chi2(0), PriVtxZCorr_CL(0), PriVtxZCorr_tracks(0),
+
+  zLxyPV(0), zCosAlphaPV(0), zCTauPV(0), zCTauPVE(0),
+  zLxyPVCosAlpha(0), zCosAlphaPVCosAlpha(0), zCTauPVCosAlpha(0), zCTauPVCosAlphaE(0),
+  zLxyPVX(0), zCosAlphaPVX(0), zCTauPVX(0), zCTauPVXE(0),
+  zLxyBS(0), zCosAlphaBS(0), zCTauBS(0), zCTauBSE(0),
+  zCTauPVX_3D(0), zCTauPVX_3D_err(0),
+
+
+  // X  
+  xMass(0), xVtx_CL(0), xVtx_Chi2(0),
+  xPx(0), xPy(0), xPz(0), xPxE(0), xPyE(0), xPzE(0), 
+  xDecayVtx_X(0), xDecayVtx_Y(0), xDecayVtx_Z(0), xDecayVtx_XE(0), xDecayVtx_YE(0), xDecayVtx_ZE(0),
+  // Muons and pions after X cand fit
+  mu1Px_MuMuPiPi(0), mu1Py_MuMuPiPi(0), mu1Pz_MuMuPiPi(0), mu1E_MuMuPiPi(0),
+  mu2Px_MuMuPiPi(0), mu2Py_MuMuPiPi(0), mu2Pz_MuMuPiPi(0), mu2E_MuMuPiPi(0),
+  pi1Px_MuMuPiPi(0), pi1Py_MuMuPiPi(0), pi1Pz_MuMuPiPi(0), pi1E_MuMuPiPi(0),
+  pi2Px_MuMuPiPi(0), pi2Py_MuMuPiPi(0), pi2Pz_MuMuPiPi(0), pi2E_MuMuPiPi(0), 
+  // Primary Vertex with largest X_cos(alpha)
+  PriVtx_XCosAlpha_X(0), PriVtx_XCosAlpha_Y(0), PriVtx_XCosAlpha_Z(0), PriVtx_XCosAlpha_EX(0), PriVtx_XCosAlpha_EY(0), PriVtx_XCosAlpha_EZ(0),
+  PriVtx_XCosAlpha_Chi2(0), PriVtx_XCosAlpha_CL(0), PriVtx_XCosAlpha_tracks(0),
+  // Primary Vertex with "X correction"
+  PriVtxXCorr_X(0), PriVtxXCorr_Y(0), PriVtxXCorr_Z(0), PriVtxXCorr_EX(0), PriVtxXCorr_EY(0), PriVtxXCorr_EZ(0),
+  PriVtxXCorr_Chi2(0), PriVtxXCorr_CL(0), PriVtxXCorr_tracks(0),
+
+  xLxyPV(0), xCosAlphaPV(0), xCTauPV(0), xCTauPVE(0),
+  xLxyPVCosAlpha(0), xCosAlphaPVCosAlpha(0), xCTauPVCosAlpha(0), xCTauPVCosAlphaE(0),
+  xLxyBS(0), xCosAlphaBS(0), xCTauBS(0), xCTauBSE(0),
+  xLxyPVX(0), xCosAlphaPVX(0), xCTauPVX(0), xCTauPVXE(0),
+  xCTauPVX_3D(0), xCTauPVX_3D_err(0),
+
+  // B0  
+  b0Mass(0), b0Vtx_CL(0), b0Vtx_Chi2(0),
+  b0Px(0), b0Py(0), b0Pz(0), b0PxE(0), b0PyE(0), b0PzE(0), 
+  b0DecayVtx_X(0), b0DecayVtx_Y(0), b0DecayVtx_Z(0), b0DecayVtx_XE(0), b0DecayVtx_YE(0), b0DecayVtx_ZE(0),
+  // Muons and pions/tracks after B0 Cand fit
+  mu1Px_MuMuPiK(0), mu1Py_MuMuPiK(0), mu1Pz_MuMuPiK(0), mu1E_MuMuPiK(0),
+  mu2Px_MuMuPiK(0), mu2Py_MuMuPiK(0), mu2Pz_MuMuPiK(0), mu2E_MuMuPiK(0),
+  piPx_MuMuPiK(0), piPy_MuMuPiK(0), piPz_MuMuPiK(0), piE_MuMuPiK(0),
+  kPx_MuMuPiK(0), kPy_MuMuPiK(0), kPz_MuMuPiK(0), kE_MuMuPiK(0), 
+  // Primary Vertex with largest B0_cos(alpha)
+  PriVtx_B0CosAlpha_X(0), PriVtx_B0CosAlpha_Y(0), PriVtx_B0CosAlpha_Z(0), PriVtx_B0CosAlpha_EX(0), PriVtx_B0CosAlpha_EY(0), PriVtx_B0CosAlpha_EZ(0),
+  PriVtx_B0CosAlpha_Chi2(0), PriVtx_B0CosAlpha_CL(0), PriVtx_B0CosAlpha_tracks(0),
+  // Primary Vertex with "B0 correction"
+  PriVtxB0Corr_X(0), PriVtxB0Corr_Y(0), PriVtxB0Corr_Z(0), PriVtxB0Corr_EX(0), PriVtxB0Corr_EY(0), PriVtxB0Corr_EZ(0),
+  PriVtxB0Corr_Chi2(0), PriVtxB0Corr_CL(0), PriVtxB0Corr_tracks(0),
+
+  b0LxyPV(0), b0CosAlphaPV(0), b0CTauPV(0), b0CTauPVE(0), 
+  b0LxyPVCosAlpha(0), b0CosAlphaPVCosAlpha(0), b0CTauPVCosAlpha(0), b0CTauPVCosAlphaE(0),
+  b0LxyPVX(0), b0CosAlphaPVX(0), b0CTauPVX(0), b0CTauPVXE(0),
+  b0LxyBS(0), b0CosAlphaBS(0), b0CTauBS(0), b0CTauBSE(0),
+  b0CTauPVX_3D(0), b0CTauPVX_3D_err(0),
+
+  PiPiMass_err(0)
+
+{
+  //string DoubleMu0 = "HLT_DoubleMu0"; 
+  //TriggersForMatching.push_back(DoubleMu0);
+  //string DoubleMu0_Quark = "HLT_DoubleMuO_Quarkonium_V1";
+  //TriggersForMatching.push_back(DoubleMu0_Quark);
+  //now do what ever initialization is needed
+}
+
+
+MuMuPiKPAT::~MuMuPiKPAT()
+{
+  // do anything here that needs to be done at desctruction time
+  // (e.g. close files, deallocate resources etc.)
+	
+}
+
+
+//
+// member functions
+//
+
+// ------------ method called to for each event  ------------
+void MuMuPiKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
+{	
+  // get event content information
+	
+  runNum = iEvent.id().run();
+  evtNum = iEvent.id().event();
+  lumiNum = iEvent.id().luminosityBlock();
+  bool hasRequestedTrigger = false;
+  ESHandle<MagneticField> bFieldHandle;
+  iSetup.get<IdealMagneticFieldRecord>().get(bFieldHandle);
+	
+  // first get HLT results
+  map<string,int> HLTPreScaleMap;
+
+  edm::Handle<edm::TriggerResults> hltresults;
+  try {
+    iEvent.getByLabel(hlTriggerResults_, hltresults);
+  }
+  catch ( ... ) {
+    cout << "Couldn't get handle on HLT Trigger!" << endl;
+  }
+  if (!hltresults.isValid()) {
+    cout << "No Trigger Results!" << endl;
+  } 
+  else {
+    int ntrigs=hltresults->size();
+    if (ntrigs==0){
+      cout << "No trigger name given in TriggerResults of the input " << endl;
+    } 
+		
+    // get hold of trigger names - based on TriggerResults object!
+    edm::TriggerNames triggerNames_;
+    //     triggerNames_.init(*hltresults); 
+    triggerNames_ = iEvent.triggerNames(*hltresults);
+	
+    int ntriggers = TriggersForMatching_.size();
+    for (int MatchTrig=0; MatchTrig<ntriggers; MatchTrig++){
+      MatchingTriggerResult[MatchTrig]= 0;
+    }
+
+    for (int itrig=0; itrig< ntrigs; itrig++) {
+      string trigName = triggerNames_.triggerName(itrig);
+      int hltflag = (*hltresults)[itrig].accept();
+      if (hltflag) cout << trigName << " " <<hltflag <<endl;
+      trigRes->push_back(hltflag);
+      trigNames->push_back(trigName);
+      
+      int ntriggers = TriggersForMatching_.size();
+      for (int MatchTrig=0; MatchTrig<ntriggers; MatchTrig++) {
+	if (TriggersForMatching_[MatchTrig] == triggerNames_.triggerName(itrig)){
+	  MatchingTriggerResult[MatchTrig] = hltflag;
+	  if (hltflag==1) hasRequestedTrigger = true;
+	  break;
+	}
+      }
+    }
+    //int ntriggers = TriggersForMatching_.size();
+    for (int MatchTrig=0; MatchTrig<ntriggers; MatchTrig++){
+      //      cout << TriggersForMatching_[MatchTrig]<<endl;
+      MatchTriggerNames->push_back(TriggersForMatching_[MatchTrig]);
+    }
+    
+    //
+    // Get HLT map : triggername associated with its prescale, saved only for accepted trigger
+    //
+    for (unsigned int i=0; i<triggerNames_.size(); i++){
+      if ( hltresults->accept(i) ) { //  save trigger info only for accepted paths
+	// get the prescale from the HLTConfiguration, initialized at beginRun
+	int prescale = hltConfig_.prescaleValue(iEvent,iSetup,triggerNames_.triggerNames().at(i));
+	//std::cout<<" HLT===> "<<triggerNames_.triggerNames().at(i)<<" prescale ="<<prescale<<std::endl;
+	HLTPreScaleMap[triggerNames_.triggerNames().at(i)] = prescale;
+      }
+    }
+    HLTTrig = &HLTPreScaleMap; // store in the branch
+
+  } // end valid trigger
+
+	
+  // get L1 trigger info
+	
+  edm::ESHandle<L1GtTriggerMenu> menuRcd;
+  iSetup.get<L1GtTriggerMenuRcd>().get(menuRcd) ;
+
+  //const L1GtTriggerMenu* menu = menuRcd.product();
+	
+  edm::Handle< L1GlobalTriggerReadoutRecord > gtRecord;
+  iEvent.getByLabel( edm::InputTag("gtDigis"), gtRecord);
+  const DecisionWord dWord = gtRecord->decisionWord();  
+	
+  const TechnicalTriggerWord ttWord = gtRecord->technicalTriggerWord();
+  for(unsigned int l1i=0; l1i!=ttWord.size(); ++l1i){
+    L1TT->push_back(ttWord.at(l1i));
+  }
+	
+  Vertex thePrimaryVtx;
+  Vertex theBeamSpotVtx;
+  math::XYZPoint RefVtx;
+	
+  reco::BeamSpot beamSpot;
+  edm::Handle<reco::BeamSpot> beamSpotHandle;
+  iEvent.getByLabel("offlineBeamSpot", beamSpotHandle);
+  if ( beamSpotHandle.isValid() ) {
+    beamSpot = *beamSpotHandle; 
+    theBeamSpotVtx = Vertex(beamSpot.position(), beamSpot.covariance3D());
+  }
+  else cout << "No beam spot available from EventSetup" << endl;
+	
+	
+  Handle<VertexCollection> recVtxs;
+  iEvent.getByLabel(vtxSample, recVtxs);
+  unsigned int nVtxTrks = 0;
+  if ( recVtxs->begin() != recVtxs->end() ) {
+    if (addMuMulessPrimaryVertex_ || addZlessPrimaryVertex_ || addXlessPrimaryVertex_ || addB0lessPrimaryVertex_ || resolveAmbiguity_) { 
+      thePrimaryVtx = Vertex(*(recVtxs->begin()));
+    }
+    else {
+      for ( reco::VertexCollection::const_iterator vtx = recVtxs->begin(); vtx != recVtxs->end(); ++vtx) {
+	if (nVtxTrks < vtx->tracksSize() ) {
+	  nVtxTrks = vtx->tracksSize();
+	  thePrimaryVtx = Vertex(*vtx);
+	}				
+      }
+    }
+  }
+  else {
+    thePrimaryVtx = Vertex(beamSpot.position(), beamSpot.covariance3D());
+  }
+	
+  edm::ESHandle<TransientTrackBuilder> theTTBuilder;
+  iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder",theTTBuilder);
+  KalmanVertexFitter vtxFitter(true);
+
+  RefVtx = thePrimaryVtx.position(); //reference primary vertex choosen	
+	
+  priVtx_X = (thePrimaryVtx.position().x()) ;
+  priVtx_Y = (thePrimaryVtx.position().y()) ;
+  priVtx_Z = (thePrimaryVtx.position().z()) ;
+  priVtx_XE = (thePrimaryVtx.xError()) ;	
+  priVtx_YE = (thePrimaryVtx.yError()) ;
+  priVtx_ZE = (thePrimaryVtx.zError()) ;
+  priVtx_NormChi2 = (thePrimaryVtx.normalizedChi2()) ;
+  priVtx_Chi2 = thePrimaryVtx.chi2() ;
+  priVtx_CL = ChiSquaredProbability( (double)(thePrimaryVtx.chi2()), (double)(thePrimaryVtx.ndof())) ;
+  priVtx_tracks = thePrimaryVtx.tracksSize() ;
+	
+  //  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  // try reconstruction without fitting modules
+  //  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	
+  Handle< vector<pat::GenericParticle> > thePATTrackHandle;
+  iEvent.getByLabel("cleanPatTrackCands", thePATTrackHandle);
+	
+  Handle< vector<pat::Muon> > thePATMuonHandle;
+  iEvent.getByLabel("patMuonsWithTrigger", thePATMuonHandle);
+	
+  Handle<reco::DeDxDataValueMap> elossCollection;
+  energyLoss=0;
+  iexception_dedx=0;
+  try {
+    //iEvent.getByLabel("dedxHarmonic2", elossCollection);
+    iEvent.getByLabel(DeDxEstimator_, elossCollection);
+    energyLoss = elossCollection.product();
+  } catch ( cms::Exception& ex ) {
+    if (evtNum<100) edm::LogError("Analyzer") <<"Warning can't get collection with label : elossCollection";
+    iexception_dedx=1;
+  }
+	
+	
+  bool isEventWithInvalidMu = false;
+	
+  if (Debug_) {
+    cout << "starting event with " << thePATTrackHandle->size() << " tracks, and " << thePATMuonHandle->size() << " muons" << endl;
+  }
+  if ((thePATMuonHandle->size()) * (thePATTrackHandle->size()) > 20000) {
+    cout << "Too many Muons: " << thePATMuonHandle->size() << " and Tracks " << thePATTrackHandle->size() << endl;
+  }
+  //
+  else //if (thePATMuonHandle->size() >= 2) {
+    if (thePATMuonHandle->size() >= 2  && hasRequestedTrigger) {
+      if (Debug_) cout <<"============================  evt: " <<evtNum <<" Accept event with 2 mu and TRIGGER ==============================================" <<endl;
+      
+      //filling track tree
+
+      for ( vector<pat::GenericParticle>::const_iterator iTr = thePATTrackHandle->begin();
+	    iTr != thePATTrackHandle->end(); ++iTr ) {
+
+	pat::GenericParticle tr = *iTr;
+	trPx->push_back(tr.px());
+	trPy->push_back(tr.py());
+	trPz->push_back(tr.pz());
+	trE->push_back(tr.energy());
+	
+	trNDF->push_back(tr.track()->ndof());
+	trPhits->push_back(tr.track()->hitPattern().numberOfValidPixelHits());
+	trShits->push_back(tr.track()->hitPattern().numberOfValidStripHits());
+	trChi2->push_back(tr.track()->chi2());
+	
+	trD0->push_back(tr.track()->d0());
+	trD0E->push_back(tr.track()->d0Error());
+	trCharge->push_back(tr.charge());
+	
+	float hits = (1.0*tr.track()->found() )/ (tr.track()->found()+ tr.track()->lost() + tr.track()->trackerExpectedHitsInner().numberOfHits() + tr.track()->trackerExpectedHitsOuter().numberOfHits());
+	trfHits->push_back(hits);
+	trFirstBarrel->push_back(tr.track()->hitPattern().hasValidHitInFirstPixelBarrel());
+	trFirstEndCap->push_back(tr.track()->hitPattern().hasValidHitInFirstPixelEndcap());
+	trDzVtx->push_back(tr.track()->dz(RefVtx));
+	trDxyVtx->push_back(tr.track()->dxy(RefVtx));
+	
+	double theo =0. ;
+	double sigma =0. ;
+	
+	tr_nsigdedx->push_back(nsigmaofdedx(tr.track(),theo,sigma));
+	tr_dedx->push_back(getEnergyLoss(tr.track()));
+	tr_dedxMass->push_back(GetMass(tr.track()));
+	tr_theo->push_back(theo);
+	tr_sigma->push_back(sigma);
+	
+	//  Track quality:            
+	//// loose=0, tight=1, highPurity=2, confirmed=3, goodIterative=4, looseSetWithPV=5, highPuritySetWithPV=6
+	bool ishighPurity = tr.track()->quality(reco::TrackBase::highPurity);
+	trQualityHighPurity->push_back(ishighPurity);
+	trQualityTight->push_back(tr.track()->quality(reco::TrackBase::tight));
+      }
+      
+      //get Z and PsiPrime cands
+      for ( std::vector<pat::Muon>::const_iterator Muon1 = thePATMuonHandle->begin();
+	    Muon1 != thePATMuonHandle->end(); ++Muon1) {
+
+	// push back all muon information
+	++nMu;
+	const reco::Muon* rmu1 = dynamic_cast<const reco::Muon * >(Muon1->originalObject());
+	muPx->push_back(rmu1->px());
+	muPy->push_back(rmu1->py());
+	muPz->push_back(rmu1->pz());
+	muCharge->push_back(rmu1->charge());
+	
+	if (rmu1->track().isNull()) { // rmu->track() returns innerTrack();
+	  //	 cout << "no track for " << std::distance(thePATMuonHandle->begin(), Muon1) << " filling defaults" << endl;
+	  ///AF
+	  muD0->push_back(0);
+	  muDz->push_back(0);
+	  muChi2->push_back(0);
+	  muNDF->push_back(-1);
+	  muPhits->push_back(0);
+	  muShits->push_back(0);
+
+	  muLayersTr->push_back(0);
+	  muLayersPix->push_back(0);
+	  muDzVtx->push_back(0);
+	  muDxyVtx->push_back(0);
+	  mufHits->push_back(0);
+	  muFirstBarrel->push_back(0);
+	  muFirstEndCap->push_back(0);
+	  muD0E->push_back(0);
+	  muDzVtxErr->push_back(0);
+	  muKey->push_back(0);
+	  
+	  muGlChi2->push_back(0); 
+	  muGlNDF->push_back(-1);
+	  muGlMuHits->push_back(0);
+	  muGlMatchedStation->push_back(0);
+	  muGlDzVtx->push_back(0);
+	  muGlDxyVtx->push_back(0);
+	  
+	  if (Debug_) cout <<"evt:" <<evtNum << "no track for PAT muon " <<std::distance(thePATMuonHandle->begin(), Muon1) <<" skipping muon... should skip event instead" <<endl;
+	  isEventWithInvalidMu = true;
+	  continue;
+	}
+	else {
+	  muD0->push_back(rmu1->track()->d0());
+	  muDz->push_back(rmu1->track()->dz());
+	  muChi2->push_back(rmu1->track()->chi2());
+	  muNDF->push_back(rmu1->track()->ndof());
+	  muPhits->push_back(rmu1->track()->hitPattern().numberOfValidPixelHits());
+	  muShits->push_back(rmu1->track()->hitPattern().numberOfValidStripHits());
+	  /*
+	    muDzVtx->push_back(rmu1->track()->dz(RefVtx));
+	    muDxyVtx->push_back(rmu1->track()->dxy(RefVtx));
+	    
+	    mufHits->push_back((1.0*rmu1->track()->found())/ (rmu1->track()->found()+ rmu1->track()->lost() + rmu1->track()->trackerExpectedHitsInner().numberOfHits() + rmu1->track()->trackerExpectedHitsOuter().numberOfHits() ) );
+	    muFirstBarrel->push_back(rmu1->track()->hitPattern().hasValidHitInFirstPixelBarrel());
+	    muFirstEndCap->push_back(rmu1->track()->hitPattern().hasValidHitInFirstPixelEndcap());
+	  */
+	  if (Debug_) cout <<"evt:" <<evtNum <<" trackerLayersWithMeasurement=" <<rmu1->track()->hitPattern().trackerLayersWithMeasurement() <<endl;
+	  if ( !(rmu1->track()->hitPattern().trackerLayersWithMeasurement()) ) { 
+	    isEventWithInvalidMu = true;
+	    if (Debug_) cout <<"evt:" <<evtNum <<" problem with trackerLayersWithMeasurement" <<endl;
+	    continue ;
+	  }
+	  if ( !(rmu1->track()->hitPattern().pixelLayersWithMeasurement()) ) {
+	    isEventWithInvalidMu = true;
+	    continue ;
+	  }
+	  muLayersTr->push_back(rmu1->track()->hitPattern().trackerLayersWithMeasurement());
+	  muLayersPix->push_back(rmu1->track()->hitPattern().pixelLayersWithMeasurement());	
+	  muDzVtx->push_back(rmu1->track()->dz(RefVtx));
+	  muDxyVtx->push_back(rmu1->track()->dxy(RefVtx));
+	  mufHits->push_back((1.0*rmu1->track()->found())/ (rmu1->track()->found()+ rmu1->track()->lost() + rmu1->track()->trackerExpectedHitsInner().numberOfHits() + rmu1->track()->trackerExpectedHitsOuter().numberOfHits() ) );
+	  if (Debug_) cout <<"mu found " <<rmu1->track()->found() <<" fHits=" <<(1.0*rmu1->track()->found())/ (rmu1->track()->found()+ rmu1->track()->lost() + rmu1->track()->trackerExpectedHitsInner().numberOfHits() + rmu1->track()->trackerExpectedHitsOuter().numberOfHits() ) <<endl;
+	  muFirstBarrel->push_back(rmu1->track()->hitPattern().hasValidHitInFirstPixelBarrel());
+	  muFirstEndCap->push_back(rmu1->track()->hitPattern().hasValidHitInFirstPixelEndcap());
+	  muD0E->push_back(rmu1->track()->d0Error());
+	  muDzVtxErr->push_back(rmu1->track()->dzError());
+	  muKey->push_back(rmu1->track().key());
+	  
+	}
+	
+	if (rmu1->globalTrack().isNull()) { 
+	  muGlChi2->push_back(0);
+	  muGlNDF->push_back(-1);
+	  muGlMuHits->push_back(0);
+	  muGlDzVtx->push_back(-1);
+	  muGlDxyVtx->push_back(-1);
+	  muGlMatchedStation->push_back(0);
+	}
+	else {
+	  muGlChi2->push_back(rmu1->globalTrack()->chi2());
+	  muGlNDF->push_back(rmu1->globalTrack()->ndof());
+	  muGlMuHits->push_back(rmu1->globalTrack()->hitPattern().numberOfValidMuonHits());
+	  muGlDzVtx->push_back(rmu1->globalTrack()->dz(RefVtx));
+	  muGlDxyVtx->push_back(rmu1->globalTrack()->dxy(RefVtx));
+	  muGlMatchedStation->push_back(rmu1->numberOfMatchedStations());
+	}
+	//
+	muType->push_back(rmu1->type());
+	int qm = 0;
+	for (int qi=1; qi!= 24; ++qi) {
+	  if (muon::isGoodMuon(*rmu1, muon::SelectionType(qi)))
+	    qm += 1<<qi;
+	}
+	muQual->push_back(qm);
+	muTrack->push_back(-1);// not implemented yet
+	
+	//check for muon1
+	TrackRef muTrack1 = Muon1->track();
+	if ( muTrack1.isNull() )
+	  continue;      
+	// cuts on muon1
+	if (rmu1->track()->hitPattern().numberOfValidPixelHits() < MuMinPixHits
+	    || rmu1->track()->hitPattern().numberOfValidStripHits() < MuMinSiHits
+	    || rmu1->track()->chi2()/rmu1->track()->ndof() > MuMaxNormChi
+	    || fabs(rmu1->track()->dxy(RefVtx)) > MuMaxD0) {
+	  continue ;
+	}
+			
+	//next check for muon2
+	for ( std::vector<pat::Muon>::const_iterator Muon2 = Muon1+1;
+	      Muon2 != thePATMuonHandle->end(); ++Muon2) {
+	  //checks for muon2
+	  if(Muon2->charge() * Muon1->charge() > 0)
+	    continue ;
+	  //
+	  const reco::Muon* rmu2 = dynamic_cast<const reco::Muon *>(Muon2->originalObject()) ;	 
+	  if (muon::overlap(*rmu1, *rmu2) )
+	    continue ;	
+	  //
+	  TrackRef muTrack2 = Muon2->track() ;
+	  if ( muTrack2.isNull() )
+	    continue ;	
+	  // cuts on muon2
+	  if (rmu2->track()->hitPattern().numberOfValidPixelHits() < MuMinPixHits
+	      || rmu2->track()->hitPattern().numberOfValidStripHits() < MuMinSiHits
+	      || rmu2->track()->chi2()/rmu1->track()->ndof() > MuMaxNormChi
+	      || fabs(rmu2->track()->dxy(RefVtx)) > MuMaxD0) {
+	    continue ;
+	  }
+
+	  //Get The J/Psi information				
+	  TransientTrack muon1TT( muTrack1, &(*bFieldHandle) );
+	  TransientTrack muon2TT( muTrack2, &(*bFieldHandle) );
+				
+	  KinematicParticleFactoryFromTransientTrack pFactory;
+				
+	  //initial chi2 and ndf before kinematic fits.
+	  float chi = 0., ndf = 0. ;
+
+	  vector<RefCountedKinematicParticle> muons;
+	  muons.push_back( pFactory.particle( muon1TT, muon_mass, chi, ndf, muon_sigma));
+	  muons.push_back( pFactory.particle( muon2TT, muon_mass, chi, ndf, muon_sigma));
+				
+	  KinematicParticleVertexFitter PsiPrimeFitter;   
+	  RefCountedKinematicTree PsiPrimeVertexFitTree;
+	  PsiPrimeVertexFitTree = PsiPrimeFitter.fit(muons); 
+	  if (!PsiPrimeVertexFitTree->isValid())
+	    continue ; 
+	
+	  PsiPrimeVertexFitTree->movePointerToTheTop();				
+	  RefCountedKinematicParticle PsiPrimeCand_fromFit = PsiPrimeVertexFitTree->currentParticle();
+	  RefCountedKinematicVertex PsiPrimeCand_vertex_fromFit = PsiPrimeVertexFitTree->currentDecayVertex();
+				
+	  PsiPrimeVertexFitTree->movePointerToTheFirstChild();
+	  RefCountedKinematicParticle Mu1Cand_fromFit = PsiPrimeVertexFitTree->currentParticle(); // cambia i nomi togliendo MC o mettendo noMC!!!! 
+	  PsiPrimeVertexFitTree->movePointerToTheNextChild();
+	  RefCountedKinematicParticle Mu2Cand_fromFit = PsiPrimeVertexFitTree->currentParticle();
+				
+	  KinematicParameters Mu1Cand_KP = Mu1Cand_fromFit->currentState().kinematicParameters();
+	  KinematicParameters Mu2Cand_KP = Mu2Cand_fromFit->currentState().kinematicParameters();
+				
+	  //Fill the Psi' vectors
+	  if (PsiPrimeCand_fromFit->currentState().mass() < 3.45  ||  PsiPrimeCand_fromFit->currentState().mass() > 3.9)
+	    continue ;
+ 
+	  psiPrimeMass->push_back( PsiPrimeCand_fromFit->currentState().mass() );
+				
+	  psiPrimeDecayVtx_X->push_back( PsiPrimeCand_vertex_fromFit->position().x() );
+	  psiPrimeDecayVtx_Y->push_back( PsiPrimeCand_vertex_fromFit->position().y() );
+	  psiPrimeDecayVtx_Z->push_back( PsiPrimeCand_vertex_fromFit->position().z() );
+				
+	  psiPrimeDecayVtx_XE->push_back( sqrt( PsiPrimeCand_vertex_fromFit->error().cxx()) );
+	  psiPrimeDecayVtx_YE->push_back( sqrt( PsiPrimeCand_vertex_fromFit->error().cyy()) );
+	  psiPrimeDecayVtx_ZE->push_back( sqrt( PsiPrimeCand_vertex_fromFit->error().czz()) );
+	  psiPrimeVtx_CL->push_back( ChiSquaredProbability((double)( PsiPrimeCand_vertex_fromFit->chiSquared()),(double)( PsiPrimeCand_vertex_fromFit->degreesOfFreedom())) );
+	  psiPrimeVtx_Chi2->push_back( PsiPrimeCand_vertex_fromFit->chiSquared() ) ;
+
+	  psiPrimePx->push_back( Mu1Cand_KP.momentum().x() + Mu2Cand_KP.momentum().x() );
+	  psiPrimePy->push_back( Mu1Cand_KP.momentum().y() + Mu2Cand_KP.momentum().y() );
+	  psiPrimePz->push_back( Mu1Cand_KP.momentum().z() + Mu2Cand_KP.momentum().z() );
+
+	  mu1Idx->push_back(std::distance(thePATMuonHandle->begin(), Muon1)); 
+	  mu2Idx->push_back(std::distance(thePATMuonHandle->begin(), Muon2));
+				
+	  mu1_MuMu_Px->push_back( Mu1Cand_KP.momentum().x());
+	  mu1_MuMu_Py->push_back( Mu1Cand_KP.momentum().y());
+	  mu1_MuMu_Pz->push_back( Mu1Cand_KP.momentum().z());
+	  mu1_MuMu_Chi2->push_back( Mu1Cand_fromFit->chiSquared());
+	  mu1_MuMu_NDF->push_back( Mu1Cand_fromFit->degreesOfFreedom());
+
+	  mu2_MuMu_Px->push_back( Mu2Cand_KP.momentum().x());
+	  mu2_MuMu_Py->push_back( Mu2Cand_KP.momentum().y());
+	  mu2_MuMu_Pz->push_back( Mu2Cand_KP.momentum().z());
+	  mu2_MuMu_Chi2->push_back( Mu2Cand_fromFit->chiSquared());
+	  mu2_MuMu_NDF->push_back( Mu2Cand_fromFit->degreesOfFreedom());
+
+
+	  int dimuonType = 0;   //0 nothing,  1 J/Psi  , 2 Psi(2S)   
+	  if ( PsiPrimeCand_fromFit->currentState().mass() > JPsiMinMass  &&  PsiPrimeCand_fromFit->currentState().mass() < JPsiMaxMass ) {
+	    dimuonType = 1 ;
+	  }
+        
+	  if ( PsiPrimeCand_fromFit->currentState().mass() > PsiPrimeMinMass  &&  PsiPrimeCand_fromFit->currentState().mass() < PsiPrimeMaxMass ) {
+	    dimuonType = 2 ;
+	  }
+	  //cout <<dimuonType <<endl;
+
+	  if (Debug_) cout <<"evt:" <<evtNum <<" psiPrime with diMuonType = " <<dimuonType <<endl;
+
+	  jtype->push_back(dimuonType);
+	
+
+	  int ntriggers = TriggersForMatching_.size();
+	  for (int MatchTrig=0; MatchTrig < ntriggers; MatchTrig++) {
+
+	    //cout << "result " << MatchingTriggerResult[MatchTrig] << " " << TriggersForMatching_[MatchTrig] <<endl;
+	    if (MatchingTriggerResult[MatchTrig]!=0) {
+	      const pat::TriggerObjectStandAloneCollection mu1HLTMatches = Muon1->triggerObjectMatchesByFilter(FiltersForMatching_[MatchTrig]  );
+	      const pat::TriggerObjectStandAloneCollection mu2HLTMatches = Muon2->triggerObjectMatchesByFilter(FiltersForMatching_[MatchTrig]  );
+	      bool pass1 = mu1HLTMatches.size() > 0;
+	      bool pass2 = mu2HLTMatches.size() > 0;
+	   
+	      if ((pass1) && (pass2)) {
+		PsiPrimeMuonTrigMatch->push_back(true);
+		if (Debug_) cout <<"Matched psiPrime" <<endl ;
+	      } else
+		PsiPrimeMuonTrigMatch->push_back(false);
+	    }
+	    else
+	      PsiPrimeMuonTrigMatch->push_back(false);
+	  }
+	  
+	  // vertex without matched muons 
+	  vector<TransientVertex> pvs ;
+	  //
+	  
+	  if (addMuMulessPrimaryVertex_)
+	    {
+	      VertexReProducer revertex(recVtxs, iEvent);
+	      Handle<TrackCollection> pvtracks;   
+	      iEvent.getByLabel(revertex.inputTracks(),   pvtracks);
+	      Handle<BeamSpot>        pvbeamspot;
+	      iEvent.getByLabel(revertex.inputBeamSpot(), pvbeamspot);
+	      //
+	      if ( pvbeamspot.isValid() < 0 ) 
+		continue ; 
+	      if (pvbeamspot.id() != beamSpotHandle.id()) {
+		edm::LogWarning("Inconsistency") << "The BeamSpot used for PV reco is not the same used in this analyzer.";
+	      }
+	      //
+	      const reco::Muon *rmu_1 = dynamic_cast<const reco::Muon*>( Muon1->originalObject() ) ;
+	      const reco::Muon *rmu_2 = dynamic_cast<const reco::Muon*>( Muon2->originalObject() ) ;
+	      //
+	      if (rmu_1 != 0  &&  rmu_2 != 0  &&  rmu_1->track().id() == pvtracks.id()  &&  rmu_2->track().id() == pvtracks.id() ) { 
+		TrackCollection MuMuLess;
+		MuMuLess.reserve(pvtracks->size());
+		for (size_t i = 0, n = pvtracks->size(); i < n; ++i) {
+		  if (i == rmu_1->track().key()) continue;
+		  if (i == rmu_2->track().key()) continue;
+		  //
+		  MuMuLess.push_back((*pvtracks)[i]);
+		}
+		cout <<pvbeamspot.isValid() <<endl ;
+		pvs = revertex.makeVertices(MuMuLess, *pvbeamspot, iSetup) ;
+		//
+		if (!pvs.empty()) {
+		  Vertex MuMuLessPV = Vertex(pvs.front());
+		  thePrimaryVtx = MuMuLessPV;
+		}
+	      }
+	    }
+	  
+	  //							
+	  PriVtxMuMuCorr_X->push_back( thePrimaryVtx.position().x() ) ;
+	  PriVtxMuMuCorr_Y->push_back( thePrimaryVtx.position().y() ) ; 
+	  PriVtxMuMuCorr_Z->push_back( thePrimaryVtx.position().z() ) ;
+	  PriVtxMuMuCorr_EX->push_back( thePrimaryVtx.xError() ) ;
+	  PriVtxMuMuCorr_EY->push_back( thePrimaryVtx.yError() ) ;
+	  PriVtxMuMuCorr_EZ->push_back( thePrimaryVtx.zError() ) ;
+	  PriVtxMuMuCorr_CL->push_back( ChiSquaredProbability( (double)(thePrimaryVtx.chi2()), (double)(thePrimaryVtx.ndof())) ) ;
+	  PriVtxMuMuCorr_Chi2->push_back( thePrimaryVtx.chi2() ) ;
+	  PriVtxMuMuCorr_tracks->push_back( thePrimaryVtx.tracksSize() ) ;
+
+	  
+	  ++nPsiPrime;
+	  muons.clear();
+	  //////////////////////////////////////////////////////////////////////
+
+	  if (dimuonType == 0) 
+	    continue ;
+	  	
+	  if (Debug_) cout <<"evt:"<<evtNum<< " is Invalid Muon ?  " <<isEventWithInvalidMu << endl;
+	  /*
+	    if (isEventWithInvalidMu ) { 
+	    if (Debug_) cout <<"evt:"<<evtNum<< "invalid muon ... skip event" << endl;
+	    continue;
+	    }
+	  */
+	  if ( skipPsi2S  &&  (dimuonType == 2) ) { // skip Psi(2S)pipi decay
+	    continue ;
+	  }                
+
+		
+	  if (thePATTrackHandle->size() < 2)
+	    continue ;	
+	  /////// cuts on Psi' mass window
+	  if (psiPrimeMass->at(nPsiPrime-1) < PsiPrimeMinMass  ||  psiPrimeMass->at(nPsiPrime-1) > PsiPrimeMaxMass)
+	    continue ;
+	
+	  // next check tracks for pion
+	  //
+	  for ( vector<pat::GenericParticle>::const_iterator Track1 = thePATTrackHandle->begin();
+		Track1 != thePATTrackHandle->end(); ++Track1 ) {
+					
+	    //check track doesn't overlap with the Psi' candidate tracks
+	    if (Track1->track().key() == rmu1->track().key()  ||  Track1->track().key() == rmu2->track().key())
+	      continue;
+	    
+	    // cuts on charged tracks	
+	    if (( Track1->track()->chi2()/Track1->track()->ndof() > TrMaxNormChi2 )  ||  Track1->pt() < TrMinPt)
+	      continue ;
+	    	
+	    ////////// Start Z candidate requirements
+	    bool Z_ok = true ;
+
+	    // cuts on tracks' delta R								
+	    math::XYZTLorentzVector psiPrime = (rmu1->p4() + rmu2->p4()) ;
+	    float psiPrimePiDR = sqrt( pow(psiPrime.eta() - Track1->p4().eta(),2) + pow(psiPrime.phi() - Track1->p4().phi(),2) ) ;
+	    //
+	    math::XYZTLorentzVector zP4 = (rmu1->p4() + rmu2->p4() + Track1->p4()) ;
+	    float zPiDR = sqrt( pow(zP4.eta() - Track1->p4().eta(),2) + pow(zP4.phi() - Track1->p4().phi(),2) ) ;
+	    //
+	    if (UseZDR) {
+	      if (zPiDR > ZTrackMaxDR ) {
+		 //continue ;
+		Z_ok = false ;
+	      }
+	    } else {
+	      if (psiPrimePiDR > PsiPrimeTrackMaxDR ) {
+		//continue ;
+		Z_ok = false ;
+	      }
+	    }
+	    ////////// cuts on Psi'+pi mass window
+	    if ((Track1->p4() + psiPrime).M() >= PsiPrimePiMaxMass  ||  (Track1->p4() + psiPrime).M() < PsiPrimePiMinMass) {
+	      //continue ;
+	      Z_ok = false ;
+	    }
+	    //			
+	    // having two oppositely charged muons, and 1 charged pion: try to vertex them	    	     
+	    TransientTrack pionTT(Track1->track(), &(*bFieldHandle)) ;
+	    //		
+	    // Do mass constraint for PsiPrime cand and do mass constrained vertex fit			
+	    vector<RefCountedKinematicParticle> zVtxFitMCParticles; // MC stands for Mass Constrained
+	    zVtxFitMCParticles.push_back( pFactory.particle(muon1TT, muon_mass, chi, ndf, muon_sigma) ) ;
+	    zVtxFitMCParticles.push_back( pFactory.particle(muon2TT, muon_mass, chi, ndf, muon_sigma) ) ;
+	    zVtxFitMCParticles.push_back( pFactory.particle(pionTT, pion_mass, chi, ndf, pion_sigma) ) ;
+
+
+	    RefCountedKinematicTree zVtxFitTree;
+	    //				
+	    if (doPsiPrimeMassConst) {
+	      cout << "Doing mass constraint fit" << endl;
+	      MultiTrackKinematicConstraint *PsiPrime = new TwoTrackMassKinematicConstraint(psi2S_mass);
+	      KinematicConstrainedVertexFitter kcvFitter;
+	      zVtxFitTree = kcvFitter.fit(zVtxFitMCParticles, PsiPrime);
+	      //
+	      if ( !zVtxFitTree->isValid() ) {
+		cout << "caught an exception in the Z vertex fit with MassConstraint" << std::endl;
+		//continue ;
+		Z_ok = false ;
+	      }
+	    } else {
+	      KinematicParticleVertexFitter kcvFitter;
+	      zVtxFitTree = kcvFitter.fit(zVtxFitMCParticles);
+	      if ( !zVtxFitTree->isValid() ) {
+		cout << "caught an exception in the Z vertex fit with MassConstraint" << std::endl;
+		//continue ;
+		Z_ok = false ;
+	      }
+	    }
+	    //						
+	    if (Z_ok) 
+	      {
+		zVtxFitTree->movePointerToTheTop();
+		RefCountedKinematicParticle zCand_fromMCFit = zVtxFitTree->currentParticle(); 
+		RefCountedKinematicVertex zCand_vertex_fromMCFit = zVtxFitTree->currentDecayVertex();
+		//
+		if ( !zCand_vertex_fromMCFit->vertexIsValid() ) {
+		  cout << "Z MassConstraint fit vertex is not valid" << endl;
+		  //continue ;
+		  Z_ok = false ;
+		}
+		if ( zCand_vertex_fromMCFit->chiSquared() < 0  ||  zCand_vertex_fromMCFit->chiSquared() > 10000 ) {
+		  cout << " failed chi2 cut in MassConstraint fit with chi2 = " << zCand_vertex_fromMCFit->chiSquared() << endl;
+		  //continue;
+		  Z_ok = false ;
+		}
+		if ( zCand_fromMCFit->currentState().mass() > 100 ) {
+		  //continue ;
+		  Z_ok = false ;
+		}
+		double zVtxProb = ChiSquaredProbability((double)(zCand_fromMCFit->chiSquared()),(double)(zCand_fromMCFit->degreesOfFreedom()));
+		if ( zVtxProb < 0.003 ) {
+		  //continue ; 
+		  Z_ok = false ;
+		}
+	    	
+		// fill Z candidate variables now
+		MuMuPiMass->push_back( zCand_fromMCFit->currentState().mass());
+		MuMuPiPx->push_back( zCand_fromMCFit->currentState().globalMomentum().x());
+		MuMuPiPy->push_back( zCand_fromMCFit->currentState().globalMomentum().y());
+		MuMuPiPz->push_back( zCand_fromMCFit->currentState().globalMomentum().z());			
+		MuMuPiPxE->push_back( sqrt( zCand_fromMCFit->currentState().kinematicParametersError().matrix()(3,3) ) );
+		MuMuPiPyE->push_back( sqrt( zCand_fromMCFit->currentState().kinematicParametersError().matrix()(4,4) ) );
+		MuMuPiPzE->push_back( sqrt( zCand_fromMCFit->currentState().kinematicParametersError().matrix()(5,5) ) );		
+		MuMuPiVtx_CL->push_back( ChiSquaredProbability((double)(zCand_vertex_fromMCFit->chiSquared()), (double)(zCand_vertex_fromMCFit->degreesOfFreedom())) ) ;
+		MuMuPiVtx_Chi2->push_back( zCand_vertex_fromMCFit->chiSquared() ) ;
+
+		MuMuPiDecayVtx_X->push_back((*zCand_vertex_fromMCFit).position().x());
+		MuMuPiDecayVtx_Y->push_back((*zCand_vertex_fromMCFit).position().y());
+		MuMuPiDecayVtx_Z->push_back((*zCand_vertex_fromMCFit).position().z());
+		MuMuPiDecayVtx_XE->push_back(sqrt((*zCand_vertex_fromMCFit).error().cxx()));
+		MuMuPiDecayVtx_YE->push_back(sqrt((*zCand_vertex_fromMCFit).error().cyy()));
+		MuMuPiDecayVtx_ZE->push_back(sqrt((*zCand_vertex_fromMCFit).error().czz()));
+		
+		zVtxFitTree->movePointerToTheFirstChild();
+		RefCountedKinematicParticle mu1_MuMuPi = zVtxFitTree->currentParticle();
+		zVtxFitTree->movePointerToTheNextChild();
+		RefCountedKinematicParticle mu2_MuMuPi = zVtxFitTree->currentParticle();
+		zVtxFitTree->movePointerToTheNextChild();
+		RefCountedKinematicParticle pi = zVtxFitTree->currentParticle();
+		
+		mu1Px_MuMuPi->push_back(mu1_MuMuPi->currentState().globalMomentum().x());
+		mu1Py_MuMuPi->push_back(mu1_MuMuPi->currentState().globalMomentum().y());
+		mu1Pz_MuMuPi->push_back(mu1_MuMuPi->currentState().globalMomentum().z());
+		mu1E_MuMuPi->push_back(mu1_MuMuPi->currentState().kinematicParameters().energy());
+		
+		mu2Px_MuMuPi->push_back(mu2_MuMuPi->currentState().globalMomentum().x());
+		mu2Py_MuMuPi->push_back(mu2_MuMuPi->currentState().globalMomentum().y());
+		mu2Pz_MuMuPi->push_back(mu2_MuMuPi->currentState().globalMomentum().z());
+		mu2E_MuMuPi->push_back(mu2_MuMuPi->currentState().kinematicParameters().energy());
+		
+		piPx_MuMuPi->push_back(pi->currentState().globalMomentum().x());
+		piPy_MuMuPi->push_back(pi->currentState().globalMomentum().y());
+		piPz_MuMuPi->push_back(pi->currentState().globalMomentum().z());
+		piE_MuMuPi->push_back(pi->currentState().kinematicParameters().energy());
+		//				
+		///////////////////////////////////	
+		//					
+		vector<TransientVertex> Z_pvs ;
+		//
+		if (addZlessPrimaryVertex_)
+		  {
+		    VertexReProducer Z_revertex(recVtxs, iEvent);
+		    Handle<TrackCollection> Z_pvtracks;   
+		    iEvent.getByLabel(Z_revertex.inputTracks(),   Z_pvtracks);
+		    Handle<BeamSpot>        Z_pvbeamspot;
+		    iEvent.getByLabel(Z_revertex.inputBeamSpot(), Z_pvbeamspot);
+		    //
+		    if (Z_pvbeamspot.id() != beamSpotHandle.id()) {
+		      edm::LogWarning("Inconsistency") << "The BeamSpot used for PV reco is not the same used in this analyzer.";
+		    }
+		    //
+		    const reco::Muon *Zrmu_1 = dynamic_cast<const reco::Muon*>( Muon1->originalObject() ) ;
+		    const reco::Muon *Zrmu_2 = dynamic_cast<const reco::Muon*>( Muon2->originalObject() ) ;
+		    //
+		    if (Zrmu_1 != 0  &&  Zrmu_2 != 0  &&  Zrmu_1->track().id() == Z_pvtracks.id()  &&  Zrmu_2->track().id() == Z_pvtracks.id()  &&  Track1->track().id() == Z_pvtracks.id() ) {  
+		      TrackCollection ZLess;
+		      ZLess.reserve(Z_pvtracks->size());
+		      for (size_t i = 0, n = Z_pvtracks->size(); i < n; ++i) {
+			if (i == Zrmu_1->track().key()) continue;
+			if (i == Zrmu_2->track().key()) continue;
+			if (i == Track1->track().key()) continue;
+			//
+			ZLess.push_back((*Z_pvtracks)[i]);
+		      }
+		      Z_pvs = Z_revertex.makeVertices(ZLess, *Z_pvbeamspot, iSetup) ;
+		      //
+		      if (!Z_pvs.empty()) {
+			Vertex ZLessPV = Vertex(Z_pvs.front());
+			thePrimaryVtx = ZLessPV;
+		      }
+		    }
+		  }
+
+
+		TVector3 pperp( zCand_fromMCFit->currentState().globalMomentum().x(), zCand_fromMCFit->currentState().globalMomentum().y(), 0 ) ;
+		TVector3 Z_vtx( (*zCand_vertex_fromMCFit).position().x(), (*zCand_vertex_fromMCFit).position().y(), 0 ) ;				
+		TVector3 pvtx ;
+		TVector3 vdiff ;
+
+		// Find the PV with the largest Z_cos(alpha)
+		Vertex theCosAlphaV = thePrimaryVtx ; // first declaration here
+		float maxCosAlpha = -1. ;
+		//
+		for (VertexCollection::const_iterator itv = recVtxs->begin(), itvend = recVtxs->end(); itv != itvend; ++itv) {
+		  pvtx.SetXYZ(itv->position().x(), itv->position().y(), 0) ;	
+		  vdiff = Z_vtx - pvtx ;
+		  float cosAlpha_temp = vdiff.Dot(pperp) / (vdiff.Perp()*pperp.Perp()) ;
+		  
+		  if ( cosAlpha_temp > maxCosAlpha ) {
+		    maxCosAlpha = cosAlpha_temp ;    
+		    //thePrimaryVtx = Vertex(*itv);
+		    //theCosAlphaV = thePrimaryVtx;
+		    theCosAlphaV = Vertex(*itv) ;
+		  }
+		}
+		//							
+		PriVtx_ZCosAlpha_X->push_back( theCosAlphaV.position().x() ) ;
+		PriVtx_ZCosAlpha_Y->push_back( theCosAlphaV.position().y() ) ;
+		PriVtx_ZCosAlpha_Z->push_back( theCosAlphaV.position().z() ) ;
+		PriVtx_ZCosAlpha_EX->push_back( theCosAlphaV.xError() ) ;
+		PriVtx_ZCosAlpha_EY->push_back( theCosAlphaV.yError() ) ;
+		PriVtx_ZCosAlpha_EZ->push_back( theCosAlphaV.zError() ) ;
+		PriVtx_ZCosAlpha_CL->push_back( ChiSquaredProbability((double)(theCosAlphaV.chi2()), (double)(theCosAlphaV.ndof())) ) ;
+		PriVtx_ZCosAlpha_Chi2->push_back( theCosAlphaV.chi2() ) ;
+		PriVtx_ZCosAlpha_tracks->push_back( theCosAlphaV.tracksSize() ) ;
+		
+						
+		Vertex theOtherV = thePrimaryVtx ; // first declaration here
+		//			
+		if (resolveAmbiguity_) {
+		  float minDz = 999999.;
+		  if (!addZlessPrimaryVertex_) {
+		    for (VertexCollection::const_iterator itv = recVtxs->begin(), itvend = recVtxs->end(); itv != itvend; ++itv) {
+		      float deltaZ = fabs((*zCand_vertex_fromMCFit).position().z() - itv->position().z()) ;
+		      if ( deltaZ < minDz ) {
+			minDz = deltaZ;    
+			thePrimaryVtx = Vertex(*itv);
+			theOtherV = thePrimaryVtx;
+		      }
+		    }
+		  } else {
+		    for (vector<TransientVertex>::iterator itv2 = Z_pvs.begin(), itvend2 = Z_pvs.end(); itv2 != itvend2; ++itv2) {
+		      float deltaZ = fabs((*zCand_vertex_fromMCFit).position().z() - itv2->position().z()) ;
+		      if ( deltaZ < minDz ) {
+			minDz = deltaZ;    
+			Vertex zLessPV = Vertex(*itv2); 
+			thePrimaryVtx = zLessPV;
+			theOtherV = zLessPV;
+		      }
+		    }
+		  }
+		} 
+		
+		Vertex TheOtherVertex3D = thePrimaryVtx; // first declaration here
+		cout <<" choose PV =" <<endl;
+		if (resolveAmbiguity_) {
+		  float minDz = 999999.;
+		  float minDzTrack = 999999.;
+		  if (!addZlessPrimaryVertex_) {
+		    for (VertexCollection::const_iterator itv = recVtxs->begin(), itvend = recVtxs->end(); itv != itvend; ++itv)
+		      {
+			float deltaZ = fabs((*zCand_vertex_fromMCFit).position().z() - itv->position().z()) ;
+			if ( deltaZ < minDz ) {
+			  minDz = deltaZ;    
+			  TheOtherVertex3D = Vertex(*itv);
+			}
+		      }
+		  } else {
+		    for (vector<TransientVertex>::iterator itv2 = Z_pvs.begin(), itvend2 = Z_pvs.end(); itv2 != itvend2; ++itv2)
+		      {
+			VertexDistance3D a3d;
+			float deltaZ   = a3d.distance(Vertex(*itv2), Vertex(*zCand_vertex_fromMCFit)).value();
+			if ( deltaZ < minDz ) {
+			  minDz = deltaZ;    
+			  Vertex zLessPV = Vertex(*itv2); 
+			  TheOtherVertex3D = zLessPV;
+			  //cout<<" z(X) - z(vtx) min="<<minDz<<endl; 
+			}
+			
+		      }
+		  }
+		} 
+		
+		//							
+		PriVtxZCorr_X->push_back( thePrimaryVtx.position().x() ) ;
+		PriVtxZCorr_Y->push_back( thePrimaryVtx.position().y() ) ;
+		PriVtxZCorr_Z->push_back( thePrimaryVtx.position().z() ) ;
+		PriVtxZCorr_EX->push_back( thePrimaryVtx.xError() ) ;
+		PriVtxZCorr_EY->push_back( thePrimaryVtx.yError() ) ;
+		PriVtxZCorr_EZ->push_back( thePrimaryVtx.zError() ) ;
+		PriVtxZCorr_CL->push_back( ChiSquaredProbability((double)(thePrimaryVtx.chi2()), (double)(thePrimaryVtx.ndof())) ) ;
+		PriVtxZCorr_Chi2->push_back( thePrimaryVtx.chi2() ) ;
+		PriVtxZCorr_tracks->push_back( thePrimaryVtx.tracksSize() ) ;
+		//			
+		///////////////////////////////////////////////////////////////////////////////
+		
+		VertexDistanceXY vdistXY;
+		
+		AlgebraicVector vpperp(3);
+		vpperp[0] = pperp.x(); vpperp[1] = pperp.y(); vpperp[2] = 0.;
+		AlgebraicVector3 v3pperp;
+		v3pperp[0] = pperp.x(); v3pperp[1] = pperp.y(); v3pperp[2] = 0.;
+		
+		// Lifetime PV
+		pvtx.SetXYZ(thePrimaryVtx.position().x(), thePrimaryVtx.position().y(), 0) ;	
+		vdiff = Z_vtx - pvtx ;
+		double cosAlpha = vdiff.Dot(pperp) / (vdiff.Perp()*pperp.Perp()) ;
+		Measurement1D distXY = vdistXY.distance(Vertex(*zCand_vertex_fromMCFit), Vertex(thePrimaryVtx)) ;
+		double ctauPV = distXY.value() * cosAlpha * zCand_fromMCFit->currentState().mass() / pperp.Perp() ;
+		
+		GlobalError v1e = (Vertex(*zCand_vertex_fromMCFit)).error() ;
+		GlobalError v2e = thePrimaryVtx.error();
+		//AlgebraicSymMatrix vXYe = v1e.matrix() + v2e.matrix();
+		AlgebraicSymMatrix33 vXYe = v1e.matrix() + v2e.matrix();
+		//double ctauErrPV = sqrt(vXYe.similarity(vpperp))*zCand_fromMCFit->currentState().mass()/(pperp.Perp2());
+		double ctauErrPV = sqrt(ROOT::Math::Similarity(v3pperp,vXYe)) * zCand_fromMCFit->currentState().mass() / (pperp.Perp2()) ;
+		float lxyPV = vdiff.Dot(pperp)/pperp.Mag();
+		
+		zCosAlphaPV->push_back(cosAlpha) ;
+		zCTauPV->push_back(ctauPV) ;
+		zCTauPVE->push_back(ctauErrPV) ;
+		zLxyPV->push_back(lxyPV) ;
+		
+		
+		// Lifetime wrt PV with largest Z_cos(alpha) candidate 
+		pvtx.SetXYZ(theCosAlphaV.position().x(), theCosAlphaV.position().y(), 0) ;	
+		vdiff = Z_vtx - pvtx ;
+		cosAlpha =  maxCosAlpha ;
+		distXY = vdistXY.distance( Vertex(*zCand_vertex_fromMCFit), Vertex(theCosAlphaV) ) ;
+		double ctauPVCosAlpha = distXY.value() * cosAlpha * zCand_fromMCFit->currentState().mass() / pperp.Perp();
+		
+		GlobalError v1eCosAlpha = (Vertex(*zCand_vertex_fromMCFit)).error();
+		GlobalError v2eCosAlpha = theCosAlphaV.error();
+		AlgebraicSymMatrix33 vXYeCosAlpha = v1eCosAlpha.matrix() + v2eCosAlpha.matrix();
+		//double ctauErrPVCosAlpha = sqrt(vXYeCosAlpha.similarity(vpperp))*zCand_fromMCFit->currentState().mass()/(pperp.Perp2());
+		double ctauErrPVCosAlpha = sqrt(ROOT::Math::Similarity(v3pperp,vXYeCosAlpha)) * zCand_fromMCFit->currentState().mass() / (pperp.Perp2());
+		float lxyPVCosAlpha = vdiff.Dot(pperp) / pperp.Mag() ;
+		
+		zCosAlphaPVCosAlpha->push_back( cosAlpha ) ;
+		zCTauPVCosAlpha->push_back( ctauPVCosAlpha ) ;
+		zCTauPVCosAlphaE->push_back( ctauErrPVCosAlpha ) ;
+		zLxyPVCosAlpha->push_back( lxyPVCosAlpha ) ;
+
+
+		// Lifetime wrt PV with smaller longitudinal X impact parameter 
+		pvtx.SetXYZ(theOtherV.position().x(), theOtherV.position().y(), 0);
+		vdiff = Z_vtx - pvtx;
+		cosAlpha = vdiff.Dot(pperp) / (vdiff.Perp()*pperp.Perp());
+		distXY = vdistXY.distance(Vertex(*zCand_vertex_fromMCFit), Vertex(theOtherV));
+		double ctauPVX = distXY.value() * cosAlpha * zCand_fromMCFit->currentState().mass() / pperp.Perp();
+		
+		GlobalError v1eX = (Vertex(*zCand_vertex_fromMCFit)).error();
+		GlobalError v2eX = theOtherV.error();
+		AlgebraicSymMatrix33 vXYeX = v1eX.matrix() + v2eX.matrix();
+		//double ctauErrPVX = sqrt(vXYeX.similarity(vpperp))*zCand_fromMCFit->currentState().mass()/(pperp.Perp2());
+		double ctauErrPVX = sqrt(ROOT::Math::Similarity(v3pperp,vXYeX)) * zCand_fromMCFit->currentState().mass() / (pperp.Perp2());
+		float lxyPVX = vdiff.Dot(pperp) / pperp.Mag() ;
+		
+		zCosAlphaPVX->push_back(cosAlpha);
+		zCTauPVX->push_back(ctauPVX);
+		zCTauPVXE->push_back(ctauErrPVX);
+		zLxyPVX->push_back(lxyPVX);
+		
+		
+		VertexDistance3D a3d;
+		float Dist3DPV     = a3d.distance(TheOtherVertex3D, Vertex(*zCand_vertex_fromMCFit)).value() ;
+		float Dist3DPV_err = a3d.distance(TheOtherVertex3D, Vertex(*zCand_vertex_fromMCFit)).error() ;
+		zCTauPVX_3D->push_back(Dist3DPV);
+		zCTauPVX_3D_err->push_back(Dist3DPV_err);
+		//cout << Dist3DPV << " " << Dist3DPV_err << endl; 
+		
+		
+		//Lifetime BS
+		pvtx.SetXYZ(theBeamSpotVtx.position().x(), theBeamSpotVtx.position().y(), 0);
+		vdiff = Z_vtx - pvtx;
+		cosAlpha = vdiff.Dot(pperp) / (vdiff.Perp()*pperp.Perp()) ;
+		distXY = vdistXY.distance(Vertex(*zCand_vertex_fromMCFit), Vertex(theBeamSpotVtx));
+		double ctauBS = distXY.value() * cosAlpha*zCand_fromMCFit->currentState().mass() / pperp.Perp();
+		GlobalError v1eB = (Vertex(*zCand_vertex_fromMCFit)).error();
+		GlobalError v2eB = theBeamSpotVtx.error();
+		//AlgebraicSymMatrix vXYeB = v1eB.matrix() + v2eB.matrix();
+		AlgebraicSymMatrix33 vXYeB = v1eB.matrix() + v2eB.matrix();
+		//double ctauErrBS = sqrt(vXYeB.similarity(vpperp))*zCand_fromMCFit->currentState().mass()/(pperp.Perp2());
+		double ctauErrBS = sqrt(ROOT::Math::Similarity(v3pperp,vXYeB)) * zCand_fromMCFit->currentState().mass() / (pperp.Perp2()) ;
+		float lxyBS = vdiff.Dot(pperp) / pperp.Mag();
+		
+		zCosAlphaBS->push_back(cosAlpha);
+		zCTauBS->push_back(ctauBS);
+		zCTauBSE->push_back(ctauErrBS);
+		zLxyBS->push_back(lxyBS);
+		
+		Z_psiPrimeIdx->push_back(nPsiPrime-1);
+		Z_piIdx->push_back(std::distance(thePATTrackHandle->begin(), Track1));
+		
+		nZ++;
+		
+		zVtxFitMCParticles.clear();
+	      } // end if (Z_ok)
+	    
+	    // next check tracks for 2nd pion
+	    for ( vector<pat::GenericParticle>::const_iterator Track2 = Track1+1;
+		  Track2 != thePATTrackHandle->end(); ++Track2 ) 
+	      {
+		if (Track1->charge() * Track2->charge() > 0) 
+		  continue ;
+		
+		//check track doesn't overlap with the Psi' candidate tracks
+		if (Track2->track().key() == rmu1->track().key()  ||  Track2->track().key() == rmu2->track().key())
+		  continue ;	      
+						
+		// cuts on charged tracks  	
+		if ((Track2->track()->chi2() / Track2->track()->ndof() > TrMaxNormChi2)  ||  Track2->pt() < TrMinPt)
+		  continue ;	      
+						
+		// cuts on tracks' delta R								
+		//math::XYZTLorentzVector psiPrime = (rmu1->p4() + rmu2->p4()); // already declared above
+		math::XYZTLorentzVector xP4 = (rmu1->p4() + rmu2->p4() + Track1->p4() + Track2->p4()) ; 
+		//
+		float psiPrimePi1DR = sqrt( pow(psiPrime.eta() - Track1->p4().eta(),2) + pow(psiPrime.phi() - Track1->p4().phi(),2) );
+		float psiPrimePi2DR = sqrt( pow(psiPrime.eta() - Track2->p4().eta(),2) + pow(psiPrime.phi() - Track2->p4().phi(),2) ) ;		  
+		float xPi1DR = sqrt(pow(xP4.eta() - Track1->p4().eta(),2) + pow(xP4.phi() - Track1->p4().phi(),2)) ;
+		float xPi2DR = sqrt(pow(xP4.eta() - Track2->p4().eta(),2) + pow(xP4.phi() - Track2->p4().phi(),2)) ;
+
+		////////// cuts on Psi'+pi+pi mass window
+		if ((Track1->p4() + Track2->p4() + psiPrime).M() > PsiPrimePiPiMaxMass  ||  (Track1->p4() + Track2->p4() + psiPrime).M() < PsiPrimePiPiMinMass)
+		  continue ;
+
+		// X
+		if (UseXDR) {
+		  if (xPi1DR > XTrackMaxDR  ||  xPi2DR > XTrackMaxDR)
+		    continue ; // XTrackMaxDR = 2
+		} else {
+		  if (psiPrimePi1DR > PsiPrimeTrackMaxDR  ||  psiPrimePi2DR > PsiPrimeTrackMaxDR)
+		    continue ; // PsiPrimeTrackMaxDR = 3.5
+		}
+		 		  						
+		// having two oppositely charged muons, and two oppositely charged tracks: try to vertex them
+		//TransientTrack pionTT( Track1->track(), &(*bFieldHandle) ); // already declared above
+		TransientTrack pion2TT( Track2->track(), &(*bFieldHandle) );
+	       						
+		// Do mass constraint for Psi' cand and do mass constrained vertex fit
+		vector<RefCountedKinematicParticle> xDaughters;
+		xDaughters.push_back(pFactory.particle( muon1TT, muon_mass, chi, ndf, muon_sigma));
+		xDaughters.push_back(pFactory.particle( muon2TT, muon_mass, chi, ndf, muon_sigma));
+		xDaughters.push_back(pFactory.particle( pionTT, pion_mass, chi, ndf, pion_sigma));
+		xDaughters.push_back(pFactory.particle( pion2TT, pion_mass, chi, ndf, pion_sigma));
+						
+		RefCountedKinematicTree XVertexFitTree;
+
+		if (doPsiPrimeMassConst) { // MassConst = 'MC' in the following
+		  //MultiTrackKinematicConstraint *PsiPrime = new  TwoTrackMassKinematicConstraint(psi2S_mass);
+		  MultiTrackKinematicConstraint *PsiPrime = 0;
+		  if (dimuonType == 1) { // constrain to JPsi mass
+		    PsiPrime = new TwoTrackMassKinematicConstraint(Jpsi_mass);
+		  } else if (dimuonType == 2) { // constrain to Psi(2S) mass
+		    PsiPrime = new TwoTrackMassKinematicConstraint(psi2S_mass);
+		  }
+	      
+		  KinematicConstrainedVertexFitter XFitter;
+		  XVertexFitTree = XFitter.fit(xDaughters, PsiPrime);
+		} 
+		else {
+		  KinematicParticleVertexFitter XFitter;
+		  XVertexFitTree = XFitter.fit(xDaughters);
+		}
+	    
+		if (!XVertexFitTree->isValid())
+		  continue ;	      
+
+		XVertexFitTree->movePointerToTheTop();
+		RefCountedKinematicParticle XCand_fromMCFit = XVertexFitTree->currentParticle();
+		RefCountedKinematicVertex XCand_vertex_fromMCFit = XVertexFitTree->currentDecayVertex();	      
+		//
+		if (!XCand_vertex_fromMCFit->vertexIsValid())
+		  continue ;
+	    
+		if ( XCand_vertex_fromMCFit->chiSquared() < 0  ||  XCand_vertex_fromMCFit->chiSquared() > 10000 )
+		  continue ;
+	    
+		if ( XCand_fromMCFit->currentState().mass() > 100 )
+		  continue ;
+	    
+		double xVtxProb = ChiSquaredProbability((double)(XCand_vertex_fromMCFit->chiSquared()),(double)(XCand_vertex_fromMCFit->degreesOfFreedom()));
+		if ( xVtxProb < 0.005 ) 
+		  continue ; 
+		
+		if (Debug_) cout<<"Starting mass error computation"<<endl;
+		vector<double> PionMasses;
+		PionMasses.push_back( 0.13957018 );
+		PionMasses.push_back( 0.13957018 );
+		vector<TransientTrack> t_tksPions;
+		t_tksPions.push_back(theTTBuilder->build(*Track1->track()));  // pass the reco::Track, not  the reco::TrackRef (which can be transient)
+		t_tksPions.push_back(theTTBuilder->build(*Track2->track()));
+            
+		//TransientVertex myPionVertex = vtxFitter.vertex(t_tksPions);
+            
+		CachingVertex<5> VtxForInvMass = vtxFitter.vertex( t_tksPions );
+		Measurement1D MassWErr = massCalculator.invariantMass( VtxForInvMass, PionMasses );
+            
+		PiPiMass_err->push_back(MassWErr.error());
+		if (Debug_) cout <<"Ending mass error computation" <<endl;
+		            
+		//Memory problem is above this line
+		
+		// fill X candidate variables now
+		xMass->push_back( XCand_fromMCFit->currentState().mass());
+		xPx->push_back( XCand_fromMCFit->currentState().globalMomentum().x());
+		xPy->push_back( XCand_fromMCFit->currentState().globalMomentum().y());
+		xPz->push_back( XCand_fromMCFit->currentState().globalMomentum().z());					
+		xPxE->push_back( sqrt( XCand_fromMCFit->currentState().kinematicParametersError().matrix()(3,3)));
+		xPyE->push_back( sqrt( XCand_fromMCFit->currentState().kinematicParametersError().matrix()(4,4)));
+		xPzE->push_back( sqrt( XCand_fromMCFit->currentState().kinematicParametersError().matrix()(5,5)));
+		xVtx_CL->push_back( ChiSquaredProbability((double)(XCand_vertex_fromMCFit->chiSquared()), (double)(XCand_vertex_fromMCFit->degreesOfFreedom())) );
+		xVtx_Chi2->push_back( XCand_vertex_fromMCFit->chiSquared() );
+		
+		xDecayVtx_X->push_back((*XCand_vertex_fromMCFit).position().x());
+		xDecayVtx_Y->push_back((*XCand_vertex_fromMCFit).position().y());
+		xDecayVtx_Z->push_back((*XCand_vertex_fromMCFit).position().z());
+		xDecayVtx_XE->push_back(sqrt((*XCand_vertex_fromMCFit).error().cxx()));
+		xDecayVtx_YE->push_back(sqrt((*XCand_vertex_fromMCFit).error().cyy()));
+		xDecayVtx_ZE->push_back(sqrt((*XCand_vertex_fromMCFit).error().czz()));
+						
+		XVertexFitTree->movePointerToTheFirstChild();
+		RefCountedKinematicParticle mu1_MuMuPiPi =  XVertexFitTree->currentParticle();
+		XVertexFitTree->movePointerToTheNextChild();
+		RefCountedKinematicParticle mu2_MuMuPiPi = XVertexFitTree->currentParticle();
+		XVertexFitTree->movePointerToTheNextChild();
+		RefCountedKinematicParticle pi1_MuMuPiPi = XVertexFitTree->currentParticle();
+		XVertexFitTree->movePointerToTheNextChild();
+		RefCountedKinematicParticle pi2_MuMuPiPi = XVertexFitTree->currentParticle();
+						
+		mu1Px_MuMuPiPi->push_back( mu1_MuMuPiPi->currentState().globalMomentum().x() );
+		mu1Py_MuMuPiPi->push_back( mu1_MuMuPiPi->currentState().globalMomentum().y() );
+		mu1Pz_MuMuPiPi->push_back( mu1_MuMuPiPi->currentState().globalMomentum().z() );
+		mu1E_MuMuPiPi->push_back( mu1_MuMuPiPi->currentState().kinematicParameters().energy() );
+	      
+		mu2Px_MuMuPiPi->push_back( mu2_MuMuPiPi->currentState().globalMomentum().x() );
+		mu2Py_MuMuPiPi->push_back( mu2_MuMuPiPi->currentState().globalMomentum().y() );
+		mu2Pz_MuMuPiPi->push_back( mu2_MuMuPiPi->currentState().globalMomentum().z() );
+		mu2E_MuMuPiPi->push_back( mu2_MuMuPiPi->currentState().kinematicParameters().energy() );
+	    
+		pi1Px_MuMuPiPi->push_back( pi1_MuMuPiPi->currentState().globalMomentum().x() );
+		pi1Py_MuMuPiPi->push_back( pi1_MuMuPiPi->currentState().globalMomentum().y() );
+		pi1Pz_MuMuPiPi->push_back( pi1_MuMuPiPi->currentState().globalMomentum().z() );
+		pi1E_MuMuPiPi->push_back( pi1_MuMuPiPi->currentState().kinematicParameters().energy() );
+		  
+		pi2Px_MuMuPiPi->push_back( pi2_MuMuPiPi->currentState().globalMomentum().x() );
+		pi2Py_MuMuPiPi->push_back( pi2_MuMuPiPi->currentState().globalMomentum().y() );
+		pi2Pz_MuMuPiPi->push_back( pi2_MuMuPiPi->currentState().globalMomentum().z() );
+		pi2E_MuMuPiPi->push_back( pi2_MuMuPiPi->currentState().kinematicParameters().energy() );
+						
+		///////////////////////////////////						
+													
+		vector<TransientVertex> X_pvs ; 
+		if (addXlessPrimaryVertex_) 
+		  {
+		    VertexReProducer revertex(recVtxs, iEvent);
+		    Handle<TrackCollection> pvtracks;   
+		    iEvent.getByLabel(revertex.inputTracks(),   pvtracks);
+		    Handle<BeamSpot>        pvbeamspot;
+		    iEvent.getByLabel(revertex.inputBeamSpot(), pvbeamspot);
+		    //
+		    if (pvbeamspot.id() != beamSpotHandle.id() ) 
+		      edm::LogWarning("Inconsistency") << "The BeamSpot used for PV reco is not the same used in this analyzer.";
+		    //
+		    const reco::Muon *Xrmu_1 = dynamic_cast<const reco::Muon *>(Muon1->originalObject());
+		    const reco::Muon *Xrmu_2 = dynamic_cast<const reco::Muon *>(Muon2->originalObject());
+		    //
+		    if (Xrmu_1 != 0  &&  Xrmu_2 != 0  &&  Xrmu_1->track().id() == pvtracks.id()  &&  Xrmu_2->track().id() == pvtracks.id() 
+			&&  Track1->track().id() == pvtracks.id()  &&  Track2->track().id() == pvtracks.id()) { 
+		      TrackCollection XLess;
+		      XLess.reserve(pvtracks->size());
+		      for (size_t i = 0, n = pvtracks->size(); i < n; ++i) {
+			if (i == Xrmu_1->track().key()) continue;
+			if (i == Xrmu_2->track().key()) continue;
+			if (i == Track1->track().key()) continue;
+			if (i == Track2->track().key()) continue;
+			XLess.push_back((*pvtracks)[i]);
+		      }
+		      X_pvs = revertex.makeVertices(XLess, *pvbeamspot, iSetup) ;
+		      if (!X_pvs.empty()) {
+			Vertex XLessPV = Vertex(X_pvs.front());
+			thePrimaryVtx = XLessPV;
+		      }
+		    }
+		  }
+	    
+
+		TVector3 X_pperp( XCand_fromMCFit->currentState().globalMomentum().x(), XCand_fromMCFit->currentState().globalMomentum().y(), 0 ) ;
+		TVector3 X_vtx( (*XCand_vertex_fromMCFit).position().x(), (*XCand_vertex_fromMCFit).position().y(), 0 ) ;				
+		TVector3 X_pvtx ;
+		TVector3 X_vdiff ;
+
+		// Find the PV with the largest X_cos(alpha)
+		Vertex theCosAlphaV = thePrimaryVtx ; // first declaration here
+		float maxCosAlpha = -1. ;
+		//
+		for (VertexCollection::const_iterator itv = recVtxs->begin(), itvend = recVtxs->end(); itv != itvend; ++itv) {
+		  X_pvtx.SetXYZ(itv->position().x(), itv->position().y(), 0) ;	
+		  X_vdiff = X_vtx - X_pvtx ;
+		  float cosAlpha_temp = X_vdiff.Dot(X_pperp) / (X_vdiff.Perp()*X_pperp.Perp()) ;
+		  
+		  if ( cosAlpha_temp > maxCosAlpha ) {
+		    maxCosAlpha = cosAlpha_temp ;    
+		    //thePrimaryVtx = Vertex(*itv);
+		    //theCosAlphaV = thePrimaryVtx;
+		    theCosAlphaV = Vertex(*itv) ;
+		  }
+		}
+		//							
+		PriVtx_XCosAlpha_X->push_back( theCosAlphaV.position().x() ) ;
+		PriVtx_XCosAlpha_Y->push_back( theCosAlphaV.position().y() ) ;
+		PriVtx_XCosAlpha_Z->push_back( theCosAlphaV.position().z() ) ;
+		PriVtx_XCosAlpha_EX->push_back( theCosAlphaV.xError() ) ;
+		PriVtx_XCosAlpha_EY->push_back( theCosAlphaV.yError() ) ;
+		PriVtx_XCosAlpha_EZ->push_back( theCosAlphaV.zError() ) ;
+		PriVtx_XCosAlpha_CL->push_back( ChiSquaredProbability((double)(theCosAlphaV.chi2()), (double)(theCosAlphaV.ndof())) ) ;
+		PriVtx_XCosAlpha_Chi2->push_back( theCosAlphaV.chi2() ) ;
+		PriVtx_XCosAlpha_tracks->push_back( theCosAlphaV.tracksSize() ) ;
+
+		
+		Vertex theOtherV = thePrimaryVtx ; 
+		//			
+		if (resolveAmbiguity_) {
+		  float minDz = 999999. ;
+		  if (!addXlessPrimaryVertex_) {
+		    for (VertexCollection::const_iterator itv = recVtxs->begin(), itvend = recVtxs->end(); itv != itvend; ++itv)
+		      {
+			float deltaZ = fabs((*XCand_vertex_fromMCFit).position().z() - itv->position().z()) ;
+			if ( deltaZ < minDz ) {
+			  minDz = deltaZ;    
+			  thePrimaryVtx = Vertex(*itv);
+			  theOtherV = thePrimaryVtx;
+			}
+		      }
+		  } else {
+		    for (vector<TransientVertex>::iterator itv2 = X_pvs.begin(), itvend2 = X_pvs.end(); itv2 != itvend2; ++itv2)
+		      {
+			float deltaZ = fabs((*XCand_vertex_fromMCFit).position().z() - itv2->position().z()) ;
+			if ( deltaZ < minDz ) {
+			  minDz = deltaZ;    
+			  Vertex XLessPV = Vertex(*itv2); 
+			  thePrimaryVtx = XLessPV;
+			  theOtherV = XLessPV;
+			}
+		      }
+		  }
+		} 
+	    
+	
+		Vertex TheOtherVertex3D = thePrimaryVtx; // first declaration here
+		//cout<<" choose PV ="<<endl;
+		if (resolveAmbiguity_) {
+		  float minDz = 999999.;
+		  float minDzTrack = 999999.;
+		  if (!addXlessPrimaryVertex_) {
+		    for (VertexCollection::const_iterator itv = recVtxs->begin(), itvend = recVtxs->end(); itv != itvend; ++itv)
+		      {
+			float deltaZ = fabs((*XCand_vertex_fromMCFit).position().z() - itv->position().z()) ;
+			if ( deltaZ < minDz ) {
+			  minDz = deltaZ;    
+			  TheOtherVertex3D = Vertex(*itv);
+			}
+		      }
+		  } else {
+		    for (vector<TransientVertex>::iterator itv2 = X_pvs.begin(), itvend2 = X_pvs.end(); itv2 != itvend2; ++itv2)
+		      {
+			VertexDistance3D a3d;
+			float deltaZ   = a3d.distance(Vertex(*itv2), Vertex(*XCand_vertex_fromMCFit)).value();
+			if ( deltaZ < minDz ) {
+			  minDz = deltaZ;    
+			  Vertex XLessPV = Vertex(*itv2); 
+			  TheOtherVertex3D = XLessPV;
+			  //cout<<" z(X) - z(vtx) min="<<minDz<<endl; 
+			}
+			
+		      }
+		  }
+		} 
+	    
+		//					
+		PriVtxXCorr_X->push_back( thePrimaryVtx.position().x());
+		PriVtxXCorr_Y->push_back( thePrimaryVtx.position().y());
+		PriVtxXCorr_Z->push_back( thePrimaryVtx.position().z());
+		PriVtxXCorr_EX->push_back( thePrimaryVtx.xError());
+		PriVtxXCorr_EY->push_back( thePrimaryVtx.yError());
+		PriVtxXCorr_EZ->push_back( thePrimaryVtx.zError());
+		PriVtxXCorr_CL->push_back( ChiSquaredProbability((double)(thePrimaryVtx.chi2()), (double)(thePrimaryVtx.ndof())) );
+		PriVtxXCorr_Chi2->push_back( thePrimaryVtx.chi2());
+		PriVtxXCorr_tracks->push_back( thePrimaryVtx.tracksSize());
+		//			
+		///////////////////////////////////////////////////////////////////////////////
+						
+		VertexDistanceXY X_vdistXY;
+						
+		AlgebraicVector X_vpperp(3) ;
+		X_vpperp[0] = X_pperp.x(); X_vpperp[1] = X_pperp.y(); X_vpperp[2] = 0.;
+		AlgebraicVector3 X_v3pperp ;
+		X_v3pperp[0] = X_pperp.x(); X_v3pperp[1] = X_pperp.y(); X_v3pperp[2] = 0.;
+
+		//Lifetime PV
+		X_pvtx.SetXYZ(thePrimaryVtx.position().x(), thePrimaryVtx.position().y(), 0);
+						
+		X_vdiff = X_vtx - X_pvtx ;
+		double X_cosAlpha = X_vdiff.Dot(X_pperp) / (X_vdiff.Perp()*X_pperp.Perp()) ;
+		Measurement1D X_distXY = X_vdistXY.distance(Vertex(*XCand_vertex_fromMCFit), Vertex(thePrimaryVtx)) ;
+		double X_ctauPV = X_distXY.value() * X_cosAlpha * XCand_fromMCFit->currentState().mass() / X_pperp.Perp() ;
+						
+		GlobalError X_v1e = (Vertex(*XCand_vertex_fromMCFit)).error();
+		GlobalError X_v2e = thePrimaryVtx.error();
+		//AlgebraicSymMatrix X_vXYe = X_v1e.matrix() + X_v2e.matrix() ;
+		AlgebraicSymMatrix33 X_vXYe = X_v1e.matrix() + X_v2e.matrix() ;
+		//double X_ctauErrPV = sqrt(X_vXYe.similarity(X_vpperp)) * XCand_fromMCFit->currentState().mass() / (X_pperp.Perp2()) ;
+		double X_ctauErrPV = sqrt(ROOT::Math::Similarity(X_v3pperp,X_vXYe)) * XCand_fromMCFit->currentState().mass() / (X_pperp.Perp2()) ;
+		float X_lxyPV = X_vdiff.Dot(X_pperp)/X_pperp.Mag();
+						
+		xCosAlphaPV->push_back(X_cosAlpha);
+		xCTauPV->push_back(X_ctauPV);
+		xCTauPVE->push_back(X_ctauErrPV);
+		xLxyPV->push_back(X_lxyPV);
+					
+		
+		// Lifetime wrt PV with largest X_cos(alpha) candidate 
+		X_pvtx.SetXYZ(theCosAlphaV.position().x(), theCosAlphaV.position().y(), 0) ;	
+		X_vdiff = X_vtx - X_pvtx ;
+		X_cosAlpha =  maxCosAlpha ;
+		X_distXY = X_vdistXY.distance( Vertex(*XCand_vertex_fromMCFit), Vertex(theCosAlphaV) ) ;
+		double X_ctauPVCosAlpha = X_distXY.value() * X_cosAlpha * XCand_fromMCFit->currentState().mass() / X_pperp.Perp();
+		
+		GlobalError X_v1eCosAlpha = (Vertex(*XCand_vertex_fromMCFit)).error();
+		GlobalError X_v2eCosAlpha = theCosAlphaV.error();
+		AlgebraicSymMatrix33 X_vXYeCosAlpha = X_v1eCosAlpha.matrix() + X_v2eCosAlpha.matrix();
+		//double X_ctauErrPVCosAlpha = sqrt(X_vXYeCosAlpha.similarity(X_vpperp))*XCand_fromMCFit->currentState().mass()/(X_pperp.Perp2());
+		double X_ctauErrPVCosAlpha = sqrt(ROOT::Math::Similarity(X_v3pperp,X_vXYeCosAlpha)) * XCand_fromMCFit->currentState().mass() / (X_pperp.Perp2());
+		float X_lxyPVCosAlpha = X_vdiff.Dot(X_pperp) / X_pperp.Mag() ;
+		
+		xCosAlphaPVCosAlpha->push_back( X_cosAlpha ) ;
+		xCTauPVCosAlpha->push_back( X_ctauPVCosAlpha ) ;
+		xCTauPVCosAlphaE->push_back( X_ctauErrPVCosAlpha ) ;
+		xLxyPVCosAlpha->push_back( X_lxyPVCosAlpha ) ;
+
+
+		// Lifetime wrt PV with smaller longitudinal X impact parameter 
+		X_pvtx.SetXYZ(theOtherV.position().x(), theOtherV.position().y(), 0);
+		X_vdiff = X_vtx - X_pvtx;
+		X_cosAlpha = X_vdiff.Dot(X_pperp) / (X_vdiff.Perp()*X_pperp.Perp());
+		X_distXY = X_vdistXY.distance(Vertex(*XCand_vertex_fromMCFit), Vertex(theOtherV));
+		double X_ctauPVX = X_distXY.value()*X_cosAlpha*XCand_fromMCFit->currentState().mass()/X_pperp.Perp();
+		GlobalError X_v1eX = (Vertex(*XCand_vertex_fromMCFit)).error();
+		GlobalError X_v2eX = theOtherV.error();
+		AlgebraicSymMatrix33 X_vXYeX = X_v1eX.matrix() + X_v2eX.matrix();
+		//double X_ctauErrPVX = sqrt(X_vXYeX.similarity(X_vpperp))*XCand_fromMCFit->currentState().mass()/(X_pperp.Perp2());
+		double X_ctauErrPVX = sqrt(ROOT::Math::Similarity(X_v3pperp,X_vXYeX)) * XCand_fromMCFit->currentState().mass() / (X_pperp.Perp2());
+		float X_lxyPVX = X_vdiff.Dot(X_pperp) / X_pperp.Mag() ;
+	    
+		xCosAlphaPVX->push_back(X_cosAlpha);
+		xCTauPVX->push_back(X_ctauPVX);
+		xCTauPVXE->push_back(X_ctauErrPVX);
+		xLxyPVX->push_back(X_lxyPVX);
+	    
+
+		VertexDistance3D X_a3d;
+		float X_Dist3DPV     = X_a3d.distance(TheOtherVertex3D, Vertex(*XCand_vertex_fromMCFit)).value() ;
+		float X_Dist3DPV_err = X_a3d.distance(TheOtherVertex3D, Vertex(*XCand_vertex_fromMCFit)).error() ;
+		xCTauPVX_3D->push_back(X_Dist3DPV);
+		xCTauPVX_3D_err->push_back(X_Dist3DPV_err);
+		//cout << Dist3DPV << " " << Dist3DPV_err << endl; 
+
+
+		//Lifetime BS
+		X_pvtx.SetXYZ(theBeamSpotVtx.position().x(), theBeamSpotVtx.position().y(), 0);
+		X_vdiff = X_vtx - X_pvtx;
+		X_cosAlpha = X_vdiff.Dot(X_pperp) / (X_vdiff.Perp()*X_pperp.Perp());
+		X_distXY = X_vdistXY.distance(Vertex(*XCand_vertex_fromMCFit), Vertex(theBeamSpotVtx));
+		double ctauBS = X_distXY.value() * X_cosAlpha * XCand_fromMCFit->currentState().mass() / X_pperp.Perp();
+		GlobalError X_v1eB = (Vertex(*XCand_vertex_fromMCFit)).error();
+		GlobalError X_v2eB = theBeamSpotVtx.error();
+		//AlgebraicSymMatrix X_vXYeB = X_v1eB.matrix() + X_v2eB.matrix();
+		AlgebraicSymMatrix33 X_vXYeB = X_v1eB.matrix() + X_v2eB.matrix();
+		//double X_ctauErrBS = sqrt(X_vXYeB.similarity(X_vpperp))*XCand_fromMCFit->currentState().mass()/(X_pperp.Perp2());
+		double X_ctauErrBS = sqrt(ROOT::Math::Similarity(X_v3pperp,X_vXYeB)) * XCand_fromMCFit->currentState().mass() / (X_pperp.Perp2()) ;
+		float X_lxyBS = X_vdiff.Dot(X_pperp)/X_pperp.Mag(); 
+						
+		xCosAlphaBS->push_back(X_cosAlpha);
+		xCTauBS->push_back(ctauBS);
+		xCTauBSE->push_back(X_ctauErrBS);
+		xLxyBS->push_back(X_lxyBS);
+
+		X_psiPrimeIdx->push_back(nPsiPrime-1);
+		X_pi1Idx->push_back(std::distance(thePATTrackHandle->begin(), Track1));
+		X_pi2Idx->push_back(std::distance(thePATTrackHandle->begin(), Track2));
+								
+		nX++;
+						
+		xDaughters.clear();
+	      } // 2nd loop over track (look for pi2)
+
+	    
+	    //next check tracks for kaon
+	    for ( vector<pat::GenericParticle>::const_iterator Track2 = Track1+1; Track2 != thePATTrackHandle->end(); ++Track2 )
+	      {
+		if (Track1->charge() * Track2->charge() > 0)
+		  continue ;
+	      
+		//check track doesn't overlap with the Psi' candidate tracks
+		if (Track2->track().key() == rmu1->track().key()  ||  Track2->track().key() == rmu2->track().key())
+		  continue ;	      
+		
+		///// cuts on charged tracks	
+		if ((Track2->track()->chi2() / Track2->track()->ndof() > TrMaxNormChi2)  ||  Track2->pt() < TrMinPt)
+		  continue;	      
+		
+		// cuts on tracks' delta R								
+		math::XYZTLorentzVector psiPrime = (rmu1->p4() + rmu2->p4()); 
+		math::XYZTLorentzVector b0 = (rmu1->p4() + rmu2->p4() + Track1->p4() + Track2->p4()); 
+		//
+		float psiPrimePiDR = sqrt( pow(psiPrime.eta() - Track1->p4().eta(),2) + pow(psiPrime.phi() - Track1->p4().phi(),2) );
+		float psiPrimeKDR = sqrt( pow(psiPrime.eta() - Track2->p4().eta(),2) + pow(psiPrime.phi() - Track2->p4().phi(),2) );
+		
+		float b0PiDR = sqrt(pow(b0.eta()-Track1->p4().eta(),2) + pow(b0.phi()-Track1->p4().phi(),2));
+		float b0KDR = sqrt(pow(b0.eta()-Track2->p4().eta(),2) + pow(b0.phi()-Track2->p4().phi(),2));
+
+		
+		// B0
+		if (UseB0DR) {
+		  if (b0PiDR > B0TrackMaxDR  ||  b0KDR > B0TrackMaxDR)
+		    continue ; // B0TrackMaxDR = 2
+		} else {
+		  if (psiPrimePiDR > PsiPrimeTrackMaxDR  ||  psiPrimeKDR > PsiPrimeTrackMaxDR)
+		    continue ; // PsiPrimeTrackMaxDR = 3.5
+		}
+		
+		////////// cuts on Psi'+pi+k mass window
+		if ((Track1->p4() + Track2->p4() + psiPrime).M() > PsiPrimePiKMaxMass  ||  (Track1->p4() + Track2->p4() + psiPrime).M() < PsiPrimePiKMinMass)
+		  continue ;
+		
+		// having two oppositely charged muons, and two oppositely charged tracks: try to vertex them
+		//TransientTrack pionTT( Track1->track(), &(*bFieldHandle) ); // already declared above
+		TransientTrack kaonTT( Track2->track(), &(*bFieldHandle) );
+	      
+		// Do mass constraint for Psi' cand and do mass constrained vertex fit
+		vector<RefCountedKinematicParticle> b0Daughters;
+		b0Daughters.push_back(pFactory.particle( muon1TT, muon_mass, chi, ndf, muon_sigma));
+		b0Daughters.push_back(pFactory.particle( muon2TT, muon_mass, chi, ndf, muon_sigma));
+		b0Daughters.push_back(pFactory.particle( pionTT, pion_mass, chi, ndf, pion_sigma));
+		b0Daughters.push_back(pFactory.particle( kaonTT, kaon_mass, chi, ndf, kaon_sigma));
+		
+		RefCountedKinematicTree B0VertexFitTree;
+	      
+		if (doPsiPrimeMassConst) { // MassConst = 'MC' in the following
+		  //MultiTrackKinematicConstraint *PsiPrime = new  TwoTrackMassKinematicConstraint(psi2S_mass);
+		  MultiTrackKinematicConstraint *PsiPrime = 0;
+		  if (dimuonType == 1) { // constrain to JPsi mass
+		    PsiPrime = new TwoTrackMassKinematicConstraint(Jpsi_mass);
+		  } else if (dimuonType == 2) { // constrain to Psi(2S) mass
+		    PsiPrime = new TwoTrackMassKinematicConstraint(psi2S_mass);
+		  }
+		  
+		  KinematicConstrainedVertexFitter B0Fitter;
+		  B0VertexFitTree = B0Fitter.fit(b0Daughters, PsiPrime);
+		} 
+		else {
+		  KinematicParticleVertexFitter B0Fitter;
+		  B0VertexFitTree = B0Fitter.fit(b0Daughters);
+		}
+		
+		if (!B0VertexFitTree->isValid())
+		  continue ;	      
+		B0VertexFitTree->movePointerToTheTop();
+		RefCountedKinematicParticle B0Cand_fromMCFit = B0VertexFitTree->currentParticle();
+		RefCountedKinematicVertex B0Cand_vertex_fromMCFit = B0VertexFitTree->currentDecayVertex();	      
+		//
+		if (!B0Cand_vertex_fromMCFit->vertexIsValid())
+		  continue ;
+		
+		if ( B0Cand_vertex_fromMCFit->chiSquared() < 0  ||  B0Cand_vertex_fromMCFit->chiSquared() > 10000 )
+		  continue ;
+	    
+		if ( B0Cand_fromMCFit->currentState().mass() > 100 )
+		  continue ;
+		
+		double b0VtxProb = ChiSquaredProbability((double)(B0Cand_vertex_fromMCFit->chiSquared()),(double)(B0Cand_vertex_fromMCFit->degreesOfFreedom()));
+		if ( b0VtxProb < 0.005 ) 
+		  continue ; 
+
+		// fill B0 candidate variables now
+		b0Mass->push_back( B0Cand_fromMCFit->currentState().mass()) ;
+		b0Px->push_back( B0Cand_fromMCFit->currentState().globalMomentum().x()) ;
+		b0Py->push_back( B0Cand_fromMCFit->currentState().globalMomentum().y()) ;
+		b0Pz->push_back( B0Cand_fromMCFit->currentState().globalMomentum().z()) ;			
+		b0PxE->push_back( sqrt( B0Cand_fromMCFit->currentState().kinematicParametersError().matrix()(3,3) ) ) ;
+		b0PyE->push_back( sqrt( B0Cand_fromMCFit->currentState().kinematicParametersError().matrix()(4,4) ) ) ;
+		b0PzE->push_back( sqrt( B0Cand_fromMCFit->currentState().kinematicParametersError().matrix()(5,5) ) ) ;			
+		b0Vtx_CL->push_back( ChiSquaredProbability((double)(B0Cand_vertex_fromMCFit->chiSquared()), (double)(B0Cand_vertex_fromMCFit->degreesOfFreedom())) );
+		b0Vtx_Chi2->push_back( B0Cand_vertex_fromMCFit->chiSquared() ) ;
+
+		b0DecayVtx_X->push_back((*B0Cand_vertex_fromMCFit).position().x());
+		b0DecayVtx_Y->push_back((*B0Cand_vertex_fromMCFit).position().y());
+		b0DecayVtx_Z->push_back((*B0Cand_vertex_fromMCFit).position().z());
+		b0DecayVtx_XE->push_back(sqrt((*B0Cand_vertex_fromMCFit).error().cxx()));
+		b0DecayVtx_YE->push_back(sqrt((*B0Cand_vertex_fromMCFit).error().cyy()));
+		b0DecayVtx_ZE->push_back(sqrt((*B0Cand_vertex_fromMCFit).error().czz()));
+						
+		B0VertexFitTree->movePointerToTheFirstChild(); 
+		RefCountedKinematicParticle mu1_MuMuPiK = B0VertexFitTree->currentParticle();
+		B0VertexFitTree->movePointerToTheNextChild();
+		RefCountedKinematicParticle mu2_MuMuPiK = B0VertexFitTree->currentParticle();
+		B0VertexFitTree->movePointerToTheNextChild();
+		RefCountedKinematicParticle pi_MuMuPiK = B0VertexFitTree->currentParticle();
+		B0VertexFitTree->movePointerToTheNextChild();
+		RefCountedKinematicParticle k_MuMuPiK = B0VertexFitTree->currentParticle();
+						
+		mu1Px_MuMuPiK->push_back( mu1_MuMuPiK->currentState().globalMomentum().x() );
+		mu1Py_MuMuPiK->push_back( mu1_MuMuPiK->currentState().globalMomentum().y() );
+		mu1Pz_MuMuPiK->push_back( mu1_MuMuPiK->currentState().globalMomentum().z() );
+		mu1E_MuMuPiK->push_back( mu1_MuMuPiK->currentState().kinematicParameters().energy() );
+	      
+		mu2Px_MuMuPiK->push_back( mu2_MuMuPiK->currentState().globalMomentum().x() );
+		mu2Py_MuMuPiK->push_back( mu2_MuMuPiK->currentState().globalMomentum().y() );
+		mu2Pz_MuMuPiK->push_back( mu2_MuMuPiK->currentState().globalMomentum().z() );
+		mu2E_MuMuPiK->push_back( mu2_MuMuPiK->currentState().kinematicParameters().energy() );
+	    
+		piPx_MuMuPiK->push_back( pi_MuMuPiK->currentState().globalMomentum().x() );
+		piPy_MuMuPiK->push_back( pi_MuMuPiK->currentState().globalMomentum().y() );
+		piPz_MuMuPiK->push_back( pi_MuMuPiK->currentState().globalMomentum().z() );
+		piE_MuMuPiK->push_back( pi_MuMuPiK->currentState().kinematicParameters().energy() );
+		  
+		kPx_MuMuPiK->push_back( k_MuMuPiK->currentState().globalMomentum().x() );
+		kPy_MuMuPiK->push_back( k_MuMuPiK->currentState().globalMomentum().y() );
+		kPz_MuMuPiK->push_back( k_MuMuPiK->currentState().globalMomentum().z() );
+		kE_MuMuPiK->push_back( k_MuMuPiK->currentState().kinematicParameters().energy() );
+						
+		///////////////////////////////////						
+													
+		vector<TransientVertex> B0_pvs ;  
+		if (addB0lessPrimaryVertex_) 
+		  {
+		    VertexReProducer revertex(recVtxs, iEvent);
+		    Handle<TrackCollection> pvtracks;   
+		    iEvent.getByLabel(revertex.inputTracks(),   pvtracks);
+		    Handle<BeamSpot>        pvbeamspot;
+		    iEvent.getByLabel(revertex.inputBeamSpot(), pvbeamspot);
+		    //
+		    if (pvbeamspot.id() != beamSpotHandle.id() ) 
+		      edm::LogWarning("Inconsistency") << "The BeamSpot used for PV reco is not the same used in this analyzer.";
+		    //
+		    const reco::Muon *B0rmu_1 = dynamic_cast<const reco::Muon *>(Muon1->originalObject());
+		    const reco::Muon *B0rmu_2 = dynamic_cast<const reco::Muon *>(Muon2->originalObject());
+		    //
+		    if (B0rmu_1 != 0  &&  B0rmu_2 != 0  &&  B0rmu_1->track().id() == pvtracks.id()  &&  B0rmu_2->track().id() == pvtracks.id() 
+			&&  Track1->track().id() == pvtracks.id()  &&  Track2->track().id() ==  pvtracks.id()) { 
+		      TrackCollection B0Less;
+		      B0Less.reserve(pvtracks->size());
+		      for (size_t i = 0, n = pvtracks->size(); i < n; ++i) {
+			if (i == B0rmu_1->track().key()) continue;
+			if (i == B0rmu_2->track().key()) continue;
+			if (i == Track1->track().key()) continue;
+			if (i == Track2->track().key()) continue;
+			B0Less.push_back((*pvtracks)[i]);
+		      }
+		      B0_pvs = revertex.makeVertices(B0Less, *pvbeamspot, iSetup) ;
+		      if (!B0_pvs.empty()) {
+			Vertex B0LessPV = Vertex(B0_pvs.front());
+			thePrimaryVtx = B0LessPV;
+		      }
+		    }
+		  }
+		
+
+		TVector3 B0_vtx((*B0Cand_vertex_fromMCFit).position().x(), (*B0Cand_vertex_fromMCFit).position().y(), 0) ;			
+		TVector3 B0_pperp(B0Cand_fromMCFit->currentState().globalMomentum().x(), B0Cand_fromMCFit->currentState().globalMomentum().y(), 0);
+		TVector3 B0_pvtx ;
+		TVector3 B0_vdiff ;
+
+		// Find the PV with the largest B0_cos(alpha)
+		Vertex theCosAlphaV = thePrimaryVtx ; // first declaration here
+		float maxCosAlpha = -1. ;
+		//
+		for (VertexCollection::const_iterator itv = recVtxs->begin(), itvend = recVtxs->end(); itv != itvend; ++itv) {
+		  B0_pvtx.SetXYZ(itv->position().x(), itv->position().y(), 0) ;	
+		  B0_vdiff = B0_vtx - B0_pvtx ;
+		  float cosAlpha_temp = B0_vdiff.Dot(B0_pperp) / (B0_vdiff.Perp()*B0_pperp.Perp()) ;
+		  
+		  if ( cosAlpha_temp > maxCosAlpha ) {
+		    maxCosAlpha = cosAlpha_temp ;    
+		    //thePrimaryVtx = Vertex(*itv);
+		    //theCosAlphaV = thePrimaryVtx;
+		    theCosAlphaV = Vertex(*itv) ;
+		  }
+		}
+		//							
+		PriVtx_B0CosAlpha_X->push_back( theCosAlphaV.position().x() ) ;
+		PriVtx_B0CosAlpha_Y->push_back( theCosAlphaV.position().y() ) ;
+		PriVtx_B0CosAlpha_Z->push_back( theCosAlphaV.position().z() ) ;
+		PriVtx_B0CosAlpha_EX->push_back( theCosAlphaV.xError() ) ;
+		PriVtx_B0CosAlpha_EY->push_back( theCosAlphaV.yError() ) ;
+		PriVtx_B0CosAlpha_EZ->push_back( theCosAlphaV.zError() ) ;
+		PriVtx_B0CosAlpha_CL->push_back( ChiSquaredProbability((double)(theCosAlphaV.chi2()), (double)(theCosAlphaV.ndof())) ) ;
+		PriVtx_B0CosAlpha_Chi2->push_back( theCosAlphaV.chi2() ) ;
+		PriVtx_B0CosAlpha_tracks->push_back( theCosAlphaV.tracksSize() ) ;
+
+		
+		Vertex theOtherV = thePrimaryVtx; 
+		//			
+		if (resolveAmbiguity_) {
+		  float minDz = 999999. ;
+		  if (!addB0lessPrimaryVertex_) {
+		    for (VertexCollection::const_iterator itv = recVtxs->begin(), itvend = recVtxs->end(); itv != itvend; ++itv)
+		      {
+			float deltaZ = fabs((*B0Cand_vertex_fromMCFit).position().z() - itv->position().z()) ;
+			if ( deltaZ < minDz ) {
+			  minDz = deltaZ;    
+			  thePrimaryVtx = Vertex(*itv);
+			  theOtherV = thePrimaryVtx;
+			}
+		      }
+		  } else {
+		    for (vector<TransientVertex>::iterator itv2 = B0_pvs.begin(), itvend2 = B0_pvs.end(); itv2 != itvend2; ++itv2)
+		      {
+			float deltaZ = fabs((*B0Cand_vertex_fromMCFit).position().z() - itv2->position().z()) ;
+			if ( deltaZ < minDz ) {
+			  minDz = deltaZ;    
+			  Vertex B0LessPV = Vertex(*itv2); 
+			  thePrimaryVtx = B0LessPV;
+			  theOtherV = B0LessPV;
+			}
+		      }
+		  }
+		} 
+	    
+	
+		Vertex TheOtherVertex3D = thePrimaryVtx; 
+		//cout<<" choose PV ="<<endl;
+		if (resolveAmbiguity_) {
+		  float minDz = 999999.;
+		  float minDzTrack = 999999.;
+		  if (!addB0lessPrimaryVertex_) {
+		    for (VertexCollection::const_iterator itv = recVtxs->begin(), itvend = recVtxs->end(); itv != itvend; ++itv) {
+		      float deltaZ = fabs((*B0Cand_vertex_fromMCFit).position().z() - itv->position().z()) ;
+		      if ( deltaZ < minDz ) {
+			minDz = deltaZ;    
+			TheOtherVertex3D = Vertex(*itv);
+		      }
+		    }
+		  } else {
+		    for (vector<TransientVertex>::iterator itv2 = B0_pvs.begin(), itvend2 = B0_pvs.end(); itv2 != itvend2; ++itv2) {
+		      VertexDistance3D a3d;
+		      float deltaZ   = a3d.distance(Vertex(*itv2), Vertex(*B0Cand_vertex_fromMCFit)).value();
+		      if ( deltaZ < minDz ) {
+			minDz = deltaZ;    
+			Vertex XLessPV = Vertex(*itv2); 
+			TheOtherVertex3D = XLessPV;
+			//cout<<" z(X) - z(vtx) min="<<minDz<<endl; 
+		      }
+		      
+		    }
+		  }
+		} 
+		
+		//					
+		PriVtxB0Corr_X->push_back( thePrimaryVtx.position().x() ) ;
+		PriVtxB0Corr_Y->push_back( thePrimaryVtx.position().y() ) ;
+		PriVtxB0Corr_Z->push_back( thePrimaryVtx.position().z() ) ; 
+		PriVtxB0Corr_EX->push_back( thePrimaryVtx.xError() ) ;
+		PriVtxB0Corr_EY->push_back( thePrimaryVtx.yError() ) ;
+		PriVtxB0Corr_EZ->push_back( thePrimaryVtx.zError() ) ;
+		PriVtxB0Corr_CL->push_back( ChiSquaredProbability( (double)(thePrimaryVtx.chi2()), (double)(thePrimaryVtx.ndof())) );
+		PriVtxB0Corr_Chi2->push_back( thePrimaryVtx.chi2() ) ;
+		PriVtxB0Corr_tracks->push_back( thePrimaryVtx.tracksSize() ) ;
+		//			
+		///////////////////////////////////////////////////////////////////////////////
+						
+						
+		VertexDistanceXY B0_vdistXY;
+												
+		AlgebraicVector B0_vpperp(3);
+		B0_vpperp[0] = B0_pperp.x(); B0_vpperp[1] = B0_pperp.y(); B0_vpperp[2] = 0.;
+		AlgebraicVector3 B0_v3pperp ;
+		B0_v3pperp[0] = B0_pperp.x(); B0_v3pperp[1] = B0_pperp.y(); B0_v3pperp[2] = 0.;
+
+		// Lifetime PV
+		B0_pvtx.SetXYZ(thePrimaryVtx.position().x(), thePrimaryVtx.position().y(), 0) ;
+		B0_vdiff = B0_vtx - B0_pvtx ;
+		double B0_cosAlpha = B0_vdiff.Dot(B0_pperp) / (B0_vdiff.Perp()*B0_pperp.Perp()) ;
+		Measurement1D B0_distXY = B0_vdistXY.distance(Vertex(*B0Cand_vertex_fromMCFit), Vertex(thePrimaryVtx));
+		double B0_ctauPV = B0_distXY.value() * B0_cosAlpha * B0Cand_fromMCFit->currentState().mass() / B0_pperp.Perp();
+						
+		GlobalError B0_v1e = (Vertex(*B0Cand_vertex_fromMCFit)).error();
+		GlobalError B0_v2e = thePrimaryVtx.error();
+		//AlgebraicSymMatrix B0_vXYe = B0_v1e.matrix() + B0_v2e.matrix() ;
+		AlgebraicSymMatrix33 B0_vXYe = B0_v1e.matrix() + B0_v2e.matrix() ;
+		//double ctauErrPV = sqrt(B0_vXYe.similarity(B0_vpperp)) * B0Cand_fromMCFit->currentState().mass() / (B0_pperp.Perp2()) ;
+		double ctauErrPV = sqrt(ROOT::Math::Similarity(B0_v3pperp,B0_vXYe)) * B0Cand_fromMCFit->currentState().mass() / (B0_pperp.Perp2()) ;
+		float lxyPV = B0_vdiff.Dot(B0_pperp)/B0_pperp.Mag();
+						
+		b0CosAlphaPV->push_back(B0_cosAlpha);
+		b0CTauPV->push_back(B0_ctauPV);
+		b0CTauPVE->push_back(ctauErrPV);
+		b0LxyPV->push_back(lxyPV);
+					
+		
+		// Lifetime wrt PV with largest B0_cos(alpha) candidate 
+		B0_pvtx.SetXYZ(theCosAlphaV.position().x(), theCosAlphaV.position().y(), 0) ;	
+		B0_vdiff = B0_vtx - B0_pvtx ;
+		B0_cosAlpha =  maxCosAlpha ;
+		B0_distXY = B0_vdistXY.distance( Vertex(*B0Cand_vertex_fromMCFit), Vertex(theCosAlphaV) ) ;
+		double B0_ctauPVCosAlpha = B0_distXY.value() * B0_cosAlpha * B0Cand_fromMCFit->currentState().mass() / B0_pperp.Perp();
+		
+		GlobalError B0_v1eCosAlpha = (Vertex(*B0Cand_vertex_fromMCFit)).error();
+		GlobalError B0_v2eCosAlpha = theCosAlphaV.error();
+		AlgebraicSymMatrix33 B0_vXYeCosAlpha = B0_v1eCosAlpha.matrix() + B0_v2eCosAlpha.matrix();
+		//double B0_ctauErrPVCosAlpha = sqrt(B0_vXYeCosAlpha.similarity(B0_vpperp))*B0Cand_fromMCFit->currentState().mass()/(B0_pperp.Perp2());
+		double B0_ctauErrPVCosAlpha = sqrt(ROOT::Math::Similarity(B0_v3pperp,B0_vXYeCosAlpha)) * B0Cand_fromMCFit->currentState().mass() / (B0_pperp.Perp2());
+		float B0_lxyPVCosAlpha = B0_vdiff.Dot(B0_pperp) / B0_pperp.Mag() ;
+		
+		b0CosAlphaPVCosAlpha->push_back( B0_cosAlpha ) ;
+		b0CTauPVCosAlpha->push_back( B0_ctauPVCosAlpha ) ;
+		b0CTauPVCosAlphaE->push_back( B0_ctauErrPVCosAlpha ) ;
+		b0LxyPVCosAlpha->push_back( B0_lxyPVCosAlpha ) ;
+
+
+		// Lifetime wrt PV with smaller longitudinal X impact parameter 
+		B0_pvtx.SetXYZ(theOtherV.position().x(), theOtherV.position().y(), 0);
+		B0_vdiff = B0_vtx - B0_pvtx;
+		B0_cosAlpha = B0_vdiff.Dot(B0_pperp) / (B0_vdiff.Perp()*B0_pperp.Perp());
+		B0_distXY = B0_vdistXY.distance(Vertex(*B0Cand_vertex_fromMCFit), Vertex(theOtherV));
+		double B0_ctauPVX = B0_distXY.value() * B0_cosAlpha * B0Cand_fromMCFit->currentState().mass() / B0_pperp.Perp();
+		GlobalError B0_v1eX = (Vertex(*B0Cand_vertex_fromMCFit)).error();
+		GlobalError B0_v2eX = theOtherV.error();
+		AlgebraicSymMatrix33 B0_vXYeX = B0_v1eX.matrix() + B0_v2eX.matrix();
+		//double ctauErrPVX = sqrt(B0_vXYeX.similarity(B0_vpperp))*B0Cand_fromMCFit->currentState().mass()/(B0_pperp.Perp2());
+		double ctauErrPVX = sqrt(ROOT::Math::Similarity(B0_v3pperp,B0_vXYeX)) * B0Cand_fromMCFit->currentState().mass() / (B0_pperp.Perp2());
+		float lxyPVX = B0_vdiff.Dot(B0_pperp) / B0_pperp.Mag() ;
+	    
+		b0CosAlphaPVX->push_back(B0_cosAlpha);
+		b0CTauPVX->push_back(B0_ctauPVX);
+		b0CTauPVXE->push_back(ctauErrPVX);
+		b0LxyPVX->push_back(lxyPVX);
+	    
+
+		VertexDistance3D a3d; 
+		float Dist3DPV     = a3d.distance(TheOtherVertex3D, Vertex(*B0Cand_vertex_fromMCFit)).value() ;
+		float Dist3DPV_err = a3d.distance(TheOtherVertex3D, Vertex(*B0Cand_vertex_fromMCFit)).error() ;
+		b0CTauPVX_3D->push_back(Dist3DPV);
+		b0CTauPVX_3D_err->push_back(Dist3DPV_err);
+		//cout << Dist3DPV << " " << Dist3DPV_err << endl; 
+
+
+		//Lifetime BS
+		B0_pvtx.SetXYZ(theBeamSpotVtx.position().x(), theBeamSpotVtx.position().y(), 0);
+		B0_vdiff = B0_vtx - B0_pvtx;
+		B0_cosAlpha = B0_vdiff.Dot(B0_pperp)/(B0_vdiff.Perp()*B0_pperp.Perp());
+		B0_distXY = B0_vdistXY.distance(Vertex(*B0Cand_vertex_fromMCFit), Vertex(theBeamSpotVtx));
+		double ctauBS = B0_distXY.value()*B0_cosAlpha*B0Cand_fromMCFit->currentState().mass()/B0_pperp.Perp();
+		GlobalError B0_v1eB = (Vertex(*B0Cand_vertex_fromMCFit)).error();
+		GlobalError B0_v2eB = theBeamSpotVtx.error();
+		//AlgebraicSymMatrix B0_vXYeB = B0_v1eB.matrix() + B0_v2eB.matrix();
+		AlgebraicSymMatrix33 B0_vXYeB = B0_v1eB.matrix() + B0_v2eB.matrix();
+		//double ctauErrBS = sqrt(B0_vXYeB.similarity(B0_vpperp))*B0Cand_fromMCFit->currentState().mass()/(B0_pperp.Perp2());
+		double ctauErrBS = sqrt(ROOT::Math::Similarity(B0_v3pperp,B0_vXYeB)) * B0Cand_fromMCFit->currentState().mass()/(B0_pperp.Perp2());
+		float lxyBS = B0_vdiff.Dot(B0_pperp)/B0_pperp.Mag();
+						
+		b0CosAlphaBS->push_back(B0_cosAlpha);
+		b0CTauBS->push_back(ctauBS);
+		b0CTauBSE->push_back(ctauErrBS);
+		b0LxyBS->push_back(lxyBS);
+
+		B0_psiPrimeIdx->push_back(nPsiPrime-1);
+		B0_piIdx->push_back(std::distance(thePATTrackHandle->begin(), Track1));
+		B0_kIdx->push_back(std::distance(thePATTrackHandle->begin(), Track2));
+		
+		nB0++;
+						
+		b0Daughters.clear();
+	      }// 2nd loop over track (look for k)
+	  }// 1st loop over track (look for pi)
+	  //	 */ // End Comment out all of Z candidate stuff
+	}// 2nd loop over muons (look for mu-)
+      }//first loop over muons (look for mu+)
+    }//if two muons
+	
+  // AT THE END OF THE EVENT fill the tree and clear the vectors
+  // ===========================================================
+	
+  if (nPsiPrime > 0)
+    Z_One_Tree_->Fill() ;
+  //
+  //
+  // trigger stuff
+  trigRes->clear(); trigNames->clear(); L1TT->clear(); MatchTriggerNames->clear(); 
+  //
+  // event numbers
+  runNum = 0; evtNum=0; lumiNum=0;
+  //
+  // counters
+  nMu = 0; nPsiPrime = 0; nZ = 0; nB0 = 0; nX = 0; 
+  //
+  // indices
+  mu1Idx->clear(); mu2Idx->clear();
+  // Z
+  Z_psiPrimeIdx->clear(); Z_piIdx->clear();
+  // X
+  X_psiPrimeIdx->clear(); X_pi1Idx->clear(); X_pi2Idx->clear();
+  // B0
+  B0_psiPrimeIdx->clear(); B0_piIdx->clear(); B0_kIdx->clear();
+  //
+  // Primary Vertex	
+  priVtx_X = 0; priVtx_Y = 0; priVtx_Z = 0 ; 
+  priVtx_XE = 0; priVtx_YE = 0; priVtx_ZE = 0 ; 
+  priVtx_NormChi2 = 0; priVtx_Chi2 = 0; priVtx_CL = 0, priVtx_tracks = 0 ;
+  //
+  // PsiPrime cand
+  psiPrimeMass->clear(); psiPrimeVtx_CL->clear(); psiPrimeVtx_Chi2->clear(); 
+  psiPrimePx->clear(); psiPrimePy->clear(); psiPrimePz->clear();
+  psiPrimeDecayVtx_X->clear(); psiPrimeDecayVtx_Y->clear(); psiPrimeDecayVtx_Z->clear();
+  psiPrimeDecayVtx_XE->clear(); psiPrimeDecayVtx_YE->clear(); psiPrimeDecayVtx_ZE->clear();
+  PsiPrimeMuonTrigMatch->clear();
+  //
+  // muons from Psi' fit
+  mu1_MuMu_Px->clear(); mu1_MuMu_Py->clear(); mu1_MuMu_Pz->clear(); mu1_MuMu_Chi2->clear(); mu1_MuMu_NDF->clear();
+  mu2_MuMu_Px->clear(); mu2_MuMu_Py->clear(); mu2_MuMu_Pz->clear(); mu2_MuMu_Chi2->clear(); mu2_MuMu_NDF->clear();
+  jtype->clear();
+  // Primary Vertex with "MuMu correction"
+  PriVtxMuMuCorr_X->clear(); PriVtxMuMuCorr_Y->clear(); PriVtxMuMuCorr_Z->clear(); 
+  PriVtxMuMuCorr_EX->clear(); PriVtxMuMuCorr_EY->clear(); PriVtxMuMuCorr_EZ->clear();  
+  PriVtxMuMuCorr_Chi2->clear(); PriVtxMuMuCorr_CL->clear(); PriVtxMuMuCorr_tracks->clear();
+  //
+  // Z cand	
+  MuMuPiMass->clear(); MuMuPiVtx_CL->clear(); MuMuPiVtx_Chi2->clear(); 
+  MuMuPiPx->clear(); MuMuPiPy->clear(); MuMuPiPz->clear(); 
+  MuMuPiPxE->clear(); MuMuPiPyE->clear(); MuMuPiPzE->clear();
+  MuMuPiDecayVtx_X->clear(); MuMuPiDecayVtx_Y->clear(); MuMuPiDecayVtx_Z->clear(); 
+  MuMuPiDecayVtx_XE->clear(); MuMuPiDecayVtx_YE->clear(); MuMuPiDecayVtx_ZE->clear(); 
+  // muons and tracks after Z cand fit
+  mu1Px_MuMuPi->clear(); mu1Py_MuMuPi->clear(); mu1Pz_MuMuPi->clear(); mu1E_MuMuPi->clear();
+  mu2Px_MuMuPi->clear(); mu2Py_MuMuPi->clear(); mu2Pz_MuMuPi->clear(); mu2E_MuMuPi->clear();
+  piPx_MuMuPi->clear(); piPy_MuMuPi->clear(); piPz_MuMuPi->clear(); piE_MuMuPi->clear();
+  // Primary Vertex with largest Z_cos(alpha)
+  PriVtx_ZCosAlpha_X->clear(); PriVtx_ZCosAlpha_Y->clear(); PriVtx_ZCosAlpha_Z->clear(); 
+  PriVtx_ZCosAlpha_EX->clear(); PriVtx_ZCosAlpha_EY->clear(); PriVtx_ZCosAlpha_EZ->clear();  
+  PriVtx_ZCosAlpha_Chi2->clear(); PriVtx_ZCosAlpha_CL->clear(); PriVtx_ZCosAlpha_tracks->clear();
+  // Primary Vertex with "Z correction"
+  PriVtxZCorr_X->clear(); PriVtxZCorr_Y->clear(); PriVtxZCorr_Z->clear(); 
+  PriVtxZCorr_EX->clear(); PriVtxZCorr_EY->clear(); PriVtxZCorr_EZ->clear();  
+  PriVtxZCorr_Chi2->clear(); PriVtxZCorr_CL->clear(); PriVtxZCorr_tracks->clear();
+  //
+  // Z lifetime
+  zLxyPV->clear(); zCosAlphaPV->clear(); zCTauPV->clear(); zCTauPVE->clear(); 
+  zLxyPVCosAlpha->clear(); zCosAlphaPVCosAlpha->clear(); zCTauPVCosAlpha->clear(); zCTauPVCosAlphaE->clear();
+  zLxyPVX->clear(); zCosAlphaPVX->clear(); zCTauPVX->clear(); zCTauPVXE->clear();
+  zLxyBS->clear(); zCosAlphaBS->clear(); zCTauBS->clear(); zCTauBSE->clear();
+  zCTauPVX_3D->clear(); zCTauPVX_3D_err->clear();
+  //
+  // X cand	
+  xMass->clear(); xVtx_CL->clear(); xVtx_Chi2->clear(); 
+  xPx->clear(); xPy->clear(); xPz->clear(); 
+  xPxE->clear(); xPyE->clear(); xPzE->clear();
+  xDecayVtx_X->clear(); xDecayVtx_Y->clear(); xDecayVtx_Z->clear(); 
+  xDecayVtx_XE->clear(); xDecayVtx_YE->clear(); xDecayVtx_ZE->clear(); 
+  // muons and pions after X cand fit
+  mu1Px_MuMuPiPi->clear(); mu1Py_MuMuPiPi->clear(); mu1Pz_MuMuPiPi->clear(); mu1E_MuMuPiPi->clear();
+  mu2Px_MuMuPiPi->clear(); mu2Py_MuMuPiPi->clear(); mu2Pz_MuMuPiPi->clear(); mu2E_MuMuPiPi->clear();
+  pi1Px_MuMuPiPi->clear(); pi1Py_MuMuPiPi->clear(); pi1Pz_MuMuPiPi->clear(); pi1E_MuMuPiPi->clear();
+  pi2Px_MuMuPiPi->clear(); pi2Py_MuMuPiPi->clear(); pi2Pz_MuMuPiPi->clear(); pi2E_MuMuPiPi->clear();
+  PiPiMass_err->clear(); 
+  // Primary Vertex with largest X_cos(alpha)
+  PriVtx_XCosAlpha_X->clear(); PriVtx_XCosAlpha_Y->clear(); PriVtx_XCosAlpha_Z->clear(); 
+  PriVtx_XCosAlpha_EX->clear(); PriVtx_XCosAlpha_EY->clear(); PriVtx_XCosAlpha_EZ->clear();  
+  PriVtx_XCosAlpha_Chi2->clear(); PriVtx_XCosAlpha_CL->clear(); PriVtx_XCosAlpha_tracks->clear();
+  // Primary Vertex with "X correction"
+  PriVtxXCorr_X->clear(); PriVtxXCorr_Y->clear(); PriVtxXCorr_Z->clear(); 
+  PriVtxXCorr_EX->clear(); PriVtxXCorr_EY->clear(); PriVtxXCorr_EZ->clear();  
+  PriVtxXCorr_Chi2->clear(); PriVtxXCorr_CL->clear(); PriVtxXCorr_tracks->clear();
+  // X lifetime
+  xLxyPV->clear(); xCosAlphaPV->clear(); xCTauPV->clear(); xCTauPVE->clear(); 
+  xLxyPVCosAlpha->clear(); xCosAlphaPVCosAlpha->clear(); xCTauPVCosAlpha->clear(); xCTauPVCosAlphaE->clear();
+  xLxyPVX->clear(); xCosAlphaPVX->clear(); xCTauPVX->clear(); xCTauPVXE->clear();
+  xLxyBS->clear(); xCosAlphaBS->clear(); xCTauBS->clear(); xCTauBSE->clear();
+  xCTauPVX_3D->clear(); xCTauPVX_3D_err->clear();
+  //
+  // B0 cand	
+  b0Mass->clear(); b0Vtx_CL->clear(); b0Vtx_Chi2->clear(); 
+  b0Px->clear(); b0Py->clear(); b0Pz->clear(); 
+  b0PxE->clear(); b0PyE->clear(); b0PzE->clear();
+  b0DecayVtx_X->clear(); b0DecayVtx_Y->clear(); b0DecayVtx_Z->clear(); 
+  b0DecayVtx_XE->clear(); b0DecayVtx_YE->clear(); b0DecayVtx_ZE->clear(); 
+  // muons and tracks after B0 Cand fit
+  mu1Px_MuMuPiK->clear(); mu1Py_MuMuPiK->clear(); mu1Pz_MuMuPiK->clear(); mu1E_MuMuPiK->clear();
+  mu2Px_MuMuPiK->clear(); mu2Py_MuMuPiK->clear(); mu2Pz_MuMuPiK->clear(); mu2E_MuMuPiK->clear();
+  piPx_MuMuPiK->clear(); piPy_MuMuPiK->clear(); piPz_MuMuPiK->clear(); piE_MuMuPiK->clear();
+  kPx_MuMuPiK->clear(); kPy_MuMuPiK->clear(); kPz_MuMuPiK->clear(); kE_MuMuPiK->clear();
+  // Primary Vertex with largest B0_cos(alpha)
+  PriVtx_B0CosAlpha_X->clear(); PriVtx_B0CosAlpha_Y->clear(); PriVtx_B0CosAlpha_Z->clear(); 
+  PriVtx_B0CosAlpha_EX->clear(); PriVtx_B0CosAlpha_EY->clear(); PriVtx_B0CosAlpha_EZ->clear();  
+  PriVtx_B0CosAlpha_Chi2->clear(); PriVtx_B0CosAlpha_CL->clear(); PriVtx_B0CosAlpha_tracks->clear();
+  // Primary Vertex with "B0 correction"
+  PriVtxB0Corr_X->clear(); PriVtxB0Corr_Y->clear(); PriVtxB0Corr_Z->clear(); 
+  PriVtxB0Corr_EX->clear(); PriVtxB0Corr_EY->clear(); PriVtxB0Corr_EZ->clear();  
+  PriVtxB0Corr_Chi2->clear(); PriVtxB0Corr_CL->clear(); PriVtxB0Corr_tracks->clear();
+  //
+  // B0 lifetime
+  b0LxyPV->clear(); b0CosAlphaPV->clear(); b0CTauPV->clear(); b0CTauPVE->clear(); 
+  b0LxyPVCosAlpha->clear(); b0CosAlphaPVCosAlpha->clear(); b0CTauPVCosAlpha->clear(); b0CTauPVCosAlphaE->clear();
+  b0LxyPVX->clear(); b0CosAlphaPVX->clear(); b0CTauPVX->clear(); b0CTauPVXE->clear();
+  b0LxyBS->clear(); b0CosAlphaBS->clear(); b0CTauBS->clear(); b0CTauBSE->clear();
+  b0CTauPVX_3D->clear(); b0CTauPVX_3D_err->clear();
+  //
+  muPx->clear(); muPy->clear(); muPz->clear(); 
+  muD0->clear(); muDz->clear(); muChi2->clear(); muGlChi2->clear();
+  mufHits->clear(); muFirstBarrel->clear(); muFirstEndCap->clear(); muD0E->clear() ;  muDzVtxErr->clear() ; muKey->clear() ;
+  muDzVtx->clear(); muDxyVtx->clear(); muGlDzVtx->clear(); muGlDxyVtx->clear(); muGlMatchedStation->clear();
+  muNDF->clear(); muGlNDF->clear(); muPhits->clear(); muShits->clear(); muGlMuHits->clear(); muType->clear(); 
+  muQual->clear(); muTrack->clear(); muCharge->clear();
+  //
+  // tracks	
+  trPx->clear(); trPy->clear(); trPz->clear(); trE->clear();	
+  trNDF->clear(); trPhits->clear(); trShits->clear(); trChi2->clear();
+  trD0->clear(); trD0E->clear(); trCharge->clear();
+  trQualityHighPurity->clear(); trQualityTight->clear();
+  trfHits->clear(); trFirstBarrel->clear(); trFirstEndCap->clear();
+  trDzVtx->clear(); trDxyVtx->clear();
+  tr_nsigdedx->clear(); tr_dedx->clear(); tr_dedxMass->clear(); tr_theo->clear(); tr_sigma->clear();
+  //
+
+}// analyze
+
+
+// ------------ method called once each job just before starting event loop  ------------
+void MuMuPiKPAT::beginRun(edm::Run const & iRun, edm::EventSetup const& iSetup){
+  //   bool changed = true;
+  //   proccessName_="HLT";
+  //   hltConfig_.init(iRun,iSetup,proccessName_,changed);
+}
+
+
+void MuMuPiKPAT::beginJob()
+{
+  edm::Service<TFileService> fs;
+	
+  Z_One_Tree_ = fs->make<TTree>("Z_data", "Z(4430) Data");
+
+  Z_One_Tree_->Branch("TrigRes", &trigRes);
+  Z_One_Tree_->Branch("TrigNames", &trigNames);
+  Z_One_Tree_->Branch("MatchTriggerNames", &MatchTriggerNames);
+  Z_One_Tree_->Branch("L1TrigRes", &L1TT);
+  //
+  Z_One_Tree_->Branch("evtNum",&evtNum,"evtNum/i");
+  Z_One_Tree_->Branch("runNum",&runNum,"runNum/i");
+  Z_One_Tree_->Branch("lumiNum", &lumiNum, "lumiNum/i");
+  //
+  Z_One_Tree_->Branch("priVtx_X",&priVtx_X, "priVtx_X/f");
+  Z_One_Tree_->Branch("priVtx_Y",&priVtx_Y, "priVtx_Y/f");
+  Z_One_Tree_->Branch("priVtx_Z",&priVtx_Z, "priVtx_Z/f");
+  Z_One_Tree_->Branch("priVtx_XE",&priVtx_XE, "priVtx_XE/f");
+  Z_One_Tree_->Branch("priVtx_YE",&priVtx_YE, "priVtx_YE/f");
+  Z_One_Tree_->Branch("priVtx_ZE",&priVtx_ZE, "priVtx_ZE/f");
+  Z_One_Tree_->Branch("priVtx_NormChi2",&priVtx_NormChi2, "priVtx_NormChi2/f");
+  Z_One_Tree_->Branch("priVtx_Chi2",&priVtx_Chi2, "priVtx_Chi2/f");
+  Z_One_Tree_->Branch("priVtx_CL",&priVtx_CL, "priVtx_CL/f");
+  Z_One_Tree_->Branch("priVtx_tracks", &priVtx_tracks, "priVtx_tracks/i");
+  //
+  Z_One_Tree_->Branch("nMu", &nMu, "nMu/i");
+  Z_One_Tree_->Branch("muPx",&muPx);
+  Z_One_Tree_->Branch("muPy",&muPy);
+  Z_One_Tree_->Branch("muPz",&muPz);
+  Z_One_Tree_->Branch("muD0",&muD0);
+  Z_One_Tree_->Branch("muDz",&muDz);
+  Z_One_Tree_->Branch("muChi2",&muChi2);
+  Z_One_Tree_->Branch("muNDF",&muNDF);
+  Z_One_Tree_->Branch("muPhits",&muPhits);
+  Z_One_Tree_->Branch("muShits",&muShits);
+
+  Z_One_Tree_->Branch("muLayersTr",&muLayersTr);
+  Z_One_Tree_->Branch("muLayersPix",&muLayersPix);
+    
+  Z_One_Tree_->Branch("muD0E",&muD0E);
+  Z_One_Tree_->Branch("muDzVtxErr",&muDzVtxErr);
+  Z_One_Tree_->Branch("muKey",&muKey);
+    
+  Z_One_Tree_->Branch("muGlChi2",&muGlChi2);
+  Z_One_Tree_->Branch("muGlNDF",&muGlNDF);
+  Z_One_Tree_->Branch("muGlMuHits",&muGlMuHits);
+  Z_One_Tree_->Branch("muGlMatchedStation",&muGlMatchedStation);
+  Z_One_Tree_->Branch("muGlDzVtx", &muGlDzVtx);
+  Z_One_Tree_->Branch("muGlDxyVtx", &muGlDxyVtx);
+
+  Z_One_Tree_->Branch("muType",&muType);
+  Z_One_Tree_->Branch("muQual",&muQual);
+  Z_One_Tree_->Branch("muTrack",&muTrack);
+  Z_One_Tree_->Branch("muCharge", &muCharge);
+  //
+  Z_One_Tree_->Branch("mufHits", &mufHits);
+  Z_One_Tree_->Branch("muFirstBarrel", &muFirstBarrel);
+  Z_One_Tree_->Branch("muFirstEndCap", &muFirstEndCap);
+  Z_One_Tree_->Branch("muDzVtx", &muDzVtx);
+  Z_One_Tree_->Branch("muDxyVtx", &muDxyVtx);
+  //
+  Z_One_Tree_->Branch("trackPx", &trPx);
+  Z_One_Tree_->Branch("trackPy", &trPy);
+  Z_One_Tree_->Branch("trackPz", &trPz);
+  Z_One_Tree_->Branch("trackEnergy", &trE);
+  Z_One_Tree_->Branch("trackNDF", &trNDF);
+  Z_One_Tree_->Branch("trackPhits", &trPhits);
+  Z_One_Tree_->Branch("trackShits", &trShits);
+  Z_One_Tree_->Branch("trackChi2", &trChi2);
+  Z_One_Tree_->Branch("trackD0", &trD0);
+  Z_One_Tree_->Branch("trackD0Err", &trD0E);
+  Z_One_Tree_->Branch("trackCharge", &trCharge);
+  Z_One_Tree_->Branch("TrackHighPurity", &trQualityHighPurity);
+  Z_One_Tree_->Branch("TrackTight", &trQualityTight);
+  Z_One_Tree_->Branch("trackfHits", &trfHits);
+  Z_One_Tree_->Branch("trackFirstBarrel", &trFirstBarrel);
+  Z_One_Tree_->Branch("trackFirstEndCap", &trFirstEndCap);
+  Z_One_Tree_->Branch("trackDzVtx", &trDzVtx);
+  Z_One_Tree_->Branch("trackDxyVtx", &trDxyVtx);
+  //
+  Z_One_Tree_->Branch("tr_nsigdedx", &tr_nsigdedx);
+  Z_One_Tree_->Branch("tr_dedx", &tr_dedx);
+  Z_One_Tree_->Branch("tr_dedxMass", &tr_dedxMass);
+  Z_One_Tree_->Branch("tr_theo", &tr_theo);
+  Z_One_Tree_->Branch("tr_sigma", &tr_sigma);
+  //Z_One_Tree_->Branch("nX",&nX,"nX/i"); // Error in <TTreePlayer::MakeClass>: The branch named nX (full path name: nX) is hidden by another branch of the same name and its data will not be loaded.
+  // Z cand
+  Z_One_Tree_->Branch("nZ",&nZ,"nZ/i");
+  Z_One_Tree_->Branch("MuMuPiMass",&MuMuPiMass);
+  Z_One_Tree_->Branch("MuMuPiPx",&MuMuPiPx);
+  Z_One_Tree_->Branch("MuMuPiPy",&MuMuPiPy);
+  Z_One_Tree_->Branch("MuMuPiPz",&MuMuPiPz);
+  Z_One_Tree_->Branch("MuMuPiPxE",&MuMuPiPxE);
+  Z_One_Tree_->Branch("MuMuPiPyE",&MuMuPiPyE);
+  Z_One_Tree_->Branch("MuMuPiPzE",&MuMuPiPzE);
+  Z_One_Tree_->Branch("MuMuPiVtx_CL",&MuMuPiVtx_CL);
+  Z_One_Tree_->Branch("MuMuPiVtx_Chi2",&MuMuPiVtx_Chi2);
+
+  Z_One_Tree_->Branch("MuMuPiDecayVtx_X",&MuMuPiDecayVtx_X);
+  Z_One_Tree_->Branch("MuMuPiDecayVtx_Y",&MuMuPiDecayVtx_Y);
+  Z_One_Tree_->Branch("MuMuPiDecayVtx_Z",&MuMuPiDecayVtx_Z);
+  Z_One_Tree_->Branch("MuMuPiDecayVtx_XE",&MuMuPiDecayVtx_XE);
+  Z_One_Tree_->Branch("MuMuPiDecayVtx_YE",&MuMuPiDecayVtx_YE);
+  Z_One_Tree_->Branch("MuMuPiDecayVtx_ZE",&MuMuPiDecayVtx_ZE);
+  //
+  Z_One_Tree_->Branch("Muon1Px_MuMuPi",&mu1Px_MuMuPi); 
+  Z_One_Tree_->Branch("Muon1Py_MuMuPi",&mu1Py_MuMuPi); 
+  Z_One_Tree_->Branch("Muon1Pz_MuMuPi",&mu1Pz_MuMuPi); 
+  Z_One_Tree_->Branch("Muon1E_MuMuPi",&mu1E_MuMuPi);
+  Z_One_Tree_->Branch("Muon2Px_MuMuPi",&mu2Px_MuMuPi); 
+  Z_One_Tree_->Branch("Muon2Py_MuMuPi",&mu2Py_MuMuPi); 
+  Z_One_Tree_->Branch("Muon2Pz_MuMuPi",&mu2Pz_MuMuPi); 
+  Z_One_Tree_->Branch("Muon2E_MuMuPi",&mu2E_MuMuPi);
+  Z_One_Tree_->Branch("PionPx_MuMuPi", &piPx_MuMuPi); 
+  Z_One_Tree_->Branch("PionPy_MuMuPi", &piPy_MuMuPi); 
+  Z_One_Tree_->Branch("PionPz_MuMuPi", &piPz_MuMuPi); 
+  Z_One_Tree_->Branch("PionE_MuMuPi", &piE_MuMuPi);
+  //
+  Z_One_Tree_->Branch("PriVtx_ZCosAlpha_X",&PriVtx_ZCosAlpha_X);
+  Z_One_Tree_->Branch("PriVtx_ZCosAlpha_Y",&PriVtx_ZCosAlpha_Y);
+  Z_One_Tree_->Branch("PriVtx_ZCosAlpha_Z",&PriVtx_ZCosAlpha_Z);
+  Z_One_Tree_->Branch("PriVtx_ZCosAlpha_EX",&PriVtx_ZCosAlpha_EX);
+  Z_One_Tree_->Branch("PriVtx_ZCosAlpha_EY",&PriVtx_ZCosAlpha_EY);
+  Z_One_Tree_->Branch("PriVtx_ZCosAlpha_EZ",&PriVtx_ZCosAlpha_EZ);
+  Z_One_Tree_->Branch("PriVtx_ZCosAlpha_Chi2",&PriVtx_ZCosAlpha_Chi2);
+  Z_One_Tree_->Branch("PriVtx_ZCosAlpha_CL",&PriVtx_ZCosAlpha_CL);
+  Z_One_Tree_->Branch("PriVtx_ZCosAlpha_tracks",&PriVtx_ZCosAlpha_tracks);
+  //
+  Z_One_Tree_->Branch("PriVtxZCorr_X",&PriVtxZCorr_X);
+  Z_One_Tree_->Branch("PriVtxZCorr_Y",&PriVtxZCorr_Y);
+  Z_One_Tree_->Branch("PriVtxZCorr_Z",&PriVtxZCorr_Z);
+  Z_One_Tree_->Branch("PriVtxZCorr_EX",&PriVtxZCorr_EX);
+  Z_One_Tree_->Branch("PriVtxZCorr_EY",&PriVtxZCorr_EY);
+  Z_One_Tree_->Branch("PriVtxZCorr_EZ",&PriVtxZCorr_EZ);
+  Z_One_Tree_->Branch("PriVtxZCorr_Chi2",&PriVtxZCorr_Chi2);
+  Z_One_Tree_->Branch("PriVtxZCorr_CL",&PriVtxZCorr_CL);
+  Z_One_Tree_->Branch("PriVtxZCorr_tracks",&PriVtxZCorr_tracks);
+  //
+  Z_One_Tree_->Branch("ZLxyPV", &zLxyPV);
+  Z_One_Tree_->Branch("ZCosAlphaPV", &zCosAlphaPV);
+  Z_One_Tree_->Branch("ZCTauPV", &zCTauPV);
+  Z_One_Tree_->Branch("ZCTauPVE", &zCTauPVE);
+  Z_One_Tree_->Branch("ZLxyPVCosAlpha", &zLxyPVCosAlpha);
+  Z_One_Tree_->Branch("ZCosAlphaPVCosAlpha", &zCosAlphaPVCosAlpha);
+  Z_One_Tree_->Branch("ZCTauPVCosAlpha", &zCTauPVCosAlpha);
+  Z_One_Tree_->Branch("ZCTauPVCosAlphaE", &zCTauPVCosAlphaE);
+  Z_One_Tree_->Branch("ZLxyPVX", &zLxyPVX);
+  Z_One_Tree_->Branch("ZCosAlphaPVX", &zCosAlphaPVX);
+  Z_One_Tree_->Branch("ZCTauPVX", &zCTauPVX);
+  Z_One_Tree_->Branch("ZCTauPVXE", &zCTauPVXE);
+  Z_One_Tree_->Branch("ZLxyBS", &zLxyBS);
+  Z_One_Tree_->Branch("ZCosAlphaBS", &zCosAlphaBS);
+  Z_One_Tree_->Branch("ZCTauBS", &zCTauBS);
+  Z_One_Tree_->Branch("ZCTauBSE", &zCTauBSE);
+  Z_One_Tree_->Branch("ZCTauPVX_3D", &zCTauPVX_3D);
+  Z_One_Tree_->Branch("ZCTauPVX_3D_err", &zCTauPVX_3D_err);
+  //
+  Z_One_Tree_->Branch("ZPsiPrimeIdx", &Z_psiPrimeIdx);
+  Z_One_Tree_->Branch("ZPionIdx", &Z_piIdx);
+  //
+  // X cand
+  Z_One_Tree_->Branch("nX",&nX,"nX/i");
+  Z_One_Tree_->Branch("XMass",&xMass);
+  Z_One_Tree_->Branch("XPx",&xPx);
+  Z_One_Tree_->Branch("XPy",&xPy);
+  Z_One_Tree_->Branch("XPz",&xPz);
+  Z_One_Tree_->Branch("XPxE",&xPxE);
+  Z_One_Tree_->Branch("XPyE",&xPyE);
+  Z_One_Tree_->Branch("XPzE",&xPzE);
+  Z_One_Tree_->Branch("XVtx_CL",&xVtx_CL);
+  Z_One_Tree_->Branch("XVtx_Chi2",&xVtx_Chi2);
+
+  Z_One_Tree_->Branch("XDecayVtx_X",&xDecayVtx_X);
+  Z_One_Tree_->Branch("XDecayVtx_Y",&xDecayVtx_Y);
+  Z_One_Tree_->Branch("XDecayVtx_Z",&xDecayVtx_Z);
+  Z_One_Tree_->Branch("XDecayVtx_XE",&xDecayVtx_XE);
+  Z_One_Tree_->Branch("XDecayVtx_YE",&xDecayVtx_YE);
+  Z_One_Tree_->Branch("XDecayVtx_ZE",&xDecayVtx_ZE);
+  // muons and tracks after X cand fit
+  Z_One_Tree_->Branch("Muon1Px_MuMuPiPi", &mu1Px_MuMuPiPi); 
+  Z_One_Tree_->Branch("Muon1Py_MuMuPiPi", &mu1Py_MuMuPiPi); 
+  Z_One_Tree_->Branch("Muon1Pz_MuMuPiPi", &mu1Pz_MuMuPiPi); 
+  Z_One_Tree_->Branch("Muon1E_MuMuPiPi", &mu1E_MuMuPiPi);
+  Z_One_Tree_->Branch("Muon2Px_MuMuPiPi", &mu2Px_MuMuPiPi); 
+  Z_One_Tree_->Branch("Muon2Py_MuMuPiPi", &mu2Py_MuMuPiPi); 
+  Z_One_Tree_->Branch("Muon2Pz_MuMuPiPi", &mu2Pz_MuMuPiPi); 
+  Z_One_Tree_->Branch("Muon2E_MuMuPiPi", &mu2E_MuMuPiPi);
+  Z_One_Tree_->Branch("Pion1Px_MuMuPiPi", &pi1Px_MuMuPiPi); 
+  Z_One_Tree_->Branch("Pion1Py_MuMuPiPi", &pi1Py_MuMuPiPi); 
+  Z_One_Tree_->Branch("Pion1Pz_MuMuPiPi", &pi1Pz_MuMuPiPi); 
+  Z_One_Tree_->Branch("Pion1E_MuMuPiPi", &pi1E_MuMuPiPi);
+  Z_One_Tree_->Branch("Pion2Px_MuMuPiPi", &pi2Px_MuMuPiPi); 
+  Z_One_Tree_->Branch("Pion2Py_MuMuPiPi", &pi2Py_MuMuPiPi); 
+  Z_One_Tree_->Branch("Pion2Pz_MuMuPiPi", &pi2Pz_MuMuPiPi); 
+  Z_One_Tree_->Branch("Pion2E_MuMuPiPi", &pi2E_MuMuPiPi);
+  //
+  Z_One_Tree_->Branch("PriVtx_XCosAlpha_X",&PriVtx_XCosAlpha_X);
+  Z_One_Tree_->Branch("PriVtx_XCosAlpha_Y",&PriVtx_XCosAlpha_Y);
+  Z_One_Tree_->Branch("PriVtx_XCosAlpha_Z",&PriVtx_XCosAlpha_Z);
+  Z_One_Tree_->Branch("PriVtx_XCosAlpha_EX",&PriVtx_XCosAlpha_EX);
+  Z_One_Tree_->Branch("PriVtx_XCosAlpha_EY",&PriVtx_XCosAlpha_EY);
+  Z_One_Tree_->Branch("PriVtx_XCosAlpha_EZ",&PriVtx_XCosAlpha_EZ);
+  Z_One_Tree_->Branch("PriVtx_XCosAlpha_Chi2",&PriVtx_XCosAlpha_Chi2);
+  Z_One_Tree_->Branch("PriVtx_XCosAlpha_CL",&PriVtx_XCosAlpha_CL);
+  Z_One_Tree_->Branch("PriVtx_XCosAlpha_tracks",&PriVtx_XCosAlpha_tracks);
+  //	
+  Z_One_Tree_->Branch("PriVtxXCorr_X",&PriVtxXCorr_X);
+  Z_One_Tree_->Branch("PriVtxXCorr_Y",&PriVtxXCorr_Y);
+  Z_One_Tree_->Branch("PriVtxXCorr_Z",&PriVtxXCorr_Z);
+  Z_One_Tree_->Branch("PriVtxXCorr_EX",&PriVtxXCorr_EX);
+  Z_One_Tree_->Branch("PriVtxXCorr_EY",&PriVtxXCorr_EY);
+  Z_One_Tree_->Branch("PriVtxXCorr_EZ",&PriVtxXCorr_EZ);
+  Z_One_Tree_->Branch("PriVtxXCorr_Chi2",&PriVtxXCorr_Chi2);
+  Z_One_Tree_->Branch("PriVtxXCorr_CL",&PriVtxXCorr_CL);
+  Z_One_Tree_->Branch("PriVtxXCorr_tracks",&PriVtxXCorr_tracks);
+  //
+  Z_One_Tree_->Branch("XLxyPV", &xLxyPV);
+  Z_One_Tree_->Branch("XCosAlphaPV", &xCosAlphaPV);
+  Z_One_Tree_->Branch("XCTauPV", &xCTauPV);
+  Z_One_Tree_->Branch("XCTauPVE", &xCTauPVE);
+  Z_One_Tree_->Branch("XLxyPVCosAlpha", &xLxyPVCosAlpha);
+  Z_One_Tree_->Branch("XCosAlphaPVCosAlpha", &xCosAlphaPVCosAlpha);
+  Z_One_Tree_->Branch("XCTauPVCosAlpha", &xCTauPVCosAlpha);
+  Z_One_Tree_->Branch("XCTauPVCosAlphaE", &xCTauPVCosAlphaE);
+  Z_One_Tree_->Branch("XLxyBS", &xLxyBS);
+  Z_One_Tree_->Branch("XCosAlphaBS", &xCosAlphaBS);
+  Z_One_Tree_->Branch("XCTauBS", &xCTauBS);
+  Z_One_Tree_->Branch("XCTauBSE", &xCTauBSE);
+  Z_One_Tree_->Branch("XLxyPVX", &xLxyPVX);
+  Z_One_Tree_->Branch("XCosAlphaPVX", &xCosAlphaPVX);
+  Z_One_Tree_->Branch("XCTauPVX", &xCTauPVX);
+  Z_One_Tree_->Branch("XCTauPVXE", &xCTauPVXE);
+  Z_One_Tree_->Branch("XCTauPVX_3D", &xCTauPVX_3D);
+  Z_One_Tree_->Branch("XCTauPVX_3D_err", &xCTauPVX_3D_err);
+  //
+  Z_One_Tree_->Branch("XPsiPrimeIdx", &X_psiPrimeIdx);
+  Z_One_Tree_->Branch("XPion1Idx", &X_pi1Idx);
+  Z_One_Tree_->Branch("XPion2Idx", &X_pi2Idx);
+  //
+  // B0 cand
+  Z_One_Tree_->Branch("nB0",&nB0,"nB0/i");
+  Z_One_Tree_->Branch("B0Mass",&b0Mass);
+  Z_One_Tree_->Branch("B0Px",&b0Px);
+  Z_One_Tree_->Branch("B0Py",&b0Py);
+  Z_One_Tree_->Branch("B0Pz",&b0Pz);
+  Z_One_Tree_->Branch("B0PxE",&b0PxE);
+  Z_One_Tree_->Branch("B0PyE",&b0PyE);
+  Z_One_Tree_->Branch("B0PzE",&b0PzE);
+  Z_One_Tree_->Branch("B0Vtx_CL",&b0Vtx_CL);
+  Z_One_Tree_->Branch("B0Vtx_Chi2",&b0Vtx_Chi2);
+
+  Z_One_Tree_->Branch("B0DecayVtx_X",&b0DecayVtx_X);
+  Z_One_Tree_->Branch("B0DecayVtx_Y",&b0DecayVtx_Y);
+  Z_One_Tree_->Branch("B0DecayVtx_Z",&b0DecayVtx_Z);
+  Z_One_Tree_->Branch("B0DecayVtx_XE",&b0DecayVtx_XE);
+  Z_One_Tree_->Branch("B0DecayVtx_YE",&b0DecayVtx_YE);
+  Z_One_Tree_->Branch("B0DecayVtx_ZE",&b0DecayVtx_ZE);
+  //
+  Z_One_Tree_->Branch("PriVtx_B0CosAlpha_X",&PriVtx_B0CosAlpha_X);
+  Z_One_Tree_->Branch("PriVtx_B0CosAlpha_Y",&PriVtx_B0CosAlpha_Y);
+  Z_One_Tree_->Branch("PriVtx_B0CosAlpha_Z",&PriVtx_B0CosAlpha_Z);
+  Z_One_Tree_->Branch("PriVtx_B0CosAlpha_EX",&PriVtx_B0CosAlpha_EX);
+  Z_One_Tree_->Branch("PriVtx_B0CosAlpha_EY",&PriVtx_B0CosAlpha_EY);
+  Z_One_Tree_->Branch("PriVtx_B0CosAlpha_EZ",&PriVtx_B0CosAlpha_EZ);
+  Z_One_Tree_->Branch("PriVtx_B0CosAlpha_Chi2",&PriVtx_B0CosAlpha_Chi2);
+  Z_One_Tree_->Branch("PriVtx_B0CosAlpha_CL",&PriVtx_B0CosAlpha_CL);
+  Z_One_Tree_->Branch("PriVtx_B0CosAlpha_tracks",&PriVtx_B0CosAlpha_tracks);
+  //	
+  Z_One_Tree_->Branch("PriVtxB0Corr_X",&PriVtxB0Corr_X);
+  Z_One_Tree_->Branch("PriVtxB0Corr_Y",&PriVtxB0Corr_Y);
+  Z_One_Tree_->Branch("PriVtxB0Corr_Z",&PriVtxB0Corr_Z);
+  Z_One_Tree_->Branch("PriVtxB0Corr_EX",&PriVtxB0Corr_EX);
+  Z_One_Tree_->Branch("PriVtxB0Corr_EY",&PriVtxB0Corr_EY);
+  Z_One_Tree_->Branch("PriVtxB0Corr_EZ",&PriVtxB0Corr_EZ);
+  Z_One_Tree_->Branch("PriVtxB0Corr_Chi2",&PriVtxB0Corr_Chi2);
+  Z_One_Tree_->Branch("PriVtxB0Corr_CL",&PriVtxB0Corr_CL);
+  Z_One_Tree_->Branch("PriVtxB0Corr_tracks",&PriVtxB0Corr_tracks);
+  //
+  Z_One_Tree_->Branch("B0LxyPV", &b0LxyPV);
+  Z_One_Tree_->Branch("B0CosAlphaPV", &b0CosAlphaPV);
+  Z_One_Tree_->Branch("B0CTauPV", &b0CTauPV);
+  Z_One_Tree_->Branch("B0CTauPVE", &b0CTauPVE);
+  Z_One_Tree_->Branch("B0LxyPVCosAlpha", &b0LxyPVCosAlpha);
+  Z_One_Tree_->Branch("B0CosAlphaPVCosAlpha", &b0CosAlphaPVCosAlpha);
+  Z_One_Tree_->Branch("B0CTauPVCosAlpha", &b0CTauPVCosAlpha);
+  Z_One_Tree_->Branch("B0CTauPVCosAlphaE", &b0CTauPVCosAlphaE);
+  Z_One_Tree_->Branch("B0LxyPVX", &b0LxyPVX);
+  Z_One_Tree_->Branch("B0CosAlphaPVX", &b0CosAlphaPVX);
+  Z_One_Tree_->Branch("B0CTauPVX", &b0CTauPVX);
+  Z_One_Tree_->Branch("B0CTauPVXE", &b0CTauPVXE);
+  Z_One_Tree_->Branch("B0LxyBS", &b0LxyBS);
+  Z_One_Tree_->Branch("B0CosAlphaBS", &b0CosAlphaBS);
+  Z_One_Tree_->Branch("B0CTauBS", &b0CTauBS);
+  Z_One_Tree_->Branch("B0CTauBSE", &b0CTauBSE);
+  Z_One_Tree_->Branch("B0CTauPVX_3D", &b0CTauPVX_3D);
+  Z_One_Tree_->Branch("B0CTauPVX_3D_err", &b0CTauPVX_3D_err);
+  //
+  Z_One_Tree_->Branch("B0PsiPrimeIdx", &B0_psiPrimeIdx);
+  Z_One_Tree_->Branch("B0PionIdx", &B0_piIdx);
+  Z_One_Tree_->Branch("B0KaonIdx", &B0_kIdx);
+  //
+  Z_One_Tree_->Branch("PiPiMass_err",& PiPiMass_err);
+  //
+  Z_One_Tree_->Branch("Muon1Px_MuMuPiK", &mu1Px_MuMuPiK);
+  Z_One_Tree_->Branch("Muon1Py_MuMuPiK", &mu1Py_MuMuPiK);
+  Z_One_Tree_->Branch("Muon1Pz_MuMuPiK", &mu1Pz_MuMuPiK);
+  Z_One_Tree_->Branch("Muon1E_MuMuPiK", &mu1E_MuMuPiK);
+  //
+  Z_One_Tree_->Branch("Muon2Px_MuMuPiK", &mu2Px_MuMuPiK);
+  Z_One_Tree_->Branch("Muon2Py_MuMuPiK", &mu2Py_MuMuPiK);
+  Z_One_Tree_->Branch("Muon2Pz_MuMuPiK", &mu2Pz_MuMuPiK);
+  Z_One_Tree_->Branch("Muon2E_MuMuPiK", &mu2E_MuMuPiK);
+  //
+  Z_One_Tree_->Branch("PionPx_MuMuPiK", &piPx_MuMuPiK);
+  Z_One_Tree_->Branch("PionPy_MuMuPiK", &piPy_MuMuPiK);
+  Z_One_Tree_->Branch("PionPz_MuMuPiK", &piPz_MuMuPiK);
+  Z_One_Tree_->Branch("PionE_MuMuPiK", &piE_MuMuPiK);
+  //
+  Z_One_Tree_->Branch("KaonPx_MuMuPiK", &kPx_MuMuPiK);
+  Z_One_Tree_->Branch("KaonPy_MuMuPiK", &kPy_MuMuPiK);
+  Z_One_Tree_->Branch("KaonPz_MuMuPiK", &kPz_MuMuPiK);
+  Z_One_Tree_->Branch("KaonE_MuMuPiK", &kE_MuMuPiK);
+  //
+  Z_One_Tree_->Branch("nPsiPrime",&nPsiPrime,"nPsiPrime/i");
+  Z_One_Tree_->Branch("PsiPrimeMass",&psiPrimeMass);
+  Z_One_Tree_->Branch("PsiPrimePx",&psiPrimePx);
+  Z_One_Tree_->Branch("PsiPrimePy",&psiPrimePy);
+  Z_One_Tree_->Branch("PsiPrimePz",&psiPrimePz);
+  Z_One_Tree_->Branch("PsiPrimeVtx_CL",&psiPrimeVtx_CL);
+  Z_One_Tree_->Branch("PsiPrimeVtx_Chi2",&psiPrimeVtx_Chi2);
+
+  Z_One_Tree_->Branch("PsiPrimeDecayVtx_X",&psiPrimeDecayVtx_X);
+  Z_One_Tree_->Branch("PsiPrimeDecayVtx_Y",&psiPrimeDecayVtx_Y);
+  Z_One_Tree_->Branch("PsiPrimeDecayVtx_Z",&psiPrimeDecayVtx_Z);
+  Z_One_Tree_->Branch("PsiPrimeDecayVtx_XE",&psiPrimeDecayVtx_XE);
+  Z_One_Tree_->Branch("PsiPrimeDecayVtx_YE",&psiPrimeDecayVtx_YE);
+  Z_One_Tree_->Branch("PsiPrimeDecayVtx_ZE",&psiPrimeDecayVtx_ZE);
+  // muons from psi' fit
+  Z_One_Tree_->Branch("mu1Idx",&mu1Idx);
+  Z_One_Tree_->Branch("mu2Idx",&mu2Idx);
+  Z_One_Tree_->Branch("mu1Px_MuMu",&mu1_MuMu_Px);
+  Z_One_Tree_->Branch("mu1Py_MuMu",&mu1_MuMu_Py);
+  Z_One_Tree_->Branch("mu1Pz_MuMu",&mu1_MuMu_Pz);
+  Z_One_Tree_->Branch("mu1Chi_MuMu2",&mu1_MuMu_Chi2);
+  Z_One_Tree_->Branch("mu1NDF_MuMu",&mu1_MuMu_NDF);
+  Z_One_Tree_->Branch("mu2Px_MuMu",&mu2_MuMu_Px);
+  Z_One_Tree_->Branch("mu2Py_MuMu",&mu2_MuMu_Py);
+  Z_One_Tree_->Branch("mu2Pz_MuMu",&mu2_MuMu_Pz);
+  Z_One_Tree_->Branch("mu2Chi2_MuMu",&mu2_MuMu_Chi2);
+  Z_One_Tree_->Branch("mu2NDF_MuMu",&mu2_MuMu_NDF);
+  Z_One_Tree_->Branch("jtype",&jtype);
+  Z_One_Tree_->Branch("PsiPrimeMuonTrigMatch",&PsiPrimeMuonTrigMatch);
+  //
+  Z_One_Tree_->Branch("PriVtxMuMuCorr_X",&PriVtxMuMuCorr_X);
+  Z_One_Tree_->Branch("PriVtxMuMuCorr_Y",&PriVtxMuMuCorr_Y);
+  Z_One_Tree_->Branch("PriVtxMuMuCorr_Z",&PriVtxMuMuCorr_Z);
+  Z_One_Tree_->Branch("PriVtxMuMuCorr_EX",&PriVtxMuMuCorr_EX);
+  Z_One_Tree_->Branch("PriVtxMuMuCorr_EY",&PriVtxMuMuCorr_EY);
+  Z_One_Tree_->Branch("PriVtxMuMuCorr_EZ",&PriVtxMuMuCorr_EZ);
+  Z_One_Tree_->Branch("PriVtxMuMuCorr_Chi2",&PriVtxMuMuCorr_Chi2);
+  Z_One_Tree_->Branch("PriVtxMuMuCorr_CL",&PriVtxMuMuCorr_CL);
+  Z_One_Tree_->Branch("PriVtxMuMuCorr_tracks",&PriVtxMuMuCorr_tracks);
+
+  //
+
+}// begin Job
+
+// ------------ method called once each job just after ending the event loop  ------------
+void 
+MuMuPiKPAT::endJob() {
+  Z_One_Tree_->GetDirectory()->cd();
+  Z_One_Tree_->Write();
+}//endjob
+
+double MuMuPiKPAT::getSigmaOfLogdEdx(double logde)
+{
+  return 0.3;
+}
+
+float MuMuPiKPAT::getEnergyLoss(const reco::TrackRef & track)
+{
+  if(iexception_dedx==1)return 9999.;
+  //   const DeDxDataValueMap & eloss = *energyLoss;
+  const reco::DeDxDataValueMap & eloss = *energyLoss;
+  return eloss[track].dEdx();
+}
+
+double MuMuPiKPAT::nsigmaofdedx(const reco::TrackRef & track, double & theo, double & sigma)
+{  
+	
+  //   ch = (track->charge() > 0 ? 0 : 1);
+    
+  // no usable dE/dx if p > 2
+	
+  double nsigma = 99 ;
+  if (iexception_dedx==1) return nsigma ;
+	
+  //   if(track->p() > 2) return nsigma;
+	
+  double m  = 0.13957; 
+  double bg = track->p() / m;
+	
+  theo = getLogdEdx(bg);
+	
+  // !!!!!!
+  int nhitr = track->numberOfValidHits();
+	
+  double meas = log(getEnergyLoss(track));
+  sigma = getSigmaOfLogdEdx(theo) * pow(nhitr,-0.65);
+  //   double errdedxTrk = eloss[trk1Ref].dEdxError();
+  if (sigma>0)
+    nsigma = (meas-theo) / sigma ;
+  return nsigma;
+}
+
+
+double MuMuPiKPAT::getLogdEdx(double bg)
+{
+  const double a =  3.25 ;
+  const double b =  0.288;
+  const double c = -0.852;
+	
+  double beta = bg/sqrt(bg*bg + 1);
+  double dedx = log( a/(beta*beta) + b * log(bg) + c );
+	
+  return dedx;
+	
+}
+
+
+double MuMuPiKPAT::GetMass(const reco::TrackRef & track){
+  double P = track->p();
+  double C = 2.625;
+  double K = 2.495;
+  double I = getEnergyLoss(track);
+  return sqrt((I-C)/K)*P;
+}
+
+
+
+//define this as a plug-in
+DEFINE_FWK_MODULE(MuMuPiKPAT);
+

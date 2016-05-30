@@ -1,0 +1,305 @@
+// -*- C++ -*-
+//
+// Package:    PsiPrimePiKPAT
+// Class:      PsiPrimePiKPAT
+// 
+/**\class PsiPrimePiKPAT PsiPrimePiKPAT.cc myAnalyzers/PsiPrimePiKPAT/src/PsiPrimePiKPAT.cc
+
+   Description: <one line class summary>
+   Make rootTuple for JPsiPiPi reconstruction
+
+   Implementation:
+   <Notes on implementation>
+*/
+//
+// Original Author:  Keith Ulmer   keith.ulmer@colorado.edu
+//
+//
+
+#ifndef _PsiPrimePiKPAT_h
+#define _PsiPrimePiKPAT_h
+
+// system include files
+#include <memory>
+
+// user include files
+#include "../interface/VertexReProducer.h"
+
+#include "FWCore/Framework/interface/Frameworkfwd.h"
+#include "FWCore/Framework/interface/EDAnalyzer.h"
+#include "FWCore/Framework/interface/Event.h"
+#include "FWCore/Framework/interface/MakerMacros.h"
+
+#include "FWCore/ParameterSet/interface/ParameterSet.h"
+#include "FWCore/Framework/interface/EventSetup.h"
+#include "FWCore/Framework/interface/ESHandle.h"
+#include "DataFormats/Common/interface/Handle.h"
+
+#include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"
+
+#include "RecoVertex/KinematicFit/interface/KinematicParticleVertexFitter.h"
+#include "RecoVertex/KinematicFit/interface/KinematicParticleFitter.h"
+#include "RecoVertex/KinematicFit/interface/MassKinematicConstraint.h"
+#include "RecoVertex/KinematicFitPrimitives/interface/KinematicParticle.h"
+#include "RecoVertex/KinematicFitPrimitives/interface/RefCountedKinematicParticle.h"
+#include "RecoVertex/KinematicFitPrimitives/interface/TransientTrackKinematicParticle.h"
+#include "RecoVertex/KinematicFitPrimitives/interface/KinematicParticleFactoryFromTransientTrack.h"
+#include "TrackingTools/TransientTrack/interface/TransientTrackFromFTSFactory.h"
+
+#include "DataFormats/TrackReco/interface/Track.h"
+#include "DataFormats/VertexReco/interface/Vertex.h"
+#include "DataFormats/VertexReco/interface/VertexFwd.h"
+#include "DataFormats/Candidate/interface/Candidate.h"
+#include "DataFormats/Candidate/interface/CompositeCandidate.h"
+#include "DataFormats/Candidate/interface/VertexCompositeCandidate.h"
+#include "DataFormats/V0Candidate/interface/V0Candidate.h"
+#include "DataFormats/RecoCandidate/interface/RecoChargedCandidate.h"
+#include "RecoVertex/V0Producer/interface/V0Producer.h"
+#include "DataFormats/HepMCCandidate/interface/GenParticle.h"
+
+#include "CondFormats/L1TObjects/interface/L1GtTriggerMenu.h"
+#include "CondFormats/DataRecord/interface/L1GtTriggerMenuRcd.h"
+#include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerReadoutSetupFwd.h"
+#include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerObjectMapRecord.h"
+#include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerReadoutSetup.h"
+#include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerReadoutRecord.h"
+
+#include "DataFormats/MuonReco/interface/Muon.h"
+#include "DataFormats/MuonReco/interface/MuonFwd.h"
+
+#include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
+
+#include "DataFormats/Common/interface/ValueMap.h"
+#include "DataFormats/TrackReco/interface/DeDxData.h"
+
+#include "TFile.h"
+#include "TTree.h"
+
+#include <vector>
+#include <string>
+#include "RecoVertex/VertexTools/interface/InvariantMassFromVertex.h"
+//
+// class decleration
+//
+
+using std::vector;
+using namespace edm;
+using namespace reco;
+using namespace std;
+
+class PsiPrimePiKPAT : public edm::EDAnalyzer {
+public:
+  explicit PsiPrimePiKPAT(const edm::ParameterSet&);
+  ~PsiPrimePiKPAT();
+  
+private:
+  virtual void beginJob() ;
+  virtual void beginRun(edm::Run const & iRun, edm::EventSetup const& iSetup);
+  virtual void analyze(const edm::Event&, const edm::EventSetup&);
+  virtual void endJob() ;
+	
+  InvariantMassFromVertex massCalculator;
+
+  const reco::DeDxDataValueMap * energyLoss;
+  Int_t iexception_dedx;
+  
+  virtual double getSigmaOfLogdEdx(double logde);
+  virtual float  getEnergyLoss(const reco::TrackRef & track);
+  virtual double nsigmaofdedx(const reco::TrackRef & track, double & theo, double & sigma);
+  virtual double getLogdEdx(double bg);
+  virtual double GetMass(const reco::TrackRef & track);
+  
+  // ----------member data ---------------------------
+  std::string proccessName_;
+  HLTConfigProvider hltConfig_;
+
+  edm::InputTag hlTriggerResults_;
+  std::map<std::string,int> *HLTTrig; // HLT trigger prescale for accepted paths
+
+  edm::InputTag inputGEN_;
+  std::string vtxSample;
+  bool doMC;
+  int  MCParticle;
+  bool doPsiPrimeMassConst;
+  bool skipPsi2S;
+
+  int MuMinPixHits;
+  int MuMinSiHits;
+  double MuMaxNormChi;
+  double MuMaxD0;
+
+  double JPsiMaxMass;
+  double JPsiMinMass;
+
+  double PsiPrimeMinMass, PsiPrimeMaxMass;
+  double PsiPrimePiMinMass, PsiPrimePiMaxMass;
+  double PsiPrimePiPiMinMass, PsiPrimePiPiMaxMass;
+  double PsiPrimePiKMinMass, PsiPrimePiKMaxMass;
+
+  int    TrMinSiHits;
+  double TrMinPt;
+  double TrMaxNormChi2;
+
+  double PsiPrimeTrackMaxDR, ZTrackMaxDR, XTrackMaxDR, B0TrackMaxDR ;
+  bool   UseZDR, UseXDR, UseB0DR ;
+	
+  bool resolveAmbiguity_; 
+  bool addMuMulessPrimaryVertex_, addZlessPrimaryVertex_, addXlessPrimaryVertex_, addB0lessPrimaryVertex_;
+  vector<string>      TriggersForMatching_;
+  vector<string>      FiltersForMatching_;
+  int  MatchingTriggerResult[50];
+  bool Debug_;
+
+  std::string DeDxEstimator_;
+
+  TTree* Z_One_Tree_;
+
+  unsigned int        runNum, evtNum, lumiNum;
+  //
+  vector<unsigned int>* trigRes;
+  vector<std::string>*  trigNames;
+  //
+  vector<unsigned int>* L1TT;
+  vector<std::string>*  MatchTriggerNames;
+
+  unsigned int          nMu, nPsiPrime, nZ, nB0, nX;
+  float                 priVtx_X, priVtx_Y, priVtx_Z, priVtx_XE, priVtx_YE, priVtx_ZE, priVtx_NormChi2, priVtx_Chi2, priVtx_CL;
+  int                   priVtx_tracks;
+
+  //// Indices
+  vector<int>           *mu1Idx, *mu2Idx ;
+  // Z
+  vector<int>           *Z_psiPrimeIdx, *Z_piIdx ;
+  // X
+  vector<int>           *X_psiPrimeIdx, *X_pi1Idx, *X_pi2Idx ;
+  // B0
+  vector<int>           *B0_psiPrimeIdx, *B0_piIdx, *B0_kIdx;
+
+  //// Generic Muons
+  vector<float>         *muPx, *muPy, *muPz, *muChi2, *muGlChi2,  *mufHits;
+  vector<unsigned int>	*muKey;
+  vector<bool>          *muFirstBarrel, *muFirstEndCap;
+  vector<float>	        *muD0E, *muDzVtxErr, *muD0, *muDz, *muDzVtx, *muDxyVtx,*muGlDzVtx, *muGlDxyVtx;
+	
+  vector<int>           *muNDF, *muPhits, *muShits, *muLayersTr, *muLayersPix, *muGlNDF, *muGlMuHits, *muGlMatchedStation, *muQual, *muType, *muTrack;
+  vector<float>         *muCharge;
+
+  //// Generic tracks
+  vector<float>         *trPx, *trPy, *trPz, *trE;
+  vector<float>         *trD0, *trD0E, *trCharge;
+  vector<int>           *trQualityHighPurity, *trQualityTight;
+  vector<int>           *trNDF, *trPhits, *trShits;
+  vector<float>         *trChi2;
+  vector<float>         *trfHits;
+  vector<bool>          *trFirstBarrel, *trFirstEndCap;
+  vector<float>         *trDzVtx, *trDxyVtx;
+
+  vector<double>        *tr_nsigdedx;
+  vector<float>         *tr_dedx, *tr_dedxMass, *tr_theo, *tr_sigma;
+
+  //// Psi'
+  vector<float>         *psiPrimeMass, *psiPrimePx, *psiPrimePy, *psiPrimePz;
+  vector<float>         *psiPrimeDecayVtx_X, *psiPrimeDecayVtx_Y, *psiPrimeDecayVtx_Z, *psiPrimeDecayVtx_XE, *psiPrimeDecayVtx_YE, *psiPrimeDecayVtx_ZE;
+  vector<float>         *psiPrimeVtx_CL, *psiPrimeVtx_Chi2;
+  vector<bool>          *PsiPrimeMuonTrigMatch;
+
+  //// Muons after Psi' fit
+  vector<float>         *mu1_MuMu_Px, *mu1_MuMu_Py, *mu1_MuMu_Pz, *mu1_MuMu_Chi2;
+  vector<float>         *mu2_MuMu_Px, *mu2_MuMu_Py, *mu2_MuMu_Pz, *mu2_MuMu_Chi2;
+  vector<int>           *mu1_MuMu_NDF, *mu2_MuMu_NDF, *jtype;
+  // Primary Vertex with "MuMu correction"
+  vector<float>         *PriVtxMuMuCorr_X, *PriVtxMuMuCorr_Y, *PriVtxMuMuCorr_Z ; 
+  vector<double>        *PriVtxMuMuCorr_EX, *PriVtxMuMuCorr_EY, *PriVtxMuMuCorr_EZ ;
+  vector<float>	        *PriVtxMuMuCorr_Chi2, *PriVtxMuMuCorr_CL;
+  vector<int>           *PriVtxMuMuCorr_tracks ;
+
+  // Z cand
+  vector<float>         *MuMuPiMass, *MuMuPiVtx_CL, *MuMuPiVtx_Chi2;
+  vector<double>        *MuMuPiPx, *MuMuPiPy, *MuMuPiPz;
+  vector<double>        *MuMuPiPxE, *MuMuPiPyE, *MuMuPiPzE;
+  vector<float>         *MuMuPiDecayVtx_X, *MuMuPiDecayVtx_Y, *MuMuPiDecayVtx_Z;
+  vector<double>        *MuMuPiDecayVtx_XE, *MuMuPiDecayVtx_YE, *MuMuPiDecayVtx_ZE;
+  // Muons and track after Z Cand fit
+  vector<float>         *mu1Px_MuMuPi, *mu1Py_MuMuPi, *mu1Pz_MuMuPi, *mu1E_MuMuPi ;
+  vector<float>         *mu2Px_MuMuPi, *mu2Py_MuMuPi, *mu2Pz_MuMuPi, *mu2E_MuMuPi ;
+  vector<float>         *piPx_MuMuPi, *piPy_MuMuPi, *piPz_MuMuPi, *piE_MuMuPi ;
+  // Primary Vertex with largest Z_cos(alpha)
+  vector<float>         *PriVtx_ZCosAlpha_X, *PriVtx_ZCosAlpha_Y, *PriVtx_ZCosAlpha_Z ; 
+  vector<double>        *PriVtx_ZCosAlpha_EX, *PriVtx_ZCosAlpha_EY, *PriVtx_ZCosAlpha_EZ ;
+  vector<float>	        *PriVtx_ZCosAlpha_Chi2, *PriVtx_ZCosAlpha_CL;
+  vector<int>           *PriVtx_ZCosAlpha_tracks ;
+  // Primary Vertex with "Z correction"
+  vector<float>         *PriVtxZCorr_X, *PriVtxZCorr_Y, *PriVtxZCorr_Z ; 
+  vector<double>        *PriVtxZCorr_EX, *PriVtxZCorr_EY, *PriVtxZCorr_EZ ;
+  vector<float>	        *PriVtxZCorr_Chi2, *PriVtxZCorr_CL;
+  vector<int>           *PriVtxZCorr_tracks ;
+  // Lifetimes
+  vector<double>        *zLxyPV, *zCosAlphaPV, *zCTauPV, *zCTauPVE ;
+  vector<double>        *zLxyPVCosAlpha, *zCosAlphaPVCosAlpha, *zCTauPVCosAlpha, *zCTauPVCosAlphaE ;
+  vector<double>        *zLxyPVX, *zCosAlphaPVX, *zCTauPVX, *zCTauPVXE ;
+  vector<double>        *zLxyBS, *zCosAlphaBS, *zCTauBS, *zCTauBSE ;
+  vector<float>	        *zCTauPVX_3D, *zCTauPVX_3D_err;
+
+
+  // X cand 
+  vector<float>         *xMass, *xVtx_CL, *xVtx_Chi2;
+  vector<float>         *xPx, *xPy, *xPz ;
+  vector<double>        *xPxE, *xPyE, *xPzE ;
+  vector<float>         *xDecayVtx_X, *xDecayVtx_Y, *xDecayVtx_Z ;
+  vector<double>        *xDecayVtx_XE, *xDecayVtx_YE, *xDecayVtx_ZE ;
+  // Muons and tracks after X cand fit
+  vector<float>         *mu1Px_MuMuPiPi, *mu1Py_MuMuPiPi, *mu1Pz_MuMuPiPi, *mu1E_MuMuPiPi ;
+  vector<float>         *mu2Px_MuMuPiPi, *mu2Py_MuMuPiPi, *mu2Pz_MuMuPiPi, *mu2E_MuMuPiPi ;
+  vector<float>         *pi1Px_MuMuPiPi, *pi1Py_MuMuPiPi, *pi1Pz_MuMuPiPi, *pi1E_MuMuPiPi ;
+  vector<float>         *pi2Px_MuMuPiPi, *pi2Py_MuMuPiPi, *pi2Pz_MuMuPiPi, *pi2E_MuMuPiPi ;
+  // Primary Vertex with largest X_cos(alpha)
+  vector<float>         *PriVtx_XCosAlpha_X, *PriVtx_XCosAlpha_Y, *PriVtx_XCosAlpha_Z ; 
+  vector<double>        *PriVtx_XCosAlpha_EX, *PriVtx_XCosAlpha_EY, *PriVtx_XCosAlpha_EZ ;
+  vector<float>	        *PriVtx_XCosAlpha_Chi2, *PriVtx_XCosAlpha_CL;
+  vector<int>           *PriVtx_XCosAlpha_tracks ;
+  // Primary Vertex with "X correction"
+  vector<float>         *PriVtxXCorr_X, *PriVtxXCorr_Y, *PriVtxXCorr_Z ;
+  vector<double>        *PriVtxXCorr_EX, *PriVtxXCorr_EY, *PriVtxXCorr_EZ ;
+  vector<float>	        *PriVtxXCorr_Chi2, *PriVtxXCorr_CL;
+  vector<int>           *PriVtxXCorr_tracks ;
+
+  vector<double>        *xLxyPV, *xCosAlphaPV, *xCTauPV, *xCTauPVE ;
+  vector<double>        *xLxyPVCosAlpha, *xCosAlphaPVCosAlpha, *xCTauPVCosAlpha, *xCTauPVCosAlphaE ;
+  vector<double>        *xLxyPVX, *xCosAlphaPVX, *xCTauPVX, *xCTauPVXE ;
+  vector<double>        *xLxyBS, *xCosAlphaBS, *xCTauBS, *xCTauBSE ;
+  vector<float>	        *xCTauPVX_3D, *xCTauPVX_3D_err;
+
+
+  // B0 cand 
+  vector<float>         *b0Mass, *b0Vtx_CL, *b0Vtx_Chi2;
+  vector<float>         *b0Px, *b0Py, *b0Pz ;
+  vector<double>        *b0PxE, *b0PyE, *b0PzE ;
+  vector<float>         *b0DecayVtx_X, *b0DecayVtx_Y, *b0DecayVtx_Z ;
+  vector<double>        *b0DecayVtx_XE, *b0DecayVtx_YE, *b0DecayVtx_ZE ;
+  // Muons and tracks after B0 cand fit
+  vector<float>         *mu1Px_MuMuPiK, *mu1Py_MuMuPiK, *mu1Pz_MuMuPiK, *mu1E_MuMuPiK ;
+  vector<float>         *mu2Px_MuMuPiK, *mu2Py_MuMuPiK, *mu2Pz_MuMuPiK, *mu2E_MuMuPiK ;
+  vector<float>         *piPx_MuMuPiK, *piPy_MuMuPiK, *piPz_MuMuPiK, *piE_MuMuPiK ;
+  vector<float>         *kPx_MuMuPiK, *kPy_MuMuPiK, *kPz_MuMuPiK, *kE_MuMuPiK ;
+  // Primary Vertex with largest B0_cos(alpha)
+  vector<float>         *PriVtx_B0CosAlpha_X, *PriVtx_B0CosAlpha_Y, *PriVtx_B0CosAlpha_Z ; 
+  vector<double>        *PriVtx_B0CosAlpha_EX, *PriVtx_B0CosAlpha_EY, *PriVtx_B0CosAlpha_EZ ;
+  vector<float>	        *PriVtx_B0CosAlpha_Chi2, *PriVtx_B0CosAlpha_CL;
+  vector<int>           *PriVtx_B0CosAlpha_tracks ;
+  // Primary Vertex with "B0 correction"
+  vector<float>         *PriVtxB0Corr_X, *PriVtxB0Corr_Y, *PriVtxB0Corr_Z;
+  vector<double>        *PriVtxB0Corr_EX, *PriVtxB0Corr_EY, *PriVtxB0Corr_EZ;
+  vector<float>	        *PriVtxB0Corr_Chi2, *PriVtxB0Corr_CL;
+  vector<int>           *PriVtxB0Corr_tracks;
+
+  vector<double>        *b0LxyPV, *b0CosAlphaPV, *b0CTauPV, *b0CTauPVE ;
+  vector<double>        *b0LxyPVCosAlpha, *b0CosAlphaPVCosAlpha, *b0CTauPVCosAlpha, *b0CTauPVCosAlphaE ;
+  vector<double>        *b0LxyPVX, *b0CosAlphaPVX, *b0CTauPVX, *b0CTauPVXE ;
+  vector<double>        *b0LxyBS, *b0CosAlphaBS, *b0CTauBS, *b0CTauBSE ;
+  vector<float>	        *b0CTauPVX_3D, *b0CTauPVX_3D_err;
+
+  vector<float>         *PiPiMass_err;
+
+};
+
+#endif
