@@ -13,7 +13,7 @@
 //
 // Original Author:  Warren Clarida
 //         Created:  Mon Apr 19 10:52:47 CDT 2010
-// $Id: Z4430FilterPAT.h,v 1.2 2010/07/19 13:15:47 wclarida Exp $
+// $Id: X4140FilterPAT.h,v 1.2 2010/07/19 13:15:47 wclarida Exp $
 //
 //
 
@@ -40,10 +40,10 @@
 // class declaration
 //
 /*
-class Z4430FilterPAT : public edm::EDFilter {
+class X4140FilterPAT : public edm::EDFilter {
    public:
-      explicit Z4430FilterPAT(const edm::ParameterSet&);
-      ~Z4430FilterPAT();
+      explicit X4140FilterPAT(const edm::ParameterSet&);
+      ~X4140FilterPAT();
 
    private:
       virtual void beginJob() ;
@@ -52,6 +52,5 @@ class Z4430FilterPAT : public edm::EDFilter {
       
       // ----------member data ---------------------------
 
-};
-*/
+};*/
 #endif

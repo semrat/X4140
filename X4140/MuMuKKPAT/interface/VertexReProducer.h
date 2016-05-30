@@ -1,5 +1,5 @@
-#ifndef MuMuPiKPAT_interface_VertexReProducer_h
-#define MuMuPiKPAT_interface_VertexReProducer_h
+#ifndef MuMuKKPAT_interface_VertexReProducer_h
+#define MuMuKKPAT_interface_VertexReProducer_h
 
 #include "DataFormats/Common/interface/Handle.h"
 #include "DataFormats/TrackReco/interface/TrackFwd.h"

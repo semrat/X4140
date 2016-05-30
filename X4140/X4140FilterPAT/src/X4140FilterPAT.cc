@@ -1,10 +1,9 @@
 // -*- C++ -*-
 //
-// Package:    Z4430FilterPAT
-// Class:      Z4430FilterPAT
+// Package:    X4140FilterPAT
+// Class:      X4140FilterPAT
 // 
-/**\class Z4430FilterPAT Z4430FilterPAT.cc UserCode/Z4430FilterPAT/src/Z4430FilterPAT.cc
-
+/**\class X4140FilterPAT X4140FilterPAT.cc UserCode/X4140FilterPAT/src/X4140FilterPAT.cc
  Description: [one line class summary]
 
  Implementation:
@@ -31,7 +30,7 @@
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
 
-#include "../interface/Z4430FilterPAT.h"
+#include "../interface/X4140FilterPAT.h"
 
 #include "DataFormats/Common/interface/Handle.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
@@ -54,10 +53,10 @@
 // class declaration
 //
 
-class Z4430FilterPAT : public edm::EDFilter {
+class X4140FilterPAT : public edm::EDFilter {
    public:
-      explicit Z4430FilterPAT(const edm::ParameterSet&);
-      ~Z4430FilterPAT();
+      explicit X4140FilterPAT(const edm::ParameterSet&);
+      ~X4140FilterPAT();
 
       static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
 
@@ -85,14 +84,14 @@ class Z4430FilterPAT : public edm::EDFilter {
 //
 // constructors and destructor
 //
-Z4430FilterPAT::Z4430FilterPAT(const edm::ParameterSet& iConfig)
+X4140FilterPAT::X4140FilterPAT(const edm::ParameterSet& iConfig)
 {
    //now do what ever initialization is needed
 
 }
 
 
-Z4430FilterPAT::~Z4430FilterPAT()
+X4140FilterPAT::~X4140FilterPAT()
 {
  
    // do anything here that needs to be done at desctruction time
@@ -107,7 +106,7 @@ Z4430FilterPAT::~Z4430FilterPAT()
 
 // ------------ method called on each new Event  ------------
 bool
-Z4430FilterPAT::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
+X4140FilterPAT::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
 #ifdef THIS_IS_AN_EVENT_EXAMPLE
    Handle<ExampleData> pIn;
@@ -168,46 +167,46 @@ Z4430FilterPAT::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 // ------------ method called once each job just before starting event loop  ------------
 void 
-Z4430FilterPAT::beginJob()
+X4140FilterPAT::beginJob()
 {
 }
 
 // ------------ method called once each job just after ending the event loop  ------------
 void 
-Z4430FilterPAT::endJob() {
+X4140FilterPAT::endJob() {
 }
 
 // ------------ method called when starting to processes a run  ------------
 bool 
-Z4430FilterPAT::beginRun(edm::Run&, edm::EventSetup const&)
+X4140FilterPAT::beginRun(edm::Run&, edm::EventSetup const&)
 { 
   return true;
 }
 
 // ------------ method called when ending the processing of a run  ------------
 bool 
-Z4430FilterPAT::endRun(edm::Run&, edm::EventSetup const&)
+X4140FilterPAT::endRun(edm::Run&, edm::EventSetup const&)
 {
   return true;
 }
 
 // ------------ method called when starting to processes a luminosity block  ------------
 bool 
-Z4430FilterPAT::beginLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&)
+X4140FilterPAT::beginLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&)
 {
   return true;
 }
 
 // ------------ method called when ending the processing of a luminosity block  ------------
 bool 
-Z4430FilterPAT::endLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&)
+X4140FilterPAT::endLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&)
 {
   return true;
 }
 
 // ------------ method fills 'descriptions' with the allowed parameters for the module  ------------
 void
-Z4430FilterPAT::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
+X4140FilterPAT::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
   //The following says we do not know what parameters are allowed so do no validation
   // Please change this to state exactly what you do use, even if it is no parameters
   edm::ParameterSetDescription desc;
@@ -215,4 +214,4 @@ Z4430FilterPAT::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
   descriptions.addDefault(desc);
 }
 //define this as a plug-in
-DEFINE_FWK_MODULE(Z4430FilterPAT);
+DEFINE_FWK_MODULE(X4140FilterPAT);
