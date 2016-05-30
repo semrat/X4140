@@ -17,12 +17,13 @@ MC = False
 if MC :
         #official = False
         official = True
+
 MCMotherId = 511 # 511 B0 (=anti-B0), 531 Bs0
 #MCMotherId = 531
 if MCMotherId == 511 :
-    MCExclusiveDecay = True	
+    MCExclusiveDecay = True
 elif MCMotherId == 531 :
-    MCExclusiveDecay = False		
+    MCExclusiveDecay = False
 
 # Input source
 process.source = cms.Source("PoolSource",
@@ -38,17 +39,7 @@ if (not MC) :
             #'root://cmsxrootd.fnal.gov//store/data/Run2012C/MuOniaParked/AOD/22Jan2013-v1/30000/1E71D761-D870-E211-9343-00215E25A5E2.root' # used to work, not on 30/07/2015
             #'/store/data/Run2012C/MuOniaParked/AOD/22Jan2013-v1/30000/1E71D761-D870-E211-9343-00215E25A5E2.root'
 	    #'root://cms-xrd-global.cern.ch//store/data/Run2012C/MuOniaParked/AOD/22Jan2013-v1/30000/1E71D761-D870-E211-9343-00215E25A5E2.root'
-	    #'root://xrootd.unl.edu//store/data/Run2012C/MuOniaParked/AOD/22Jan2013-v1/20000/00109B2A-2E77-E211-893B-E41F1318165C.root'
-	    #'/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20002/1A5DE0F3-646B-E211-91AA-001A645C2BC0.root' # guilty file
-	    #'/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20000/00054BD0-5668-E211-8091-00215E21DC7E.root'
-            '/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20000/000A1D2E-3168-E211-B2F7-00215E21D56A.root',
-            #'/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20000/00170E1F-6568-E211-9736-00215E93E7DC.root',
-            #'/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20000/003C345D-C768-E211-8C82-00215E2283FA.root',
-            #'/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20000/0054DA9E-AA67-E211-800F-E41F131815CC.root',
-            #'/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20000/005C3F2E-FE67-E211-A6E7-00215E222850.root',
-            #'/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20000/005DD843-D667-E211-8A8D-E61F13190DCB.root',
-            #'/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20000/00B2C16E-C767-E211-A36F-00215E21DA44.root',
-            #'/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20000/00B47F62-CD67-E211-B7B2-00215E221B48.root',
+	    '/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20002/1A5DE0F3-646B-E211-91AA-001A645C2BC0.root' # guilty file
     )
 elif MC :
         if MCMotherId == 511 :
@@ -60,7 +51,7 @@ elif MC :
                                 #'file:/lustre/cms/store/group/cristella/Bd2Psi2SKpi-PHSP/MC_generation/141028_153606/merge/MC_Bd2Psi2SKpi_1of2.root'
                                 'file:/lustre/cms/store/group/cristella/Bd2Psi2SKpi-PHSP/MC_generation/141028_153606/merge/MC_Bd2Psi2SKpi.root'
                         )
-		else :
+                else :
                         sourceFiles = cms.untracked.vstring(
                                 # offcial MC
                                 'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/00448020-25C4-E411-8D01-008CFA052A88.root',	
@@ -166,8 +157,8 @@ elif MC :
                                 'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/A61DF3A8-B9C3-E411-B53C-C4346BC7AAE0.root',
                                 'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/5A7A64C1-C9C3-E411-99C8-C4346BC808B8.root',
                                 'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/A8203BEC-BFC3-E411-BCE7-00266CFFC948.root'
-           )
-	elif MCMotherId == 531 :
+                        )
+        elif MCMotherId == 531 :
                 sourceFiles = cms.untracked.vstring(
                 # Bs
                 '/store/mc/Summer12_DR53X/BsToPsiMuMu_2MuPtEtaFilter_8TeV-pythia6-evtgen/AODSIM/PU_S10_START53_V7A-v1/0000/005DE3B0-FDDC-E111-9812-00266CFFC198.root',
@@ -207,13 +198,12 @@ process.load('Configuration.Geometry.GeometryIdeal_cff') # 53x
 process.load("Configuration.StandardSequences.GeometryExtended_cff") # from Lucia
 process.load("Configuration.StandardSequences.Reconstruction_cff") # from Lucia
 
-process.load("Configuration.StandardSequences.MagneticField_cff") # for using TransientTrackBuilder 
-process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff") # for using TransientTrackBuilder
-#process.GlobalTag.globaltag = 'FT_53_V6_AN3::All' # for using TransientTrackBuilder
-#process.GlobalTag.globaltag = 'START53_V19F::All'
+process.load("Configuration.StandardSequences.MagneticField_cff")
+process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
+#process.GlobalTag.globaltag = 'FT_53_V6_AN3::All'
+process.GlobalTag.globaltag = 'START53_V19F::All'
 #process.GlobalTag.globaltag = 'START53_V7C::All'
-process.GlobalTag.globaltag = 'FT_R_53_V18::All' #Global tag for 2012B data
-#process.GlobalTag.globaltag = 'FT53_V21A_AN6::All' #Global tag for 2012C data
+
 
 process.load('Configuration/EventContent/EventContent_cff')
 #
@@ -405,9 +395,9 @@ process.load("RecoVertex.BeamSpotProducer.BeamSpot_cff")
 
 
 #process.PATfilter = cms.EDFilter("X3872FilterPAT")
-process.PATfilter = cms.EDFilter("X4140FilterPAT")
+process.PATfilter = cms.EDFilter("Z4430FilterPAT")
 
-process.mkcands = cms.EDAnalyzer("MuMuKKPAT",
+process.mkcands = cms.EDAnalyzer("MuMuPiKPAT",
                                  HLTriggerResults = cms.untracked.InputTag("TriggerResults","","HLT"),
                                  inputGEN  = cms.untracked.InputTag("genParticles"),
                                  VtxSample   = cms.untracked.string('offlinePrimaryVertices'),
@@ -421,50 +411,40 @@ process.mkcands = cms.EDAnalyzer("MuMuKKPAT",
                                  DoMuMuMassConstraint = cms.untracked.bool(True),
                                  #SkipJPsi = cms.untracked.bool(True),
                                  SkipJPsi = cms.untracked.bool(False),
-                                 SkipPsi2S = cms.untracked.bool(False), # SEMRA ask closing or not
+                                 SkipPsi2S = cms.untracked.bool(False),
                                  MinNumMuPixHits = cms.untracked.int32(1),
                                  MinNumMuSiHits = cms.untracked.int32(8),
                                  MaxMuNormChi2 = cms.untracked.double(7),
                                  MaxMuD0 = cms.untracked.double(10.0),
                                  sharedFraction = cms.untracked.double(0.5),
 
-                                 MinJPsiMass = cms.untracked.double(2.8), # SEMRA changed
-                                 MaxJPsiMass = cms.untracked.double(3.4), # SEMRA changed
-                                 MinPsiPrimeMass = cms.untracked.double(3.55), # SEMRA ask closing
-                                 MaxPsiPrimeMass = cms.untracked.double(3.8), # SEMRA ask closing
-				 MinPhiMass = cms.untracked.double (0.985), # SEMRA added
- 				 MaxPhiMass = cms.untracked.double (1.055), # SEMRA added
-				 MaxJPsiPhiXMass = cms.untracked.double (4.35), # SEMRA added
-				 MinJPsiPhiBs0Mass = cms.untracked.double (5.1), # SEMRA added
-				 MaxJPsiPhiBs0Mass = cms.untracked.double (5.6), # SEMRA added 
+                                 MinJPsiMass = cms.untracked.double(2.9), 
+                                 MaxJPsiMass = cms.untracked.double(3.3), 
+                                 MinPsiPrimeMass = cms.untracked.double(3.55), 
+                                 MaxPsiPrimeMass = cms.untracked.double(3.8), 
 
                                  MinNumTrSiHits = cms.untracked.int32(4),
                                  MinTrPt = cms.untracked.double(0.350),
                                  Chi2NDF_Track =  cms.untracked.double(7.0),
 				 # Delta R
-				 MaxMuMuTrackDR = cms.untracked.double(1.5), # SEMRA why this is different with in .cc file ? 
-                                 MaxBs0CandTrackDR = cms.untracked.double(1.5), # SEMRA B0 changed with Bs0    
-                                 UseBs0Dr = cms.untracked.bool(True), # SEMRA B0 changed with Bs0            
-				 UseXDR = cms.untracked.bool(False), # SEMRA added
-				 MaxXCandTrackDR = cms.untracked.double (1.1), # SEMRA added				
+				 MaxMuMuTrackDR = cms.untracked.double(1.5), 
+                                 MaxB0CandTrackDR = cms.untracked.double(1.5),   
+                                 UseB0Dr = cms.untracked.bool(True),            
 
-                                 MinMuMuKKBs0Mass = cms.untracked.double(0), # SEMRA
-                                 MaxMuMuKKBs0Mass = cms.untracked.double(10), # SEMRA
-				 MaxMuMuKKXMass = cms.untracked.double(10), # SEMRA				
+                                 MinMuMuPiKMass = cms.untracked.double(5.1),
+                                 MaxMuMuPiKMass = cms.untracked.double(5.45),
 
                                  resolvePileUpAmbiguity = cms.untracked.bool(True),
                                  addMuMulessPrimaryVertex = cms.untracked.bool(True),
                                  #addMuMulessPrimaryVertex = cms.untracked.bool(False),
-                                 addBs0lessPrimaryVertex = cms.untracked.bool(True), # SEMRA B0 changed with Bs0
+                                 addB0lessPrimaryVertex = cms.untracked.bool(True),
                                  Debug_Output = cms.untracked.bool(True),
                                  ##
                                  ##  use the correct trigger path
                                  ##
                                  TriggersForMatching = cms.untracked.vstring(
-                                         #2012 displaced J/psi = Alessandra
-                                         "HLT_DoubleMu4_Jpsi_Displaced_v9",
-					 "HLT_DoubleMu4_Jpsi_Displaced_v10", 
-					 "HLT_DoubleMu4_Jpsi_Displaced_v11", "HLT_DoubleMu4_Jpsi_Displaced_v12",
+                                         # 2012 displaced J/psi = Alessandra
+                                         #"HLT_DoubleMu4_Jpsi_Displaced_v9", "HLT_DoubleMu4_Jpsi_Displaced_v10", "HLT_DoubleMu4_Jpsi_Displaced_v11", "HLT_DoubleMu4_Jpsi_Displaced_v12",
                                          # Lucia
                                          # 2010
                                          #"HLT_DoubleMu3_Quarkonium_v1", "HLT_DoubleMu3_Quarkonium_v2",
@@ -475,19 +455,17 @@ process.mkcands = cms.EDAnalyzer("MuMuKKPAT",
                                          #"HLT_Dimuon11_PsiPrime_v1", "HLT_Dimuon11_PsiPrime_v4", "HLT_Dimuon11_PsiPrime_v5",
                                          # inclusive psi(2S)
                                          #"HLT_Dimuon0_PsiPrime_v3", "HLT_Dimuon0_PsiPrime_v4", "HLT_Dimuon0_PsiPrime_v5", "HLT_Dimuon0_PsiPrime_v6",
-                                         #"HLT_Dimuon5_PsiPrime_v3", "HLT_Dimuon5_PsiPrime_v4", "HLT_Dimuon5_PsiPrime_v5", "HLT_Dimuon5_PsiPrime_v6",
+                                         "HLT_Dimuon5_PsiPrime_v3", "HLT_Dimuon5_PsiPrime_v4", "HLT_Dimuon5_PsiPrime_v5", "HLT_Dimuon5_PsiPrime_v6",
                                          #"HLT_Dimuon7_PsiPrime_v1", "HLT_Dimuon7_PsiPrime_v2", "HLT_Dimuon7_PsiPrime_v3", "HLT_Dimuon9_PsiPrime_v9",
                                          #"HLT_DoubleMu3p5_LowMass_Displaced_v3", "HLT_DoubleMu3p5_LowMass_Displaced_v4", "HLT_DoubleMu3p5_LowMass_Displaced_v5", "HLT_DoubleMu3p5_LowMass_Displaced_v6"
 					 # inclusive J/psi
-					 #"HLT_Dimuon8_Jpsi_v3", 
-					 "HLT_Dimuon8_Jpsi_v4", 
-					 "HLT_Dimuon8_Jpsi_v5", "HLT_Dimuon8_Jpsi_v6", "HLT_Dimuon8_Jpsi_v7",  
+					 "HLT_Dimuon8_Jpsi_v3", "HLT_Dimuon8_Jpsi_v4", "HLT_Dimuon8_Jpsi_v5", "HLT_Dimuon8_Jpsi_v6", "HLT_Dimuon8_Jpsi_v7",  
                                  ),
 				 FiltersForMatching = cms.untracked.vstring(
                                          # Alessandra
-                                         "hltDisplacedmumuFilterDoubleMu4Jpsi", "hltDisplacedmumuFilterDoubleMu4Jpsi", "hltDisplacedmumuFilterDoubleMu4Jpsi", "hltDisplacedmumuFilterDoubleMu4Jpsi"
+                                         #"hltDisplacedmumuFilterDoubleMu4Jpsi", "hltDisplacedmumuFilterDoubleMu4Jpsi", "hltDisplacedmumuFilterDoubleMu4Jpsi", "hltDisplacedmumuFilterDoubleMu4Jpsi"
                                          # Kay
-                                         #"hltVertexmumuFilterDimuon5PsiPrime", "hltVertexmumuFilterDimuon5PsiPrime", "hltVertexmumuFilterDimuon5PsiPrime", "hltVertexmumuFilterDimuon5PsiPrime", #"hltVertexmumuFilterDimuon7PsiPrime", "hltVertexmumuFilterDimuon7PsiPrime", "hltVertexmumuFilterDimuon7PsiPrime", "hltVertexmumuFilterDimuon7PsiPrime"
+                                         "hltVertexmumuFilterDimuon5PsiPrime", "hltVertexmumuFilterDimuon5PsiPrime", "hltVertexmumuFilterDimuon5PsiPrime", "hltVertexmumuFilterDimuon5PsiPrime", #"hltVertexmumuFilterDimuon7PsiPrime", "hltVertexmumuFilterDimuon7PsiPrime", "hltVertexmumuFilterDimuon7PsiPrime", "hltVertexmumuFilterDimuon7PsiPrime"
                                          #hltDoubleMu4JpsiDisplacedL3Filtered
 					 # inclusive J/psi (https://espace.cern.ch/cms-quarkonia/trigger-bph/SitePages/2012-InclusiveJPsi.aspx)         
 					 "hltVertexmumuFilterDimuon8Jpsi", "hltVertexmumuFilterDimuon8Jpsi", "hltVertexmumuFilterDimuon8Jpsi", "hltVertexmumuFilterDimuon8Jpsi", "hltVertexmumuFilterDimuon8Jpsi",
@@ -501,7 +479,7 @@ process.TFileService = cms.Service("TFileService",
     fileName = cms.string('set_below.root')
 )
 if (not MC) :
-    process.TFileService.fileName = cms.string('MuOniaRun2012B_MuMuKKPAT_ntpl.root')
+    process.TFileService.fileName = cms.string('MuOniaRun2012C_25Apr_MuMuPiPiPAT_ntpl.root')
 elif MC :
     if MCMotherId == 511 :
             if (not official) :
@@ -565,5 +543,5 @@ process.ntup = cms.Path(
 
 process.schedule = cms.Schedule(process.ntup)
 
-# rsync -vut --existing test/runMuMuKKPAT_dataOrMC_03Mar.py semrat@lxplus.cern.ch:/afs/cern.ch/work/s/semrat/private/TetraQuark/CMSSW_5_3_22/src/X4140/MuMuKKPAT/test
+# rsync -vut --existing test/crab/runMuMuPiKPAT_dataOrMC_03Mar.py cristella@cmssusy.ba.infn.it:/cmshome/cristella/work/Z_analysis/exclusive/clean_14ott/CMSSW_5_3_22/src/UserCode/MuMuPiKPAT/test/crab/runMuMuPiKPAT_dataOrMC_03Mar.py
 
