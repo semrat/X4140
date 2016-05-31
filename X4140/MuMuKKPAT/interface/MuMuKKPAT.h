@@ -173,6 +173,7 @@ private:
   /// Indices
   vector<int>           *mu1Idx, *mu2Idx;
   vector<int>           *MuMuType;
+  vector<int>           *ka1Idx, *ka2Idx;
   vector<int>           *Bs0_MuMuIdx, *Bs0_k1Idx, *Bs0_k2Idx; 
   vector<int>           *X_MuMuIdx, *X_k1Idx, *X_k2Idx; 
   /// MC Analysis
@@ -225,11 +226,15 @@ private:
   vector<float>         *tr_dedx, *tr_dedxMass, *tr_theo, *tr_sigma;
   vector<float>         *tr_dedx_byHits, *tr_dedxErr_byHits ;
   vector<int>           *tr_saturMeas_byHits, *tr_Meas_byHits ;
-  /// MuMu 
+  /// MuMu cand & KaKa cand 
   vector<float>         *MuMuMass, *MuMuPx, *MuMuPy, *MuMuPz;
   vector<float>         *MuMuVtx_CL, *MuMuVtx_Chi2;
   vector<float>         *MuMuDecayVtx_X, *MuMuDecayVtx_Y, *MuMuDecayVtx_Z, *MuMuDecayVtx_XE, *MuMuDecayVtx_YE, *MuMuDecayVtx_ZE;
   vector<bool>          *MuMuMuonTrigMatch;
+  vector<float>         *KaKaMass, *KaKaPx, *KaKaPy, *KaKaPz;
+  vector<float>         *KaKaVtx_CL, *KaKaVtx_Chi2;
+  vector<float>         *KaKaDecayVtx_X, *KaKaDecayVtx_Y, *KaKaDecayVtx_Z, *KaKaDecayVtx_XE, *KaKaDecayVtx_YE, *KaKaDecayVtx_ZE;
+  vector<bool>          *KaKaKaonTrigMatch;
   /// Muons after JPsi (MuMu) fit & Kaons after Phi (KaKa) fit
   vector<float>         *mu1_MuMu_Px, *mu1_MuMu_Py, *mu1_MuMu_Pz ;
   vector<float>         *mu1_MuMu_Chi2 ;
