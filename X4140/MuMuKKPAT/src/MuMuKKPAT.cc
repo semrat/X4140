@@ -174,6 +174,7 @@ MuMuKKPAT::MuMuKKPAT(const edm::ParameterSet& iConfig) :
   priVtx_n(0), priVtx_X(0), priVtx_Y(0), priVtx_Z(0), priVtx_XE(0), priVtx_YE(0), priVtx_ZE(0), priVtx_NormChi2(0), priVtx_Chi2(0), priVtx_CL(0), priVtx_tracks(0), priVtx_tracksPtSq(0),   
   /// indices
   mu1Idx(0), mu2Idx(0), MuMuType(0),
+  ka1Idx(0), ka2Idx(0),
   Bs0_MuMuIdx(0), Bs0_k1Idx(0), Bs0_k2Idx(0), 
   X_MuMuIdx(0), X_k1Idx(0), X_k2Idx(0), 
   /// MC Analysis /// n_Bs0Ancestors & no for X(4140)!! 
@@ -210,15 +211,22 @@ MuMuKKPAT::MuMuKKPAT(const edm::ParameterSet& iConfig) :
   trQualityHighPurity(0), trQualityTight(0),
   tr_nsigdedx(0), tr_dedx(0), tr_dedxMass(0), tr_theo(0), tr_sigma(0),
   tr_dedx_byHits(0), tr_dedxErr_byHits(0), tr_saturMeas_byHits(0), tr_Meas_byHits(0),
-  /// MuMu
+  /// MuMu cand & KaKa cand 
   MuMuMass(0), MuMuPx(0), MuMuPy(0), MuMuPz(0),
   MuMuVtx_CL(0), MuMuVtx_Chi2(0), 
   MuMuDecayVtx_X(0), MuMuDecayVtx_Y(0), MuMuDecayVtx_Z(0),
   MuMuDecayVtx_XE(0), MuMuDecayVtx_YE(0), MuMuDecayVtx_ZE(0),
   MuMuMuonTrigMatch(0),
-  /// muons after JPsi (MuMu) fit 
+  KaKaMass(0), KaKaPx(0), KaKaPy(0), KaKaPz(0),
+  KaKaVtx_CL(0), KaKaVtx_Chi2(0),
+  KaKaDecayVtx_X(0), KaKaDecayVtx_Y(0), KaKaDecayVtx_Z(0),
+  KaKaDecayVtx_XE(0), KaKaDecayVtx_YE(0), KaKaDecayVtx_ZE(0),
+  KaKaKaonTrigMatch(0),
+  /// muons after JPsi (MuMu) fit & kaons after Phi (KaKa) fit
   mu1_MuMu_Px(0), mu1_MuMu_Py(0), mu1_MuMu_Pz(0), mu1_MuMu_Chi2(0), mu1_MuMu_NDF(0),
   mu2_MuMu_Px(0), mu2_MuMu_Py(0), mu2_MuMu_Pz(0), mu2_MuMu_Chi2(0), mu2_MuMu_NDF(0),
+  ka1_KaKa_Px(0), ka1_KaKa_Py(0), ka1_KaKa_Pz(0), ka1_KaKa_Chi2(0), ka1_KaKa_NDF(0),
+  ka2_KaKa_Px(0), ka2_KaKa_Py(0), ka2_KaKa_Pz(0), ka2_KaKa_Chi2(0), ka2_KaKa_NDF(0),
   /// Primary Vertex with "MuMu correction"
   PriVtxMuMuCorr_n(0),
   PriVtxMuMuCorr_X(0), PriVtxMuMuCorr_Y(0), PriVtxMuMuCorr_Z(0), PriVtxMuMuCorr_EX(0), PriVtxMuMuCorr_EY(0), PriVtxMuMuCorr_EZ(0),
@@ -466,9 +474,10 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   Handle< vector<pat::GenericParticle> > thePATTrackHandle;
-  iEvent.getByLabel("cleanPatTrackCands", thePATTrackHandle);
+  iEvent.getByLabel("cleanPatTrackCands", thePATTrackHandle); /// container of tracks with pion mass hypothesis 
   Handle< vector<pat::GenericParticle> > theKaonRefittedPATTrackHandle;
-  iEvent.getByLabel("cleanPatTrackKaonCands", theKaonRefittedPATTrackHandle);
+  iEvent.getByLabel("cleanPatTrackKaonCands", theKaonRefittedPATTrackHandle); /// container of tracks with kaon mass hypothesis
+
 
   for ( vector<pat::GenericParticle>::const_iterator TrackNotRefitted = thePATTrackHandle->begin(); TrackNotRefitted != thePATTrackHandle->end(); ++TrackNotRefitted ) { 
     for ( vector<pat::GenericParticle>::const_iterator TrackRefitted = theKaonRefittedPATTrackHandle->begin(); TrackRefitted != theKaonRefittedPATTrackHandle->end(); ++TrackRefitted ) { 
@@ -850,7 +859,7 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      || fabs(rmu1->track()->dxy(RefVtx)) > MuMaxD0) {
 	    continue ;
 	  }
-			
+
 	  ////////////////// check for muon2 //////////////////
 	  for ( std::vector<pat::Muon>::const_iterator Muon2 = Muon1+1; Muon2 != thePATMuonHandle->end(); ++Muon2) {
 	    if(Muon2->charge() * Muon1->charge() > 0)
@@ -869,6 +878,17 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      continue ;
 	    }
 
+
+	    ////////////////// check for kaon1 //////////////////
+	    TrackRef kaTrack1 = Kaon1->track();
+	    if ( kaTrack1.isNull() )
+	     continue;
+	
+	    ////////////////// check for kaon2 //////////////////
+  	    TrackRef kaTrack2 = Kaon2->track();
+            if ( kaTrack2.isNull() )
+             continue;	
+
 	    ////////////////// get the MuMu information //////////////////
 	    TransientTrack muon1TT( muTrack1, &(*bFieldHandle) );
 	    TransientTrack muon2TT( muTrack2, &(*bFieldHandle) );			
@@ -882,10 +902,9 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    KinematicParticleVertexFitter MuMuFitter; /// SEMRA creating the vertex fitter JPsi  
 	    RefCountedKinematicTree MuMuVertexFitTree;
 	    MuMuVertexFitTree = MuMuFitter.fit(muons); 
-            RefCountedKinematicTree KaKaVertexFitTree;
-	    if (!MuMuVertexFitTree->isValid()) /// SEMRA for muon-muon 
+	    if (!MuMuVertexFitTree->isValid()) 
 	      continue ; 
-	    MuMuVertexFitTree->movePointerToTheTop(); /// SEMRA for JPsi				
+	    MuMuVertexFitTree->movePointerToTheTop(); 				
 	    RefCountedKinematicParticle MuMuCand_fromFit = MuMuVertexFitTree->currentParticle();
 	    RefCountedKinematicVertex MuMuCand_vertex_fromFit = MuMuVertexFitTree->currentDecayVertex();
 	    MuMuVertexFitTree->movePointerToTheFirstChild();
@@ -896,7 +915,7 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    KinematicParameters Mu2Cand_KP = Mu2Cand_fromFit->currentState().kinematicParameters();
 	    
             ////////////////// fill the MuMu vectors //////////////////
-	    if (MuMuCand_fromFit->currentState().mass() < MuMuMinMass  ||  MuMuCand_fromFit->currentState().mass() > MuMuMaxMass) /// SEMRA for JPsi
+	    if (MuMuCand_fromFit->currentState().mass() < MuMuMinMass  ||  MuMuCand_fromFit->currentState().mass() > MuMuMaxMass) 
 	      continue ;
 	    MuMuMass->push_back( MuMuCand_fromFit->currentState().mass() );	
 	    MuMuDecayVtx_X->push_back( MuMuCand_vertex_fromFit->position().x() );
@@ -913,8 +932,8 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    mu1Idx->push_back(std::distance(thePATMuonHandle->begin(), Muon1)); 
 	    mu2Idx->push_back(std::distance(thePATMuonHandle->begin(), Muon2));
 
-            ////////////////// JPsi (MuMu) fit & Phi (KaKa) fit //////////////////
-            mu1_MuMu_Px->push_back( Mu1Cand_KP.momentum().x()); /// SEMRA for JPsi
+            ////////////////// JPsi (MuMu) fit //////////////////
+            mu1_MuMu_Px->push_back( Mu1Cand_KP.momentum().x()); 
 	    mu1_MuMu_Py->push_back( Mu1Cand_KP.momentum().y());
 	    mu1_MuMu_Pz->push_back( Mu1Cand_KP.momentum().z());
 	    mu1_MuMu_Chi2->push_back( Mu1Cand_fromFit->chiSquared());
@@ -1036,19 +1055,19 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    ////////////////// cuts on MuMu mass window for Bs0 ////////////////////////////
 	    if (MuMuMass->at(nMuMu-1) < MuMuMinMass  ||  MuMuMass->at(nMuMu-1) > MuMuMaxMass)
 	      continue ; nBs0_pre1++ ; nX_pre1++ ;
-	    cout<<"check3---!!!!"<<endl;
+	    //cout<<"check3---!!!!"<<endl;
 
 	    ////////////////// check tracks for kaon1 for Bs0 & X(4140)//////////////////
 	    for ( vector<pat::GenericParticle>::const_iterator Track1 = theKaonRefittedPATTrackHandle->begin(); Track1 != theKaonRefittedPATTrackHandle->end(); ++Track1 ) {
-	    cout<<"check4---!!!!"<<endl;
+	    //cout<<"check4---!!!!"<<endl;
 	      /// check track doesn't overlap with the MuMu candidate tracks
 	      if (Track1->track().key() == rmu1->track().key()  ||  Track1->track().key() == rmu2->track().key())
 		continue; nBs0_pre2++ ; nX_pre2++ ;
-	      cout<<"check5---!!!!"<<endl;
+	      //cout<<"check5---!!!!"<<endl;
 	      /// cuts on charged tracks	
 	      if (( Track1->track()->chi2()/Track1->track()->ndof() > TrMaxNormChi2 )  ||  Track1->pt() < TrMinPt)
 		continue ; nBs0_pre3++ ; nX_pre3++ ;
-	      cout<<"check6---!!!!"<<endl;
+	      //cout<<"check6---!!!!"<<endl;
 
 
 	   ////////////////// check tracks for kaon2 for Bs0 & X(4140) //////////////////
@@ -1064,8 +1083,64 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    /// cuts on charged tracks	
             if ((Track2->track()->chi2() / Track2->track()->ndof() > TrMaxNormChi2)  ||  Track2->pt() < TrMinPt)
 	      continue; nBs0_pre7++ ; nX_pre7++ ;
-		
-		
+	
+	
+            ////////////////// get the KaKa information //////////////////		
+            TransientTrack kaon1TT( kaTrack1, &(*bFieldHandle) );  
+            TransientTrack kaon2TT( kaTrack2, &(*bFieldHandle) );
+            KinematicParticleFactoryFromTransientTrack pFactory;
+
+            /// initial chi2 and ndf before kinematic fits
+            float chi = 0., ndf = 0.;
+            vector<RefCountedKinematicParticle> kaons; 
+            kaons.push_back( pFactory.particle( kaon1TT, kaon_mass, chi, ndf, small_sigma));
+            kaons.push_back( pFactory.particle( kaon2TT, kaon_mass, chi, ndf, small_sigma));
+            KinematicParticleVertexFitter KaKaFitter; 
+            RefCountedKinematicTree KaKaVertexFitTree;
+            KaKaVertexFitTree = KaKaFitter.fit(kaons);
+            if (!MuMuVertexFitTree->isValid())  
+              continue ;
+            KaKaVertexFitTree->movePointerToTheTop();                                
+            RefCountedKinematicParticle KaKaCand_fromFit = KaKaVertexFitTree->currentParticle();
+            RefCountedKinematicVertex KaKaCand_vertex_fromFit = KaKaVertexFitTree->currentDecayVertex();
+            KaKaVertexFitTree->movePointerToTheFirstChild();
+            RefCountedKinematicParticle Ka1Cand_fromFit = KaKaVertexFitTree->currentParticle();
+            KaKaVertexFitTree->movePointerToTheNextChild();
+            RefCountedKinematicParticle Ka2Cand_fromFit = KaKaVertexFitTree->currentParticle();
+            KinematicParameters Ka1Cand_KP = Ka1Cand_fromFit->currentState().kinematicParameters();
+            KinematicParameters Ka2Cand_KP = Ka2Cand_fromFit->currentState().kinematicParameters();
+
+	    ////////////////// fill the KaKa vectors //////////////////
+	    if (KaKaCand_fromFit->currentState().mass() < KKMinMass  ||  KaKaCand_fromFit->currentState().mass() > KKMaxMass)
+              continue ;
+            KaKaMass->push_back( KaKaCand_fromFit->currentState().mass() );
+            KaKaDecayVtx_X->push_back( KaKaCand_vertex_fromFit->position().x() );
+            KaKaDecayVtx_Y->push_back( KaKaCand_vertex_fromFit->position().y() );
+            KaKaDecayVtx_Z->push_back( KaKaCand_vertex_fromFit->position().z() );
+            KaKaDecayVtx_XE->push_back( sqrt( KaKaCand_vertex_fromFit->error().cxx()) );
+            KaKaDecayVtx_YE->push_back( sqrt( KaKaCand_vertex_fromFit->error().cyy()) );
+            KaKaDecayVtx_ZE->push_back( sqrt( KaKaCand_vertex_fromFit->error().czz()) );
+            KaKaVtx_CL->push_back( ChiSquaredProbability((double)( KaKaCand_vertex_fromFit->chiSquared()),(double)( KaKaCand_vertex_fromFit->degreesOfFreedom())) );
+            KaKaVtx_Chi2->push_back( KaKaCand_vertex_fromFit->chiSquared() ) ;
+            KaKaPx->push_back( Ka1Cand_KP.momentum().x() + Ka2Cand_KP.momentum().x() );
+            KaKaPy->push_back( Ka1Cand_KP.momentum().y() + Ka2Cand_KP.momentum().y() );
+            KaKaPz->push_back( Ka1Cand_KP.momentum().z() + Ka2Cand_KP.momentum().z() );
+            ka1Idx->push_back(std::distance(thePATTrackHandle->begin(), Kaon1)); /// SEMRA
+            ka2Idx->push_back(std::distance(thePATTrackHandle->begin(), Kaon2)); /// SEMRA
+
+	    ////////////////// Phi (KaKa) fit //////////////////
+	    ka1_KaKa_Px->push_back( Ka1Cand_KP.momentum().x());
+            ka1_KaKa_Py->push_back( Ka1Cand_KP.momentum().y());
+            ka1_KaKa_Pz->push_back( Ka1Cand_KP.momentum().z());
+            ka1_KaKa_Chi2->push_back( Ka1Cand_fromFit->chiSquared());
+            ka1_KaKa_NDF->push_back( Ka1Cand_fromFit->degreesOfFreedom());
+            ka2_KaKa_Px->push_back( Ka2Cand_KP.momentum().x());
+            ka2_KaKa_Py->push_back( Ka2Cand_KP.momentum().y());
+            ka2_KaKa_Pz->push_back( Ka2Cand_KP.momentum().z());
+            ka2_KaKa_Chi2->push_back( Ka2Cand_fromFit->chiSquared());
+            ka2_KaKa_NDF->push_back( Ka2Cand_fromFit->degreesOfFreedom());
+
+            if ( KaKaCand_fromFit->currentState().mass() > PhiMinMass  &&  KaKaCand_fromFit->currentState().mass() < PhiMaxMass ) 
 
             ////////////////// cuts on tracks' delta R for Bs0 & X(4140) //////////////////	
             math::XYZTLorentzVector MuMu = (rmu1->p4() + rmu2->p4()); 
@@ -1074,9 +1149,9 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    float MuMuK1DR = sqrt( pow(MuMu.eta() - Track1->p4().eta(),2) + pow(MuMu.phi() - Track1->p4().phi(), 2) );
 	    float MuMuK2DR = sqrt( pow(MuMu.eta() - Track2->p4().eta(),2) + pow(MuMu.phi() - Track2->p4().phi(), 2) );
             float bs0K1DR = sqrt( pow(bs0.eta() - Track1->p4().eta(),2) + pow(bs0.phi() - Track1->p4().phi(), 2) );
-            float bs0K2DR = sqrt( pow(MuMu.eta() - Track2->p4().eta(),2) + pow(MuMu.phi() - Track2->p4().phi(), 2) );
+            float bs0K2DR = sqrt( pow(bs0.eta() - Track2->p4().eta(),2) + pow(bs0.phi() - Track2->p4().phi(), 2) );
             float xK1DR = sqrt( pow(x.eta() - Track1->p4().eta(),2) + pow(x.phi() - Track1->p4().phi(), 2) );
-            float xK2DR = sqrt( pow(MuMu.eta() - Track2->p4().eta(),2) + pow(MuMu.phi() - Track2->p4().phi(), 2) );		  
+            float xK2DR = sqrt( pow(x.eta() - Track2->p4().eta(),2) + pow(x.phi() - Track2->p4().phi(), 2) );		  
 
 		  if (UseBs0DR) {
 		    if (bs0K1DR > Bs0TrackMaxDR || bs0K2DR > Bs0TrackMaxDR)
@@ -1103,12 +1178,12 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		  if ((Track1->p4() + Track2->p4() + MuMu).M() < MuMuKKMaxXMass)
 		    continue ; nX_pre9++ ; /// SEMRA  
 
-
+                   
 		  /// having two oppositely charged muons, and two oppositely charged tracks: try to vertex them
-		  TransientTrack kaon1TT( Track1->track(), &(*bFieldHandle) ); 
-		  TransientTrack kaon2TT( Track2->track(), &(*bFieldHandle) );
+		  //TransientTrack kaon1TT( Track1->track(), &(*bFieldHandle) ); 
+		  //TransientTrack kaon2TT( Track2->track(), &(*bFieldHandle) );
 		
-		  TransientTrack kaon2TT_notRefit ; 
+		  TransientTrack kaon2TT_notRefit ; /// SEMRA I didn't understand !!! 
 		  Bool_t notRefittedPartner = false ;
 		  for ( vector<pat::GenericParticle>::const_iterator Track2_notRefit = thePATTrackHandle->begin(); Track2_notRefit != thePATTrackHandle->end(); ++Track2_notRefit )
 		    if ( Track2_notRefit->track().key() == Track2->track().key() ) {
@@ -1116,7 +1191,7 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		      kaon2TT_notRefit = TransientTrack( Track2_notRefit->track(), &(*bFieldHandle) ) ; 
 		      break ;
 		    }
-			      
+
 		  /// do mass constraint for MuMu cand and do mass constrained vertex fit for Bs0
 		  vector<RefCountedKinematicParticle> bs0Daughters;
 		  bs0Daughters.push_back(pFactory.particle( muon1TT, muon_mass, chi, ndf, small_sigma));
@@ -2035,6 +2110,7 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   nX_pre0 = 0; nX_pre1 = 0; nX_pre2 = 0; nX_pre3 = 0; nX_pre4 = 0; nX_pre5 = 0; nX_pre6 = 0; nX_pre7 = 0; nX_pre8 = 0; nX_pre9 = 0; nX_pre10 = 0; nX_pre11 = 0; nX_pre12 = 0; nX_pre13 = 0; nX_pre14 = 0;
   /// indices
   mu1Idx->clear(); mu2Idx->clear();
+  ka1Idx->clear(); ka2Idx->clear();
   Bs0_MuMuIdx->clear(); Bs0_k1Idx->clear(); Bs0_k2Idx->clear(); 
   X_MuMuIdx->clear(); X_k1Idx->clear(); X_k2Idx->clear();
 
@@ -2067,16 +2143,23 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   priVtx_X = 0; priVtx_Y = 0; priVtx_Z = 0 ; 
   priVtx_XE = 0; priVtx_YE = 0; priVtx_ZE = 0 ; 
   priVtx_NormChi2 = 0; priVtx_Chi2 = 0; priVtx_CL = 0; priVtx_tracks = 0; priVtx_tracksPtSq = 0 ;
-  /// MuMu cand
+  /// MuMu cand & KaKa cand
   MuMuMass->clear(); MuMuVtx_CL->clear(); MuMuVtx_Chi2->clear(); 
   MuMuPx->clear(); MuMuPy->clear(); MuMuPz->clear();
   MuMuDecayVtx_X->clear(); MuMuDecayVtx_Y->clear(); MuMuDecayVtx_Z->clear();
   MuMuDecayVtx_XE->clear(); MuMuDecayVtx_YE->clear(); MuMuDecayVtx_ZE->clear();
   MuMuMuonTrigMatch->clear();
-  /// muons from JPsi (MuMu) fit 
+  KaKaMass->clear(); KaKaVtx_CL->clear(); KaKaVtx_Chi2->clear();
+  KaKaPx->clear(); KaKaPy->clear(); KaKaPz->clear();
+  KaKaDecayVtx_X->clear(); KaKaDecayVtx_Y->clear(); KaKaDecayVtx_Z->clear();
+  KaKaDecayVtx_XE->clear(); KaKaDecayVtx_YE->clear(); KaKaDecayVtx_ZE->clear();
+  KaKaKaonTrigMatch->clear();
+  /// muons from JPsi (MuMu) fit & kaons from Phi (KaKa) fit
   mu1_MuMu_Px->clear(); mu1_MuMu_Py->clear(); mu1_MuMu_Pz->clear(); mu1_MuMu_Chi2->clear(); mu1_MuMu_NDF->clear();
   mu2_MuMu_Px->clear(); mu2_MuMu_Py->clear(); mu2_MuMu_Pz->clear(); mu2_MuMu_Chi2->clear(); mu2_MuMu_NDF->clear();
   MuMuType->clear();
+  ka1_KaKa_Px->clear(); ka1_KaKa_Py->clear(); ka1_KaKa_Pz->clear(); ka1_KaKa_Chi2->clear(); ka1_KaKa_NDF->clear();
+  ka2_KaKa_Px->clear(); ka2_KaKa_Py->clear(); ka2_KaKa_Pz->clear(); ka2_KaKa_Chi2->clear(); ka2_KaKa_NDF->clear();
   /// Primary Vertex with "MuMu correction"
   PriVtxMuMuCorr_n->clear();
   PriVtxMuMuCorr_X->clear(); PriVtxMuMuCorr_Y->clear(); PriVtxMuMuCorr_Z->clear(); 
@@ -2321,7 +2404,7 @@ void MuMuKKPAT::beginJob()
   Bs0_One_Tree_->Branch("tr_dedxErr_byHits", &tr_dedxErr_byHits );
   Bs0_One_Tree_->Branch("tr_saturMeas_byHits", &tr_saturMeas_byHits );
   Bs0_One_Tree_->Branch("tr_Meas_byHits", &tr_Meas_byHits );
-  /// MuMu cand
+  /// MuMu cand & KaKa cand 
   Bs0_One_Tree_->Branch("nMuMu",&nMuMu,"nMuMu/i");
   Bs0_One_Tree_->Branch("MuMuMass",&MuMuMass);
   Bs0_One_Tree_->Branch("MuMuPx",&MuMuPx);
@@ -2335,7 +2418,20 @@ void MuMuKKPAT::beginJob()
   Bs0_One_Tree_->Branch("MuMuDecayVtx_XE",&MuMuDecayVtx_XE);
   Bs0_One_Tree_->Branch("MuMuDecayVtx_YE",&MuMuDecayVtx_YE);
   Bs0_One_Tree_->Branch("MuMuDecayVtx_ZE",&MuMuDecayVtx_ZE);
-  /// muons from JPsi (MuMu) fit 
+  X_One_Tree_->Branch("nKaKa",&nKaKa,"nKaKa/i"); /// SEMRA will be added
+  X_One_Tree_->Branch("KaKaMass",&KaKaMass);
+  X_One_Tree_->Branch("KaKaPx",&KaKaPx);
+  X_One_Tree_->Branch("KaKaPy",&KaKaPy);
+  X_One_Tree_->Branch("KaKaPz",&KaKaPz);
+  X_One_Tree_->Branch("KaKaVtx_CL",&KaKaVtx_CL);
+  X_One_Tree_->Branch("KaKaVtx_Chi2",&KaKaVtx_Chi2);
+  X_One_Tree_->Branch("KaKaDecayVtx_X",&KaKaDecayVtx_X);
+  X_One_Tree_->Branch("KaKaDecayVtx_Y",&KaKaDecayVtx_Y);
+  X_One_Tree_->Branch("KaKaDecayVtx_Z",&KaKaDecayVtx_Z);
+  X_One_Tree_->Branch("KaKaDecayVtx_XE",&KaKaDecayVtx_XE);
+  X_One_Tree_->Branch("KaKaDecayVtx_YE",&KaKaDecayVtx_YE);
+  X_One_Tree_->Branch("KaKaDecayVtx_ZE",&KaKaDecayVtx_ZE);
+  /// muons from JPsi (MuMu) fit & kaons from Phi (KaKa) fit
   Bs0_One_Tree_->Branch("mu1Idx",&mu1Idx);
   Bs0_One_Tree_->Branch("mu2Idx",&mu2Idx);
   Bs0_One_Tree_->Branch("mu1Px_MuMu",&mu1_MuMu_Px);
@@ -2350,6 +2446,20 @@ void MuMuKKPAT::beginJob()
   Bs0_One_Tree_->Branch("mu2NDF_MuMu",&mu2_MuMu_NDF);
   Bs0_One_Tree_->Branch("MuMuType",&MuMuType);
   Bs0_One_Tree_->Branch("MuMuMuonTrigMatch",&MuMuMuonTrigMatch);
+  X_One_Tree_->Branch("ka1Idx",&ka1Idx);
+  X_One_Tree_->Branch("ka2Idx",&mu2Idx);
+  X_One_Tree_->Branch("ka1Px_KaKa",&ka1_KaKa_Px);
+  X_One_Tree_->Branch("ka1Py_KaKa",&ka1_KaKa_Py);
+  X_One_Tree_->Branch("ka1Pz_KaKa",&ka1_KaKa_Pz);
+  X_One_Tree_->Branch("ka1Chi2_KaKa",&ka1_KaKa_Chi2);
+  X_One_Tree_->Branch("ka1NDF_KaKa",&ka1_KaKa_NDF);
+  X_One_Tree_->Branch("ka2Px_KaKa",&ka2_KaKa_Px);
+  X_One_Tree_->Branch("ka2Py_KaKa",&ka2_KaKa_Py);
+  X_One_Tree_->Branch("ka2Pz_KaKa",&ka2_KaKa_Pz);
+  X_One_Tree_->Branch("ka2Chi2_KaKa",&ka2_KaKa_Chi2);
+  X_One_Tree_->Branch("ka2NDF_KaKa",&ka2_KaKa_NDF);
+  //X_One_Tree_->Branch("KaKaType",&KaKaType);
+  X_One_Tree_->Branch("KaKaKaonTrigMatch",&KaKaKaonTrigMatch);
   /// Primary Vertex with "MuMu correction" 
   Bs0_One_Tree_->Branch("PriVtxMuMuCorr_n", &PriVtxMuMuCorr_n);
   Bs0_One_Tree_->Branch("PriVtxMuMuCorr_X", &PriVtxMuMuCorr_X);
