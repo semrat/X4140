@@ -878,17 +878,6 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      continue ;
 	    }
 
-
-	    ////////////////// check for kaon1 //////////////////
-	    TrackRef kaTrack1 = Kaon1->track();
-	    if ( kaTrack1.isNull() )
-	     continue;
-	
-	    ////////////////// check for kaon2 //////////////////
-  	    TrackRef kaTrack2 = Kaon2->track();
-            if ( kaTrack2.isNull() )
-             continue;	
-
 	    ////////////////// get the MuMu information //////////////////
 	    TransientTrack muon1TT( muTrack1, &(*bFieldHandle) );
 	    TransientTrack muon2TT( muTrack2, &(*bFieldHandle) );			
@@ -1035,6 +1024,7 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		
             ++nMuMu;
 	    muons.clear();
+
 	    //////////////////////////////////////////////////////////////////////
             /// for Bs0 & X(4140)
 	    if (dimuonType == 0) 
@@ -1042,32 +1032,27 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    if (Debug_) cout <<"evt:"<<evtNum<< " is Invalid Muon ?  " <<isEventWithInvalidMu << endl;
 	    if (skipJPsi && ( dimuonType == 1 )) 
 	      continue ;           
-            cout<<"check0---!!!!"<<endl;
 	    nTrk->push_back( thePATTrackHandle->size() ) ;
-	    cout<<"check1 ----!!!!!"<<endl;
             if (thePATTrackHandle->size() < 2)
 	      continue ; 
-            cout<<"check2---!!!!"<<endl;
 	    nBs0_pre0++ ; 
             nX_pre0++ ;   
             cout<<"nmumu : "<<nMuMu<<endl;
             if(nMuMu == 0)continue; /// SEMRA
-	    ////////////////// cuts on MuMu mass window for Bs0 ////////////////////////////
+
+	    ////////////////// cuts on MuMu mass window for Bs0 & X(4140) ////////////////////////////
 	    if (MuMuMass->at(nMuMu-1) < MuMuMinMass  ||  MuMuMass->at(nMuMu-1) > MuMuMaxMass)
 	      continue ; nBs0_pre1++ ; nX_pre1++ ;
-	    //cout<<"check3---!!!!"<<endl;
+
 
 	    ////////////////// check tracks for kaon1 for Bs0 & X(4140)//////////////////
 	    for ( vector<pat::GenericParticle>::const_iterator Track1 = theKaonRefittedPATTrackHandle->begin(); Track1 != theKaonRefittedPATTrackHandle->end(); ++Track1 ) {
-	    //cout<<"check4---!!!!"<<endl;
 	      /// check track doesn't overlap with the MuMu candidate tracks
 	      if (Track1->track().key() == rmu1->track().key()  ||  Track1->track().key() == rmu2->track().key())
 		continue; nBs0_pre2++ ; nX_pre2++ ;
-	      //cout<<"check5---!!!!"<<endl;
 	      /// cuts on charged tracks	
 	      if (( Track1->track()->chi2()/Track1->track()->ndof() > TrMaxNormChi2 )  ||  Track1->pt() < TrMinPt)
 		continue ; nBs0_pre3++ ; nX_pre3++ ;
-	      //cout<<"check6---!!!!"<<endl;
 
 
 	   ////////////////// check tracks for kaon2 for Bs0 & X(4140) //////////////////
@@ -1086,8 +1071,8 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	
 	
             ////////////////// get the KaKa information //////////////////		
-            TransientTrack kaon1TT( kaTrack1, &(*bFieldHandle) );  
-            TransientTrack kaon2TT( kaTrack2, &(*bFieldHandle) );
+            TransientTrack kaon1TT( Track1->track(), &(*bFieldHandle) );  
+            TransientTrack kaon2TT( Track2->track(), &(*bFieldHandle) );
             KinematicParticleFactoryFromTransientTrack pFactory;
 
             /// initial chi2 and ndf before kinematic fits
@@ -1098,7 +1083,7 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
             KinematicParticleVertexFitter KaKaFitter; 
             RefCountedKinematicTree KaKaVertexFitTree;
             KaKaVertexFitTree = KaKaFitter.fit(kaons);
-            if (!MuMuVertexFitTree->isValid())  
+            if (!KaKaVertexFitTree->isValid())  
               continue ;
             KaKaVertexFitTree->movePointerToTheTop();                                
             RefCountedKinematicParticle KaKaCand_fromFit = KaKaVertexFitTree->currentParticle();
@@ -1125,8 +1110,8 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
             KaKaPx->push_back( Ka1Cand_KP.momentum().x() + Ka2Cand_KP.momentum().x() );
             KaKaPy->push_back( Ka1Cand_KP.momentum().y() + Ka2Cand_KP.momentum().y() );
             KaKaPz->push_back( Ka1Cand_KP.momentum().z() + Ka2Cand_KP.momentum().z() );
-            ka1Idx->push_back(std::distance(thePATTrackHandle->begin(), Kaon1)); /// SEMRA
-            ka2Idx->push_back(std::distance(thePATTrackHandle->begin(), Kaon2)); /// SEMRA
+            ka1Idx->push_back(std::distance(theKaonRefittedPATTrackHandle->begin(), Track1)); /// SEMRA
+            ka2Idx->push_back(std::distance(theKaonRefittedPATTrackHandle->begin(), Track2)); /// SEMRA
 
 	    ////////////////// Phi (KaKa) fit //////////////////
 	    ka1_KaKa_Px->push_back( Ka1Cand_KP.momentum().x());
@@ -1146,12 +1131,12 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
             math::XYZTLorentzVector MuMu = (rmu1->p4() + rmu2->p4()); 
 	    math::XYZTLorentzVector bs0 = (rmu1->p4() + rmu2->p4() + Track1->p4() + Track2->p4());   
 	    math::XYZTLorentzVector x = (rmu1->p4() + rmu2->p4() + Track1->p4() + Track2->p4());
-	    float MuMuK1DR = sqrt( pow(MuMu.eta() - Track1->p4().eta(),2) + pow(MuMu.phi() - Track1->p4().phi(), 2) );
-	    float MuMuK2DR = sqrt( pow(MuMu.eta() - Track2->p4().eta(),2) + pow(MuMu.phi() - Track2->p4().phi(), 2) );
-            float bs0K1DR = sqrt( pow(bs0.eta() - Track1->p4().eta(),2) + pow(bs0.phi() - Track1->p4().phi(), 2) );
-            float bs0K2DR = sqrt( pow(bs0.eta() - Track2->p4().eta(),2) + pow(bs0.phi() - Track2->p4().phi(), 2) );
-            float xK1DR = sqrt( pow(x.eta() - Track1->p4().eta(),2) + pow(x.phi() - Track1->p4().phi(), 2) );
-            float xK2DR = sqrt( pow(x.eta() - Track2->p4().eta(),2) + pow(x.phi() - Track2->p4().phi(), 2) );		  
+	    float MuMuK1DR = sqrt( pow(MuMu.eta() - Track1->p4().eta(),2) + pow(MuMu.phi() - Track1->p4().phi(),2) );
+	    float MuMuK2DR = sqrt( pow(MuMu.eta() - Track2->p4().eta(),2) + pow(MuMu.phi() - Track2->p4().phi(),2) );
+            float bs0K1DR = sqrt( pow(bs0.eta() - Track1->p4().eta(),2) + pow(bs0.phi() - Track1->p4().phi(),2) );
+            float bs0K2DR = sqrt( pow(bs0.eta() - Track2->p4().eta(),2) + pow(bs0.phi() - Track2->p4().phi(),2) );
+            float xK1DR = sqrt( pow(x.eta() - Track1->p4().eta(),2) + pow(x.phi() - Track1->p4().phi(),2) );
+            float xK2DR = sqrt( pow(x.eta() - Track2->p4().eta(),2) + pow(x.phi() - Track2->p4().phi(),2) );		  
 
 		  if (UseBs0DR) {
 		    if (bs0K1DR > Bs0TrackMaxDR || bs0K2DR > Bs0TrackMaxDR)
@@ -2418,7 +2403,6 @@ void MuMuKKPAT::beginJob()
   Bs0_One_Tree_->Branch("MuMuDecayVtx_XE",&MuMuDecayVtx_XE);
   Bs0_One_Tree_->Branch("MuMuDecayVtx_YE",&MuMuDecayVtx_YE);
   Bs0_One_Tree_->Branch("MuMuDecayVtx_ZE",&MuMuDecayVtx_ZE);
-  X_One_Tree_->Branch("nKaKa",&nKaKa,"nKaKa/i"); /// SEMRA will be added
   X_One_Tree_->Branch("KaKaMass",&KaKaMass);
   X_One_Tree_->Branch("KaKaPx",&KaKaPx);
   X_One_Tree_->Branch("KaKaPy",&KaKaPy);
