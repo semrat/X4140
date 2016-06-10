@@ -153,7 +153,6 @@ private:
   bool   addBs0lessPrimaryVertex_; 
   bool   Debug_;
   std::string DeDxEstimator_, m_dEdxDiscrimTag, m_dEdxDiscrimTag_kaon ;
-  TTree* Bs0_One_Tree_;
   TTree* X_One_Tree_;
   unsigned int        runNum, evtNum, lumiNum;
   vector<unsigned int>* trigRes;
@@ -162,10 +161,10 @@ private:
   vector<std::string>*  MatchTriggerNames;
 
   /// counters for Bs0 & X(4140)
-  unsigned int          nMu, nMuMu, nBs0; 
-  unsigned int          nBs0_pre0, nBs0_pre1, nBs0_pre2, nBs0_pre3, nBs0_pre4, nBs0_pre5, nBs0_pre6, nBs0_pre7, nBs0_pre8, nBs0_pre9, nBs0_pre10, nBs0_pre11, nBs0_pre12, nBs0_pre13, nBs0_pre14; 
+  unsigned int          nMu, nMuMu, nBs0, nKK; 
+  unsigned int          nBs0_pre0, nBs0_pre1, nBs0_pre2, nBs0_pre3, nBs0_pre4, nBs0_pre5, nBs0_pre6, nBs0_pre7, nBs0_pre8, nBs0_pre9, nBs0_pre10, nBs0_pre11, nBs0_pre12, nBs0_pre13, nBs0_pre14, nBs0_pre15, nBs0_pre16; 
   unsigned int          nX; 
-  unsigned int          nX_pre0, nX_pre1, nX_pre2, nX_pre3, nX_pre4, nX_pre5, nX_pre6, nX_pre7, nX_pre8, nX_pre9, nX_pre10, nX_pre11, nX_pre12, nX_pre13, nX_pre14;
+  unsigned int          nX_pre0, nX_pre1, nX_pre2, nX_pre3, nX_pre4, nX_pre5, nX_pre6, nX_pre7, nX_pre8, nX_pre9, nX_pre10, nX_pre11, nX_pre12, nX_pre13, nX_pre14, nX_pre15, nX_pre16;
   int                   priVtx_n;
   float                 priVtx_X, priVtx_Y, priVtx_Z, priVtx_XE, priVtx_YE, priVtx_ZE, priVtx_NormChi2, priVtx_Chi2, priVtx_CL;
   int                   priVtx_tracks;
@@ -174,6 +173,7 @@ private:
   vector<int>           *mu1Idx, *mu2Idx;
   vector<int>           *MuMuType;
   vector<int>           *ka1Idx, *ka2Idx;
+  vector<int>           *KKIdx;
   vector<int>           *Bs0_MuMuIdx, *Bs0_k1Idx, *Bs0_k2Idx; 
   vector<int>           *X_MuMuIdx, *X_k1Idx, *X_k2Idx; 
   /// MC Analysis
@@ -226,28 +226,27 @@ private:
   vector<float>         *tr_dedx, *tr_dedxMass, *tr_theo, *tr_sigma;
   vector<float>         *tr_dedx_byHits, *tr_dedxErr_byHits ;
   vector<int>           *tr_saturMeas_byHits, *tr_Meas_byHits ;
-  /// MuMu cand & KaKa cand 
+  /// MuMu cand & KK cand 
   vector<float>         *MuMuMass, *MuMuPx, *MuMuPy, *MuMuPz;
   vector<float>         *MuMuVtx_CL, *MuMuVtx_Chi2;
   vector<float>         *MuMuDecayVtx_X, *MuMuDecayVtx_Y, *MuMuDecayVtx_Z, *MuMuDecayVtx_XE, *MuMuDecayVtx_YE, *MuMuDecayVtx_ZE;
   vector<bool>          *MuMuMuonTrigMatch;
-  vector<float>         *KaKaMass, *KaKaPx, *KaKaPy, *KaKaPz;
-  vector<float>         *KaKaVtx_CL, *KaKaVtx_Chi2;
-  vector<float>         *KaKaDecayVtx_X, *KaKaDecayVtx_Y, *KaKaDecayVtx_Z, *KaKaDecayVtx_XE, *KaKaDecayVtx_YE, *KaKaDecayVtx_ZE;
-  vector<bool>          *KaKaKaonTrigMatch;
-  /// Muons after JPsi (MuMu) fit & Kaons after Phi (KaKa) fit
+  vector<float>         *KKMass, *KKPx, *KKPy, *KKPz;
+  vector<float>         *KKVtx_CL, *KKVtx_Chi2;
+  vector<float>         *KKDecayVtx_X, *KKDecayVtx_Y, *KKDecayVtx_Z, *KKDecayVtx_XE, *KKDecayVtx_YE, *KKDecayVtx_ZE;
+  /// Muons after JPsi (MuMu) fit & Kaons after Phi (KK) fit
   vector<float>         *mu1_MuMu_Px, *mu1_MuMu_Py, *mu1_MuMu_Pz ;
   vector<float>         *mu1_MuMu_Chi2 ;
   vector<int>           *mu1_MuMu_NDF ;
   vector<float>         *mu2_MuMu_Px, *mu2_MuMu_Py, *mu2_MuMu_Pz ;
   vector<float>         *mu2_MuMu_Chi2 ;
   vector<int>           *mu2_MuMu_NDF ;
-  vector<float>         *ka1_KaKa_Px, *ka1_KaKa_Py, *ka1_KaKa_Pz ;
-  vector<float>         *ka1_KaKa_Chi2 ;
-  vector<int>           *ka1_KaKa_NDF ;
-  vector<float>         *ka2_KaKa_Px, *ka2_KaKa_Py, *ka2_KaKa_Pz ;
-  vector<float>         *ka2_KaKa_Chi2 ;
-  vector<int>           *ka2_KaKa_NDF ;
+  vector<float>         *ka1_KK_Px, *ka1_KK_Py, *ka1_KK_Pz ;
+  vector<float>         *ka1_KK_Chi2 ;
+  vector<int>           *ka1_KK_NDF ;
+  vector<float>         *ka2_KK_Px, *ka2_KK_Py, *ka2_KK_Pz ;
+  vector<float>         *ka2_KK_Chi2 ;
+  vector<int>           *ka2_KK_NDF ;
   /// Primary Vertex with "MuMu correction"
   vector<int>           *PriVtxMuMuCorr_n;
   vector<float>         *PriVtxMuMuCorr_X, *PriVtxMuMuCorr_Y, *PriVtxMuMuCorr_Z ; 
@@ -356,10 +355,16 @@ private:
   vector<double>        *xCosAlphaPVX, *xCTauPVX, *xCTauPVXE, *xLxyPVX, *xLxyPVXE, *xLxyzPVX, *xLxyzPVXE ;
   vector<float>         *xCTauPVX_3D, *xCTauPVX_3D_err;
 
-  //vector<float>         *PiPiMass_err;
+  /// dxy, dz, dxyE, dzE for kaons from PV, BS, Bs0LessPV
+  vector<float>         *kaon1_dxy_PV, *kaon1_dz_PV, *kaon2_dxy_PV, *kaon2_dz_PV;
+  vector<float>         *kaon1_dxy_BS, *kaon1_dz_BS, *kaon2_dxy_BS, *kaon2_dz_BS;
+  vector<float>         *kaon1_dxy_Bs0LessPV, *kaon1_dz_Bs0LessPV, *kaon2_dxy_Bs0LessPV, *kaon2_dz_Bs0LessPV;
+  vector<float>         *kaon1_dxyE, *kaon1_dzE, *kaon2_dxyE, *kaon2_dzE; 
 
+  vector<float>         *KKMass_err;
+  vector<bool>          *Kaon1FromPV, *Kaon2FromPV;
 };
 
 #endif
 
-// rsync -vut --existing interface/MuMuPiKPAT.h semrat@lxplus.cern.ch:/afs/cern.ch/work/s/semrat/private/TetraQuark/CMSSW_5_3_22/src/X4140/MuMuKKPAT/interface
+// rsync -vut --existing interface/MuMuPiKPAT.h semrat@lxplus.cern.ch:/afs/cern.ch/user/s/semrat/scratch0/CMSSW_5_3_22/src/X4140/MuMuKKPAT/interface/MuMuPiKPAT.h
