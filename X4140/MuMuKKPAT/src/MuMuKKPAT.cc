@@ -123,7 +123,6 @@ MuMuKKPAT::MuMuKKPAT(const edm::ParameterSet& iConfig) :
   MCDaughtersN( iConfig.getUntrackedParameter<int>(" MonteCarloDaughtersN", 3) ), /// will be same  
   doMuMuMassConst( iConfig.getUntrackedParameter<bool>("DoMuMuMassConstraint", true) ),
   skipJPsi(iConfig.getUntrackedParameter<bool>("SkipJPsi", false)), 
-  //skipPsi2S(iConfig.getUntrackedParameter<bool>("SkipPsi2S", false)), /// SEMRA we won't use skip for PsiPrime(Psi2S)
 
   MuMinPixHits(iConfig.getUntrackedParameter<int>("MinNumMuPixHits", 0)),
   MuMinSiHits(iConfig.getUntrackedParameter<int>("MinNumMuSiHits", 0)),
@@ -141,8 +140,8 @@ MuMuKKPAT::MuMuKKPAT(const edm::ParameterSet& iConfig) :
 
   JPsiMinMass(iConfig.getUntrackedParameter<double>("MinJPsiMass", 2.8)), 
   JPsiMaxMass(iConfig.getUntrackedParameter<double>("MaxJPsiMass", 3.4)), 
-  PhiMinMass(iConfig.getUntrackedParameter<double>("MinPhiMass", 0.985)), 
-  PhiMaxMass(iConfig.getUntrackedParameter<double>("MaxPhiMass", 1.055)), 
+  PhiMinMass(iConfig.getUntrackedParameter<double>("MinPhiMass", 0.97)), 
+  PhiMaxMass(iConfig.getUntrackedParameter<double>("MaxPhiMass", 1.07)), 
   JPsiPhiMaxXMass(iConfig.getUntrackedParameter<double>("MaxJPsiPhiXMass", 4.35)), 
   JPsiPhiMinBs0Mass(iConfig.getUntrackedParameter<double>("MinJPsiPhiBs0Mass", 5.1)), 
   JPsiPhiMaxBs0Mass(iConfig.getUntrackedParameter<double>("MaxJPsiPhiBs0Mass", 5.6)), 
@@ -153,28 +152,26 @@ MuMuKKPAT::MuMuKKPAT(const edm::ParameterSet& iConfig) :
   UseXDR(iConfig.getUntrackedParameter<bool>("UseXDR", false)), 
   XTrackMaxDR(iConfig.getUntrackedParameter<double>("MaxXCandTrackDR", 1.1)),
   MuMuKKMinBs0Mass(iConfig.getUntrackedParameter<double>("MinMuMuKKBs0Mass", 0)),
-  MuMuKKMaxBs0Mass(iConfig.getUntrackedParameter<double>("MaxMuMuKKBs0Mass", 10)), /// SEMRA
-  MuMuKKMaxXMass(iConfig.getUntrackedParameter<double>("MaxMuMuKKXMass", 10)), /// SEMRA
+  MuMuKKMaxBs0Mass(iConfig.getUntrackedParameter<double>("MaxMuMuKKBs0Mass", 10)), 
+  MuMuKKMaxXMass(iConfig.getUntrackedParameter<double>("MaxMuMuKKXMass", 10)), 
   addBs0lessPrimaryVertex_(iConfig.getUntrackedParameter<bool>("addBs0lessPrimaryVertex", true)), 
 
-  Debug_(iConfig.getUntrackedParameter<bool>("Debug_Output",true)), /// false changed with true
+  Debug_(iConfig.getUntrackedParameter<bool>("Debug_Output",true)), 
   DeDxEstimator_(iConfig.getUntrackedParameter<std::string>("DeDxEstimator", std::string("dedxHarmonic2"))),
   m_dEdxDiscrimTag(iConfig.getUntrackedParameter<std::string>("DeDxDiscriminator", std::string("dedxHarmonic2"))),
   m_dEdxDiscrimTag_kaon(iConfig.getUntrackedParameter<std::string>("DeDxDiscriminator", std::string("dedxHarmonic2"))),
   
-  Bs0_One_Tree_(0),
   X_One_Tree_(0),
   runNum(0), evtNum(0), lumiNum(0),
   trigRes(0), trigNames(0), L1TT(0), MatchTriggerNames(0), 
   /// counters for Bs0 & X(4140)
-  nMu(0), nMuMu(0), nBs0(0),  
-  nBs0_pre0(0), nBs0_pre1(0), nBs0_pre2(0), nBs0_pre3(0), nBs0_pre4(0), nBs0_pre5(0), nBs0_pre6(0), nBs0_pre7(0), nBs0_pre8(0), nBs0_pre9(0), nBs0_pre10(0), nBs0_pre11(0), nBs0_pre12(0), nBs0_pre13(0), nBs0_pre14(0),
+  nMu(0), nMuMu(0), nBs0(0), nKK(0),  
+  nBs0_pre0(0), nBs0_pre1(0), nBs0_pre2(0), nBs0_pre3(0), nBs0_pre4(0), nBs0_pre5(0), nBs0_pre6(0), nBs0_pre7(0), nBs0_pre8(0), nBs0_pre9(0), nBs0_pre10(0), nBs0_pre11(0), nBs0_pre12(0), nBs0_pre13(0), nBs0_pre14(0), nBs0_pre15(0), nBs0_pre16(0), 
   nX(0), 
-  nX_pre0(0), nX_pre1(0), nX_pre2(0), nX_pre3(0), nX_pre4(0), nX_pre5(0), nX_pre6(0), nX_pre7(0), nX_pre8(0), nX_pre9(0), nX_pre10(0), nX_pre11(0), nX_pre12(0), nX_pre13(0), nX_pre14(0),
+  nX_pre0(0), nX_pre1(0), nX_pre2(0), nX_pre3(0), nX_pre4(0), nX_pre5(0), nX_pre6(0), nX_pre7(0), nX_pre8(0), nX_pre9(0), nX_pre10(0), nX_pre11(0), nX_pre12(0), nX_pre13(0), nX_pre14(0), nX_pre15(0), nX_pre16(0), 
   priVtx_n(0), priVtx_X(0), priVtx_Y(0), priVtx_Z(0), priVtx_XE(0), priVtx_YE(0), priVtx_ZE(0), priVtx_NormChi2(0), priVtx_Chi2(0), priVtx_CL(0), priVtx_tracks(0), priVtx_tracksPtSq(0),   
   /// indices
-  mu1Idx(0), mu2Idx(0), MuMuType(0),
-  ka1Idx(0), ka2Idx(0),
+  mu1Idx(0), mu2Idx(0), MuMuType(0), ka1Idx(0), ka2Idx(0), KKIdx(0),
   Bs0_MuMuIdx(0), Bs0_k1Idx(0), Bs0_k2Idx(0), 
   X_MuMuIdx(0), X_k1Idx(0), X_k2Idx(0), 
   /// MC Analysis /// n_Bs0Ancestors & no for X(4140)!! 
@@ -211,22 +208,21 @@ MuMuKKPAT::MuMuKKPAT(const edm::ParameterSet& iConfig) :
   trQualityHighPurity(0), trQualityTight(0),
   tr_nsigdedx(0), tr_dedx(0), tr_dedxMass(0), tr_theo(0), tr_sigma(0),
   tr_dedx_byHits(0), tr_dedxErr_byHits(0), tr_saturMeas_byHits(0), tr_Meas_byHits(0),
-  /// MuMu cand & KaKa cand 
+  /// MuMu cand & KK cand
   MuMuMass(0), MuMuPx(0), MuMuPy(0), MuMuPz(0),
   MuMuVtx_CL(0), MuMuVtx_Chi2(0), 
   MuMuDecayVtx_X(0), MuMuDecayVtx_Y(0), MuMuDecayVtx_Z(0),
   MuMuDecayVtx_XE(0), MuMuDecayVtx_YE(0), MuMuDecayVtx_ZE(0),
   MuMuMuonTrigMatch(0),
-  KaKaMass(0), KaKaPx(0), KaKaPy(0), KaKaPz(0),
-  KaKaVtx_CL(0), KaKaVtx_Chi2(0),
-  KaKaDecayVtx_X(0), KaKaDecayVtx_Y(0), KaKaDecayVtx_Z(0),
-  KaKaDecayVtx_XE(0), KaKaDecayVtx_YE(0), KaKaDecayVtx_ZE(0),
-  KaKaKaonTrigMatch(0),
-  /// muons after JPsi (MuMu) fit & kaons after Phi (KaKa) fit
+  KKMass(0), KKPx(0), KKPy(0), KKPz(0),
+  KKVtx_CL(0), KKVtx_Chi2(0),
+  KKDecayVtx_X(0), KKDecayVtx_Y(0), KKDecayVtx_Z(0),
+  KKDecayVtx_XE(0), KKDecayVtx_YE(0), KKDecayVtx_ZE(0),
+  /// muons after JPsi (MuMu) fit &kaons after Phi (KK) fit 
   mu1_MuMu_Px(0), mu1_MuMu_Py(0), mu1_MuMu_Pz(0), mu1_MuMu_Chi2(0), mu1_MuMu_NDF(0),
   mu2_MuMu_Px(0), mu2_MuMu_Py(0), mu2_MuMu_Pz(0), mu2_MuMu_Chi2(0), mu2_MuMu_NDF(0),
-  ka1_KaKa_Px(0), ka1_KaKa_Py(0), ka1_KaKa_Pz(0), ka1_KaKa_Chi2(0), ka1_KaKa_NDF(0),
-  ka2_KaKa_Px(0), ka2_KaKa_Py(0), ka2_KaKa_Pz(0), ka2_KaKa_Chi2(0), ka2_KaKa_NDF(0),
+  ka1_KK_Px(0), ka1_KK_Py(0), ka1_KK_Pz(0), ka1_KK_Chi2(0), ka1_KK_NDF(0),
+  ka2_KK_Px(0), ka2_KK_Py(0), ka2_KK_Pz(0), ka2_KK_Chi2(0), ka2_KK_NDF(0),
   /// Primary Vertex with "MuMu correction"
   PriVtxMuMuCorr_n(0),
   PriVtxMuMuCorr_X(0), PriVtxMuMuCorr_Y(0), PriVtxMuMuCorr_Z(0), PriVtxMuMuCorr_EX(0), PriVtxMuMuCorr_EY(0), PriVtxMuMuCorr_EZ(0),
@@ -299,12 +295,16 @@ MuMuKKPAT::MuMuKKPAT(const edm::ParameterSet& iConfig) :
   bs0CTauPVX_3D(0), bs0CTauPVX_3D_err(0),
   xCosAlphaBS(0), xCosAlpha3DBS(0), xCTauBS(0), xCTauBSE(0), xLxyBS(0), xLxyBSE(0), xLxyzBS(0), xLxyzBSE(0),
   xCosAlphaPV(0), xCosAlpha3DPV(0), xCTauPV(0), xCTauPVE(0), xLxyPV(0), xLxyPVE(0), xLxyzPV(0), xLxyzPVE(0),
-  xCosAlphaPVCosAlpha(0), xCosAlpha3DPVCosAlpha(0), xCTauPVCosAlpha(0), xCTauPVCosAlphaE(0), xLxyPVCosAlpha(0), xLxyPVCosAlphaE(0), xLxyzPVCosAlpha(0), xLxyzPVCosAlphaE(0),
   xCosAlphaPVCosAlpha3D(0), xCosAlpha3DPVCosAlpha3D(0), xCTauPVCosAlpha3D(0), xCTauPVCosAlpha3DE(0), xLxyPVCosAlpha3D(0), xLxyPVCosAlpha3DE(0), xLxyzPVCosAlpha3D(0), xLxyzPVCosAlpha3DE(0),
   xCosAlphaPVX(0), xCTauPVX(0), xCTauPVXE(0), xLxyPVX(0), xLxyzPVX(0), xLxyzPVXE(0),
-  xCTauPVX_3D(0), xCTauPVX_3D_err(0)
+  xCTauPVX_3D(0), xCTauPVX_3D_err(0),
+  /// dxy, dz, dxyE, dzE for kaons from PV, BS, Bs0LessPV
+  kaon1_dxy_PV(0), kaon1_dz_PV(0), kaon2_dxy_PV(0), kaon2_dz_PV(0),
+  kaon1_dxy_BS(0), kaon1_dz_BS(0), kaon2_dxy_BS(0), kaon2_dz_BS(0),
+  kaon1_dxy_Bs0LessPV(0), kaon1_dz_Bs0LessPV(0), kaon2_dxy_Bs0LessPV(0), kaon2_dz_Bs0LessPV(0), 
+  kaon1_dxyE(0), kaon1_dzE(0), kaon2_dxyE(0), kaon2_dzE(0),
 
-  //PiPiMass_err(0)
+  KKMass_err(0), Kaon1FromPV(0), Kaon2FromPV(0)
 
 {
   /// now do what ever initialization is needed
@@ -454,7 +454,7 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder",theTTBuilder);
   KalmanVertexFitter vtxFitter(true);
 
-  RefVtx = thePrimaryVtx.position(); // reference primary vertex choosen
+  RefVtx = thePrimaryVtx.position(); /// reference primary vertex choosen
   priVtx_n = thePrimaryVtx_multiplicity ;
   priVtx_X = (thePrimaryVtx.position().x()) ;
   priVtx_Y = (thePrimaryVtx.position().y()) ;
@@ -473,11 +473,10 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   /// try reconstruction without fitting modules
   /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-  Handle< vector<pat::GenericParticle> > thePATTrackHandle;
-  iEvent.getByLabel("cleanPatTrackCands", thePATTrackHandle); /// container of tracks with pion mass hypothesis 
+  Handle< vector<pat::GenericParticle> > thePATTrackHandle; 
+  iEvent.getByLabel("cleanPatTrackCands", thePATTrackHandle); /// container of tracks with pion mass hypothesis
   Handle< vector<pat::GenericParticle> > theKaonRefittedPATTrackHandle;
   iEvent.getByLabel("cleanPatTrackKaonCands", theKaonRefittedPATTrackHandle); /// container of tracks with kaon mass hypothesis
-
 
   for ( vector<pat::GenericParticle>::const_iterator TrackNotRefitted = thePATTrackHandle->begin(); TrackNotRefitted != thePATTrackHandle->end(); ++TrackNotRefitted ) { 
     for ( vector<pat::GenericParticle>::const_iterator TrackRefitted = theKaonRefittedPATTrackHandle->begin(); TrackRefitted != theKaonRefittedPATTrackHandle->end(); ++TrackRefitted ) { 
@@ -640,7 +639,7 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      PriVtxGen_Ndof->push_back( p.vertexNdof() ) ;
 	      
 	      Bool_t status = kTRUE ;
-	      const Candidate *bs0_ancestor = p.mother(0) ; // a particle can have several mothers
+	      const Candidate *bs0_ancestor = p.mother(0) ; /// a particle can have several mothers
 	      Int_t n_ancestors = 1 ;
 	      while ( status ) { 
 		if ( abs(bs0_ancestor->pdgId()) <= 8 || bs0_ancestor->pdgId() == 21 || bs0_ancestor->status() == 3 ) {
@@ -848,6 +847,7 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  muNOverlap->push_back( nOverlapMus ) ;
 	  muNSharingSegWith->push_back( nSharingSegWith ) ;
 
+
 	  ////////////////// check for muon1 //////////////////
 	  TrackRef muTrack1 = Muon1->track();
 	  if ( muTrack1.isNull() )
@@ -859,7 +859,7 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      || fabs(rmu1->track()->dxy(RefVtx)) > MuMaxD0) {
 	    continue ;
 	  }
-
+			
 	  ////////////////// check for muon2 //////////////////
 	  for ( std::vector<pat::Muon>::const_iterator Muon2 = Muon1+1; Muon2 != thePATMuonHandle->end(); ++Muon2) {
 	    if(Muon2->charge() * Muon1->charge() > 0)
@@ -878,6 +878,7 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      continue ;
 	    }
 
+
 	    ////////////////// get the MuMu information //////////////////
 	    TransientTrack muon1TT( muTrack1, &(*bFieldHandle) );
 	    TransientTrack muon2TT( muTrack2, &(*bFieldHandle) );			
@@ -885,13 +886,13 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 			
 	    /// initial chi2 and ndf before kinematic fits
 	    float chi = 0., ndf = 0.;
-	    vector<RefCountedKinematicParticle> muons; /// SEMRA the final state muons produced by the KinematicParticleFactory 
+	    vector<RefCountedKinematicParticle> muons; /// the final state muons produced by the KinematicParticleFactory 
 	    muons.push_back( pFactory.particle( muon1TT, muon_mass, chi, ndf, small_sigma));
 	    muons.push_back( pFactory.particle( muon2TT, muon_mass, chi, ndf, small_sigma));
-	    KinematicParticleVertexFitter MuMuFitter; /// SEMRA creating the vertex fitter JPsi  
+	    KinematicParticleVertexFitter MuMuFitter; /// creating the vertex fitter for JPsi  
 	    RefCountedKinematicTree MuMuVertexFitTree;
 	    MuMuVertexFitTree = MuMuFitter.fit(muons); 
-	    if (!MuMuVertexFitTree->isValid()) 
+	    if (!MuMuVertexFitTree->isValid())  
 	      continue ; 
 	    MuMuVertexFitTree->movePointerToTheTop(); 				
 	    RefCountedKinematicParticle MuMuCand_fromFit = MuMuVertexFitTree->currentParticle();
@@ -922,7 +923,7 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    mu2Idx->push_back(std::distance(thePATMuonHandle->begin(), Muon2));
 
             ////////////////// JPsi (MuMu) fit //////////////////
-            mu1_MuMu_Px->push_back( Mu1Cand_KP.momentum().x()); 
+            mu1_MuMu_Px->push_back( Mu1Cand_KP.momentum().x()); /// SEMRA for JPsi
 	    mu1_MuMu_Py->push_back( Mu1Cand_KP.momentum().y());
 	    mu1_MuMu_Pz->push_back( Mu1Cand_KP.momentum().z());
 	    mu1_MuMu_Chi2->push_back( Mu1Cand_fromFit->chiSquared());
@@ -940,38 +941,38 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    cout <<dimuonType <<endl;
      
 	    if (Debug_) cout <<"evt:" <<evtNum <<" MuMu with diMuonType = " <<dimuonType <<endl;
-	    cout << "POINT 1" << endl; /// added
+	    //cout << "POINT 0" << endl; 
 	    MuMuType->push_back(dimuonType);
-	    cout << "POINT 2" << endl; /// added	
+	    //cout << "POINT 2" << endl;	
 
 	    int ntriggers = TriggersForMatching_.size();
-	    cout << "ntriggers: " << ntriggers << endl; /// added
+	    cout << "ntriggers: " << ntriggers << endl; 
 	    for (int MatchTrig = 0; MatchTrig < ntriggers; MatchTrig++) 
 	      {
-	        cout << "MatchingTriggerResult[" << MatchTrig << "]: " << MatchingTriggerResult[MatchTrig] << endl; /// added
+	        cout << "MatchingTriggerResult[" << MatchTrig << "]: " << MatchingTriggerResult[MatchTrig] << endl; 
 		if ( MatchingTriggerResult[MatchTrig]!=0 ) 
 		  {
-		    cout << "FIRST IF" << endl; /// added
-		    cout << "CHECKING FiltersForMatching_[" << MatchTrig << "]: " << FiltersForMatching_[MatchTrig] << endl; /// added
-		    cout << "FILTER WAS OK" << endl; /// added
+		    //cout << "POINT 3" << endl; 
+		    cout << "CHECKING FiltersForMatching_[" << MatchTrig << "]: " << FiltersForMatching_[MatchTrig] << endl; 
+		    //cout << "POINT 4" << endl; 
 		    pat::TriggerObjectStandAloneCollection mu1HLTMatches = Muon1->triggerObjectMatchesByFilter( FiltersForMatching_[MatchTrig] );
-		    cout << "MUON 1 OK :)" << endl; /// added
+		    //cout << "POINT 5" << endl;
 		    pat::TriggerObjectStandAloneCollection mu2HLTMatches = Muon2->triggerObjectMatchesByFilter( FiltersForMatching_[MatchTrig] );
-	            cout << "POINT 3" << endl; /// added
+	            //cout << "POINT 6" << endl; 
 		    bool pass1 = mu1HLTMatches.size() > 0;
 		    bool pass2 = mu2HLTMatches.size() > 0;
-		    cout << "POINT 4" << endl; /// added	  
+		    //cout << "POINT 7" << endl; 	  
 		    if ((pass1) && (pass2))
 		      {
-			cout << " SECOND IF" << endl; /// added
+			//cout << "POINT 8" << endl; 
 			MuMuMuonTrigMatch->push_back(true);
 			if (Debug_) cout <<"Matched MuMu" <<endl ;
 		      } else
-	              cout << "THIRD ELSE" << endl; /// added
+	              //cout << "POINT 9" << endl; 
 		      MuMuMuonTrigMatch->push_back(false);
 		  }
 		else
-		  cout << "SECOND ELSE" << endl; /// added
+		  //cout << "POINT 10" << endl; 
 		  MuMuMuonTrigMatch->push_back(false);
 	      }
   
@@ -1009,8 +1010,7 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		    MuMuLessPV = Vertex(pvs.front());
 		  }
 		}
-	      }
-	  							
+	      }							
 	    PriVtxMuMuCorr_n->push_back( pvs.size() ) ;
 	    PriVtxMuMuCorr_X->push_back( MuMuLessPV.position().x() ) ;
 	    PriVtxMuMuCorr_Y->push_back( MuMuLessPV.position().y() ) ; 
@@ -1032,28 +1032,35 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    if (Debug_) cout <<"evt:"<<evtNum<< " is Invalid Muon ?  " <<isEventWithInvalidMu << endl;
 	    if (skipJPsi && ( dimuonType == 1 )) 
 	      continue ;           
+            //cout<< "POINT 11" <<endl;
 	    nTrk->push_back( thePATTrackHandle->size() ) ;
+	    //cout<< "POINT 12" <<endl;
             if (thePATTrackHandle->size() < 2)
 	      continue ; 
+            //cout<< "POINT 13" <<endl;
 	    nBs0_pre0++ ; 
             nX_pre0++ ;   
             cout<<"nmumu : "<<nMuMu<<endl;
-            if(nMuMu == 0)continue; /// SEMRA
+            if(nMuMu == 0)continue; 
 
-	    ////////////////// cuts on MuMu mass window for Bs0 & X(4140) ////////////////////////////
+
+	    ////////////////// cuts on MuMu mass window for Bs0 ////////////////////////////
 	    if (MuMuMass->at(nMuMu-1) < MuMuMinMass  ||  MuMuMass->at(nMuMu-1) > MuMuMaxMass)
 	      continue ; nBs0_pre1++ ; nX_pre1++ ;
+	    //cout<< "POINT 14" <<endl;
 
 
 	    ////////////////// check tracks for kaon1 for Bs0 & X(4140)//////////////////
 	    for ( vector<pat::GenericParticle>::const_iterator Track1 = theKaonRefittedPATTrackHandle->begin(); Track1 != theKaonRefittedPATTrackHandle->end(); ++Track1 ) {
+	    //cout<< "POINT 15" <<endl;
 	      /// check track doesn't overlap with the MuMu candidate tracks
 	      if (Track1->track().key() == rmu1->track().key()  ||  Track1->track().key() == rmu2->track().key())
 		continue; nBs0_pre2++ ; nX_pre2++ ;
+	      //cout<< "POINT 16" <<endl;
 	      /// cuts on charged tracks	
 	      if (( Track1->track()->chi2()/Track1->track()->ndof() > TrMaxNormChi2 )  ||  Track1->pt() < TrMinPt)
 		continue ; nBs0_pre3++ ; nX_pre3++ ;
-
+	      //cout<< "POINT 17" <<endl;
 
 	   ////////////////// check tracks for kaon2 for Bs0 & X(4140) //////////////////
 	   for ( vector<pat::GenericParticle>::const_iterator Track2 = theKaonRefittedPATTrackHandle->begin(); Track2 != theKaonRefittedPATTrackHandle->end(); ++Track2 ){
@@ -1068,75 +1075,77 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    /// cuts on charged tracks	
             if ((Track2->track()->chi2() / Track2->track()->ndof() > TrMaxNormChi2)  ||  Track2->pt() < TrMinPt)
 	      continue; nBs0_pre7++ ; nX_pre7++ ;
-	
-	
-            ////////////////// get the KaKa information //////////////////		
-            TransientTrack kaon1TT( Track1->track(), &(*bFieldHandle) );  
-            TransientTrack kaon2TT( Track2->track(), &(*bFieldHandle) );
-            KinematicParticleFactoryFromTransientTrack pFactory;
+		
+		
+	   ////////////////// get the KK information //////////////////
+	   TransientTrack kaon1TT( Track1->track(), &(*bFieldHandle) );
+           TransientTrack kaon2TT( Track2->track(), &(*bFieldHandle) );
+           KinematicParticleFactoryFromTransientTrack pFactory;
 
-            /// initial chi2 and ndf before kinematic fits
-            float chi = 0., ndf = 0.;
-            vector<RefCountedKinematicParticle> kaons; 
-            kaons.push_back( pFactory.particle( kaon1TT, kaon_mass, chi, ndf, small_sigma));
-            kaons.push_back( pFactory.particle( kaon2TT, kaon_mass, chi, ndf, small_sigma));
-            KinematicParticleVertexFitter KaKaFitter; 
-            RefCountedKinematicTree KaKaVertexFitTree;
-            KaKaVertexFitTree = KaKaFitter.fit(kaons);
-            if (!KaKaVertexFitTree->isValid())  
+           /// initial chi2 and ndf before kinematic fits
+	   float chi = 0., ndf = 0.;
+           vector<RefCountedKinematicParticle> kaons;
+           kaons.push_back( pFactory.particle( kaon1TT, kaon_mass, chi, ndf, small_sigma));
+           kaons.push_back( pFactory.particle( kaon2TT, kaon_mass, chi, ndf, small_sigma));
+           KinematicParticleVertexFitter KKFitter;
+           RefCountedKinematicTree KKVertexFitTree;
+           KKVertexFitTree = KKFitter.fit(kaons);
+            if (!KKVertexFitTree->isValid())
               continue ;
-            KaKaVertexFitTree->movePointerToTheTop();                                
-            RefCountedKinematicParticle KaKaCand_fromFit = KaKaVertexFitTree->currentParticle();
-            RefCountedKinematicVertex KaKaCand_vertex_fromFit = KaKaVertexFitTree->currentDecayVertex();
-            KaKaVertexFitTree->movePointerToTheFirstChild();
-            RefCountedKinematicParticle Ka1Cand_fromFit = KaKaVertexFitTree->currentParticle();
-            KaKaVertexFitTree->movePointerToTheNextChild();
-            RefCountedKinematicParticle Ka2Cand_fromFit = KaKaVertexFitTree->currentParticle();
-            KinematicParameters Ka1Cand_KP = Ka1Cand_fromFit->currentState().kinematicParameters();
-            KinematicParameters Ka2Cand_KP = Ka2Cand_fromFit->currentState().kinematicParameters();
+           KKVertexFitTree->movePointerToTheTop();
+           RefCountedKinematicParticle KKCand_fromFit = KKVertexFitTree->currentParticle();
+           RefCountedKinematicVertex KKCand_vertex_fromFit = KKVertexFitTree->currentDecayVertex();
+           KKVertexFitTree->movePointerToTheFirstChild();
+           RefCountedKinematicParticle Ka1Cand_fromFit = KKVertexFitTree->currentParticle();
+           KKVertexFitTree->movePointerToTheNextChild();
+           RefCountedKinematicParticle Ka2Cand_fromFit = KKVertexFitTree->currentParticle();
+           KinematicParameters Ka1Cand_KP = Ka1Cand_fromFit->currentState().kinematicParameters();
+           KinematicParameters Ka2Cand_KP = Ka2Cand_fromFit->currentState().kinematicParameters();
 
-	    ////////////////// fill the KaKa vectors //////////////////
-	    if (KaKaCand_fromFit->currentState().mass() < KKMinMass  ||  KaKaCand_fromFit->currentState().mass() > KKMaxMass)
+           ////////////////// fill the KK vectors //////////////////   
+	   if (KKCand_fromFit->currentState().mass() < KKMinMass  ||  KKCand_fromFit->currentState().mass() > KKMaxMass)
               continue ;
-            KaKaMass->push_back( KaKaCand_fromFit->currentState().mass() );
-            KaKaDecayVtx_X->push_back( KaKaCand_vertex_fromFit->position().x() );
-            KaKaDecayVtx_Y->push_back( KaKaCand_vertex_fromFit->position().y() );
-            KaKaDecayVtx_Z->push_back( KaKaCand_vertex_fromFit->position().z() );
-            KaKaDecayVtx_XE->push_back( sqrt( KaKaCand_vertex_fromFit->error().cxx()) );
-            KaKaDecayVtx_YE->push_back( sqrt( KaKaCand_vertex_fromFit->error().cyy()) );
-            KaKaDecayVtx_ZE->push_back( sqrt( KaKaCand_vertex_fromFit->error().czz()) );
-            KaKaVtx_CL->push_back( ChiSquaredProbability((double)( KaKaCand_vertex_fromFit->chiSquared()),(double)( KaKaCand_vertex_fromFit->degreesOfFreedom())) );
-            KaKaVtx_Chi2->push_back( KaKaCand_vertex_fromFit->chiSquared() ) ;
-            KaKaPx->push_back( Ka1Cand_KP.momentum().x() + Ka2Cand_KP.momentum().x() );
-            KaKaPy->push_back( Ka1Cand_KP.momentum().y() + Ka2Cand_KP.momentum().y() );
-            KaKaPz->push_back( Ka1Cand_KP.momentum().z() + Ka2Cand_KP.momentum().z() );
-            ka1Idx->push_back(std::distance(theKaonRefittedPATTrackHandle->begin(), Track1)); /// SEMRA
-            ka2Idx->push_back(std::distance(theKaonRefittedPATTrackHandle->begin(), Track2)); /// SEMRA
+           KKMass->push_back( KKCand_fromFit->currentState().mass() );
+           KKDecayVtx_X->push_back( KKCand_vertex_fromFit->position().x() );
+           KKDecayVtx_Y->push_back( KKCand_vertex_fromFit->position().y() );
+           KKDecayVtx_Z->push_back( KKCand_vertex_fromFit->position().z() );
+           KKDecayVtx_XE->push_back( sqrt( KKCand_vertex_fromFit->error().cxx()) );
+           KKDecayVtx_YE->push_back( sqrt( KKCand_vertex_fromFit->error().cyy()) );
+           KKDecayVtx_ZE->push_back( sqrt( KKCand_vertex_fromFit->error().czz()) );
+           KKVtx_CL->push_back( ChiSquaredProbability((double)( KKCand_vertex_fromFit->chiSquared()),(double)( KKCand_vertex_fromFit->degreesOfFreedom())) );
+           KKVtx_Chi2->push_back( MuMuCand_vertex_fromFit->chiSquared() ) ;
+           KKPx->push_back( Ka1Cand_KP.momentum().x() + Ka2Cand_KP.momentum().x() );
+           KKPy->push_back( Ka1Cand_KP.momentum().y() + Ka2Cand_KP.momentum().y() );
+           KKPz->push_back( Ka1Cand_KP.momentum().z() + Ka2Cand_KP.momentum().z() );
+           ka1Idx->push_back(std::distance(theKaonRefittedPATTrackHandle->begin(), Track1));
+           ka2Idx->push_back(std::distance(theKaonRefittedPATTrackHandle->begin(), Track2));
 
-	    ////////////////// Phi (KaKa) fit //////////////////
-	    ka1_KaKa_Px->push_back( Ka1Cand_KP.momentum().x());
-            ka1_KaKa_Py->push_back( Ka1Cand_KP.momentum().y());
-            ka1_KaKa_Pz->push_back( Ka1Cand_KP.momentum().z());
-            ka1_KaKa_Chi2->push_back( Ka1Cand_fromFit->chiSquared());
-            ka1_KaKa_NDF->push_back( Ka1Cand_fromFit->degreesOfFreedom());
-            ka2_KaKa_Px->push_back( Ka2Cand_KP.momentum().x());
-            ka2_KaKa_Py->push_back( Ka2Cand_KP.momentum().y());
-            ka2_KaKa_Pz->push_back( Ka2Cand_KP.momentum().z());
-            ka2_KaKa_Chi2->push_back( Ka2Cand_fromFit->chiSquared());
-            ka2_KaKa_NDF->push_back( Ka2Cand_fromFit->degreesOfFreedom());
+           ////////////////// Phi (KK) fit //////////////////
+	   ka1_KK_Px->push_back( Ka1Cand_KP.momentum().x()); 
+           ka1_KK_Py->push_back( Ka1Cand_KP.momentum().y());
+           ka1_KK_Pz->push_back( Ka1Cand_KP.momentum().z());
+           ka1_KK_Chi2->push_back( Ka1Cand_fromFit->chiSquared());
+           ka1_KK_NDF->push_back( Ka1Cand_fromFit->degreesOfFreedom());
+           ka2_KK_Px->push_back( Ka2Cand_KP.momentum().x());
+           ka2_KK_Py->push_back( Ka2Cand_KP.momentum().y());
+           ka2_KK_Pz->push_back( Ka2Cand_KP.momentum().z());
+           ka2_KK_Chi2->push_back( Ka2Cand_fromFit->chiSquared());
+           ka2_KK_NDF->push_back( Ka2Cand_fromFit->degreesOfFreedom());	
 
-            if ( KaKaCand_fromFit->currentState().mass() > PhiMinMass  &&  KaKaCand_fromFit->currentState().mass() < PhiMaxMass ) 
+	   ++nKK;
+           KKIdx->push_back(nKK);
+           kaons.clear();
 
             ////////////////// cuts on tracks' delta R for Bs0 & X(4140) //////////////////	
             math::XYZTLorentzVector MuMu = (rmu1->p4() + rmu2->p4()); 
 	    math::XYZTLorentzVector bs0 = (rmu1->p4() + rmu2->p4() + Track1->p4() + Track2->p4());   
 	    math::XYZTLorentzVector x = (rmu1->p4() + rmu2->p4() + Track1->p4() + Track2->p4());
-	    float MuMuK1DR = sqrt( pow(MuMu.eta() - Track1->p4().eta(),2) + pow(MuMu.phi() - Track1->p4().phi(),2) );
-	    float MuMuK2DR = sqrt( pow(MuMu.eta() - Track2->p4().eta(),2) + pow(MuMu.phi() - Track2->p4().phi(),2) );
-            float bs0K1DR = sqrt( pow(bs0.eta() - Track1->p4().eta(),2) + pow(bs0.phi() - Track1->p4().phi(),2) );
-            float bs0K2DR = sqrt( pow(bs0.eta() - Track2->p4().eta(),2) + pow(bs0.phi() - Track2->p4().phi(),2) );
-            float xK1DR = sqrt( pow(x.eta() - Track1->p4().eta(),2) + pow(x.phi() - Track1->p4().phi(),2) );
-            float xK2DR = sqrt( pow(x.eta() - Track2->p4().eta(),2) + pow(x.phi() - Track2->p4().phi(),2) );		  
+	    float MuMuK1DR = sqrt( pow(MuMu.eta() - Track1->p4().eta(),2) + pow(MuMu.phi() - Track1->p4().phi(), 2) );
+	    float MuMuK2DR = sqrt( pow(MuMu.eta() - Track2->p4().eta(),2) + pow(MuMu.phi() - Track2->p4().phi(), 2) );
+            float bs0K1DR = sqrt( pow(bs0.eta() - Track1->p4().eta(),2) + pow(bs0.phi() - Track1->p4().phi(), 2) );
+            float bs0K2DR = sqrt( pow(MuMu.eta() - Track2->p4().eta(),2) + pow(MuMu.phi() - Track2->p4().phi(), 2) );
+            float xK1DR = sqrt( pow(x.eta() - Track1->p4().eta(),2) + pow(x.phi() - Track1->p4().phi(), 2) );
+            float xK2DR = sqrt( pow(MuMu.eta() - Track2->p4().eta(),2) + pow(MuMu.phi() - Track2->p4().phi(), 2) );		  
 
 		  if (UseBs0DR) {
 		    if (bs0K1DR > Bs0TrackMaxDR || bs0K2DR > Bs0TrackMaxDR)
@@ -1156,19 +1165,20 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		  }
 		  nX_pre8++ ; 
 
+            ////////////////// cuts on MuMuKK mass window for Bs0 & X(4140) //////////////////
+            if ((Track1->p4() + Track2->p4() + MuMu).M() < MuMuKKMaxBs0Mass  ||  (Track1->p4() + Track2->p4() + MuMu).M() > MuMuKKMinBs0Mass)
+	      nBs0_pre9++ ; 
+	    if ((Track1->p4() + Track2->p4() + MuMu).M() > MuMuKKMaxXMass) /// < changed with >
+	      nX_pre9++ ;   
+	    //cout << "mass window" << endl;
 
-                  ////////////////// cuts on MuMuKK mass window for Bs0 & X(4140) //////////////////
-		  if ((Track1->p4() + Track2->p4() + MuMu).M() > MuMuKKMaxBs0Mass  ||  (Track1->p4() + Track2->p4() + MuMu).M() < MuMuKKMinBs0Mass)
-		    continue ; nBs0_pre9++ ; /// SEMRA 
-		  if ((Track1->p4() + Track2->p4() + MuMu).M() < MuMuKKMaxXMass)
-		    continue ; nX_pre9++ ; /// SEMRA  
 
-                   
-		  /// having two oppositely charged muons, and two oppositely charged tracks: try to vertex them
-		  //TransientTrack kaon1TT( Track1->track(), &(*bFieldHandle) ); 
-		  //TransientTrack kaon2TT( Track2->track(), &(*bFieldHandle) );
+
+                  /// having two oppositely charged muons, and two oppositely charged tracks: try to vertex them
+                 //TransientTrack kaon1TT( Track1->track(), &(*bFieldHandle) ); 
+                 //TransientTrack kaon2TT( Track2->track(), &(*bFieldHandle) );
 		
-		  TransientTrack kaon2TT_notRefit ; /// SEMRA I didn't understand !!! 
+		  TransientTrack kaon2TT_notRefit ; 
 		  Bool_t notRefittedPartner = false ;
 		  for ( vector<pat::GenericParticle>::const_iterator Track2_notRefit = thePATTrackHandle->begin(); Track2_notRefit != thePATTrackHandle->end(); ++Track2_notRefit )
 		    if ( Track2_notRefit->track().key() == Track2->track().key() ) {
@@ -1176,7 +1186,7 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		      kaon2TT_notRefit = TransientTrack( Track2_notRefit->track(), &(*bFieldHandle) ) ; 
 		      break ;
 		    }
-
+			      
 		  /// do mass constraint for MuMu cand and do mass constrained vertex fit for Bs0
 		  vector<RefCountedKinematicParticle> bs0Daughters;
 		  bs0Daughters.push_back(pFactory.particle( muon1TT, muon_mass, chi, ndf, small_sigma));
@@ -1212,7 +1222,8 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		  }
 		  
 		  if ( !Bs0VertexFitTree->isValid() ) 
-		    continue ; nBs0_pre10++ ;      
+		    continue ; nBs0_pre10++ ;     
+ 
 		  Bs0VertexFitTree->movePointerToTheTop(); 
 		  RefCountedKinematicParticle Bs0Cand_fromMCFit = Bs0VertexFitTree->currentParticle(); 
 		  RefCountedKinematicVertex Bs0Cand_vertex_fromMCFit = Bs0VertexFitTree->currentDecayVertex(); 
@@ -1220,15 +1231,18 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		  if ( !Bs0Cand_vertex_fromMCFit->vertexIsValid() )
 		    continue ; nBs0_pre11++ ; 
 		  		  
-		  if ( Bs0Cand_vertex_fromMCFit->chiSquared() < 0  ||  Bs0Cand_vertex_fromMCFit->chiSquared() > 10000 ) 
+		  if ( Bs0Cand_vertex_fromMCFit->chiSquared() < 0  ||  Bs0Cand_vertex_fromMCFit->chiSquared() > 10000 )  
 		    continue ; nBs0_pre12++ ; 
-		  
+
+	          if (Bs0Cand_vertex_fromMCFit->chiSquared() / Bs0Cand_vertex_fromMCFit->degreesOfFreedom() > 7)
+                    continue; nBs0_pre13++; 
+ 
 		  if ( Bs0Cand_fromMCFit->currentState().mass() > 100 ) 
-		    continue ; nBs0_pre13++ ; 
+		    continue ; nBs0_pre14++ ; 
 		  
 		  double bs0VtxProb = ChiSquaredProbability((double)(Bs0Cand_vertex_fromMCFit->chiSquared()), (double)(Bs0Cand_vertex_fromMCFit->degreesOfFreedom())); 
 		  if ( bs0VtxProb < 0.005 ) //0.0001 ) 
-		    continue ; nBs0_pre14++ ;
+		    continue ; nBs0_pre15++ ;
 					
 		 /// do mass constraint for MuMu cand and do mass constrained vertex fit for X(4140)
 		 vector<RefCountedKinematicParticle> xDaughters;
@@ -1266,16 +1280,25 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
                   
 		  XVertexFitTree->movePointerToTheTop(); 
 		  RefCountedKinematicParticle XCand_fromMCFit = XVertexFitTree->currentParticle();  
-                  RefCountedKinematicVertex XCand_vertex_fromMCFit = XVertexFitTree->currentDecayVertex();  
+                  RefCountedKinematicVertex XCand_vertex_fromMCFit = XVertexFitTree->currentDecayVertex();
+  
                   if ( !XCand_vertex_fromMCFit->vertexIsValid() ) 
-                    continue ; nX_pre11++ ; 
+                    continue ; nX_pre11++ ;
+ 
                   if ( XCand_vertex_fromMCFit->chiSquared() < 0  ||  XCand_vertex_fromMCFit->chiSquared() > 10000 )  
-                    continue ; nX_pre12++ ; 
+                    continue ; nX_pre12++ ;
+
+		 if (XCand_vertex_fromMCFit->chiSquared() / XCand_vertex_fromMCFit->degreesOfFreedom() > 7)
+                    continue; nX_pre13++;		
+
+                  cout << "chi2 cut" << endl;
+ 
                   if ( XCand_fromMCFit->currentState().mass() > 100 )  
-                    continue ; nX_pre13++ ; 
-                  double xVtxProb = ChiSquaredProbability((double)(XCand_vertex_fromMCFit->chiSquared()), (double)(XCand_vertex_fromMCFit->degreesOfFreedom()));  
-                  if ( xVtxProb < 0.005 ) 
                     continue ; nX_pre14++ ; 
+                  double xVtxProb = ChiSquaredProbability((double)(XCand_vertex_fromMCFit->chiSquared()), (double)(XCand_vertex_fromMCFit->degreesOfFreedom())); 
+ 
+                  if ( xVtxProb < 0.005 ) 
+                    continue ; nX_pre15++ ; 
 
 											
 		  //////////////////// Lifetimes calculations for Bs0 & X(4140) //////////////////// 
@@ -1314,7 +1337,7 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
                   ROOT::Math::SVector<double, 3> X_vDiff, X_vDiff3D ;
 
 
-		  ////////////////// Lifetime wrt PV for Bs0 & X(4140)//////////////////
+		  ////////////////// Lifetime wrt PV for Bs0 & X(4140) //////////////////
 		  Bs0_v2e = thePrimaryVtx.error(); /// Bs0
 		  Bs0_vXYe = Bs0_v1e.matrix() + Bs0_v2e.matrix() ; 
 		  /// 2D
@@ -1495,6 +1518,11 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
                   xCTauPV->push_back( X_ctau ); xCTauPVE->push_back( X_ctauErr );
                   xLxyPV->push_back( X_lxy ); xLxyPVE->push_back( X_lxyErr );
                   xLxyzPV->push_back( X_lxyz ); xLxyzPVE->push_back( X_lxyzErr );
+	          /// dxy, dz, dxyE, dzE for kaons from PV 
+                  kaon1_dxy_PV->push_back( Track1->track()->dxy(RefVtx) ); 
+		  kaon1_dz_PV->push_back( Track1->track()->dz(RefVtx) );
+                  kaon2_dxy_PV->push_back( Track2->track()->dxy(RefVtx) );
+                  kaon2_dz_PV->push_back( Track2->track()->dz(RefVtx) );
 
 
 		  ////////////////// Lifetime wrt BS for Bs0 & X(4140) //////////////////
@@ -1537,7 +1565,6 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
                   X_lxyz = X_vdiff3D.Mag();
                   X_vDiff3D[0] = X_vdiff3D.x(); X_vDiff3D[1] = X_vdiff3D.y(); X_vDiff3D[2] = X_vdiff3D.z() ;
                   X_lxyzErr = sqrt(ROOT::Math::Similarity(X_vDiff3D,X_vXYe)) / X_vdiff3D.Mag();
-
 
 
 		  ////////////////// BS (beam spot) for Bs0 ////////////////// 	
@@ -1605,7 +1632,7 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 			}
 		      }
 		    }
-		  
+
 		  PriVtxBs0Less_n->push_back( Bs0_pvs.size() ) ;
 		  PriVtxBs0Less_X->push_back( Bs0LessPV.position().x() ) ;
 		  PriVtxBs0Less_Y->push_back( Bs0LessPV.position().y() ) ;
@@ -1617,9 +1644,16 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		  PriVtxBs0Less_Chi2->push_back( Bs0LessPV.chi2() ) ;
 		  PriVtxBs0Less_tracks->push_back( Bs0LessPV.tracksSize() ) ;
 		 
-		  
+		  /// dxy, dz, dxyE, dzE for kaons from BS
+    		  math::XYZPoint BSVtx; /// SEMRA
+		  BSVtx = theBeamSpotVtx.position();		
+	          kaon1_dxy_BS->push_back( Track1->track()->dxy(BSVtx) ); 
+                  kaon1_dz_BS->push_back( Track1->track()->dz(BSVtx) );
+                  kaon2_dxy_BS->push_back( Track2->track()->dxy(BSVtx) );
+                  kaon2_dz_BS->push_back( Track2->track()->dz(BSVtx) );
 
-		  ////////////////// Lifetime wrt B0LessPV for Bs0 ////////////////// 
+
+		  ////////////////// Lifetime wrt Bs0LessPV for Bs0 ////////////////// 
 		  Bs0_v2e = Bs0LessPV.error();
 		  Bs0_vXYe = Bs0_v1e.matrix() + Bs0_v2e.matrix();
 		  /// 2D
@@ -1644,6 +1678,20 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		  bs0CTauBs0LessPV->push_back( Bs0_ctau ) ; bs0CTauBs0LessPVE->push_back( Bs0_ctauErr ) ;
 		  bs0LxyBs0LessPV->push_back( Bs0_lxy ) ; bs0LxyBs0LessPVE->push_back( Bs0_lxyErr ) ;
 		  bs0LxyzBs0LessPV->push_back( Bs0_lxyz ) ; bs0LxyzBs0LessPVE->push_back( Bs0_lxyzErr ) ;
+
+		  /// dxy, dz, dxyE, dzE for kaons from Bs0LessPV
+		  math::XYZPoint Bs0LessPVvtx; /// SEMRA
+     		  Bs0LessPVvtx = Bs0LessPV.position();
+                  kaon1_dxy_Bs0LessPV->push_back( Track1->track()->dxy(Bs0LessPVvtx) );
+                  kaon1_dz_Bs0LessPV->push_back( Track1->track()->dz(Bs0LessPVvtx) );
+                  kaon2_dxy_Bs0LessPV->push_back( Track2->track()->dxy(Bs0LessPVvtx) );
+                  kaon2_dz_Bs0LessPV->push_back( Track2->track()->dz(Bs0LessPVvtx) );
+ 
+                  kaon1_dxyE->push_back( Track1->track()->dxyError() );
+                  kaon1_dzE->push_back( Track1->track()->dzError() );
+		  kaon2_dxyE->push_back( Track2->track()->dxyError() );
+		  kaon2_dzE->push_back( Track2->track()->dzError() );
+
  
 		  /// Find the PV among the original offlinePV with the largest Bs0_cos(alpha)
 		  Vertex theCosAlphaV = thePrimaryVtx ; 
@@ -1713,7 +1761,6 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		      theCosAlpha3DV = Vertex(*itv) ;
 		    }
 		  }
-		  
 		  PriVtx_Bs0CosAlpha3D_n->push_back( recVtxs->size() ) ;
 		  PriVtx_Bs0CosAlpha3D_X->push_back( theCosAlpha3DV.position().x() ) ;
 		  PriVtx_Bs0CosAlpha3D_Y->push_back( theCosAlpha3DV.position().y() ) ;
@@ -1888,7 +1935,7 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		  bs0LxyBs0LessPVCosAlpha->push_back( Bs0_lxy ) ; bs0LxyBs0LessPVCosAlphaE->push_back( Bs0_lxyErr ) ;
 		  bs0LxyzBs0LessPVCosAlpha->push_back( Bs0_lxyz ) ; bs0LxyzBs0LessPVCosAlphaE->push_back( Bs0_lxyzErr ) ;
 
-		  /// Find the PV among the B0lessPV with the largest Bs0_cos(alpha) 3D
+		  /// Find the PV among the Bs0lessPV with the largest Bs0_cos(alpha) 3D
 		  Vertex theBs0LessCosAlpha3DV = thePrimaryVtx ;
 		  maxCosAlpha3D = -1. ; 
 		  
@@ -1914,7 +1961,7 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		  PriVtxBs0Less_Bs0CosAlpha3D_Chi2->push_back( theBs0LessCosAlpha3DV.chi2() ) ;
 		  PriVtxBs0Less_Bs0CosAlpha3D_tracks->push_back( theBs0LessCosAlpha3DV.tracksSize() ) ;
 
-		  ////////////////// Lifetime wrt B0LessPV with largest Bs0_cos(alpha) 3D candidate  
+		  ////////////////// Lifetime wrt Bs0LessPV with largest Bs0_cos(alpha) 3D candidate  
 		  Bs0_v2e = theBs0LessCosAlpha3DV.error();
 		  Bs0_vXYe = Bs0_v1e.matrix() + Bs0_v2e.matrix();
 		  /// 2D
@@ -2067,8 +2114,43 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
                   X_k1Idx->push_back(std::distance(theKaonRefittedPATTrackHandle->begin(), Track1)); 
                   X_k2Idx->push_back(std::distance(theKaonRefittedPATTrackHandle->begin(), Track2)); 
                   nX++;
-                  xDaughters.clear(); 
+                  xDaughters.clear();
 
+		  ////////////////// flag for checking the Kaons from PV or not PV //////////////////
+		  vector<TransientTrack> vertexTracksKaon1;
+		   for ( std::vector<TrackBaseRef >::const_iterator iTrack = thePrimaryVtx.tracks_begin();
+                         iTrack != thePrimaryVtx.tracks_end(); ++iTrack) {
+                     TrackRef trackRefkaon1 = iTrack->castTo<TrackRef>();
+
+                     if (  (Track1->track()==trackRefkaon1) ) {
+                       TransientTrack kaon1TT(trackRefkaon1, &(*bFieldHandle) );
+                        vertexTracksKaon1.push_back(kaon1TT);
+                     }      
+                   }
+ 
+		  if (vertexTracksKaon1.size()==0){
+		    Kaon1FromPV->push_back(false);
+		  }
+		  else Kaon1FromPV->push_back(true);{
+		}
+
+		 
+               vector<TransientTrack> vertexTracksKaon2;
+		for ( std::vector<TrackBaseRef >::const_iterator iTrack = thePrimaryVtx.tracks_begin();
+                         iTrack != thePrimaryVtx.tracks_end(); ++iTrack) {
+                 TrackRef trackRefkaon2 = iTrack->castTo<TrackRef>();
+               if (  (Track2->track()==trackRefkaon2) ) {
+                       TransientTrack kaon2TT(trackRefkaon2, &(*bFieldHandle) );
+                        vertexTracksKaon2.push_back(kaon2TT);
+                     }
+                   }
+
+		  if (vertexTracksKaon2.size()==0){
+                    Kaon2FromPV->push_back(false);
+                  }
+		  else Kaon2FromPV->push_back(true);{
+		 }
+		  
 		} // 2nd loop over track (look for k2)
 	    } // 1st loop over track (look for k1)	 
 	  } // 2nd loop over muons (look for mu-)
@@ -2079,8 +2161,6 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   // AT THE END OF THE EVENT fill the tree and clear the vectors
   // ===========================================================
  
-  if (nBs0 > 0) 
-    Bs0_One_Tree_->Fill() ; 
   if (nX > 0) 
     X_One_Tree_->Fill() ;
 
@@ -2089,13 +2169,14 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   /// event numbers
   runNum = 0; evtNum = 0; lumiNum = 0;
   /// counters for Bs0 & X(4140)
-  nMu = 0; nMuMu = 0; nBs0 = 0; 
-  nBs0_pre0 = 0; nBs0_pre1 = 0; nBs0_pre2 = 0; nBs0_pre3 = 0; nBs0_pre4 = 0; nBs0_pre5 = 0; nBs0_pre6 = 0; nBs0_pre7 = 0; nBs0_pre8 = 0; nBs0_pre9 = 0; nBs0_pre10 = 0; nBs0_pre11 = 0; nBs0_pre12 = 0; nBs0_pre13 = 0; nBs0_pre14 = 0;
+  nMu = 0; nMuMu = 0; nBs0 = 0; nKK = 0; 
+  nBs0_pre0 = 0; nBs0_pre1 = 0; nBs0_pre2 = 0; nBs0_pre3 = 0; nBs0_pre4 = 0; nBs0_pre5 = 0; nBs0_pre6 = 0; nBs0_pre7 = 0; nBs0_pre8 = 0; nBs0_pre9 = 0; nBs0_pre10 = 0; nBs0_pre11 = 0; nBs0_pre12 = 0; nBs0_pre13 = 0; nBs0_pre14 = 0; nBs0_pre15 = 0; nBs0_pre16 = 0;
   nX = 0;
-  nX_pre0 = 0; nX_pre1 = 0; nX_pre2 = 0; nX_pre3 = 0; nX_pre4 = 0; nX_pre5 = 0; nX_pre6 = 0; nX_pre7 = 0; nX_pre8 = 0; nX_pre9 = 0; nX_pre10 = 0; nX_pre11 = 0; nX_pre12 = 0; nX_pre13 = 0; nX_pre14 = 0;
+  nX_pre0 = 0; nX_pre1 = 0; nX_pre2 = 0; nX_pre3 = 0; nX_pre4 = 0; nX_pre5 = 0; nX_pre6 = 0; nX_pre7 = 0; nX_pre8 = 0; nX_pre9 = 0; nX_pre10 = 0; nX_pre11 = 0; nX_pre12 = 0; nX_pre13 = 0; nX_pre14 = 0; nX_pre15 = 0; nX_pre16 = 0;
   /// indices
-  mu1Idx->clear(); mu2Idx->clear();
+  mu1Idx->clear(); mu2Idx->clear(); 
   ka1Idx->clear(); ka2Idx->clear();
+  KKIdx->clear();
   Bs0_MuMuIdx->clear(); Bs0_k1Idx->clear(); Bs0_k2Idx->clear(); 
   X_MuMuIdx->clear(); X_k1Idx->clear(); X_k2Idx->clear();
 
@@ -2128,23 +2209,22 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   priVtx_X = 0; priVtx_Y = 0; priVtx_Z = 0 ; 
   priVtx_XE = 0; priVtx_YE = 0; priVtx_ZE = 0 ; 
   priVtx_NormChi2 = 0; priVtx_Chi2 = 0; priVtx_CL = 0; priVtx_tracks = 0; priVtx_tracksPtSq = 0 ;
-  /// MuMu cand & KaKa cand
+  /// MuMu cand & KK cand
   MuMuMass->clear(); MuMuVtx_CL->clear(); MuMuVtx_Chi2->clear(); 
   MuMuPx->clear(); MuMuPy->clear(); MuMuPz->clear();
   MuMuDecayVtx_X->clear(); MuMuDecayVtx_Y->clear(); MuMuDecayVtx_Z->clear();
   MuMuDecayVtx_XE->clear(); MuMuDecayVtx_YE->clear(); MuMuDecayVtx_ZE->clear();
   MuMuMuonTrigMatch->clear();
-  KaKaMass->clear(); KaKaVtx_CL->clear(); KaKaVtx_Chi2->clear();
-  KaKaPx->clear(); KaKaPy->clear(); KaKaPz->clear();
-  KaKaDecayVtx_X->clear(); KaKaDecayVtx_Y->clear(); KaKaDecayVtx_Z->clear();
-  KaKaDecayVtx_XE->clear(); KaKaDecayVtx_YE->clear(); KaKaDecayVtx_ZE->clear();
-  KaKaKaonTrigMatch->clear();
-  /// muons from JPsi (MuMu) fit & kaons from Phi (KaKa) fit
+  KKMass->clear(); KKPx->clear(); KKPy->clear(); KKPz->clear();
+  KKVtx_CL->clear(); KKVtx_Chi2->clear();
+  KKDecayVtx_X->clear(); KKDecayVtx_Y->clear(); KKDecayVtx_Z->clear();
+  KKDecayVtx_XE->clear(); KKDecayVtx_YE->clear(); KKDecayVtx_ZE->clear();
+  /// muons from JPsi (MuMu) fit & kaons from Phi (KK) fit
   mu1_MuMu_Px->clear(); mu1_MuMu_Py->clear(); mu1_MuMu_Pz->clear(); mu1_MuMu_Chi2->clear(); mu1_MuMu_NDF->clear();
   mu2_MuMu_Px->clear(); mu2_MuMu_Py->clear(); mu2_MuMu_Pz->clear(); mu2_MuMu_Chi2->clear(); mu2_MuMu_NDF->clear();
   MuMuType->clear();
-  ka1_KaKa_Px->clear(); ka1_KaKa_Py->clear(); ka1_KaKa_Pz->clear(); ka1_KaKa_Chi2->clear(); ka1_KaKa_NDF->clear();
-  ka2_KaKa_Px->clear(); ka2_KaKa_Py->clear(); ka2_KaKa_Pz->clear(); ka2_KaKa_Chi2->clear(); ka2_KaKa_NDF->clear();
+  ka1_KK_Px->clear(); ka1_KK_Py->clear(); ka1_KK_Pz->clear(); ka1_KK_Chi2->clear(); ka1_KK_NDF->clear();
+  ka2_KK_Px->clear(); ka2_KK_Py->clear();  ka2_KK_Pz->clear(); ka2_KK_Chi2->clear(); ka2_KK_NDF->clear();
   /// Primary Vertex with "MuMu correction"
   PriVtxMuMuCorr_n->clear();
   PriVtxMuMuCorr_X->clear(); PriVtxMuMuCorr_Y->clear(); PriVtxMuMuCorr_Z->clear(); 
@@ -2222,6 +2302,13 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   xCosAlphaPVCosAlpha3D->clear(); xCosAlpha3DPVCosAlpha3D->clear(); xCTauPVCosAlpha3D->clear(); xCTauPVCosAlpha3DE->clear(); xLxyPVCosAlpha3D->clear(); xLxyPVCosAlpha3DE->clear(); xLxyzPVCosAlpha3D->clear(); xLxyzPVCosAlpha3DE->clear();  
   xCosAlphaPVX->clear(); xCTauPVX->clear(); xCTauPVXE->clear(); xLxyPVX->clear(); xLxyzPVX->clear();
   xCTauPVX_3D->clear(); xCTauPVX_3D_err->clear();
+  /// dxy, dz, dxyE, dzE for kaons from PV, BS, Bs0LessPV
+  kaon1_dxy_PV->clear(); kaon1_dz_PV->clear(); kaon2_dxy_PV->clear(); kaon2_dz_PV->clear(); 
+  kaon1_dxy_BS->clear(); kaon1_dz_BS->clear(); kaon2_dxy_BS->clear(); kaon2_dz_BS->clear(); 
+  kaon1_dxy_Bs0LessPV->clear(); kaon1_dz_Bs0LessPV->clear(); kaon2_dxy_Bs0LessPV->clear(); kaon2_dz_Bs0LessPV->clear(); 
+  kaon1_dxyE->clear(); kaon1_dzE->clear(); kaon2_dxyE->clear(); kaon2_dzE->clear();
+
+  KKMass_err->clear(); Kaon1FromPV->clear(); Kaon2FromPV->clear();
 
   if (Debug_) cout <<"before muon stuff clear" <<endl ;
   /// muons
@@ -2257,222 +2344,223 @@ void MuMuKKPAT::beginJob()
 {
   edm::Service<TFileService> fs;
 	
-  Bs0_One_Tree_ = fs->make<TTree>("Bs0_data", "Bs0 Data");
   X_One_Tree_ = fs->make<TTree>("X_data", "X(4140) Data");
   
-  Bs0_One_Tree_->Branch("TrigRes", &trigRes);
-  Bs0_One_Tree_->Branch("TrigNames", &trigNames);
-  Bs0_One_Tree_->Branch("MatchTriggerNames", &MatchTriggerNames);
-  Bs0_One_Tree_->Branch("L1TrigRes", &L1TT);  
-  Bs0_One_Tree_->Branch("evtNum", &evtNum,"evtNum/i");
-  Bs0_One_Tree_->Branch("runNum", &runNum,"runNum/i");
-  Bs0_One_Tree_->Branch("lumiNum", &lumiNum, "lumiNum/i");
-  Bs0_One_Tree_->Branch("priVtx_n", &priVtx_n, "priVtx_n/i");
-  Bs0_One_Tree_->Branch("priVtx_X", &priVtx_X, "priVtx_X/f");
-  Bs0_One_Tree_->Branch("priVtx_Y", &priVtx_Y, "priVtx_Y/f");
-  Bs0_One_Tree_->Branch("priVtx_Z", &priVtx_Z, "priVtx_Z/f");
-  Bs0_One_Tree_->Branch("priVtx_XE", &priVtx_XE, "priVtx_XE/f");
-  Bs0_One_Tree_->Branch("priVtx_YE", &priVtx_YE, "priVtx_YE/f");
-  Bs0_One_Tree_->Branch("priVtx_ZE", &priVtx_ZE, "priVtx_ZE/f");
-  Bs0_One_Tree_->Branch("priVtx_NormChi2",&priVtx_NormChi2, "priVtx_NormChi2/f");
-  Bs0_One_Tree_->Branch("priVtx_Chi2",&priVtx_Chi2, "priVtx_Chi2/f");
-  Bs0_One_Tree_->Branch("priVtx_CL",&priVtx_CL, "priVtx_CL/f");
-  Bs0_One_Tree_->Branch("priVtx_tracks", &priVtx_tracks, "priVtx_tracks/i");
-  Bs0_One_Tree_->Branch("priVtx_tracksPtSq", &priVtx_tracksPtSq, "priVtx_tracksPtSq/f");
+  X_One_Tree_->Branch("TrigRes", &trigRes);
+  X_One_Tree_->Branch("TrigNames", &trigNames);
+  X_One_Tree_->Branch("MatchTriggerNames", &MatchTriggerNames);
+  X_One_Tree_->Branch("L1TrigRes", &L1TT);  
+  X_One_Tree_->Branch("evtNum", &evtNum,"evtNum/i");
+  X_One_Tree_->Branch("runNum", &runNum,"runNum/i");
+  X_One_Tree_->Branch("lumiNum", &lumiNum, "lumiNum/i");
+  X_One_Tree_->Branch("priVtx_n", &priVtx_n, "priVtx_n/i");
+  X_One_Tree_->Branch("priVtx_X", &priVtx_X, "priVtx_X/f");
+  X_One_Tree_->Branch("priVtx_Y", &priVtx_Y, "priVtx_Y/f");
+  X_One_Tree_->Branch("priVtx_Z", &priVtx_Z, "priVtx_Z/f");
+  X_One_Tree_->Branch("priVtx_XE", &priVtx_XE, "priVtx_XE/f");
+  X_One_Tree_->Branch("priVtx_YE", &priVtx_YE, "priVtx_YE/f");
+  X_One_Tree_->Branch("priVtx_ZE", &priVtx_ZE, "priVtx_ZE/f");
+  X_One_Tree_->Branch("priVtx_NormChi2",&priVtx_NormChi2, "priVtx_NormChi2/f");
+  X_One_Tree_->Branch("priVtx_Chi2",&priVtx_Chi2, "priVtx_Chi2/f");
+  X_One_Tree_->Branch("priVtx_CL",&priVtx_CL, "priVtx_CL/f");
+  X_One_Tree_->Branch("priVtx_tracks", &priVtx_tracks, "priVtx_tracks/i");
+  X_One_Tree_->Branch("priVtx_tracksPtSq", &priVtx_tracksPtSq, "priVtx_tracksPtSq/f");
   /// MC Analysis
   if (doMC) {
     // Gen Primary Vertex
-    Bs0_One_Tree_->Branch("genEvtVtx_X", &genEvtVtx_X); 
-    Bs0_One_Tree_->Branch("genEvtVtx_Y", &genEvtVtx_Y);
-    Bs0_One_Tree_->Branch("genEvtVtx_Z", &genEvtVtx_Z);
-    Bs0_One_Tree_->Branch("genEvtVtx_particles", &genEvtVtx_particles);
-    Bs0_One_Tree_->Branch("n_Bs0Ancestors", &n_Bs0Ancestors);  
-    Bs0_One_Tree_->Branch("nMCAll", &nMCAll, "nMCAll/i");
-    Bs0_One_Tree_->Branch("MCPdgIdAll", &MCPdgIdAll);
-    Bs0_One_Tree_->Branch("MCDanNumAll", &MCDanNumAll);
-    Bs0_One_Tree_->Branch("nMCBs0",&nMCBs0,"nMCBs0/i"); 
+    X_One_Tree_->Branch("genEvtVtx_X", &genEvtVtx_X); 
+    X_One_Tree_->Branch("genEvtVtx_Y", &genEvtVtx_Y);
+    X_One_Tree_->Branch("genEvtVtx_Z", &genEvtVtx_Z);
+    X_One_Tree_->Branch("genEvtVtx_particles", &genEvtVtx_particles);
+    X_One_Tree_->Branch("n_Bs0Ancestors", &n_Bs0Ancestors);  
+    X_One_Tree_->Branch("nMCAll", &nMCAll, "nMCAll/i");
+    X_One_Tree_->Branch("MCPdgIdAll", &MCPdgIdAll);
+    X_One_Tree_->Branch("MCDanNumAll", &MCDanNumAll);
+    X_One_Tree_->Branch("nMCBs0",&nMCBs0,"nMCBs0/i"); 
     // Gen Primary Vertex
-    Bs0_One_Tree_->Branch("PriVtxGen_X",&PriVtxGen_X);
-    Bs0_One_Tree_->Branch("PriVtxGen_Y",&PriVtxGen_Y);
-    Bs0_One_Tree_->Branch("PriVtxGen_Z",&PriVtxGen_Z);
-    Bs0_One_Tree_->Branch("PriVtxGen_EX",&PriVtxGen_EX);
-    Bs0_One_Tree_->Branch("PriVtxGen_EY",&PriVtxGen_EY);
-    Bs0_One_Tree_->Branch("PriVtxGen_EZ",&PriVtxGen_EZ);
-    Bs0_One_Tree_->Branch("PriVtxGen_Chi2",&PriVtxGen_Chi2);
-    Bs0_One_Tree_->Branch("PriVtxGen_CL",&PriVtxGen_CL);
-    Bs0_One_Tree_->Branch("PriVtxGen_Ndof",&PriVtxGen_Ndof);
-    Bs0_One_Tree_->Branch("PriVtxGen_tracks",&PriVtxGen_tracks);
-    //Bs0_One_Tree_->Branch("MCpsi2SPx",&MCpsi2SPx);
-    //Bs0_One_Tree_->Branch("MCpsi2SPy",&MCpsi2SPy);
-    //Bs0_One_Tree_->Branch("MCpsi2SPz",&MCpsi2SPz);
-    Bs0_One_Tree_->Branch("MCmupPx",&MCmupPx);
-    Bs0_One_Tree_->Branch("MCmupPy",&MCmupPy);
-    Bs0_One_Tree_->Branch("MCmupPz",&MCmupPz);
-    Bs0_One_Tree_->Branch("MCmumPx",&MCmumPx);
-    Bs0_One_Tree_->Branch("MCmumPy",&MCmumPy);
-    Bs0_One_Tree_->Branch("MCmumPz",&MCmumPz);
-    Bs0_One_Tree_->Branch("MCpionPx",&MCpionPx);
-    Bs0_One_Tree_->Branch("MCpionPy",&MCpionPy);
-    Bs0_One_Tree_->Branch("MCpionPz",&MCpionPz);
-    Bs0_One_Tree_->Branch("MCpionCh",&MCpionCh);
-    Bs0_One_Tree_->Branch("MCkaonPx",&MCkaonPx);
-    Bs0_One_Tree_->Branch("MCkaonPy",&MCkaonPy);
-    Bs0_One_Tree_->Branch("MCkaonPz",&MCkaonPz);
-    Bs0_One_Tree_->Branch("MCkaonCh",&MCkaonCh);
-    Bs0_One_Tree_->Branch("MCPx", &MCPx);
-    Bs0_One_Tree_->Branch("MCPy", &MCPy);
-    Bs0_One_Tree_->Branch("MCPz", &MCPz);
+    X_One_Tree_->Branch("PriVtxGen_X",&PriVtxGen_X);
+    X_One_Tree_->Branch("PriVtxGen_Y",&PriVtxGen_Y);
+    X_One_Tree_->Branch("PriVtxGen_Z",&PriVtxGen_Z);
+    X_One_Tree_->Branch("PriVtxGen_EX",&PriVtxGen_EX);
+    X_One_Tree_->Branch("PriVtxGen_EY",&PriVtxGen_EY);
+    X_One_Tree_->Branch("PriVtxGen_EZ",&PriVtxGen_EZ);
+    X_One_Tree_->Branch("PriVtxGen_Chi2",&PriVtxGen_Chi2);
+    X_One_Tree_->Branch("PriVtxGen_CL",&PriVtxGen_CL);
+    X_One_Tree_->Branch("PriVtxGen_Ndof",&PriVtxGen_Ndof);
+    X_One_Tree_->Branch("PriVtxGen_tracks",&PriVtxGen_tracks);
+    //X_One_Tree_->Branch("MCpsi2SPx",&MCpsi2SPx);
+    //X_One_Tree_->Branch("MCpsi2SPy",&MCpsi2SPy);
+    //X_One_Tree_->Branch("MCpsi2SPz",&MCpsi2SPz);
+    X_One_Tree_->Branch("MCmupPx",&MCmupPx);
+    X_One_Tree_->Branch("MCmupPy",&MCmupPy);
+    X_One_Tree_->Branch("MCmupPz",&MCmupPz);
+    X_One_Tree_->Branch("MCmumPx",&MCmumPx);
+    X_One_Tree_->Branch("MCmumPy",&MCmumPy);
+    X_One_Tree_->Branch("MCmumPz",&MCmumPz);
+    X_One_Tree_->Branch("MCpionPx",&MCpionPx);
+    X_One_Tree_->Branch("MCpionPy",&MCpionPy);
+    X_One_Tree_->Branch("MCpionPz",&MCpionPz);
+    X_One_Tree_->Branch("MCpionCh",&MCpionCh);
+    X_One_Tree_->Branch("MCkaonPx",&MCkaonPx);
+    X_One_Tree_->Branch("MCkaonPy",&MCkaonPy);
+    X_One_Tree_->Branch("MCkaonPz",&MCkaonPz);
+    X_One_Tree_->Branch("MCkaonCh",&MCkaonCh);
+    X_One_Tree_->Branch("MCPx", &MCPx);
+    X_One_Tree_->Branch("MCPy", &MCPy);
+    X_One_Tree_->Branch("MCPz", &MCPz);
   }
   /// Generic muons
-  Bs0_One_Tree_->Branch("nMu", &nMu, "nMu/i");
-  Bs0_One_Tree_->Branch("muPx",&muPx);
-  Bs0_One_Tree_->Branch("muPy",&muPy);
-  Bs0_One_Tree_->Branch("muPz",&muPz);
-  Bs0_One_Tree_->Branch("muCharge", &muCharge);
-  Bs0_One_Tree_->Branch("muD0",&muD0);
-  Bs0_One_Tree_->Branch("muDz",&muDz);
-  Bs0_One_Tree_->Branch("muChi2",&muChi2);
-  Bs0_One_Tree_->Branch("muNDF",&muNDF);
-  Bs0_One_Tree_->Branch("muPhits",&muPhits);
-  Bs0_One_Tree_->Branch("muShits",&muShits);
-  Bs0_One_Tree_->Branch("muLayersTr",&muLayersTr);
-  Bs0_One_Tree_->Branch("muLayersPix",&muLayersPix);
-  Bs0_One_Tree_->Branch("muD0E",&muD0E);
-  Bs0_One_Tree_->Branch("muDzVtxErr",&muDzVtxErr);
-  Bs0_One_Tree_->Branch("muKey",&muKey);
-  Bs0_One_Tree_->Branch("muIsGlobal",&muIsGlobal);
-  Bs0_One_Tree_->Branch("muIsPF",&muIsPF);
-  Bs0_One_Tree_->Branch("muGlMuHits",&muGlMuHits);
-  Bs0_One_Tree_->Branch("muGlChi2",&muGlChi2);
-  Bs0_One_Tree_->Branch("muGlNDF",&muGlNDF);
-  Bs0_One_Tree_->Branch("muGlMatchedStation",&muGlMatchedStation);
-  Bs0_One_Tree_->Branch("muGlDzVtx", &muGlDzVtx);
-  Bs0_One_Tree_->Branch("muGlDxyVtx", &muGlDxyVtx);
-  Bs0_One_Tree_->Branch("nMatchedStations", &nMatchedStations);
-  Bs0_One_Tree_->Branch("muType",&muType);
-  Bs0_One_Tree_->Branch("muQual",&muQual);
-  Bs0_One_Tree_->Branch("muTrack",&muTrack);
-  Bs0_One_Tree_->Branch("muNOverlap",&muNOverlap);
-  Bs0_One_Tree_->Branch("muNSharingSegWith",&muNSharingSegWith);
-  Bs0_One_Tree_->Branch("mufHits", &mufHits);
-  Bs0_One_Tree_->Branch("muFirstBarrel", &muFirstBarrel);
-  Bs0_One_Tree_->Branch("muFirstEndCap", &muFirstEndCap);
-  Bs0_One_Tree_->Branch("muDzVtx", &muDzVtx);
-  Bs0_One_Tree_->Branch("muDxyVtx", &muDxyVtx);
+  X_One_Tree_->Branch("nMu", &nMu, "nMu/i");
+  X_One_Tree_->Branch("muPx",&muPx);
+  X_One_Tree_->Branch("muPy",&muPy);
+  X_One_Tree_->Branch("muPz",&muPz);
+  X_One_Tree_->Branch("muCharge", &muCharge);
+  X_One_Tree_->Branch("muD0",&muD0);
+  X_One_Tree_->Branch("muDz",&muDz);
+  X_One_Tree_->Branch("muChi2",&muChi2);
+  X_One_Tree_->Branch("muNDF",&muNDF);
+  X_One_Tree_->Branch("muPhits",&muPhits);
+  X_One_Tree_->Branch("muShits",&muShits);
+  X_One_Tree_->Branch("muLayersTr",&muLayersTr);
+  X_One_Tree_->Branch("muLayersPix",&muLayersPix);
+  X_One_Tree_->Branch("muD0E",&muD0E);
+  X_One_Tree_->Branch("muDzVtxErr",&muDzVtxErr);
+  X_One_Tree_->Branch("muKey",&muKey);
+  X_One_Tree_->Branch("muIsGlobal",&muIsGlobal);
+  X_One_Tree_->Branch("muIsPF",&muIsPF);
+  X_One_Tree_->Branch("muGlMuHits",&muGlMuHits);
+  X_One_Tree_->Branch("muGlChi2",&muGlChi2);
+  X_One_Tree_->Branch("muGlNDF",&muGlNDF);
+  X_One_Tree_->Branch("muGlMatchedStation",&muGlMatchedStation);
+  X_One_Tree_->Branch("muGlDzVtx", &muGlDzVtx);
+  X_One_Tree_->Branch("muGlDxyVtx", &muGlDxyVtx);
+  X_One_Tree_->Branch("nMatchedStations", &nMatchedStations);
+  X_One_Tree_->Branch("muType",&muType);
+  X_One_Tree_->Branch("muQual",&muQual);
+  X_One_Tree_->Branch("muTrack",&muTrack);
+  X_One_Tree_->Branch("muNOverlap",&muNOverlap);
+  X_One_Tree_->Branch("muNSharingSegWith",&muNSharingSegWith);
+  X_One_Tree_->Branch("mufHits", &mufHits);
+  X_One_Tree_->Branch("muFirstBarrel", &muFirstBarrel);
+  X_One_Tree_->Branch("muFirstEndCap", &muFirstEndCap);
+  X_One_Tree_->Branch("muDzVtx", &muDzVtx);
+  X_One_Tree_->Branch("muDxyVtx", &muDxyVtx);
   /// generic tracks 
-  Bs0_One_Tree_->Branch("trNotRef", &trNotRef);
-  Bs0_One_Tree_->Branch("trRef", &trRef);
-  Bs0_One_Tree_->Branch("trackPx", &trPx);
-  Bs0_One_Tree_->Branch("trackPy", &trPy);
-  Bs0_One_Tree_->Branch("trackPz", &trPz);
-  Bs0_One_Tree_->Branch("trackEnergy", &trE);
-  Bs0_One_Tree_->Branch("trackNDF", &trNDF);
-  Bs0_One_Tree_->Branch("trackPhits", &trPhits);
-  Bs0_One_Tree_->Branch("trackShits", &trShits);
-  Bs0_One_Tree_->Branch("trackChi2", &trChi2);
-  Bs0_One_Tree_->Branch("trackD0", &trD0);
-  Bs0_One_Tree_->Branch("trackD0Err", &trD0E);
-  Bs0_One_Tree_->Branch("trackCharge", &trCharge);
-  Bs0_One_Tree_->Branch("TrackHighPurity", &trQualityHighPurity);
-  Bs0_One_Tree_->Branch("TrackTight", &trQualityTight);
-  Bs0_One_Tree_->Branch("trackfHits", &trfHits);
-  Bs0_One_Tree_->Branch("trackFirstBarrel", &trFirstBarrel);
-  Bs0_One_Tree_->Branch("trackFirstEndCap", &trFirstEndCap);
-  Bs0_One_Tree_->Branch("trackDzVtx", &trDzVtx);
-  Bs0_One_Tree_->Branch("trackDxyVtx", &trDxyVtx);
-  Bs0_One_Tree_->Branch("tr_nsigdedx", &tr_nsigdedx);
-  Bs0_One_Tree_->Branch("tr_dedx", &tr_dedx);
-  Bs0_One_Tree_->Branch("tr_dedxMass", &tr_dedxMass);
-  Bs0_One_Tree_->Branch("tr_theo", &tr_theo);
-  Bs0_One_Tree_->Branch("tr_sigma", &tr_sigma);
-  Bs0_One_Tree_->Branch("tr_dedx_byHits", &tr_dedx_byHits );
-  Bs0_One_Tree_->Branch("tr_dedxErr_byHits", &tr_dedxErr_byHits );
-  Bs0_One_Tree_->Branch("tr_saturMeas_byHits", &tr_saturMeas_byHits );
-  Bs0_One_Tree_->Branch("tr_Meas_byHits", &tr_Meas_byHits );
-  /// MuMu cand & KaKa cand 
-  Bs0_One_Tree_->Branch("nMuMu",&nMuMu,"nMuMu/i");
-  Bs0_One_Tree_->Branch("MuMuMass",&MuMuMass);
-  Bs0_One_Tree_->Branch("MuMuPx",&MuMuPx);
-  Bs0_One_Tree_->Branch("MuMuPy",&MuMuPy);
-  Bs0_One_Tree_->Branch("MuMuPz",&MuMuPz);
-  Bs0_One_Tree_->Branch("MuMuVtx_CL",&MuMuVtx_CL);
-  Bs0_One_Tree_->Branch("MuMuVtx_Chi2",&MuMuVtx_Chi2);
-  Bs0_One_Tree_->Branch("MuMuDecayVtx_X",&MuMuDecayVtx_X);
-  Bs0_One_Tree_->Branch("MuMuDecayVtx_Y",&MuMuDecayVtx_Y);
-  Bs0_One_Tree_->Branch("MuMuDecayVtx_Z",&MuMuDecayVtx_Z);
-  Bs0_One_Tree_->Branch("MuMuDecayVtx_XE",&MuMuDecayVtx_XE);
-  Bs0_One_Tree_->Branch("MuMuDecayVtx_YE",&MuMuDecayVtx_YE);
-  Bs0_One_Tree_->Branch("MuMuDecayVtx_ZE",&MuMuDecayVtx_ZE);
-  X_One_Tree_->Branch("KaKaMass",&KaKaMass);
-  X_One_Tree_->Branch("KaKaPx",&KaKaPx);
-  X_One_Tree_->Branch("KaKaPy",&KaKaPy);
-  X_One_Tree_->Branch("KaKaPz",&KaKaPz);
-  X_One_Tree_->Branch("KaKaVtx_CL",&KaKaVtx_CL);
-  X_One_Tree_->Branch("KaKaVtx_Chi2",&KaKaVtx_Chi2);
-  X_One_Tree_->Branch("KaKaDecayVtx_X",&KaKaDecayVtx_X);
-  X_One_Tree_->Branch("KaKaDecayVtx_Y",&KaKaDecayVtx_Y);
-  X_One_Tree_->Branch("KaKaDecayVtx_Z",&KaKaDecayVtx_Z);
-  X_One_Tree_->Branch("KaKaDecayVtx_XE",&KaKaDecayVtx_XE);
-  X_One_Tree_->Branch("KaKaDecayVtx_YE",&KaKaDecayVtx_YE);
-  X_One_Tree_->Branch("KaKaDecayVtx_ZE",&KaKaDecayVtx_ZE);
-  /// muons from JPsi (MuMu) fit & kaons from Phi (KaKa) fit
-  Bs0_One_Tree_->Branch("mu1Idx",&mu1Idx);
-  Bs0_One_Tree_->Branch("mu2Idx",&mu2Idx);
-  Bs0_One_Tree_->Branch("mu1Px_MuMu",&mu1_MuMu_Px);
-  Bs0_One_Tree_->Branch("mu1Py_MuMu",&mu1_MuMu_Py);
-  Bs0_One_Tree_->Branch("mu1Pz_MuMu",&mu1_MuMu_Pz);
-  Bs0_One_Tree_->Branch("mu1Chi_MuMu2",&mu1_MuMu_Chi2);
-  Bs0_One_Tree_->Branch("mu1NDF_MuMu",&mu1_MuMu_NDF);
-  Bs0_One_Tree_->Branch("mu2Px_MuMu",&mu2_MuMu_Px);
-  Bs0_One_Tree_->Branch("mu2Py_MuMu",&mu2_MuMu_Py);
-  Bs0_One_Tree_->Branch("mu2Pz_MuMu",&mu2_MuMu_Pz);
-  Bs0_One_Tree_->Branch("mu2Chi2_MuMu",&mu2_MuMu_Chi2);
-  Bs0_One_Tree_->Branch("mu2NDF_MuMu",&mu2_MuMu_NDF);
-  Bs0_One_Tree_->Branch("MuMuType",&MuMuType);
-  Bs0_One_Tree_->Branch("MuMuMuonTrigMatch",&MuMuMuonTrigMatch);
+  X_One_Tree_->Branch("trNotRef", &trNotRef);
+  X_One_Tree_->Branch("trRef", &trRef);
+  X_One_Tree_->Branch("trackPx", &trPx);
+  X_One_Tree_->Branch("trackPy", &trPy);
+  X_One_Tree_->Branch("trackPz", &trPz);
+  X_One_Tree_->Branch("trackEnergy", &trE);
+  X_One_Tree_->Branch("trackNDF", &trNDF);
+  X_One_Tree_->Branch("trackPhits", &trPhits);
+  X_One_Tree_->Branch("trackShits", &trShits);
+  X_One_Tree_->Branch("trackChi2", &trChi2);
+  X_One_Tree_->Branch("trackD0", &trD0);
+  X_One_Tree_->Branch("trackD0Err", &trD0E);
+  X_One_Tree_->Branch("trackCharge", &trCharge);
+  X_One_Tree_->Branch("TrackHighPurity", &trQualityHighPurity);
+  X_One_Tree_->Branch("TrackTight", &trQualityTight);
+  X_One_Tree_->Branch("trackfHits", &trfHits);
+  X_One_Tree_->Branch("trackFirstBarrel", &trFirstBarrel);
+  X_One_Tree_->Branch("trackFirstEndCap", &trFirstEndCap);
+  X_One_Tree_->Branch("trackDzVtx", &trDzVtx);
+  X_One_Tree_->Branch("trackDxyVtx", &trDxyVtx);
+  X_One_Tree_->Branch("tr_nsigdedx", &tr_nsigdedx);
+  X_One_Tree_->Branch("tr_dedx", &tr_dedx);
+  X_One_Tree_->Branch("tr_dedxMass", &tr_dedxMass);
+  X_One_Tree_->Branch("tr_theo", &tr_theo);
+  X_One_Tree_->Branch("tr_sigma", &tr_sigma);
+  X_One_Tree_->Branch("tr_dedx_byHits", &tr_dedx_byHits );
+  X_One_Tree_->Branch("tr_dedxErr_byHits", &tr_dedxErr_byHits );
+  X_One_Tree_->Branch("tr_saturMeas_byHits", &tr_saturMeas_byHits );
+  X_One_Tree_->Branch("tr_Meas_byHits", &tr_Meas_byHits );
+  /// MuMu cand & KK cand 
+  X_One_Tree_->Branch("nMuMu",&nMuMu,"nMuMu/i");
+  X_One_Tree_->Branch("MuMuMass",&MuMuMass);
+  X_One_Tree_->Branch("MuMuPx",&MuMuPx);
+  X_One_Tree_->Branch("MuMuPy",&MuMuPy);
+  X_One_Tree_->Branch("MuMuPz",&MuMuPz);
+  X_One_Tree_->Branch("MuMuVtx_CL",&MuMuVtx_CL);
+  X_One_Tree_->Branch("MuMuVtx_Chi2",&MuMuVtx_Chi2);
+  X_One_Tree_->Branch("MuMuDecayVtx_X",&MuMuDecayVtx_X);
+  X_One_Tree_->Branch("MuMuDecayVtx_Y",&MuMuDecayVtx_Y);
+  X_One_Tree_->Branch("MuMuDecayVtx_Z",&MuMuDecayVtx_Z);
+  X_One_Tree_->Branch("MuMuDecayVtx_XE",&MuMuDecayVtx_XE);
+  X_One_Tree_->Branch("MuMuDecayVtx_YE",&MuMuDecayVtx_YE);
+  X_One_Tree_->Branch("MuMuDecayVtx_ZE",&MuMuDecayVtx_ZE);
+  X_One_Tree_->Branch("nKK",&nKK,"nKK/i");
+  X_One_Tree_->Branch("KKMass",&KKMass);
+  X_One_Tree_->Branch("KKPx",&KKPx);
+  X_One_Tree_->Branch("KKPy",&KKPy);
+  X_One_Tree_->Branch("KKPz",&KKPz);
+  X_One_Tree_->Branch("KKVtx_CL",&KKVtx_CL);
+  X_One_Tree_->Branch("KKVtx_Chi2",&KKVtx_Chi2);
+  X_One_Tree_->Branch("KKDecayVtx_X",&KKDecayVtx_X);
+  X_One_Tree_->Branch("KKDecayVtx_Y",&KKDecayVtx_Y);
+  X_One_Tree_->Branch("KKDecayVtx_Z",&KKDecayVtx_Z);
+  X_One_Tree_->Branch("KKDecayVtx_XE",&KKDecayVtx_XE);
+  X_One_Tree_->Branch("KKDecayVtx_YE",&KKDecayVtx_YE);
+  X_One_Tree_->Branch("KKDecayVtx_ZE",&KKDecayVtx_ZE);
+  /// muons from JPsi (MuMu) fit & kaons from Phi (KK) fit 
+  X_One_Tree_->Branch("mu1Idx",&mu1Idx);
+  X_One_Tree_->Branch("mu2Idx",&mu2Idx);
+  X_One_Tree_->Branch("mu1Px_MuMu",&mu1_MuMu_Px);
+  X_One_Tree_->Branch("mu1Py_MuMu",&mu1_MuMu_Py);
+  X_One_Tree_->Branch("mu1Pz_MuMu",&mu1_MuMu_Pz);
+  X_One_Tree_->Branch("mu1Chi2_MuMu",&mu1_MuMu_Chi2);
+  X_One_Tree_->Branch("mu1NDF_MuMu",&mu1_MuMu_NDF);
+  X_One_Tree_->Branch("mu2Px_MuMu",&mu2_MuMu_Px);
+  X_One_Tree_->Branch("mu2Py_MuMu",&mu2_MuMu_Py);
+  X_One_Tree_->Branch("mu2Pz_MuMu",&mu2_MuMu_Pz);
+  X_One_Tree_->Branch("mu2Chi2_MuMu",&mu2_MuMu_Chi2);
+  X_One_Tree_->Branch("mu2NDF_MuMu",&mu2_MuMu_NDF);
+  X_One_Tree_->Branch("MuMuType",&MuMuType);
+  X_One_Tree_->Branch("MuMuMuonTrigMatch",&MuMuMuonTrigMatch);
+  X_One_Tree_->Branch("KKIdx",&KKIdx);
   X_One_Tree_->Branch("ka1Idx",&ka1Idx);
-  X_One_Tree_->Branch("ka2Idx",&mu2Idx);
-  X_One_Tree_->Branch("ka1Px_KaKa",&ka1_KaKa_Px);
-  X_One_Tree_->Branch("ka1Py_KaKa",&ka1_KaKa_Py);
-  X_One_Tree_->Branch("ka1Pz_KaKa",&ka1_KaKa_Pz);
-  X_One_Tree_->Branch("ka1Chi2_KaKa",&ka1_KaKa_Chi2);
-  X_One_Tree_->Branch("ka1NDF_KaKa",&ka1_KaKa_NDF);
-  X_One_Tree_->Branch("ka2Px_KaKa",&ka2_KaKa_Px);
-  X_One_Tree_->Branch("ka2Py_KaKa",&ka2_KaKa_Py);
-  X_One_Tree_->Branch("ka2Pz_KaKa",&ka2_KaKa_Pz);
-  X_One_Tree_->Branch("ka2Chi2_KaKa",&ka2_KaKa_Chi2);
-  X_One_Tree_->Branch("ka2NDF_KaKa",&ka2_KaKa_NDF);
-  //X_One_Tree_->Branch("KaKaType",&KaKaType);
-  X_One_Tree_->Branch("KaKaKaonTrigMatch",&KaKaKaonTrigMatch);
+  X_One_Tree_->Branch("ka2Idx",&ka2Idx);
+  X_One_Tree_->Branch("ka1Px_KK",&ka1_KK_Px);
+  X_One_Tree_->Branch("ka1Py_KK",&ka1_KK_Py);
+  X_One_Tree_->Branch("ka1Pz_KK",&ka1_KK_Pz);
+  X_One_Tree_->Branch("ka1Chi2_KK",&ka1_KK_Chi2);
+  X_One_Tree_->Branch("ka1NDF_KK",&ka1_KK_NDF);
+  X_One_Tree_->Branch("ka2Px_KK",&ka2_KK_Px);
+  X_One_Tree_->Branch("ka2Py_KK",&ka2_KK_Py);
+  X_One_Tree_->Branch("ka2Pz_KK",&ka2_KK_Pz);
+  X_One_Tree_->Branch("ka2Chi2_KK",&ka2_KK_Chi2);
+  X_One_Tree_->Branch("ka2NDF_KK",&ka2_KK_NDF);
   /// Primary Vertex with "MuMu correction" 
-  Bs0_One_Tree_->Branch("PriVtxMuMuCorr_n", &PriVtxMuMuCorr_n);
-  Bs0_One_Tree_->Branch("PriVtxMuMuCorr_X", &PriVtxMuMuCorr_X);
-  Bs0_One_Tree_->Branch("PriVtxMuMuCorr_Y", &PriVtxMuMuCorr_Y);
-  Bs0_One_Tree_->Branch("PriVtxMuMuCorr_Z", &PriVtxMuMuCorr_Z);
-  Bs0_One_Tree_->Branch("PriVtxMuMuCorr_EX", &PriVtxMuMuCorr_EX);
-  Bs0_One_Tree_->Branch("PriVtxMuMuCorr_EY", &PriVtxMuMuCorr_EY);
-  Bs0_One_Tree_->Branch("PriVtxMuMuCorr_EZ", &PriVtxMuMuCorr_EZ);
-  Bs0_One_Tree_->Branch("PriVtxMuMuCorr_Chi2", &PriVtxMuMuCorr_Chi2);
-  Bs0_One_Tree_->Branch("PriVtxMuMuCorr_CL", &PriVtxMuMuCorr_CL);
-  Bs0_One_Tree_->Branch("PriVtxMuMuCorr_tracks", &PriVtxMuMuCorr_tracks);
-  Bs0_One_Tree_->Branch("nTrk_afterMuMu", &nTrk);
+  X_One_Tree_->Branch("PriVtxMuMuCorr_n", &PriVtxMuMuCorr_n);
+  X_One_Tree_->Branch("PriVtxMuMuCorr_X", &PriVtxMuMuCorr_X);
+  X_One_Tree_->Branch("PriVtxMuMuCorr_Y", &PriVtxMuMuCorr_Y);
+  X_One_Tree_->Branch("PriVtxMuMuCorr_Z", &PriVtxMuMuCorr_Z);
+  X_One_Tree_->Branch("PriVtxMuMuCorr_EX", &PriVtxMuMuCorr_EX);
+  X_One_Tree_->Branch("PriVtxMuMuCorr_EY", &PriVtxMuMuCorr_EY);
+  X_One_Tree_->Branch("PriVtxMuMuCorr_EZ", &PriVtxMuMuCorr_EZ);
+  X_One_Tree_->Branch("PriVtxMuMuCorr_Chi2", &PriVtxMuMuCorr_Chi2);
+  X_One_Tree_->Branch("PriVtxMuMuCorr_CL", &PriVtxMuMuCorr_CL);
+  X_One_Tree_->Branch("PriVtxMuMuCorr_tracks", &PriVtxMuMuCorr_tracks);
+  X_One_Tree_->Branch("nTrk_afterMuMu", &nTrk);
   /// counters for Bs0 & X(4140)
-  Bs0_One_Tree_->Branch("nBs0",&nBs0,"nBs0/i");
-  Bs0_One_Tree_->Branch("nBs0_pre0",&nBs0_pre0,"nBs0_pre0/i");
-  Bs0_One_Tree_->Branch("nBs0_pre1",&nBs0_pre1,"nBs0_pre1/i");
-  Bs0_One_Tree_->Branch("nBs0_pre2",&nBs0_pre2,"nBs0_pre2/i");
-  Bs0_One_Tree_->Branch("nBs0_pre3",&nBs0_pre3,"nBs0_pre3/i");
-  Bs0_One_Tree_->Branch("nBs0_pre4",&nBs0_pre4,"nBs0_pre4/i");
-  Bs0_One_Tree_->Branch("nBs0_pre5",&nBs0_pre5,"nBs0_pre5/i");
-  Bs0_One_Tree_->Branch("nBs0_pre6",&nBs0_pre6,"nBs0_pre6/i");
-  Bs0_One_Tree_->Branch("nBs0_pre7",&nBs0_pre7,"nBs0_pre7/i");
-  Bs0_One_Tree_->Branch("nBs0_pre8",&nBs0_pre8,"nBs0_pre8/i");
-  Bs0_One_Tree_->Branch("nBs0_pre9",&nBs0_pre9,"nBs0_pre9/i");
-  Bs0_One_Tree_->Branch("nBs0_pre10",&nBs0_pre10,"nBs0_pre10/i");
-  Bs0_One_Tree_->Branch("nBs0_pre11",&nBs0_pre11,"nBs0_pre11/i");
-  Bs0_One_Tree_->Branch("nBs0_pre12",&nBs0_pre12,"nBs0_pre12/i");
-  Bs0_One_Tree_->Branch("nBs0_pre13",&nBs0_pre13,"nBs0_pre13/i");
-  Bs0_One_Tree_->Branch("nBs0_pre14",&nBs0_pre14,"nBs0_pre14/i");
+  X_One_Tree_->Branch("nBs0",&nBs0,"nBs0/i");
+  X_One_Tree_->Branch("nBs0_pre0",&nBs0_pre0,"nBs0_pre0/i");
+  X_One_Tree_->Branch("nBs0_pre1",&nBs0_pre1,"nBs0_pre1/i");
+  X_One_Tree_->Branch("nBs0_pre2",&nBs0_pre2,"nBs0_pre2/i");
+  X_One_Tree_->Branch("nBs0_pre3",&nBs0_pre3,"nBs0_pre3/i");
+  X_One_Tree_->Branch("nBs0_pre4",&nBs0_pre4,"nBs0_pre4/i");
+  X_One_Tree_->Branch("nBs0_pre5",&nBs0_pre5,"nBs0_pre5/i");
+  X_One_Tree_->Branch("nBs0_pre6",&nBs0_pre6,"nBs0_pre6/i");
+  X_One_Tree_->Branch("nBs0_pre7",&nBs0_pre7,"nBs0_pre7/i");
+  X_One_Tree_->Branch("nBs0_pre8",&nBs0_pre8,"nBs0_pre8/i");
+  X_One_Tree_->Branch("nBs0_pre9",&nBs0_pre9,"nBs0_pre9/i");
+  X_One_Tree_->Branch("nBs0_pre10",&nBs0_pre10,"nBs0_pre10/i");
+  X_One_Tree_->Branch("nBs0_pre11",&nBs0_pre11,"nBs0_pre11/i");
+  X_One_Tree_->Branch("nBs0_pre12",&nBs0_pre12,"nBs0_pre12/i");
+  X_One_Tree_->Branch("nBs0_pre13",&nBs0_pre13,"nBs0_pre13/i");
+  X_One_Tree_->Branch("nBs0_pre14",&nBs0_pre14,"nBs0_pre14/i");
+  X_One_Tree_->Branch("nBs0_pre15",&nBs0_pre15,"nBs0_pre15/i");
+  X_One_Tree_->Branch("nBs0_pre16",&nBs0_pre16,"nBs0_pre16/i");
   X_One_Tree_->Branch("nX",&nX,"nX/i");
   X_One_Tree_->Branch("nX_pre0",&nX_pre0,"nX_pre0/i");
   X_One_Tree_->Branch("nX_pre1",&nX_pre1,"nX_pre1/i");
@@ -2489,38 +2577,40 @@ void MuMuKKPAT::beginJob()
   X_One_Tree_->Branch("nX_pre12",&nX_pre12,"nX_pre12/i");
   X_One_Tree_->Branch("nX_pre13",&nX_pre13,"nX_pre13/i");
   X_One_Tree_->Branch("nX_pre14",&nX_pre14,"nX_pre14/i");
+  X_One_Tree_->Branch("nX_pre15",&nX_pre15,"nX_pre15/i");
+  X_One_Tree_->Branch("nX_pre16",&nX_pre16,"nX_pre16/i");
   /// Bs0 cand & X(4140) cand 
-  Bs0_One_Tree_->Branch("Bs0Mass",&bs0Mass);
-  Bs0_One_Tree_->Branch("Bs0Px",&bs0Px);
-  Bs0_One_Tree_->Branch("Bs0Py",&bs0Py);
-  Bs0_One_Tree_->Branch("Bs0Pz",&bs0Pz);
-  Bs0_One_Tree_->Branch("Bs0PxE",&bs0PxE);
-  Bs0_One_Tree_->Branch("Bs0PyE",&bs0PyE);
-  Bs0_One_Tree_->Branch("Bs0PzE",&bs0PzE);
-  Bs0_One_Tree_->Branch("Bs0Vtx_CL",&bs0Vtx_CL);
-  Bs0_One_Tree_->Branch("Bs0Vtx_Chi2",&bs0Vtx_Chi2);
-  Bs0_One_Tree_->Branch("Bs0DecayVtx_X",&bs0DecayVtx_X);
-  Bs0_One_Tree_->Branch("Bs0DecayVtx_Y",&bs0DecayVtx_Y);
-  Bs0_One_Tree_->Branch("Bs0DecayVtx_Z",&bs0DecayVtx_Z);
-  Bs0_One_Tree_->Branch("Bs0DecayVtx_XE",&bs0DecayVtx_XE);
-  Bs0_One_Tree_->Branch("Bs0DecayVtx_YE",&bs0DecayVtx_YE);
-  Bs0_One_Tree_->Branch("Bs0DecayVtx_ZE",&bs0DecayVtx_ZE);
-  Bs0_One_Tree_->Branch("Bs0CosAlphaBS", &bs0CosAlphaBS);
-  Bs0_One_Tree_->Branch("Bs0CosAlpha3DBS", &bs0CosAlpha3DBS);
-  Bs0_One_Tree_->Branch("Bs0CTauBS", &bs0CTauBS);
-  Bs0_One_Tree_->Branch("Bs0CTauBSE", &bs0CTauBSE);
-  Bs0_One_Tree_->Branch("Bs0LxyBS", &bs0LxyBS);
-  Bs0_One_Tree_->Branch("Bs0LxyBSE", &bs0LxyBSE);
-  Bs0_One_Tree_->Branch("Bs0LxyzBS", &bs0LxyzBS);
-  Bs0_One_Tree_->Branch("Bs0LxyzBSE", &bs0LxyzBSE);
-  Bs0_One_Tree_->Branch("Bs0CosAlphaPV", &bs0CosAlphaPV);
-  Bs0_One_Tree_->Branch("Bs0CosAlpha3DPV", &bs0CosAlpha3DPV);
-  Bs0_One_Tree_->Branch("Bs0CTauPV", &bs0CTauPV);
-  Bs0_One_Tree_->Branch("Bs0CTauPVE", &bs0CTauPVE);
-  Bs0_One_Tree_->Branch("Bs0LxyPV", &bs0LxyPV);
-  Bs0_One_Tree_->Branch("Bs0LxyPVE", &bs0LxyPVE);
-  Bs0_One_Tree_->Branch("Bs0LxyzPV", &bs0LxyzPV);
-  Bs0_One_Tree_->Branch("Bs0LxyzPVE", &bs0LxyzPVE);
+  X_One_Tree_->Branch("Bs0Mass",&bs0Mass);
+  X_One_Tree_->Branch("Bs0Px",&bs0Px);
+  X_One_Tree_->Branch("Bs0Py",&bs0Py);
+  X_One_Tree_->Branch("Bs0Pz",&bs0Pz);
+  X_One_Tree_->Branch("Bs0PxE",&bs0PxE);
+  X_One_Tree_->Branch("Bs0PyE",&bs0PyE);
+  X_One_Tree_->Branch("Bs0PzE",&bs0PzE);
+  X_One_Tree_->Branch("Bs0Vtx_CL",&bs0Vtx_CL);
+  X_One_Tree_->Branch("Bs0Vtx_Chi2",&bs0Vtx_Chi2);
+  X_One_Tree_->Branch("Bs0DecayVtx_X",&bs0DecayVtx_X);
+  X_One_Tree_->Branch("Bs0DecayVtx_Y",&bs0DecayVtx_Y);
+  X_One_Tree_->Branch("Bs0DecayVtx_Z",&bs0DecayVtx_Z);
+  X_One_Tree_->Branch("Bs0DecayVtx_XE",&bs0DecayVtx_XE);
+  X_One_Tree_->Branch("Bs0DecayVtx_YE",&bs0DecayVtx_YE);
+  X_One_Tree_->Branch("Bs0DecayVtx_ZE",&bs0DecayVtx_ZE);
+  X_One_Tree_->Branch("Bs0CosAlphaBS", &bs0CosAlphaBS);
+  X_One_Tree_->Branch("Bs0CosAlpha3DBS", &bs0CosAlpha3DBS);
+  X_One_Tree_->Branch("Bs0CTauBS", &bs0CTauBS);
+  X_One_Tree_->Branch("Bs0CTauBSE", &bs0CTauBSE);
+  X_One_Tree_->Branch("Bs0LxyBS", &bs0LxyBS);
+  X_One_Tree_->Branch("Bs0LxyBSE", &bs0LxyBSE);
+  X_One_Tree_->Branch("Bs0LxyzBS", &bs0LxyzBS);
+  X_One_Tree_->Branch("Bs0LxyzBSE", &bs0LxyzBSE);
+  X_One_Tree_->Branch("Bs0CosAlphaPV", &bs0CosAlphaPV);
+  X_One_Tree_->Branch("Bs0CosAlpha3DPV", &bs0CosAlpha3DPV);
+  X_One_Tree_->Branch("Bs0CTauPV", &bs0CTauPV);
+  X_One_Tree_->Branch("Bs0CTauPVE", &bs0CTauPVE);
+  X_One_Tree_->Branch("Bs0LxyPV", &bs0LxyPV);
+  X_One_Tree_->Branch("Bs0LxyPVE", &bs0LxyPVE);
+  X_One_Tree_->Branch("Bs0LxyzPV", &bs0LxyzPV);
+  X_One_Tree_->Branch("Bs0LxyzPVE", &bs0LxyzPVE);
   X_One_Tree_->Branch("XMass",&xMass);
   X_One_Tree_->Branch("XPx",&xPx);
   X_One_Tree_->Branch("XPy",&xPy);
@@ -2553,24 +2643,24 @@ void MuMuKKPAT::beginJob()
   X_One_Tree_->Branch("XLxyzPV", &xLxyzPV);
   X_One_Tree_->Branch("XLxyzPVE", &xLxyzPVE); 
   /// Primary Vertex with largest Bs0_cos(alpha) & largest X(4140)_cos(alpha)
-  Bs0_One_Tree_->Branch("PriVtx_Bs0CosAlpha_n",&PriVtx_Bs0CosAlpha_n);
-  Bs0_One_Tree_->Branch("PriVtx_Bs0CosAlpha_X",&PriVtx_Bs0CosAlpha_X);
-  Bs0_One_Tree_->Branch("PriVtx_Bs0CosAlpha_Y",&PriVtx_Bs0CosAlpha_Y);
-  Bs0_One_Tree_->Branch("PriVtx_Bs0CosAlpha_Z",&PriVtx_Bs0CosAlpha_Z);
-  Bs0_One_Tree_->Branch("PriVtx_Bs0CosAlpha_EX",&PriVtx_Bs0CosAlpha_EX);
-  Bs0_One_Tree_->Branch("PriVtx_Bs0CosAlpha_EY",&PriVtx_Bs0CosAlpha_EY);
-  Bs0_One_Tree_->Branch("PriVtx_Bs0CosAlpha_EZ",&PriVtx_Bs0CosAlpha_EZ);
-  Bs0_One_Tree_->Branch("PriVtx_Bs0CosAlpha_Chi2",&PriVtx_Bs0CosAlpha_Chi2);
-  Bs0_One_Tree_->Branch("PriVtx_Bs0CosAlpha_CL",&PriVtx_Bs0CosAlpha_CL);
-  Bs0_One_Tree_->Branch("PriVtx_Bs0CosAlpha_tracks",&PriVtx_Bs0CosAlpha_tracks);
-  Bs0_One_Tree_->Branch("Bs0CosAlphaPVCosAlpha", &bs0CosAlphaPVCosAlpha);
-  Bs0_One_Tree_->Branch("Bs0CosAlpha3DPVCosAlpha", &bs0CosAlpha3DPVCosAlpha);
-  Bs0_One_Tree_->Branch("Bs0CTauPVCosAlpha", &bs0CTauPVCosAlpha);
-  Bs0_One_Tree_->Branch("Bs0CTauPVCosAlphaE", &bs0CTauPVCosAlphaE);
-  Bs0_One_Tree_->Branch("Bs0LxyPVCosAlpha", &bs0LxyPVCosAlpha);
-  Bs0_One_Tree_->Branch("Bs0LxyPVCosAlphaE", &bs0LxyPVCosAlphaE);
-  Bs0_One_Tree_->Branch("Bs0LxyzPVCosAlpha", &bs0LxyzPVCosAlpha);
-  Bs0_One_Tree_->Branch("Bs0LxyzPVCosAlphaE", &bs0LxyzPVCosAlphaE);
+  X_One_Tree_->Branch("PriVtx_Bs0CosAlpha_n",&PriVtx_Bs0CosAlpha_n);
+  X_One_Tree_->Branch("PriVtx_Bs0CosAlpha_X",&PriVtx_Bs0CosAlpha_X);
+  X_One_Tree_->Branch("PriVtx_Bs0CosAlpha_Y",&PriVtx_Bs0CosAlpha_Y);
+  X_One_Tree_->Branch("PriVtx_Bs0CosAlpha_Z",&PriVtx_Bs0CosAlpha_Z);
+  X_One_Tree_->Branch("PriVtx_Bs0CosAlpha_EX",&PriVtx_Bs0CosAlpha_EX);
+  X_One_Tree_->Branch("PriVtx_Bs0CosAlpha_EY",&PriVtx_Bs0CosAlpha_EY);
+  X_One_Tree_->Branch("PriVtx_Bs0CosAlpha_EZ",&PriVtx_Bs0CosAlpha_EZ);
+  X_One_Tree_->Branch("PriVtx_Bs0CosAlpha_Chi2",&PriVtx_Bs0CosAlpha_Chi2);
+  X_One_Tree_->Branch("PriVtx_Bs0CosAlpha_CL",&PriVtx_Bs0CosAlpha_CL);
+  X_One_Tree_->Branch("PriVtx_Bs0CosAlpha_tracks",&PriVtx_Bs0CosAlpha_tracks);
+  X_One_Tree_->Branch("Bs0CosAlphaPVCosAlpha", &bs0CosAlphaPVCosAlpha);
+  X_One_Tree_->Branch("Bs0CosAlpha3DPVCosAlpha", &bs0CosAlpha3DPVCosAlpha);
+  X_One_Tree_->Branch("Bs0CTauPVCosAlpha", &bs0CTauPVCosAlpha);
+  X_One_Tree_->Branch("Bs0CTauPVCosAlphaE", &bs0CTauPVCosAlphaE);
+  X_One_Tree_->Branch("Bs0LxyPVCosAlpha", &bs0LxyPVCosAlpha);
+  X_One_Tree_->Branch("Bs0LxyPVCosAlphaE", &bs0LxyPVCosAlphaE);
+  X_One_Tree_->Branch("Bs0LxyzPVCosAlpha", &bs0LxyzPVCosAlpha);
+  X_One_Tree_->Branch("Bs0LxyzPVCosAlphaE", &bs0LxyzPVCosAlphaE);
   X_One_Tree_->Branch("PriVtx_XCosAlpha_n",&PriVtx_XCosAlpha_n);
   X_One_Tree_->Branch("PriVtx_XCosAlpha_X",&PriVtx_XCosAlpha_X);
   X_One_Tree_->Branch("PriVtx_XCosAlpha_Y",&PriVtx_XCosAlpha_Y);
@@ -2589,24 +2679,24 @@ void MuMuKKPAT::beginJob()
   X_One_Tree_->Branch("XLxyPVCosAlphaE", &xLxyPVCosAlphaE);
   X_One_Tree_->Branch("XLxyzPVCosAlpha", &xLxyzPVCosAlpha);
   X_One_Tree_->Branch("XLxyzPVCosAlphaE", &xLxyzPVCosAlphaE);
-  Bs0_One_Tree_->Branch("PriVtx_Bs0CosAlpha3D_n",&PriVtx_Bs0CosAlpha3D_n);
-  Bs0_One_Tree_->Branch("PriVtx_Bs0CosAlpha3D_X",&PriVtx_Bs0CosAlpha3D_X);
-  Bs0_One_Tree_->Branch("PriVtx_Bs0CosAlpha3D_Y",&PriVtx_Bs0CosAlpha3D_Y);
-  Bs0_One_Tree_->Branch("PriVtx_Bs0CosAlpha3D_Z",&PriVtx_Bs0CosAlpha3D_Z);
-  Bs0_One_Tree_->Branch("PriVtx_Bs0CosAlpha3D_EX",&PriVtx_Bs0CosAlpha3D_EX);
-  Bs0_One_Tree_->Branch("PriVtx_Bs0CosAlpha3D_EY",&PriVtx_Bs0CosAlpha3D_EY);
-  Bs0_One_Tree_->Branch("PriVtx_Bs0CosAlpha3D_EZ",&PriVtx_Bs0CosAlpha3D_EZ);
-  Bs0_One_Tree_->Branch("PriVtx_Bs0CosAlpha3D_Chi2",&PriVtx_Bs0CosAlpha3D_Chi2);
-  Bs0_One_Tree_->Branch("PriVtx_Bs0CosAlpha3D_CL",&PriVtx_Bs0CosAlpha3D_CL);
-  Bs0_One_Tree_->Branch("PriVtx_Bs0CosAlpha3D_tracks",&PriVtx_Bs0CosAlpha3D_tracks);
-  Bs0_One_Tree_->Branch("Bs0CosAlphaPVCosAlpha3D", &bs0CosAlphaPVCosAlpha3D);
-  Bs0_One_Tree_->Branch("Bs0CosAlpha3DPVCosAlpha3D", &bs0CosAlpha3DPVCosAlpha3D);
-  Bs0_One_Tree_->Branch("Bs0CTauPVCosAlpha3D", &bs0CTauPVCosAlpha3D);
-  Bs0_One_Tree_->Branch("Bs0CTauPVCosAlpha3DE", &bs0CTauPVCosAlpha3DE);
-  Bs0_One_Tree_->Branch("Bs0LxyPVCosAlpha3D", &bs0LxyPVCosAlpha3D);
-  Bs0_One_Tree_->Branch("Bs0LxyPVCosAlpha3DE", &bs0LxyPVCosAlpha3DE);
-  Bs0_One_Tree_->Branch("Bs0LxyzPVCosAlpha3D", &bs0LxyzPVCosAlpha3D);
-  Bs0_One_Tree_->Branch("Bs0LxyzPVCosAlpha3DE", &bs0LxyzPVCosAlpha3DE);
+  X_One_Tree_->Branch("PriVtx_Bs0CosAlpha3D_n",&PriVtx_Bs0CosAlpha3D_n);
+  X_One_Tree_->Branch("PriVtx_Bs0CosAlpha3D_X",&PriVtx_Bs0CosAlpha3D_X);
+  X_One_Tree_->Branch("PriVtx_Bs0CosAlpha3D_Y",&PriVtx_Bs0CosAlpha3D_Y);
+  X_One_Tree_->Branch("PriVtx_Bs0CosAlpha3D_Z",&PriVtx_Bs0CosAlpha3D_Z);
+  X_One_Tree_->Branch("PriVtx_Bs0CosAlpha3D_EX",&PriVtx_Bs0CosAlpha3D_EX);
+  X_One_Tree_->Branch("PriVtx_Bs0CosAlpha3D_EY",&PriVtx_Bs0CosAlpha3D_EY);
+  X_One_Tree_->Branch("PriVtx_Bs0CosAlpha3D_EZ",&PriVtx_Bs0CosAlpha3D_EZ);
+  X_One_Tree_->Branch("PriVtx_Bs0CosAlpha3D_Chi2",&PriVtx_Bs0CosAlpha3D_Chi2);
+  X_One_Tree_->Branch("PriVtx_Bs0CosAlpha3D_CL",&PriVtx_Bs0CosAlpha3D_CL);
+  X_One_Tree_->Branch("PriVtx_Bs0CosAlpha3D_tracks",&PriVtx_Bs0CosAlpha3D_tracks);
+  X_One_Tree_->Branch("Bs0CosAlphaPVCosAlpha3D", &bs0CosAlphaPVCosAlpha3D);
+  X_One_Tree_->Branch("Bs0CosAlpha3DPVCosAlpha3D", &bs0CosAlpha3DPVCosAlpha3D);
+  X_One_Tree_->Branch("Bs0CTauPVCosAlpha3D", &bs0CTauPVCosAlpha3D);
+  X_One_Tree_->Branch("Bs0CTauPVCosAlpha3DE", &bs0CTauPVCosAlpha3DE);
+  X_One_Tree_->Branch("Bs0LxyPVCosAlpha3D", &bs0LxyPVCosAlpha3D);
+  X_One_Tree_->Branch("Bs0LxyPVCosAlpha3DE", &bs0LxyPVCosAlpha3DE);
+  X_One_Tree_->Branch("Bs0LxyzPVCosAlpha3D", &bs0LxyzPVCosAlpha3D);
+  X_One_Tree_->Branch("Bs0LxyzPVCosAlpha3DE", &bs0LxyzPVCosAlpha3DE);
   X_One_Tree_->Branch("PriVtx_XCosAlpha3D_n",&PriVtx_XCosAlpha3D_n);
   X_One_Tree_->Branch("PriVtx_XCosAlpha3D_X",&PriVtx_XCosAlpha3D_X);
   X_One_Tree_->Branch("PriVtx_XCosAlpha3D_Y",&PriVtx_XCosAlpha3D_Y);
@@ -2626,73 +2716,73 @@ void MuMuKKPAT::beginJob()
   X_One_Tree_->Branch("XLxyzPVCosAlpha3D", &xLxyzPVCosAlpha3D);
   X_One_Tree_->Branch("XLxyzPVCosAlpha3DE", &xLxyzPVCosAlpha3DE);
  
-  Bs0_One_Tree_->Branch("Bs0LessPV_tracksPtSq",&Bs0LessPV_tracksPtSq);
-  Bs0_One_Tree_->Branch("Bs0LessPV_4tracksPtSq",&Bs0LessPV_4tracksPtSq);
-  Bs0_One_Tree_->Branch("PriVtxBs0Less_n",&PriVtxBs0Less_n);
-  Bs0_One_Tree_->Branch("PriVtxBs0Less_X",&PriVtxBs0Less_X);
-  Bs0_One_Tree_->Branch("PriVtxBs0Less_Y",&PriVtxBs0Less_Y);
-  Bs0_One_Tree_->Branch("PriVtxBs0Less_Z",&PriVtxBs0Less_Z);
-  Bs0_One_Tree_->Branch("PriVtxBs0Less_EX",&PriVtxBs0Less_EX);
-  Bs0_One_Tree_->Branch("PriVtxBs0Less_EY",&PriVtxBs0Less_EY);
-  Bs0_One_Tree_->Branch("PriVtxBs0Less_EZ",&PriVtxBs0Less_EZ);
-  Bs0_One_Tree_->Branch("PriVtxBs0Less_Chi2",&PriVtxBs0Less_Chi2);
-  Bs0_One_Tree_->Branch("PriVtxBs0Less_CL",&PriVtxBs0Less_CL);
-  Bs0_One_Tree_->Branch("PriVtxBs0Less_tracks",&PriVtxBs0Less_tracks);
-  Bs0_One_Tree_->Branch("Bs0CosAlphaBs0LessPV", &bs0CosAlphaBs0LessPV);
-  Bs0_One_Tree_->Branch("Bs0CosAlpha3DBs0LessPV", &bs0CosAlpha3DBs0LessPV);
-  Bs0_One_Tree_->Branch("Bs0CTauBs0LessPV", &bs0CTauBs0LessPV);
-  Bs0_One_Tree_->Branch("Bs0CTauBs0LessPVE", &bs0CTauBs0LessPVE);
-  Bs0_One_Tree_->Branch("Bs0LxyBs0LessPV", &bs0LxyBs0LessPV);
-  Bs0_One_Tree_->Branch("Bs0LxyBs0LessPVE", &bs0LxyBs0LessPVE);
-  Bs0_One_Tree_->Branch("Bs0LxyzBs0LessPV", &bs0LxyzBs0LessPV);
-  Bs0_One_Tree_->Branch("Bs0LxyzBs0LessPVE", &bs0LxyzBs0LessPVE);  	
-  Bs0_One_Tree_->Branch("PriVtxBs0Less_Bs0CosAlpha_n",&PriVtxBs0Less_Bs0CosAlpha_n);
-  Bs0_One_Tree_->Branch("PriVtxBs0Less_Bs0CosAlpha_X",&PriVtxBs0Less_Bs0CosAlpha_X);
-  Bs0_One_Tree_->Branch("PriVtxBs0Less_Bs0CosAlpha_Y",&PriVtxBs0Less_Bs0CosAlpha_Y);
-  Bs0_One_Tree_->Branch("PriVtxBs0Less_Bs0CosAlpha_Z",&PriVtxBs0Less_Bs0CosAlpha_Z);
-  Bs0_One_Tree_->Branch("PriVtxBs0Less_Bs0CosAlpha_EX",&PriVtxBs0Less_Bs0CosAlpha_EX);
-  Bs0_One_Tree_->Branch("PriVtxBs0Less_Bs0CosAlpha_EY",&PriVtxBs0Less_Bs0CosAlpha_EY);
-  Bs0_One_Tree_->Branch("PriVtxBs0Less_Bs0CosAlpha_EZ",&PriVtxBs0Less_Bs0CosAlpha_EZ);
-  Bs0_One_Tree_->Branch("PriVtxBs0Less_Bs0CosAlpha_Chi2",&PriVtxBs0Less_Bs0CosAlpha_Chi2);
-  Bs0_One_Tree_->Branch("PriVtxBs0Less_Bs0CosAlpha_CL",&PriVtxBs0Less_Bs0CosAlpha_CL);
-  Bs0_One_Tree_->Branch("PriVtxBs0Less_Bs0CosAlpha_tracks",&PriVtxBs0Less_Bs0CosAlpha_tracks);
-  Bs0_One_Tree_->Branch("Bs0CosAlphaBs0LessPVCosAlpha", &bs0CosAlphaBs0LessPVCosAlpha);
-  Bs0_One_Tree_->Branch("Bs0CosAlpha3DBs0LessPVCosAlpha", &bs0CosAlpha3DBs0LessPVCosAlpha);
-  Bs0_One_Tree_->Branch("Bs0CTauBs0LessPVCosAlpha", &bs0CTauBs0LessPVCosAlpha);
-  Bs0_One_Tree_->Branch("Bs0CTauBs0LessPVCosAlphaE", &bs0CTauBs0LessPVCosAlphaE);
-  Bs0_One_Tree_->Branch("Bs0LxyBs0LessPVCosAlpha", &bs0LxyBs0LessPVCosAlpha);
-  Bs0_One_Tree_->Branch("Bs0LxyBs0LessPVCosAlphaE", &bs0LxyBs0LessPVCosAlphaE);
-  Bs0_One_Tree_->Branch("Bs0LxyzBs0LessPVCosAlpha", &bs0LxyzBs0LessPVCosAlpha);
-  Bs0_One_Tree_->Branch("Bs0LxyzBs0LessPVCosAlphaE", &bs0LxyzBs0LessPVCosAlphaE);
-  Bs0_One_Tree_->Branch("PriVtxBs0Less_Bs0CosAlpha3D_n",&PriVtxBs0Less_Bs0CosAlpha3D_n);
-  Bs0_One_Tree_->Branch("PriVtxBs0Less_Bs0CosAlpha3D_X",&PriVtxBs0Less_Bs0CosAlpha3D_X);
-  Bs0_One_Tree_->Branch("PriVtxBs0Less_Bs0CosAlpha3D_Y",&PriVtxBs0Less_Bs0CosAlpha3D_Y);
-  Bs0_One_Tree_->Branch("PriVtxBs0Less_Bs0CosAlpha3D_Z",&PriVtxBs0Less_Bs0CosAlpha3D_Z);
-  Bs0_One_Tree_->Branch("PriVtxBs0Less_Bs0CosAlpha3D_EX",&PriVtxBs0Less_Bs0CosAlpha3D_EX);
-  Bs0_One_Tree_->Branch("PriVtxBs0Less_Bs0CosAlpha3D_EY",&PriVtxBs0Less_Bs0CosAlpha3D_EY);
-  Bs0_One_Tree_->Branch("PriVtxBs0Less_Bs0CosAlpha3D_EZ",&PriVtxBs0Less_Bs0CosAlpha3D_EZ);
-  Bs0_One_Tree_->Branch("PriVtxBs0Less_Bs0CosAlpha3D_Chi2",&PriVtxBs0Less_Bs0CosAlpha3D_Chi2);
-  Bs0_One_Tree_->Branch("PriVtxBs0Less_Bs0CosAlpha3D_CL",&PriVtxBs0Less_Bs0CosAlpha3D_CL);
-  Bs0_One_Tree_->Branch("PriVtxBs0Less_Bs0CosAlpha3D_tracks",&PriVtxBs0Less_Bs0CosAlpha3D_tracks);
-  Bs0_One_Tree_->Branch("Bs0CosAlphaBs0LessPVCosAlpha3D", &bs0CosAlphaBs0LessPVCosAlpha3D);
-  Bs0_One_Tree_->Branch("Bs0CosAlpha3DBs0LessPVCosAlpha3D", &bs0CosAlpha3DBs0LessPVCosAlpha3D);
-  Bs0_One_Tree_->Branch("Bs0CTauBs0LessPVCosAlpha3D", &bs0CTauBs0LessPVCosAlpha3D);
-  Bs0_One_Tree_->Branch("Bs0CTauBs0LessPVCosAlpha3DE", &bs0CTauBs0LessPVCosAlpha3DE);
-  Bs0_One_Tree_->Branch("Bs0LxyBs0LessPVCosAlpha3D", &bs0LxyBs0LessPVCosAlpha3D);
-  Bs0_One_Tree_->Branch("Bs0LxyBs0LessPVCosAlpha3DE", &bs0LxyBs0LessPVCosAlpha3DE);
-  Bs0_One_Tree_->Branch("Bs0LxyzBs0LessPVCosAlpha3D", &bs0LxyzBs0LessPVCosAlpha3D);
-  Bs0_One_Tree_->Branch("Bs0LxyzBs0LessPVCosAlpha3DE", &bs0LxyzBs0LessPVCosAlpha3DE);
+  X_One_Tree_->Branch("Bs0LessPV_tracksPtSq",&Bs0LessPV_tracksPtSq);
+  X_One_Tree_->Branch("Bs0LessPV_4tracksPtSq",&Bs0LessPV_4tracksPtSq);
+  X_One_Tree_->Branch("PriVtxBs0Less_n",&PriVtxBs0Less_n);
+  X_One_Tree_->Branch("PriVtxBs0Less_X",&PriVtxBs0Less_X);
+  X_One_Tree_->Branch("PriVtxBs0Less_Y",&PriVtxBs0Less_Y);
+  X_One_Tree_->Branch("PriVtxBs0Less_Z",&PriVtxBs0Less_Z);
+  X_One_Tree_->Branch("PriVtxBs0Less_EX",&PriVtxBs0Less_EX);
+  X_One_Tree_->Branch("PriVtxBs0Less_EY",&PriVtxBs0Less_EY);
+  X_One_Tree_->Branch("PriVtxBs0Less_EZ",&PriVtxBs0Less_EZ);
+  X_One_Tree_->Branch("PriVtxBs0Less_Chi2",&PriVtxBs0Less_Chi2);
+  X_One_Tree_->Branch("PriVtxBs0Less_CL",&PriVtxBs0Less_CL);
+  X_One_Tree_->Branch("PriVtxBs0Less_tracks",&PriVtxBs0Less_tracks);
+  X_One_Tree_->Branch("Bs0CosAlphaBs0LessPV", &bs0CosAlphaBs0LessPV);
+  X_One_Tree_->Branch("Bs0CosAlpha3DBs0LessPV", &bs0CosAlpha3DBs0LessPV);
+  X_One_Tree_->Branch("Bs0CTauBs0LessPV", &bs0CTauBs0LessPV);
+  X_One_Tree_->Branch("Bs0CTauBs0LessPVE", &bs0CTauBs0LessPVE);
+  X_One_Tree_->Branch("Bs0LxyBs0LessPV", &bs0LxyBs0LessPV);
+  X_One_Tree_->Branch("Bs0LxyBs0LessPVE", &bs0LxyBs0LessPVE);
+  X_One_Tree_->Branch("Bs0LxyzBs0LessPV", &bs0LxyzBs0LessPV);
+  X_One_Tree_->Branch("Bs0LxyzBs0LessPVE", &bs0LxyzBs0LessPVE);  	
+  X_One_Tree_->Branch("PriVtxBs0Less_Bs0CosAlpha_n",&PriVtxBs0Less_Bs0CosAlpha_n);
+  X_One_Tree_->Branch("PriVtxBs0Less_Bs0CosAlpha_X",&PriVtxBs0Less_Bs0CosAlpha_X);
+  X_One_Tree_->Branch("PriVtxBs0Less_Bs0CosAlpha_Y",&PriVtxBs0Less_Bs0CosAlpha_Y);
+  X_One_Tree_->Branch("PriVtxBs0Less_Bs0CosAlpha_Z",&PriVtxBs0Less_Bs0CosAlpha_Z);
+  X_One_Tree_->Branch("PriVtxBs0Less_Bs0CosAlpha_EX",&PriVtxBs0Less_Bs0CosAlpha_EX);
+  X_One_Tree_->Branch("PriVtxBs0Less_Bs0CosAlpha_EY",&PriVtxBs0Less_Bs0CosAlpha_EY);
+  X_One_Tree_->Branch("PriVtxBs0Less_Bs0CosAlpha_EZ",&PriVtxBs0Less_Bs0CosAlpha_EZ);
+  X_One_Tree_->Branch("PriVtxBs0Less_Bs0CosAlpha_Chi2",&PriVtxBs0Less_Bs0CosAlpha_Chi2);
+  X_One_Tree_->Branch("PriVtxBs0Less_Bs0CosAlpha_CL",&PriVtxBs0Less_Bs0CosAlpha_CL);
+  X_One_Tree_->Branch("PriVtxBs0Less_Bs0CosAlpha_tracks",&PriVtxBs0Less_Bs0CosAlpha_tracks);
+  X_One_Tree_->Branch("Bs0CosAlphaBs0LessPVCosAlpha", &bs0CosAlphaBs0LessPVCosAlpha);
+  X_One_Tree_->Branch("Bs0CosAlpha3DBs0LessPVCosAlpha", &bs0CosAlpha3DBs0LessPVCosAlpha);
+  X_One_Tree_->Branch("Bs0CTauBs0LessPVCosAlpha", &bs0CTauBs0LessPVCosAlpha);
+  X_One_Tree_->Branch("Bs0CTauBs0LessPVCosAlphaE", &bs0CTauBs0LessPVCosAlphaE);
+  X_One_Tree_->Branch("Bs0LxyBs0LessPVCosAlpha", &bs0LxyBs0LessPVCosAlpha);
+  X_One_Tree_->Branch("Bs0LxyBs0LessPVCosAlphaE", &bs0LxyBs0LessPVCosAlphaE);
+  X_One_Tree_->Branch("Bs0LxyzBs0LessPVCosAlpha", &bs0LxyzBs0LessPVCosAlpha);
+  X_One_Tree_->Branch("Bs0LxyzBs0LessPVCosAlphaE", &bs0LxyzBs0LessPVCosAlphaE);
+  X_One_Tree_->Branch("PriVtxBs0Less_Bs0CosAlpha3D_n",&PriVtxBs0Less_Bs0CosAlpha3D_n);
+  X_One_Tree_->Branch("PriVtxBs0Less_Bs0CosAlpha3D_X",&PriVtxBs0Less_Bs0CosAlpha3D_X);
+  X_One_Tree_->Branch("PriVtxBs0Less_Bs0CosAlpha3D_Y",&PriVtxBs0Less_Bs0CosAlpha3D_Y);
+  X_One_Tree_->Branch("PriVtxBs0Less_Bs0CosAlpha3D_Z",&PriVtxBs0Less_Bs0CosAlpha3D_Z);
+  X_One_Tree_->Branch("PriVtxBs0Less_Bs0CosAlpha3D_EX",&PriVtxBs0Less_Bs0CosAlpha3D_EX);
+  X_One_Tree_->Branch("PriVtxBs0Less_Bs0CosAlpha3D_EY",&PriVtxBs0Less_Bs0CosAlpha3D_EY);
+  X_One_Tree_->Branch("PriVtxBs0Less_Bs0CosAlpha3D_EZ",&PriVtxBs0Less_Bs0CosAlpha3D_EZ);
+  X_One_Tree_->Branch("PriVtxBs0Less_Bs0CosAlpha3D_Chi2",&PriVtxBs0Less_Bs0CosAlpha3D_Chi2);
+  X_One_Tree_->Branch("PriVtxBs0Less_Bs0CosAlpha3D_CL",&PriVtxBs0Less_Bs0CosAlpha3D_CL);
+  X_One_Tree_->Branch("PriVtxBs0Less_Bs0CosAlpha3D_tracks",&PriVtxBs0Less_Bs0CosAlpha3D_tracks);
+  X_One_Tree_->Branch("Bs0CosAlphaBs0LessPVCosAlpha3D", &bs0CosAlphaBs0LessPVCosAlpha3D);
+  X_One_Tree_->Branch("Bs0CosAlpha3DBs0LessPVCosAlpha3D", &bs0CosAlpha3DBs0LessPVCosAlpha3D);
+  X_One_Tree_->Branch("Bs0CTauBs0LessPVCosAlpha3D", &bs0CTauBs0LessPVCosAlpha3D);
+  X_One_Tree_->Branch("Bs0CTauBs0LessPVCosAlpha3DE", &bs0CTauBs0LessPVCosAlpha3DE);
+  X_One_Tree_->Branch("Bs0LxyBs0LessPVCosAlpha3D", &bs0LxyBs0LessPVCosAlpha3D);
+  X_One_Tree_->Branch("Bs0LxyBs0LessPVCosAlpha3DE", &bs0LxyBs0LessPVCosAlpha3DE);
+  X_One_Tree_->Branch("Bs0LxyzBs0LessPVCosAlpha3D", &bs0LxyzBs0LessPVCosAlpha3D);
+  X_One_Tree_->Branch("Bs0LxyzBs0LessPVCosAlpha3DE", &bs0LxyzBs0LessPVCosAlpha3DE);
   /// Primary Vertex with "Bs0 correction" & "X(4140) correction" 
-  Bs0_One_Tree_->Branch("PriVtxBs0Corr_n",&PriVtxBs0Corr_n);
-  Bs0_One_Tree_->Branch("PriVtxBs0Corr_X",&PriVtxBs0Corr_X);
-  Bs0_One_Tree_->Branch("PriVtxBs0Corr_Y",&PriVtxBs0Corr_Y);
-  Bs0_One_Tree_->Branch("PriVtxBs0Corr_Z",&PriVtxBs0Corr_Z);
-  Bs0_One_Tree_->Branch("PriVtxBs0Corr_EX",&PriVtxBs0Corr_EX);
-  Bs0_One_Tree_->Branch("PriVtxBs0Corr_EY",&PriVtxBs0Corr_EY);
-  Bs0_One_Tree_->Branch("PriVtxBs0Corr_EZ",&PriVtxBs0Corr_EZ);
-  Bs0_One_Tree_->Branch("PriVtxBs0Corr_Chi2",&PriVtxBs0Corr_Chi2);
-  Bs0_One_Tree_->Branch("PriVtxBs0Corr_CL",&PriVtxBs0Corr_CL);
-  Bs0_One_Tree_->Branch("PriVtxBs0Corr_tracks",&PriVtxBs0Corr_tracks);
+  X_One_Tree_->Branch("PriVtxBs0Corr_n",&PriVtxBs0Corr_n);
+  X_One_Tree_->Branch("PriVtxBs0Corr_X",&PriVtxBs0Corr_X);
+  X_One_Tree_->Branch("PriVtxBs0Corr_Y",&PriVtxBs0Corr_Y);
+  X_One_Tree_->Branch("PriVtxBs0Corr_Z",&PriVtxBs0Corr_Z);
+  X_One_Tree_->Branch("PriVtxBs0Corr_EX",&PriVtxBs0Corr_EX);
+  X_One_Tree_->Branch("PriVtxBs0Corr_EY",&PriVtxBs0Corr_EY);
+  X_One_Tree_->Branch("PriVtxBs0Corr_EZ",&PriVtxBs0Corr_EZ);
+  X_One_Tree_->Branch("PriVtxBs0Corr_Chi2",&PriVtxBs0Corr_Chi2);
+  X_One_Tree_->Branch("PriVtxBs0Corr_CL",&PriVtxBs0Corr_CL);
+  X_One_Tree_->Branch("PriVtxBs0Corr_tracks",&PriVtxBs0Corr_tracks);
   X_One_Tree_->Branch("PriVtxXCorr_n",&PriVtxXCorr_n);
   X_One_Tree_->Branch("PriVtxXCorr_X",&PriVtxXCorr_X);
   X_One_Tree_->Branch("PriVtxXCorr_Y",&PriVtxXCorr_Y);
@@ -2704,13 +2794,13 @@ void MuMuKKPAT::beginJob()
   X_One_Tree_->Branch("PriVtxXCorr_CL",&PriVtxXCorr_CL);
   X_One_Tree_->Branch("PriVtxXCorr_tracks",&PriVtxXCorr_tracks);
   /// Lifetime variables for Bs0 & X(4140)
-  Bs0_One_Tree_->Branch("Bs0CosAlphaPVX", &bs0CosAlphaPVX);
-  Bs0_One_Tree_->Branch("Bs0CTauPVX", &bs0CTauPVX);
-  Bs0_One_Tree_->Branch("Bs0CTauPVXE", &bs0CTauPVXE);
-  Bs0_One_Tree_->Branch("Bs0LxyPVX", &bs0LxyPVX);
-  Bs0_One_Tree_->Branch("Bs0LxyzPVX", &bs0LxyzPVX);
-  Bs0_One_Tree_->Branch("Bs0CTauPVX_3D", &bs0CTauPVX_3D);
-  Bs0_One_Tree_->Branch("Bs0CTauPVX_3D_err", &bs0CTauPVX_3D_err);
+  X_One_Tree_->Branch("Bs0CosAlphaPVX", &bs0CosAlphaPVX);
+  X_One_Tree_->Branch("Bs0CTauPVX", &bs0CTauPVX);
+  X_One_Tree_->Branch("Bs0CTauPVXE", &bs0CTauPVXE);
+  X_One_Tree_->Branch("Bs0LxyPVX", &bs0LxyPVX);
+  X_One_Tree_->Branch("Bs0LxyzPVX", &bs0LxyzPVX);
+  X_One_Tree_->Branch("Bs0CTauPVX_3D", &bs0CTauPVX_3D);
+  X_One_Tree_->Branch("Bs0CTauPVX_3D_err", &bs0CTauPVX_3D_err);
   X_One_Tree_->Branch("XCosAlphaPVX", &xCosAlphaPVX);
   X_One_Tree_->Branch("XCTauPVX", &xCTauPVX);
   X_One_Tree_->Branch("XCTauPVXE", &xCTauPVXE);
@@ -2718,46 +2808,65 @@ void MuMuKKPAT::beginJob()
   X_One_Tree_->Branch("XLxyzPVX", &xLxyzPVX);
   X_One_Tree_->Branch("XCTauPVX_3D", &xCTauPVX_3D);
   X_One_Tree_->Branch("XCTauPVX_3D_err", &xCTauPVX_3D_err);
-  
-  Bs0_One_Tree_->Branch("Bs0MuMuIdx", &Bs0_MuMuIdx);
-  Bs0_One_Tree_->Branch("Bs0KaonIdx", &Bs0_k1Idx);
-  Bs0_One_Tree_->Branch("Bs0KaonIdx", &Bs0_k2Idx); 
+  /// dxy, dz, dxyE, dzE for kaons from PV, BS, Bs0LessPV 
+  X_One_Tree_->Branch("kaon1_dxy_PV", &kaon1_dxy_PV);
+  X_One_Tree_->Branch("kaon1_dz_PV", &kaon1_dz_PV);
+  X_One_Tree_->Branch("kaon2_dxy_PV", &kaon2_dxy_PV);
+  X_One_Tree_->Branch("kaon2_dz_PV", &kaon2_dz_PV);
+  X_One_Tree_->Branch("kaon1_dxy_BS", &kaon1_dxy_BS);
+  X_One_Tree_->Branch("kaon1_dz_BS", &kaon1_dz_BS);
+  X_One_Tree_->Branch("kaon2_dxy_BS", &kaon2_dxy_BS);
+  X_One_Tree_->Branch("kaon2_dz_BS", &kaon2_dz_BS);
+  X_One_Tree_->Branch("kaon1_dxy_Bs0LessPV", &kaon1_dxy_Bs0LessPV);
+  X_One_Tree_->Branch("kaon1_dz_Bs0LessPV", &kaon1_dz_Bs0LessPV);
+  X_One_Tree_->Branch("kaon2_dxy_Bs0LessPV", &kaon2_dxy_Bs0LessPV);
+  X_One_Tree_->Branch("kaon2_dz_Bs0LessPV", &kaon2_dz_Bs0LessPV);
+  X_One_Tree_->Branch("kaon1_dxyE", &kaon1_dxyE);
+  X_One_Tree_->Branch("kaon1_dzE", &kaon1_dzE);
+  X_One_Tree_->Branch("kaon2_dxyE", &kaon2_dxyE);
+  X_One_Tree_->Branch("kaon2_dzE", &kaon2_dzE);
+ 
+  X_One_Tree_->Branch("Bs0MuMuIdx", &Bs0_MuMuIdx);
+  X_One_Tree_->Branch("Bs0KaonIdx", &Bs0_k1Idx);
+  X_One_Tree_->Branch("Bs0KaonIdx", &Bs0_k2Idx); 
   X_One_Tree_->Branch("XMuMuIdx", &X_MuMuIdx);
   X_One_Tree_->Branch("XKaonIdx", &X_k1Idx); 
   X_One_Tree_->Branch("XKaonIdx", &X_k2Idx);
 
-  //Z_One_Tree_->Branch("PiPiMass_err",& PiPiMass_err);
+  X_One_Tree_->Branch("KKMass_err",&KKMass_err);
+  X_One_Tree_->Branch("Kaon1FromPV",&Kaon1FromPV);
+  X_One_Tree_->Branch("Kaon2FromPV",&Kaon2FromPV );
 
   /// Muons and tracks after Bs0 cand fit & X(4140) cand fit
-  Bs0_One_Tree_->Branch("Muon1Px_MuMuKK", &mu1Px_MuMuKK);
-  Bs0_One_Tree_->Branch("Muon1Py_MuMuKK", &mu1Py_MuMuKK);
-  Bs0_One_Tree_->Branch("Muon1Pz_MuMuKK", &mu1Pz_MuMuKK);
-  Bs0_One_Tree_->Branch("Muon1E_MuMuKK", &mu1E_MuMuKK);
+  X_One_Tree_->Branch("Muon1Px_MuMuKK", &mu1Px_MuMuKK);
+  X_One_Tree_->Branch("Muon1Py_MuMuKK", &mu1Py_MuMuKK);
+  X_One_Tree_->Branch("Muon1Pz_MuMuKK", &mu1Pz_MuMuKK);
+  X_One_Tree_->Branch("Muon1E_MuMuKK", &mu1E_MuMuKK);
   X_One_Tree_->Branch("X_Muon1Px_MuMuKK", &X_mu1Px_MuMuKK);
   X_One_Tree_->Branch("X_Muon1Py_MuMuKK", &X_mu1Py_MuMuKK);
   X_One_Tree_->Branch("X_Muon1Pz_MuMuKK", &X_mu1Pz_MuMuKK);
   X_One_Tree_->Branch("X_Muon1E_MuMuKK", &X_mu1E_MuMuKK); 
-  Bs0_One_Tree_->Branch("Muon2Px_MuMuKK", &mu2Px_MuMuKK);
-  Bs0_One_Tree_->Branch("Muon2Py_MuMuKK", &mu2Py_MuMuKK);
-  Bs0_One_Tree_->Branch("Muon2Pz_MuMuKK", &mu2Pz_MuMuKK);
-  Bs0_One_Tree_->Branch("Muon2E_MuMuKK", &mu2E_MuMuKK);
+  X_One_Tree_->Branch("Muon2Px_MuMuKK", &mu2Px_MuMuKK);
+  X_One_Tree_->Branch("Muon2Py_MuMuKK", &mu2Py_MuMuKK);
+  X_One_Tree_->Branch("Muon2Pz_MuMuKK", &mu2Pz_MuMuKK);
+  X_One_Tree_->Branch("Muon2E_MuMuKK", &mu2E_MuMuKK);
   X_One_Tree_->Branch("X_Muon2Px_MuMuKK", &X_mu2Px_MuMuKK);
   X_One_Tree_->Branch("X_Muon2Py_MuMuKK", &X_mu2Py_MuMuKK);
   X_One_Tree_->Branch("X_Muon2Pz_MuMuKK", &X_mu2Pz_MuMuKK);
   X_One_Tree_->Branch("X_Muon2E_MuMuKK", &X_mu2E_MuMuKK);
-  Bs0_One_Tree_->Branch("Kaon1Px_MuMuKK", &k1Px_MuMuKK); 
-  Bs0_One_Tree_->Branch("Kaon1Py_MuMuKK", &k1Py_MuMuKK); 
-  Bs0_One_Tree_->Branch("Kaon1Pz_MuMuKK", &k1Pz_MuMuKK); 
-  Bs0_One_Tree_->Branch("Kion1E_MuMuKK", &k1E_MuMuKK); 
-  Bs0_One_Tree_->Branch("kaon1_nsigdedx", &kaon1_nsigdedx); 
-  Bs0_One_Tree_->Branch("kaon1_dedx", &kaon1_dedx); 
-  Bs0_One_Tree_->Branch("kaon1_dedxMass", &kaon1_dedxMass); 
-  Bs0_One_Tree_->Branch("kaon1_theo", &kaon1_theo); 
-  Bs0_One_Tree_->Branch("kaon1_sigma", &kaon1_sigma); 
-  Bs0_One_Tree_->Branch("kaon1_dedx_byHits", &kaon1_dedx_byHits); 
-  Bs0_One_Tree_->Branch("kaon1_dedxErr_byHits", &kaon1_dedxErr_byHits); 
-  Bs0_One_Tree_->Branch("kaon1_saturMeas_byHits", &kaon1_saturMeas_byHits); 
-  Bs0_One_Tree_->Branch("kaon1_Meas_byHits", &kaon1_Meas_byHits); 
+  X_One_Tree_->Branch("Kaon1Px_MuMuKK", &k1Px_MuMuKK); 
+  X_One_Tree_->Branch("Kaon1Py_MuMuKK", &k1Py_MuMuKK); 
+  X_One_Tree_->Branch("Kaon1Pz_MuMuKK", &k1Pz_MuMuKK); 
+  X_One_Tree_->Branch("Kion1E_MuMuKK", &k1E_MuMuKK); 
+  X_One_Tree_->Branch("kaon1_nsigdedx", &kaon1_nsigdedx); 
+  X_One_Tree_->Branch("kaon1_dedx", &kaon1_dedx); 
+  X_One_Tree_->Branch("kaon1_dedxMass", &kaon1_dedxMass); 
+  X_One_Tree_->Branch("kaon1_theo", &kaon1_theo); 
+  X_One_Tree_->Branch("kaon1_sigma", &kaon1_sigma); 
+  X_One_Tree_->Branch("kaon1_dedx_byHits", &kaon1_dedx_byHits); 
+  X_One_Tree_->Branch("kaon1_dedxErr_byHits", &kaon1_dedxErr_byHits); 
+  X_One_Tree_->Branch("kaon1_saturMeas_byHits", &kaon1_saturMeas_byHits); 
+  X_One_Tree_->Branch("kaon1_Meas_byHits", &kaon1_Meas_byHits); 
   X_One_Tree_->Branch("X_Kaon1Px_MuMuKK", &X_k1Px_MuMuKK); 
   X_One_Tree_->Branch("X_Kaon1Py_MuMuKK", &X_k1Py_MuMuKK); 
   X_One_Tree_->Branch("X_Kaon1Pz_MuMuKK", &X_k1Pz_MuMuKK); 
@@ -2771,19 +2880,19 @@ void MuMuKKPAT::beginJob()
   X_One_Tree_->Branch("X_kaon1_dedxErr_byHits", &X_kaon1_dedxErr_byHits); 
   X_One_Tree_->Branch("X_kaon1_saturMeas_byHits", &X_kaon1_saturMeas_byHits);
   X_One_Tree_->Branch("X_kaon1_Meas_byHits", &X_kaon1_Meas_byHits); 
-  Bs0_One_Tree_->Branch("Kaon2Px_MuMuKK", &k2Px_MuMuKK); 
-  Bs0_One_Tree_->Branch("Kaon2Py_MuMuKK", &k2Py_MuMuKK); 
-  Bs0_One_Tree_->Branch("Kaon2Pz_MuMuKK", &k2Pz_MuMuKK); 
-  Bs0_One_Tree_->Branch("Kaon2E_MuMuKK", &k2E_MuMuKK); 
-  Bs0_One_Tree_->Branch("kaon2_nsigdedx", &kaon2_nsigdedx); 
-  Bs0_One_Tree_->Branch("kaon2_dedx", &kaon2_dedx); 
-  Bs0_One_Tree_->Branch("kaon2_dedxMass", &kaon2_dedxMass); 
-  Bs0_One_Tree_->Branch("kaon2_theo", &kaon2_theo); 
-  Bs0_One_Tree_->Branch("kaon2_sigma", &kaon2_sigma); 
-  Bs0_One_Tree_->Branch("kaon2_dedx_byHits", &kaon2_dedx_byHits); 
-  Bs0_One_Tree_->Branch("kaon2_dedxErr_byHits", &kaon2_dedxErr_byHits); 
-  Bs0_One_Tree_->Branch("kaon2_saturMeas_byHits", &kaon2_saturMeas_byHits); 
-  Bs0_One_Tree_->Branch("kaon2_Meas_byHits", &kaon2_Meas_byHits); 
+  X_One_Tree_->Branch("Kaon2Px_MuMuKK", &k2Px_MuMuKK); 
+  X_One_Tree_->Branch("Kaon2Py_MuMuKK", &k2Py_MuMuKK); 
+  X_One_Tree_->Branch("Kaon2Pz_MuMuKK", &k2Pz_MuMuKK); 
+  X_One_Tree_->Branch("Kaon2E_MuMuKK", &k2E_MuMuKK); 
+  X_One_Tree_->Branch("kaon2_nsigdedx", &kaon2_nsigdedx); 
+  X_One_Tree_->Branch("kaon2_dedx", &kaon2_dedx); 
+  X_One_Tree_->Branch("kaon2_dedxMass", &kaon2_dedxMass); 
+  X_One_Tree_->Branch("kaon2_theo", &kaon2_theo); 
+  X_One_Tree_->Branch("kaon2_sigma", &kaon2_sigma); 
+  X_One_Tree_->Branch("kaon2_dedx_byHits", &kaon2_dedx_byHits); 
+  X_One_Tree_->Branch("kaon2_dedxErr_byHits", &kaon2_dedxErr_byHits); 
+  X_One_Tree_->Branch("kaon2_saturMeas_byHits", &kaon2_saturMeas_byHits); 
+  X_One_Tree_->Branch("kaon2_Meas_byHits", &kaon2_Meas_byHits); 
   X_One_Tree_->Branch("X_Kaon2Px_MuMuKK", &X_k2Px_MuMuKK); 
   X_One_Tree_->Branch("X_Kaon2Py_MuMuKK", &X_k2Py_MuMuKK); 
   X_One_Tree_->Branch("X_Kaon2Pz_MuMuKK", &X_k2Pz_MuMuKK); 
@@ -2802,8 +2911,6 @@ void MuMuKKPAT::beginJob()
 
 /// ------------ method called once each job just after ending the event loop  ------------
 void MuMuKKPAT::endJob() {
-  Bs0_One_Tree_->GetDirectory()->cd();
-  Bs0_One_Tree_->Write();
   X_One_Tree_->GetDirectory()->cd();
   X_One_Tree_->Write();
 }/// endjob
@@ -2967,5 +3074,5 @@ bool MuMuKKPAT::isSameMuon(const reco::Muon &mu1, const reco::Muon &mu2) const {
 /// define this as a plug-in
 DEFINE_FWK_MODULE(MuMuKKPAT);
 
-// rsync -vut --existing src/MuMuPiKPAT.cc semrat@lxplus.cern.ch:/afs/cern.ch/work/s/semrat/private/TetraQuark/CMSSW_5_3_22/src/X4140/MuMuKKPAT/src
+// rsync -vut --existing src/MuMuPiKPAT.cc semrat@lxplus.cern.ch:/afs/cern.ch/user/s/semrat/scratch0/CMSSW_5_3_22/src/X4140/MuMuKKPAT/src/MuMuPiKPAT.cc
 
