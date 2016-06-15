@@ -23,6 +23,7 @@
 /// user include files
 #include "../interface/MuMuKKPAT.h"
 #include "../interface/VertexReProducer.h"
+//#include "DataFormats/Candidate/interface/OverlapChecker.h"
 
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "FWCore/Framework/interface/EDAnalyzer.h"
@@ -55,6 +56,8 @@
 #include "TrackingTools/PatternTools/interface/TwoTrackMinimumDistance.h"
 #include "TrackingTools/IPTools/interface/IPTools.h"
 
+//#include "TrackingTools/Records/interface/TrackingComponentsRecord.h"
+
 #include "DataFormats/Common/interface/RefToBase.h"
 #include "DataFormats/Candidate/interface/ShallowCloneCandidate.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
@@ -84,13 +87,17 @@
 
 #include "TMath.h"
 #include "Math/VectorUtil.h"
+
+/// useless so far
+//#include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"
+//#include "HepMC/GenVertex.h"
+//#include <HepMC/GenVertex.h>
+//#include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h" 
-#include <iostream>
-#include <cstring>
+
 ///
 /// constants, enums and typedefs
 ///
-using namespace std;
 
 typedef math::Error<3>::type CovarianceMatrix;
 
@@ -98,10 +105,11 @@ const ParticleMass muon_mass = 0.10565837; //pdg mass
 const ParticleMass kaon_mass = 0.493667; //pdg mass
 ParticleMass JPsi_mass = 3.096916;
 const ParticleMass Phi_mass = 1.0194; 
-ParticleMass psi2S_mass = 3.686093; /// SEMRA we don't need this !!!
+
 
 /// Setting insignificant mass sigma to avoid singularities in the covariance matrix.
 float small_sigma = muon_mass*1.e-6;				
+//float small_sigma = kaon_mass*1.e-6; /// SEMRA
 
 ///
 /// static data member definitions
@@ -171,21 +179,24 @@ MuMuKKPAT::MuMuKKPAT(const edm::ParameterSet& iConfig) :
   nX_pre0(0), nX_pre1(0), nX_pre2(0), nX_pre3(0), nX_pre4(0), nX_pre5(0), nX_pre6(0), nX_pre7(0), nX_pre8(0), nX_pre9(0), nX_pre10(0), nX_pre11(0), nX_pre12(0), nX_pre13(0), nX_pre14(0), nX_pre15(0), nX_pre16(0), 
   priVtx_n(0), priVtx_X(0), priVtx_Y(0), priVtx_Z(0), priVtx_XE(0), priVtx_YE(0), priVtx_ZE(0), priVtx_NormChi2(0), priVtx_Chi2(0), priVtx_CL(0), priVtx_tracks(0), priVtx_tracksPtSq(0),   
   /// indices
-  mu1Idx(0), mu2Idx(0), MuMuType(0), ka1Idx(0), ka2Idx(0), KKIdx(0),
-  Bs0_MuMuIdx(0), Bs0_k1Idx(0), Bs0_k2Idx(0), 
-  X_MuMuIdx(0), X_k1Idx(0), X_k2Idx(0), 
+  mu1Idx(0), mu2Idx(0), MuMuType(0), ka1Idx(0), ka2Idx(0),
+  Bs0_MuMuIdx(0), Bs0_ka1Idx(0), Bs0_ka2Idx(0), 
+  X_MuMuIdx(0), X_ka1Idx(0), X_ka2Idx(0), 
   /// MC Analysis /// n_Bs0Ancestors & no for X(4140)!! 
   n_genEvtVtx(0), genEvtVtx_X(0), genEvtVtx_Y(0), genEvtVtx_Z(0), genEvtVtx_particles(0), n_Bs0Ancestors(0),
   nMCAll(0), nMCBs0(0), /*nMCBs0Vtx(0),*/ MCPdgIdAll(0), MCDanNumAll(0),
   // Gen Primary Vertex
   PriVtxGen_X(0), PriVtxGen_Y(0), PriVtxGen_Z(0), PriVtxGen_EX(0), PriVtxGen_EY(0), PriVtxGen_EZ(0),
   PriVtxGen_Chi2(0), PriVtxGen_CL(0), PriVtxGen_Ndof(0), PriVtxGen_tracks(0),
-  //MCpsi2SPx(0), MCpsi2SPy(0), MCpsi2SPz(0),
+  MCJPsiPx(0), MCJPsiPy(0), MCJPsiPz(0),
   MCmupPx(0), MCmupPy(0), MCmupPz(0), 
-  MCmumPx(0), MCmumPy(0), MCmumPz(0), 
-  MCpionPx(0), MCpionPy(0), MCpionPz(0), 
-  MCkaonPx(0), MCkaonPy(0), MCkaonPz(0),
-  MCpionCh(0), MCkaonCh(0),
+  MCmumPx(0), MCmumPy(0), MCmumPz(0),
+  MCPhiPx(0), MCPhiPy(0), MCPhiPz(0),
+  MCkpPx(0), MCkpPy(0), MCkpPz(0),
+  MCkmPx(0), MCkmPy(0), MCkmPz(0), 
+  //MCpionPx(0), MCpionPy(0), MCpionPz(0), 
+  //MCkaonPx(0), MCkaonPy(0), MCkaonPz(0),
+  //MCpionCh(0), MCkaonCh(0),
   MCPx(0), MCPy(0), MCPz(0), 
   /// generic muons
   muPx(0), muPy(0), muPz(0), muCharge(0),
@@ -223,6 +234,7 @@ MuMuKKPAT::MuMuKKPAT(const edm::ParameterSet& iConfig) :
   mu2_MuMu_Px(0), mu2_MuMu_Py(0), mu2_MuMu_Pz(0), mu2_MuMu_Chi2(0), mu2_MuMu_NDF(0),
   ka1_KK_Px(0), ka1_KK_Py(0), ka1_KK_Pz(0), ka1_KK_Chi2(0), ka1_KK_NDF(0),
   ka2_KK_Px(0), ka2_KK_Py(0), ka2_KK_Pz(0), ka2_KK_Chi2(0), ka2_KK_NDF(0),
+  DRMuMuK1(0), DRMuMuK2(0), DRbs0K1(0), DRbs0K2(0), DRxK1(0), DRxK2(0),
   /// Primary Vertex with "MuMu correction"
   PriVtxMuMuCorr_n(0),
   PriVtxMuMuCorr_X(0), PriVtxMuMuCorr_Y(0), PriVtxMuMuCorr_Z(0), PriVtxMuMuCorr_EX(0), PriVtxMuMuCorr_EY(0), PriVtxMuMuCorr_EZ(0),
@@ -236,14 +248,14 @@ MuMuKKPAT::MuMuKKPAT(const edm::ParameterSet& iConfig) :
   xPx(0), xPy(0), xPz(0), xPxE(0), xPyE(0), xPzE(0),
   xDecayVtx_X(0), xDecayVtx_Y(0), xDecayVtx_Z(0), xDecayVtx_XE(0), xDecayVtx_YE(0), xDecayVtx_ZE(0),
   /// Muons and tracks after Bs0 cand fit & X(4140) cand fit 
-  mu1Px_MuMuKK(0), mu1Py_MuMuKK(0), mu1Pz_MuMuKK(0), mu1E_MuMuKK(0),
-  mu2Px_MuMuKK(0), mu2Py_MuMuKK(0), mu2Pz_MuMuKK(0), mu2E_MuMuKK(0),
-  k1Px_MuMuKK(0), k1Py_MuMuKK(0), k1Pz_MuMuKK(0), k1E_MuMuKK(0), 
-  kaon1_nsigdedx(0), kaon1_dedx(0), kaon1_dedxMass(0), kaon1_theo(0), kaon1_sigma(0), 
-  kaon1_dedx_byHits(0), kaon1_dedxErr_byHits(0), kaon1_saturMeas_byHits(0), kaon1_Meas_byHits(0), 
-  k2Px_MuMuKK(0), k2Py_MuMuKK(0), k2Pz_MuMuKK(0), k2E_MuMuKK(0),
-  kaon2_nsigdedx(0), kaon2_dedx(0), kaon2_dedxMass(0), kaon2_theo(0), kaon2_sigma(0), 
-  kaon2_dedx_byHits(0), kaon2_dedxErr_byHits(0), kaon2_saturMeas_byHits(0), kaon2_Meas_byHits(0), 
+  Bs0_mu1Px_MuMuKK(0), Bs0_mu1Py_MuMuKK(0), Bs0_mu1Pz_MuMuKK(0), Bs0_mu1E_MuMuKK(0),
+  Bs0_mu2Px_MuMuKK(0), Bs0_mu2Py_MuMuKK(0), Bs0_mu2Pz_MuMuKK(0), Bs0_mu2E_MuMuKK(0),
+  Bs0_k1Px_MuMuKK(0), Bs0_k1Py_MuMuKK(0), Bs0_k1Pz_MuMuKK(0), Bs0_k1E_MuMuKK(0), 
+  Bs0_kaon1_nsigdedx(0), Bs0_kaon1_dedx(0), Bs0_kaon1_dedxMass(0), Bs0_kaon1_theo(0), Bs0_kaon1_sigma(0), 
+  Bs0_kaon1_dedx_byHits(0), Bs0_kaon1_dedxErr_byHits(0), Bs0_kaon1_saturMeas_byHits(0), Bs0_kaon1_Meas_byHits(0), 
+  Bs0_k2Px_MuMuKK(0), Bs0_k2Py_MuMuKK(0), Bs0_k2Pz_MuMuKK(0), Bs0_k2E_MuMuKK(0),
+  Bs0_kaon2_nsigdedx(0), Bs0_kaon2_dedx(0), Bs0_kaon2_dedxMass(0), Bs0_kaon2_theo(0), Bs0_kaon2_sigma(0), 
+  Bs0_kaon2_dedx_byHits(0), Bs0_kaon2_dedxErr_byHits(0), Bs0_kaon2_saturMeas_byHits(0), Bs0_kaon2_Meas_byHits(0), 
   X_mu1Px_MuMuKK(0), X_mu1Py_MuMuKK(0), X_mu1Pz_MuMuKK(0), X_mu1E_MuMuKK(0),
   X_mu2Px_MuMuKK(0), X_mu2Py_MuMuKK(0), X_mu2Pz_MuMuKK(0), X_mu2E_MuMuKK(0),
   X_k1Px_MuMuKK(0), X_k1Py_MuMuKK(0), X_k1Pz_MuMuKK(0), X_k1E_MuMuKK(0), 
@@ -371,7 +383,7 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     for (int itrig = 0; itrig < ntrigs; itrig++) {
       string trigName = triggerNames_.triggerName(itrig);
       int hltflag = (*hltresults)[itrig].accept();
-      if (hltflag) cout << trigName << " " <<hltflag <<endl;
+      if (Debug_) if (hltflag) cout << trigName << " " <<hltflag <<endl;
       trigRes->push_back(hltflag);
       trigNames->push_back(trigName);
       
@@ -385,7 +397,7 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       }
     }
     for (int MatchTrig = 0; MatchTrig<ntriggers; MatchTrig++){
-            cout << TriggersForMatching_[MatchTrig]<<endl;
+            if (Debug_) cout << TriggersForMatching_[MatchTrig]<<endl;
       MatchTriggerNames->push_back(TriggersForMatching_[MatchTrig]);
     }
     
@@ -396,7 +408,7 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       if ( hltresults->accept(i) ) { //  save trigger info only for accepted paths
 	/// get the prescale from the HLTConfiguration, initialized at beginRun
 	int prescale = hltConfig_.prescaleValue(iEvent,iSetup,triggerNames_.triggerNames().at(i));
-	std::cout<<" HLT===> "<<triggerNames_.triggerNames().at(i)<<" prescale ="<<prescale<<std::endl;
+	if (Debug_) std::cout<<" HLT===> "<<triggerNames_.triggerNames().at(i)<<" prescale ="<<prescale<<std::endl;
 	HLTPreScaleMap[triggerNames_.triggerNames().at(i)] = prescale;
       }
     }
@@ -435,7 +447,9 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     thePrimaryVtx_multiplicity = recVtxs->size() ;
 
     if (addMuMulessPrimaryVertex_ || addBs0lessPrimaryVertex_ || resolveAmbiguity_) { 
-      thePrimaryVtx = Vertex(*(recVtxs->begin()));
+      //thePrimaryVtx = Vertex(*(recVtxs->begin()));
+      cout <<"here" <<endl;
+      thePrimaryVtx = *(recVtxs->begin());
     }
     else {
       for ( reco::VertexCollection::const_iterator vtx = recVtxs->begin(); vtx != recVtxs->end(); ++vtx) {
@@ -560,9 +574,12 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     Handle<GenParticleCollection> genParticles;
     iEvent.getByLabel("genParticles", genParticles);
     if (Debug_) cout << "############### GenParticles Analysis ###############" << endl;
-    //float psi2SPx=0., psi2SPy=0., psi2SPz=0.;
-    float  mupPx=0., mupPy=0., mupPz=0., mumPx=0., mumPy=0., mumPz=0., pionPx=0., pionPy=0., pionPz=0., kaonPx=0., kaonPy=0., kaonPz=0.;
-    int pionCh=0, kaonCh=0 ;
+    float jpsiPx=0., jpsiPy=0., jpsiPz=0.;
+    float  mupPx=0., mupPy=0., mupPz=0., mumPx=0., mumPy=0., mumPz=0.; 
+    float phiPx=0., phiPy=0., phiPz=0.;
+    float  kpPx=0., kpPy=0., kpPz=0., kmPx=0., kmPy=0., kmPz=0.;
+    //float pionPx=0., pionPy=0., pionPz=0., kaonPx=0., kaonPy=0., kaonPz=0.;
+    //int pionCh=0, kaonCh=0 ;
 
     for (size_t i = 0; i < genParticles->size(); ++ i) {
       nMCAll++;
@@ -575,7 +592,9 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       if ( MCExclusiveDecay ) {
 	/// check if there is a MCMother which has MCDaughtersN daughters
 	if ( abs(pdgid) == MCMother  &&  dauNum == MCDaughtersN ) {
-	  bool mumuOK = false, pionOK = false, kaonOK = false;
+	  bool mumuOK = false; 
+          bool kkOK = false;
+          //bool pionOK = false, kaonOK = false;
 
 	  for (int j=0; j<dauNum; ++j) {
 	    const Candidate *dau = p.daughter(j);
@@ -584,15 +603,13 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    /// check if one of B0 daughters is a psi(nS) whitch has 2 muons as daughters /// SEMRA ask again !!!
 	    int mumuId = 0 ;
 	    if (skipJPsi) /// SEMRA cleaned skipPsi2S
-	      cout <<"Skipping J/psi!" <<endl ; /// SEMRA cleaned skipPsi2S
-	    else if (skipJPsi) /// SEMRA ask 
-	      mumuId = 100443 ; /// SEMRA ask (Psi'ID)
+	      if (Debug_) cout <<"Skipping J/psi!" <<endl ; /// SEMRA cleaned skipPsi2S
 	    //else if (skipPsi2S) /// SEMRA
 	    //  mumuId = 443 ; /// SEMRA (JPsi ID)
  
-	    if ( ((skipJPsi) && (dau->pdgId() == mumuId)) || /// SEMRA
-		 ((!skipJPsi) && (dau->pdgId()%1000 == 443)) ) { /// SEMRA
-	      //psi2SPx = dau->px(); psi2SPy = dau->py(); psi2SPz = dau->pz(); /// SEMRA
+	    if ( ((skipJPsi) && (dau->pdgId() == mumuId)) || 
+		 ((!skipJPsi) && (dau->pdgId()%1000 == 443)) ) { 
+	      jpsiPx = dau->px(); jpsiPy = dau->py(); jpsiPz = dau->pz(); 
 	      int jpsiDauNum = dau->numberOfDaughters();
 	      if (Debug_) cout << "jpsiDauNum = " << jpsiDauNum << endl;
 	      int muNum = 0;	
@@ -611,8 +628,28 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      if ( muNum == 2 ) mumuOK = true ;
 	      
 	    } /// end check if one of the MCMother daughters is a J/Psi or psi'
+     
+	     /// for Phi 
+              phiPx = dau->px(); phiPy = dau->py(); phiPz = dau->pz();
+              int phiDauNum = dau->numberOfDaughters();
+              if (Debug_) cout << "phiDauNum = " << phiDauNum << endl;
+              int kNum = 0;
+              for (int n=0; n<phiDauNum; ++n) {
+                const Candidate *grandDau = dau->daughter(n);
+                if (Debug_)  cout << "grandDauPdgId = " << grandDau->pdgId() << endl;
+                if ( abs(grandDau->pdgId()) == 321 ) {
+                  kNum++;
+                  if (grandDau->pdgId() < 0) {
+                    kpPx = grandDau->px(); kpPy = grandDau->py(); kpPz = grandDau->pz();
+                  } else {
+                    kmPx = grandDau->px(); kmPy = grandDau->py(); kmPz = grandDau->pz();
+                  }
+                }
+              }
+	      if ( kNum == 2 ) kkOK = true ;
+
 	    
-	    else if ( abs(dau->pdgId()) == 211 ) { // check if one of B0 daughters is a pion /// SEMRA ask again !!!
+	    /*else if ( abs(dau->pdgId()) == 211 ) { // check if one of B0 daughters is a pion /// SEMRA ask again !!!
 	      pionPx = dau->px(); pionPy = dau->py(); pionPz = dau->pz();
 	      pionCh = (dau->pdgId() == 211)? 1 : -1;
 	      pionOK = true; /// SEMRA pions change with kaons for Bs0 ?
@@ -620,12 +657,12 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      kaonPx = dau->px(); kaonPy=dau->py(); kaonPz=dau->pz();
 	      kaonCh = (dau->pdgId() == 321)? 1 : -1;
 	      kaonOK = true;
-	    }
+	    }*/
 	    
 	  } /// end loop on MCMother daughters
 
-	  if (Debug_) cout << "mumuOK = " << mumuOK << ", pionOK = " << pionOK << ", kaonOK = " << kaonOK << endl;
-	  if ( mumuOK && pionOK && kaonOK ) {
+	  if (Debug_) cout << "mumuOK = " << mumuOK << ", kkOK = " << kkOK << endl;
+	  if ( mumuOK && kkOK ) {
 	    if (Debug_) {
 	      cout <<"\nnumber of Bs0 mothers = " <<p.numberOfMothers() <<endl ; 
 	      cout <<"Bs0 mother pdgID = " <<p.mother(0)->pdgId() <<endl ; 
@@ -657,12 +694,15 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		}
 	      }
 
-	    //MCpsi2SPx->push_back(psi2SPx); MCpsi2SPy->push_back(psi2SPy); MCpsi2SPz->push_back(psi2SPz);
+	    MCJPsiPx->push_back(jpsiPx); MCJPsiPy->push_back(jpsiPy); MCJPsiPz->push_back(jpsiPz);
 	    MCmupPx->push_back(mupPx); MCmupPy->push_back(mupPy); MCmupPz->push_back(mupPz);
 	    MCmumPx->push_back(mumPx); MCmumPy->push_back(mumPy); MCmumPz->push_back(mumPz);
-	    MCpionPx->push_back(pionPx); MCpionPy->push_back(pionPy); MCpionPz->push_back(pionPz);
-	    MCkaonPx->push_back(kaonPx); MCkaonPy->push_back(kaonPy); MCkaonPz->push_back(kaonPz);
-	    MCpionCh->push_back(pionCh) ; MCkaonCh->push_back(kaonCh) ;
+            MCPhiPx->push_back(phiPx); MCPhiPy->push_back(phiPy); MCPhiPz->push_back(phiPz);
+            MCkpPx->push_back(kpPx); MCkpPy->push_back(kpPy); MCkpPz->push_back(kpPz);
+            MCkmPx->push_back(kmPx); MCkmPy->push_back(kmPy); MCkmPz->push_back(kmPz);
+	    //MCpionPx->push_back(pionPx); MCpionPy->push_back(pionPy); MCpionPz->push_back(pionPz);
+	    //MCkaonPx->push_back(kaonPx); MCkaonPy->push_back(kaonPy); MCkaonPz->push_back(kaonPz);
+	    //MCpionCh->push_back(pionCh) ; MCkaonCh->push_back(kaonCh) ;
 	    decayChainOK = true;
 	    MCPx->push_back( p.px() );
 	    MCPy->push_back( p.py() );
@@ -938,7 +978,7 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    if ( MuMuCand_fromFit->currentState().mass() > JPsiMinMass  &&  MuMuCand_fromFit->currentState().mass() < JPsiMaxMass ) {
 	      dimuonType = 1 ;
 	    } 
-	    cout <<dimuonType <<endl;
+	    if (Debug_) cout <<dimuonType <<endl;
      
 	    if (Debug_) cout <<"evt:" <<evtNum <<" MuMu with diMuonType = " <<dimuonType <<endl;
 	    //cout << "POINT 0" << endl; 
@@ -946,14 +986,14 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    //cout << "POINT 2" << endl;	
 
 	    int ntriggers = TriggersForMatching_.size();
-	    cout << "ntriggers: " << ntriggers << endl; 
+	    if (Debug_) cout << "ntriggers: " << ntriggers << endl; 
 	    for (int MatchTrig = 0; MatchTrig < ntriggers; MatchTrig++) 
 	      {
-	        cout << "MatchingTriggerResult[" << MatchTrig << "]: " << MatchingTriggerResult[MatchTrig] << endl; 
+	        if (Debug_) cout << "MatchingTriggerResult[" << MatchTrig << "]: " << MatchingTriggerResult[MatchTrig] << endl; 
 		if ( MatchingTriggerResult[MatchTrig]!=0 ) 
 		  {
 		    //cout << "POINT 3" << endl; 
-		    cout << "CHECKING FiltersForMatching_[" << MatchTrig << "]: " << FiltersForMatching_[MatchTrig] << endl; 
+		    if (Debug_) cout << "CHECKING FiltersForMatching_[" << MatchTrig << "]: " << FiltersForMatching_[MatchTrig] << endl; 
 		    //cout << "POINT 4" << endl; 
 		    pat::TriggerObjectStandAloneCollection mu1HLTMatches = Muon1->triggerObjectMatchesByFilter( FiltersForMatching_[MatchTrig] );
 		    //cout << "POINT 5" << endl;
@@ -1027,46 +1067,45 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 	    //////////////////////////////////////////////////////////////////////
             /// for Bs0 & X(4140)
-	    if (dimuonType == 0) 
-	      continue ;
 	    if (Debug_) cout <<"evt:"<<evtNum<< " is Invalid Muon ?  " <<isEventWithInvalidMu << endl;
-	    if (skipJPsi && ( dimuonType == 1 )) 
-	      continue ;           
+	    //if (skipJPsi && ( dimuonType == 1 ));
             //cout<< "POINT 11" <<endl;
 	    nTrk->push_back( thePATTrackHandle->size() ) ;
 	    //cout<< "POINT 12" <<endl;
-            if (thePATTrackHandle->size() < 2)
-	      continue ; 
+            if (thePATTrackHandle->size() < 2) {
             //cout<< "POINT 13" <<endl;
-	    nBs0_pre0++ ; 
-            nX_pre0++ ;   
-            cout<<"nmumu : "<<nMuMu<<endl;
-            if(nMuMu == 0)continue; 
+            continue ; nBs0_pre0++; nX_pre0++ ; 
+	    }  
+            if (Debug_) cout<<"nmumu : "<<nMuMu<<endl;
 
 
 	    ////////////////// cuts on MuMu mass window for Bs0 ////////////////////////////
-	    if (MuMuMass->at(nMuMu-1) < MuMuMinMass  ||  MuMuMass->at(nMuMu-1) > MuMuMaxMass)
-	      continue ; nBs0_pre1++ ; nX_pre1++ ;
+	    if (MuMuMass->at(nMuMu-1) < MuMuMinMass  ||  MuMuMass->at(nMuMu-1) > MuMuMaxMass){
+	       nBs0_pre1++ ; nX_pre1++ ;
+            }
 	    //cout<< "POINT 14" <<endl;
 
 
 	    ////////////////// check tracks for kaon1 for Bs0 & X(4140)//////////////////
 	    for ( vector<pat::GenericParticle>::const_iterator Track1 = theKaonRefittedPATTrackHandle->begin(); Track1 != theKaonRefittedPATTrackHandle->end(); ++Track1 ) {
-	    //cout<< "POINT 15" <<endl;
+	      //cout<< "POINT 15" <<endl;
 	      /// check track doesn't overlap with the MuMu candidate tracks
 	      if (Track1->track().key() == rmu1->track().key()  ||  Track1->track().key() == rmu2->track().key())
-		continue; nBs0_pre2++ ; nX_pre2++ ;
+		 continue ; nBs0_pre2++ ; nX_pre2++ ;
+      
 	      //cout<< "POINT 16" <<endl;
 	      /// cuts on charged tracks	
 	      if (( Track1->track()->chi2()/Track1->track()->ndof() > TrMaxNormChi2 )  ||  Track1->pt() < TrMinPt)
 		continue ; nBs0_pre3++ ; nX_pre3++ ;
+              
 	      //cout<< "POINT 17" <<endl;
 
 	   ////////////////// check tracks for kaon2 for Bs0 & X(4140) //////////////////
-	   for ( vector<pat::GenericParticle>::const_iterator Track2 = theKaonRefittedPATTrackHandle->begin(); Track2 != theKaonRefittedPATTrackHandle->end(); ++Track2 ){
+	   for ( vector<pat::GenericParticle>::const_iterator Track2 = Track1+1; Track2 != theKaonRefittedPATTrackHandle->end(); ++Track2 ){
 	     /// check that this second track doesn't overlap with the the first track candidate
-	     if (Track2->track().key() == Track1->track().key())
-	       continue ; nBs0_pre4++ ; nX_pre4++ ;
+	     if (Track2->track().key() == Track1->track().key()) 
+	        continue ; nBs0_pre4++ ; nX_pre4++ ;
+            
             /// check track doesn't overlap with the MuMu candidate tracks
             if (Track2->track().key() == rmu1->track().key()  ||  Track2->track().key() == rmu2->track().key())
               continue ; nBs0_pre5++ ; nX_pre5++ ;
@@ -1133,7 +1172,6 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
            ka2_KK_NDF->push_back( Ka2Cand_fromFit->degreesOfFreedom());	
 
 	   ++nKK;
-           KKIdx->push_back(nKK);
            kaons.clear();
 
             ////////////////// cuts on tracks' delta R for Bs0 & X(4140) //////////////////	
@@ -1145,25 +1183,33 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
             float bs0K1DR = sqrt( pow(bs0.eta() - Track1->p4().eta(),2) + pow(bs0.phi() - Track1->p4().phi(), 2) );
             float bs0K2DR = sqrt( pow(MuMu.eta() - Track2->p4().eta(),2) + pow(MuMu.phi() - Track2->p4().phi(), 2) );
             float xK1DR = sqrt( pow(x.eta() - Track1->p4().eta(),2) + pow(x.phi() - Track1->p4().phi(), 2) );
-            float xK2DR = sqrt( pow(MuMu.eta() - Track2->p4().eta(),2) + pow(MuMu.phi() - Track2->p4().phi(), 2) );		  
+            float xK2DR = sqrt( pow(MuMu.eta() - Track2->p4().eta(),2) + pow(MuMu.phi() - Track2->p4().phi(), 2) );		 
+
+	    DRMuMuK1->push_back(MuMuK1DR);
+	    DRMuMuK2->push_back(MuMuK2DR);
+            DRbs0K1->push_back(bs0K1DR);
+            DRbs0K2->push_back(bs0K2DR);
+            DRxK1->push_back(xK1DR);
+            DRxK2->push_back(xK2DR);
+	    
 
 		  if (UseBs0DR) {
 		    if (bs0K1DR > Bs0TrackMaxDR || bs0K2DR > Bs0TrackMaxDR)
-		      continue ; // B0TrackMaxDR = 2 
+		      Bs0TrackMaxDR = 2; 
 		  } else {
 		    if (MuMuK1DR > MuMuTrackMaxDR || MuMuK2DR > MuMuTrackMaxDR)
-		      continue ; // MuMuTrackMaxDR = 3.5
+		      MuMuTrackMaxDR = 3.5;
 		  }
 		  nBs0_pre8++ ; 
  
 		  if (UseXDR) {
 		    if (xK1DR > XTrackMaxDR || xK2DR > XTrackMaxDR)
-		      continue ;
+		   XTrackMaxDR = 2;   
                   } else {
 		    if (MuMuK1DR > MuMuTrackMaxDR || MuMuK2DR > MuMuTrackMaxDR)
-		      continue ;
+		     MuMuTrackMaxDR = 3.5;
 		  }
-		  nX_pre8++ ; 
+		  nX_pre8++ ;
 
             ////////////////// cuts on MuMuKK mass window for Bs0 & X(4140) //////////////////
             if ((Track1->p4() + Track2->p4() + MuMu).M() < MuMuKKMaxBs0Mass  ||  (Track1->p4() + Track2->p4() + MuMu).M() > MuMuKKMinBs0Mass)
@@ -1201,9 +1247,9 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		    MultiTrackKinematicConstraint *MuMu = 0;
 		    if (dimuonType == 1) { // constrain to JPsi mass
 		      MuMu = new TwoTrackMassKinematicConstraint(JPsi_mass);
-		    } else if (dimuonType == 2) { // constrain to Psi(2S) mass /// SEMRA will we use this or not ?
-		      MuMu = new TwoTrackMassKinematicConstraint(psi2S_mass);
-		    } // already asked for: if (dimuonType == 0) continue ;
+		    } //else if (dimuonType == 2) { // constrain to Psi(2S) mass /// SEMRA will we use this or not ?
+		      //MuMu = new TwoTrackMassKinematicConstraint(psi2S_mass);
+		    //} // already asked for: if (dimuonType == 0) continue ;
 		  
 		    Bs0VertexFitTree = Bs0Fitter.fit( bs0Daughters, MuMu ); 
 		    if (notRefittedPartner) { // use not refitted kaons
@@ -1222,27 +1268,24 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		  }
 		  
 		  if ( !Bs0VertexFitTree->isValid() ) 
-		    continue ; nBs0_pre10++ ;     
+	             continue ; nBs0_pre10++ ;     
  
 		  Bs0VertexFitTree->movePointerToTheTop(); 
 		  RefCountedKinematicParticle Bs0Cand_fromMCFit = Bs0VertexFitTree->currentParticle(); 
 		  RefCountedKinematicVertex Bs0Cand_vertex_fromMCFit = Bs0VertexFitTree->currentDecayVertex(); 
 		  		  
-		  if ( !Bs0Cand_vertex_fromMCFit->vertexIsValid() )
-		    continue ; nBs0_pre11++ ; 
+		  if ( !Bs0Cand_vertex_fromMCFit->vertexIsValid() )  
+	             continue ; nBs0_pre11++ ; 
 		  		  
-		  if ( Bs0Cand_vertex_fromMCFit->chiSquared() < 0  ||  Bs0Cand_vertex_fromMCFit->chiSquared() > 10000 )  
-		    continue ; nBs0_pre12++ ; 
+		  if ( Bs0Cand_vertex_fromMCFit->chiSquared() < 0  ||  Bs0Cand_vertex_fromMCFit->chiSquared() > 10000 ) nBs0_pre12++ ; 
 
-	          if (Bs0Cand_vertex_fromMCFit->chiSquared() / Bs0Cand_vertex_fromMCFit->degreesOfFreedom() > 7)
-                    continue; nBs0_pre13++; 
+	          if (Bs0Cand_vertex_fromMCFit->chiSquared() / Bs0Cand_vertex_fromMCFit->degreesOfFreedom() > 7 ) nBs0_pre13++; 
  
-		  if ( Bs0Cand_fromMCFit->currentState().mass() > 100 ) 
-		    continue ; nBs0_pre14++ ; 
+		  if ( Bs0Cand_fromMCFit->currentState().mass() > 100 ) nBs0_pre14++ ; 
 		  
 		  double bs0VtxProb = ChiSquaredProbability((double)(Bs0Cand_vertex_fromMCFit->chiSquared()), (double)(Bs0Cand_vertex_fromMCFit->degreesOfFreedom())); 
 		  if ( bs0VtxProb < 0.005 ) //0.0001 ) 
-		    continue ; nBs0_pre15++ ;
+		     nBs0_pre15++ ;
 					
 		 /// do mass constraint for MuMu cand and do mass constrained vertex fit for X(4140)
 		 vector<RefCountedKinematicParticle> xDaughters;
@@ -1257,9 +1300,9 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
                     MultiTrackKinematicConstraint *MuMu = 0;
                     if (dimuonType == 1) { // constrain to JPsi mass
                       MuMu = new TwoTrackMassKinematicConstraint(JPsi_mass);
-                    } else if (dimuonType == 2) { // constrain to Psi(2S) mass
-                      MuMu = new TwoTrackMassKinematicConstraint(psi2S_mass);
-                    } 
+                    } //else if (dimuonType == 2) { // constrain to Psi(2S) mass
+                     // MuMu = new TwoTrackMassKinematicConstraint(psi2S_mass);
+                    //} 
                     XVertexFitTree = XFitter.fit( xDaughters, MuMu ); 
                   if (notRefittedPartner) { // use not refitted kaons
                       xDaughters.pop_back() ;
@@ -1275,30 +1318,25 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
                       XVertexFitTree_noKrefit = XFitter.fit( xDaughters ); 
                     }
                   }
-                  if ( !XVertexFitTree->isValid() )  
-                    continue ; nX_pre10++ ;        
+                  if ( !XVertexFitTree->isValid() ) 
+		     continue ; nX_pre10++ ;        
                   
 		  XVertexFitTree->movePointerToTheTop(); 
 		  RefCountedKinematicParticle XCand_fromMCFit = XVertexFitTree->currentParticle();  
                   RefCountedKinematicVertex XCand_vertex_fromMCFit = XVertexFitTree->currentDecayVertex();
   
                   if ( !XCand_vertex_fromMCFit->vertexIsValid() ) 
-                    continue ; nX_pre11++ ;
+	             continue ; nX_pre11++ ;
  
-                  if ( XCand_vertex_fromMCFit->chiSquared() < 0  ||  XCand_vertex_fromMCFit->chiSquared() > 10000 )  
-                    continue ; nX_pre12++ ;
+                  if ( XCand_vertex_fromMCFit->chiSquared() < 0  ||  XCand_vertex_fromMCFit->chiSquared() > 10000 ) nX_pre12++ ;
 
-		 if (XCand_vertex_fromMCFit->chiSquared() / XCand_vertex_fromMCFit->degreesOfFreedom() > 7)
-                    continue; nX_pre13++;		
-
-                  cout << "chi2 cut" << endl;
+		 if (XCand_vertex_fromMCFit->chiSquared() / XCand_vertex_fromMCFit->degreesOfFreedom() > 7) nX_pre13++;		
+                  //cout << "chi2 cut" << endl;
  
-                  if ( XCand_fromMCFit->currentState().mass() > 100 )  
-                    continue ; nX_pre14++ ; 
+                  if ( XCand_fromMCFit->currentState().mass() > 100 ) nX_pre14++ ; 
                   double xVtxProb = ChiSquaredProbability((double)(XCand_vertex_fromMCFit->chiSquared()), (double)(XCand_vertex_fromMCFit->degreesOfFreedom())); 
  
-                  if ( xVtxProb < 0.005 ) 
-                    continue ; nX_pre15++ ; 
+                  if ( xVtxProb < 0.005 ) nX_pre15++ ; 
 
 											
 		  //////////////////// Lifetimes calculations for Bs0 & X(4140) //////////////////// 
@@ -1403,51 +1441,51 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		  bs0DecayVtx_YE->push_back(sqrt((*Bs0Cand_vertex_fromMCFit).error().cyy()));
 		  bs0DecayVtx_ZE->push_back(sqrt((*Bs0Cand_vertex_fromMCFit).error().czz()));
 		  Bs0VertexFitTree->movePointerToTheFirstChild(); 
-		  RefCountedKinematicParticle mu1_MuMuKK = Bs0VertexFitTree->currentParticle();
+		  RefCountedKinematicParticle Bs0_mu1_MuMuKK = Bs0VertexFitTree->currentParticle();
 		  Bs0VertexFitTree->movePointerToTheNextChild();
-		  RefCountedKinematicParticle mu2_MuMuKK = Bs0VertexFitTree->currentParticle();
+		  RefCountedKinematicParticle Bs0_mu2_MuMuKK = Bs0VertexFitTree->currentParticle();
 		  Bs0VertexFitTree->movePointerToTheNextChild();
-		  RefCountedKinematicParticle k1_MuMuKK = Bs0VertexFitTree->currentParticle();
+		  RefCountedKinematicParticle Bs0_k1_MuMuKK = Bs0VertexFitTree->currentParticle();
 		  Bs0VertexFitTree->movePointerToTheNextChild();
-		  RefCountedKinematicParticle k2_MuMuKK = Bs0VertexFitTree->currentParticle();
+		  RefCountedKinematicParticle Bs0_k2_MuMuKK = Bs0VertexFitTree->currentParticle();
 		  /// muon1 & muon2			
-		  mu1Px_MuMuKK->push_back( mu1_MuMuKK->currentState().globalMomentum().x() );
-		  mu1Py_MuMuKK->push_back( mu1_MuMuKK->currentState().globalMomentum().y() );
-		  mu1Pz_MuMuKK->push_back( mu1_MuMuKK->currentState().globalMomentum().z() );
-		  mu1E_MuMuKK->push_back( mu1_MuMuKK->currentState().kinematicParameters().energy() );
-		  mu2Px_MuMuKK->push_back( mu2_MuMuKK->currentState().globalMomentum().x() );
-		  mu2Py_MuMuKK->push_back( mu2_MuMuKK->currentState().globalMomentum().y() );
-		  mu2Pz_MuMuKK->push_back( mu2_MuMuKK->currentState().globalMomentum().z() );
-		  mu2E_MuMuKK->push_back( mu2_MuMuKK->currentState().kinematicParameters().energy() );
+		  Bs0_mu1Px_MuMuKK->push_back( Bs0_mu1_MuMuKK->currentState().globalMomentum().x() );
+		  Bs0_mu1Py_MuMuKK->push_back( Bs0_mu1_MuMuKK->currentState().globalMomentum().y() );
+		  Bs0_mu1Pz_MuMuKK->push_back( Bs0_mu1_MuMuKK->currentState().globalMomentum().z() );
+		  Bs0_mu1E_MuMuKK->push_back( Bs0_mu1_MuMuKK->currentState().kinematicParameters().energy() );
+		  Bs0_mu2Px_MuMuKK->push_back( Bs0_mu2_MuMuKK->currentState().globalMomentum().x() );
+		  Bs0_mu2Py_MuMuKK->push_back( Bs0_mu2_MuMuKK->currentState().globalMomentum().y() );
+		  Bs0_mu2Pz_MuMuKK->push_back( Bs0_mu2_MuMuKK->currentState().globalMomentum().z() );
+		  Bs0_mu2E_MuMuKK->push_back( Bs0_mu2_MuMuKK->currentState().kinematicParameters().energy() );
 		  /// kaon1 & kaon2
-		  k1Px_MuMuKK->push_back( k1_MuMuKK->currentState().globalMomentum().x() );
-		  k1Py_MuMuKK->push_back( k1_MuMuKK->currentState().globalMomentum().y() );
-		  k1Pz_MuMuKK->push_back( k1_MuMuKK->currentState().globalMomentum().z() );
-		  k1E_MuMuKK->push_back( k1_MuMuKK->currentState().kinematicParameters().energy() );
+		  Bs0_k1Px_MuMuKK->push_back( Bs0_k1_MuMuKK->currentState().globalMomentum().x() );
+		  Bs0_k1Py_MuMuKK->push_back( Bs0_k1_MuMuKK->currentState().globalMomentum().y() );
+		  Bs0_k1Pz_MuMuKK->push_back( Bs0_k1_MuMuKK->currentState().globalMomentum().z() );
+		  Bs0_k1E_MuMuKK->push_back( Bs0_k1_MuMuKK->currentState().kinematicParameters().energy() );
 		  Double_t theo = 0., sigma = 0. ;
-		  kaon1_nsigdedx->push_back( nsigmaofdedx(Track1->track(),theo,sigma) );
-		  kaon1_dedx->push_back( getEnergyLoss(Track1->track()) );
-		  kaon1_dedxMass->push_back( GetMass(Track1->track()) );
-		  kaon1_theo->push_back( theo );
-		  kaon1_sigma->push_back( sigma );
-		  kaon1_dedx_byHits->push_back( (dEdxTrack)[Track1->track()].dEdx() );
-		  kaon1_dedxErr_byHits->push_back( (dEdxTrack)[Track1->track()].dEdxError() );
-		  kaon1_saturMeas_byHits->push_back( (dEdxTrack)[Track1->track()].numberOfSaturatedMeasurements() );
-		  kaon1_Meas_byHits->push_back( (dEdxTrack)[Track1->track()].numberOfMeasurements() );
-		  k2Px_MuMuKK->push_back( k2_MuMuKK->currentState().globalMomentum().x() );
-		  k2Py_MuMuKK->push_back( k2_MuMuKK->currentState().globalMomentum().y() );
-		  k2Pz_MuMuKK->push_back( k2_MuMuKK->currentState().globalMomentum().z() );
-		  k2E_MuMuKK->push_back( k2_MuMuKK->currentState().kinematicParameters().energy() );
+		  Bs0_kaon1_nsigdedx->push_back( nsigmaofdedx(Track1->track(),theo,sigma) );
+		  Bs0_kaon1_dedx->push_back( getEnergyLoss(Track1->track()) );
+		  Bs0_kaon1_dedxMass->push_back( GetMass(Track1->track()) );
+		  Bs0_kaon1_theo->push_back( theo );
+		  Bs0_kaon1_sigma->push_back( sigma );
+		  Bs0_kaon1_dedx_byHits->push_back( (dEdxTrack)[Track1->track()].dEdx() );
+		  Bs0_kaon1_dedxErr_byHits->push_back( (dEdxTrack)[Track1->track()].dEdxError() );
+		  Bs0_kaon1_saturMeas_byHits->push_back( (dEdxTrack)[Track1->track()].numberOfSaturatedMeasurements() );
+		  Bs0_kaon1_Meas_byHits->push_back( (dEdxTrack)[Track1->track()].numberOfMeasurements() );
+		  Bs0_k2Px_MuMuKK->push_back( Bs0_k2_MuMuKK->currentState().globalMomentum().x() );
+		  Bs0_k2Py_MuMuKK->push_back( Bs0_k2_MuMuKK->currentState().globalMomentum().y() );
+		  Bs0_k2Pz_MuMuKK->push_back( Bs0_k2_MuMuKK->currentState().globalMomentum().z() );
+		  Bs0_k2E_MuMuKK->push_back( Bs0_k2_MuMuKK->currentState().kinematicParameters().energy() );
 		  theo = 0.; sigma = 0. ;
-		  kaon2_nsigdedx->push_back(nsigmaofdedx(Track2->track(),theo,sigma));
-		  kaon2_dedx->push_back(getEnergyLoss(Track2->track()));
-		  kaon2_dedxMass->push_back(GetMass(Track2->track()));
-		  kaon2_theo->push_back(theo);
-		  kaon2_sigma->push_back(sigma);
-		  kaon2_dedx_byHits->push_back( (dEdxTrack_Kaon)[Track2->track()].dEdx() );
-		  kaon2_dedxErr_byHits->push_back( (dEdxTrack_Kaon)[Track2->track()].dEdxError() );
-		  kaon2_saturMeas_byHits->push_back( (dEdxTrack_Kaon)[Track2->track()].numberOfSaturatedMeasurements() );
-		  kaon2_Meas_byHits->push_back( (dEdxTrack_Kaon)[Track2->track()].numberOfMeasurements() );
+		  Bs0_kaon2_nsigdedx->push_back(nsigmaofdedx(Track2->track(),theo,sigma));
+		  Bs0_kaon2_dedx->push_back(getEnergyLoss(Track2->track()));
+		  Bs0_kaon2_dedxMass->push_back(GetMass(Track2->track()));
+		  Bs0_kaon2_theo->push_back(theo);
+		  Bs0_kaon2_sigma->push_back(sigma);
+		  Bs0_kaon2_dedx_byHits->push_back( (dEdxTrack_Kaon)[Track2->track()].dEdx() );
+		  Bs0_kaon2_dedxErr_byHits->push_back( (dEdxTrack_Kaon)[Track2->track()].dEdxError() );
+		  Bs0_kaon2_saturMeas_byHits->push_back( (dEdxTrack_Kaon)[Track2->track()].numberOfSaturatedMeasurements() );
+		  Bs0_kaon2_Meas_byHits->push_back( (dEdxTrack_Kaon)[Track2->track()].numberOfMeasurements() );
 		  /// PV 
 		  bs0CosAlphaPV->push_back( Bs0_cosAlpha ); bs0CosAlpha3DPV->push_back( Bs0_cosAlpha3D );
 		  bs0CTauPV->push_back( Bs0_ctau ); bs0CTauPVE->push_back( Bs0_ctauErr );
@@ -1613,7 +1651,7 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 			if ( removedTrksPtSq > 0. ) {
 			  Bs0_pvs = revertex.makeVertices(Bs0Less, *pvbeamspot, iSetup) ; // list of PV
 			} else
-			  cout <<"\n\\\\\\\\\\\\\\\\\\\\ excluded tracks pT^2 = 0 \\\\\\\\\\\\\\\\\\\\\n" <<endl ;
+			  if (Debug_) cout <<"\n\\\\\\\\\\\\\\\\\\\\ excluded tracks pT^2 = 0 \\\\\\\\\\\\\\\\\\\\\n" <<endl ;
 			if ( !Bs0_pvs.empty() ) {
 			  Bs0LessPV = Vertex(Bs0_pvs.front());
 			  Bs0LessPV_tracksPtSq->push_back( vertexHigherPtSquared.sumPtSquared(Bs0LessPV) ) ;
@@ -1645,7 +1683,7 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		  PriVtxBs0Less_tracks->push_back( Bs0LessPV.tracksSize() ) ;
 		 
 		  /// dxy, dz, dxyE, dzE for kaons from BS
-    		  math::XYZPoint BSVtx; /// SEMRA
+    		  math::XYZPoint BSVtx;
 		  BSVtx = theBeamSpotVtx.position();		
 	          kaon1_dxy_BS->push_back( Track1->track()->dxy(BSVtx) ); 
                   kaon1_dz_BS->push_back( Track1->track()->dz(BSVtx) );
@@ -1680,7 +1718,7 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		  bs0LxyzBs0LessPV->push_back( Bs0_lxyz ) ; bs0LxyzBs0LessPVE->push_back( Bs0_lxyzErr ) ;
 
 		  /// dxy, dz, dxyE, dzE for kaons from Bs0LessPV
-		  math::XYZPoint Bs0LessPVvtx; /// SEMRA
+		  math::XYZPoint Bs0LessPVvtx; 
      		  Bs0LessPVvtx = Bs0LessPV.position();
                   kaon1_dxy_Bs0LessPV->push_back( Track1->track()->dxy(Bs0LessPVvtx) );
                   kaon1_dz_Bs0LessPV->push_back( Track1->track()->dz(Bs0LessPVvtx) );
@@ -1894,12 +1932,12 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
                   X_ctauErr = sqrt(ROOT::Math::Similarity(X_v3pperp,X_vXYe)) * XCand_fromMCFit->currentState().mass() / (X_pperp.Perp2());
                   X_lxy = X_vdiff.Dot(X_pperp) / X_pperp.Mag() ;
 		  /// 3D
-		  Bs0_pvtx3D.SetXYZ(theCosAlpha3DV.position().x(), theCosAlpha3DV.position().y(), theCosAlpha3DV.position().z()) ;
-                  Bs0_vdiff3D = Bs0_vtx3D - Bs0_pvtx3D ;
-                  Bs0_cosAlpha3D =  maxCosAlpha3D ;
-                  Bs0_lxyz = Bs0_vdiff3D.Mag();
-                  Bs0_vDiff3D[0] = Bs0_vdiff3D.x(); Bs0_vDiff3D[1] = Bs0_vdiff3D.y(); Bs0_vDiff3D[2] = Bs0_vdiff3D.z() ;
-                  Bs0_lxyzErr = sqrt(ROOT::Math::Similarity(Bs0_vDiff3D,Bs0_vXYe)) / Bs0_vdiff3D.Mag();
+		  X_pvtx3D.SetXYZ(theCosAlpha3DV.position().x(), theCosAlpha3DV.position().y(), theCosAlpha3DV.position().z()) ;
+                  X_vdiff3D = X_vtx3D - X_pvtx3D ;
+                  X_cosAlpha3D =  maxCosAlpha3D ;
+                  X_lxyz = X_vdiff3D.Mag();
+                  X_vDiff3D[0] = X_vdiff3D.x(); X_vDiff3D[1] = X_vdiff3D.y(); X_vDiff3D[2] = X_vdiff3D.z() ;
+                  X_lxyzErr = sqrt(ROOT::Math::Similarity(X_vDiff3D,Bs0_vXYe)) / X_vdiff3D.Mag();
 
                   xCosAlphaPVCosAlpha3D->push_back( X_cosAlpha ) ; xCosAlpha3DPVCosAlpha3D->push_back( X_cosAlpha3D ) ;
                   xCTauPVCosAlpha3D->push_back( X_ctau ) ; xCTauPVCosAlpha3DE->push_back( X_ctauErr ) ;
@@ -1991,7 +2029,7 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 		
 		  Vertex theOtherV = thePrimaryVtx; 
-		  			
+		  	  
 		  if (resolveAmbiguity_) {
 		    float minDz = 999999. ;
 		    if (!addBs0lessPrimaryVertex_) {
@@ -2017,9 +2055,9 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 			}
 		    }
 		  } 
-
+		  
 		  Vertex TheOtherVertex3D = thePrimaryVtx; 
-		  cout<<" choose PV ="<<endl;///SEMRA
+		  if (Debug_) cout<<" choose PV ="<< endl;
 		  Int_t theBs0CorrPV_multiplicity = -1 ; 
 		  if (resolveAmbiguity_) {
 		    float minDz = 999999.;
@@ -2084,8 +2122,8 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		  bs0CTauPVX_3D_err->push_back(Dist3DPV_err);
 		  //cout << Dist3DPV << " " << Dist3DPV_err << endl; 
 		  Bs0_MuMuIdx->push_back(nMuMu-1);
-		  Bs0_k1Idx->push_back(std::distance(theKaonRefittedPATTrackHandle->begin(), Track1)); 
-		  Bs0_k2Idx->push_back(std::distance(theKaonRefittedPATTrackHandle->begin(), Track2)); 
+		  Bs0_ka1Idx->push_back(std::distance(theKaonRefittedPATTrackHandle->begin(), Track1)); 
+		  Bs0_ka2Idx->push_back(std::distance(theKaonRefittedPATTrackHandle->begin(), Track2)); 
 		  nBs0++;
 		  bs0Daughters.clear();
 		  
@@ -2111,45 +2149,56 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
                   xCTauPVX_3D_err->push_back(Dist3DPV_err);
 		  //cout << Dist3DPV << " " << Dist3DPV_err << endl;
 		  X_MuMuIdx->push_back(nMuMu-1);
-                  X_k1Idx->push_back(std::distance(theKaonRefittedPATTrackHandle->begin(), Track1)); 
-                  X_k2Idx->push_back(std::distance(theKaonRefittedPATTrackHandle->begin(), Track2)); 
+                  X_ka1Idx->push_back(std::distance(theKaonRefittedPATTrackHandle->begin(), Track1)); 
+                  X_ka2Idx->push_back(std::distance(theKaonRefittedPATTrackHandle->begin(), Track2)); 
                   nX++;
                   xDaughters.clear();
 
 		  ////////////////// flag for checking the Kaons from PV or not PV //////////////////
+		  /// flag for kaon1
 		  vector<TransientTrack> vertexTracksKaon1;
-		   for ( std::vector<TrackBaseRef >::const_iterator iTrack = thePrimaryVtx.tracks_begin();
-                         iTrack != thePrimaryVtx.tracks_end(); ++iTrack) {
-                     TrackRef trackRefkaon1 = iTrack->castTo<TrackRef>();
+                  pat::GenericParticle patKaon1 = *Track1;
+                  //cout << "\nthePrimaryVtx.tracksSize() = " << thePrimaryVtx.tracksSize() << endl;
+                  //cout << "thePrimaryVtx.nTracks() = " << thePrimaryVtx.nTracks() << endl;
+		  for ( std::vector<TrackBaseRef >::const_iterator iTrack = thePrimaryVtx.tracks_begin(); iTrack != thePrimaryVtx.tracks_end(); ++iTrack) {
 
-                     if (  (Track1->track()==trackRefkaon1) ) {
-                       TransientTrack kaon1TT(trackRefkaon1, &(*bFieldHandle) );
-                        vertexTracksKaon1.push_back(kaon1TT);
-                     }      
-                   }
- 
-		  if (vertexTracksKaon1.size()==0){
-		    Kaon1FromPV->push_back(false);
+		    TrackRef trackRefkaon1 = iTrack->castTo<TrackRef>();
+		    //cout << "\ntrackRefkaon1 = " << trackRefkaon1 << endl;
+		    //cout <<"before match" ;
+		    //if ( (patKaon1.track() == trackRefkaon1) ) {
+		    if ( (Track1->track().key() == trackRefkaon1.key()) ) {
+		      cout << "\ninside match" << endl;                 
+		      TransientTrack kaon1TT(trackRefkaon1, &(*bFieldHandle) );
+		      vertexTracksKaon1.push_back(kaon1TT);
+		    }      
 		  }
-		  else Kaon1FromPV->push_back(true);{
-		}
-
-		 
-               vector<TransientTrack> vertexTracksKaon2;
-		for ( std::vector<TrackBaseRef >::const_iterator iTrack = thePrimaryVtx.tracks_begin();
-                         iTrack != thePrimaryVtx.tracks_end(); ++iTrack) {
-                 TrackRef trackRefkaon2 = iTrack->castTo<TrackRef>();
-               if (  (Track2->track()==trackRefkaon2) ) {
-                       TransientTrack kaon2TT(trackRefkaon2, &(*bFieldHandle) );
-                        vertexTracksKaon2.push_back(kaon2TT);
-                     }
-                   }
-
-		  if (vertexTracksKaon2.size()==0){
+                  //cout << "\nvertexTracksKaon1.size() = " << vertexTracksKaon1.size() << endl; 
+		  if (vertexTracksKaon1.size()==0)
+		    Kaon1FromPV->push_back(false);
+		  else
+		    Kaon1FromPV->push_back(true);
+		   
+		  /// flag for kaon2
+		  vector<TransientTrack> vertexTracksKaon2;
+	          pat::GenericParticle patKaon2 = *Track2;
+                  //cout << "\nthePrimaryVtx.tracksSize() = " << thePrimaryVtx.tracksSize() << endl;
+                  //cout << "thePrimaryVtx.nTracks() = " << thePrimaryVtx.nTracks() << endl;
+		  for ( std::vector<TrackBaseRef >::const_iterator iTrack = thePrimaryVtx.tracks_begin(); iTrack != thePrimaryVtx.tracks_end(); ++iTrack) {
+	
+		    TrackRef trackRefkaon2 = iTrack->castTo<TrackRef>();
+                    //cout << "\ntrackRefkaon2 = " << trackRefkaon2 << endl;
+                    //cout <<"before match" ;
+                    //if ( (patKaon2.track() == trackRefkaon2) ) {
+		    if (  (Track2->track().key() == trackRefkaon2.key()) ) {
+		      TransientTrack kaon2TT(trackRefkaon2, &(*bFieldHandle) );
+		      vertexTracksKaon2.push_back(kaon2TT);
+		    }
+		  }
+		  //cout << "\nvertexTracksKaon1.size() = " << vertexTracksKaon1.size() << endl; 
+		  if (vertexTracksKaon2.size()==0)
                     Kaon2FromPV->push_back(false);
-                  }
-		  else Kaon2FromPV->push_back(true);{
-		 }
+		  else 
+		    Kaon2FromPV->push_back(true);
 		  
 		} // 2nd loop over track (look for k2)
 	    } // 1st loop over track (look for k1)	 
@@ -2176,9 +2225,8 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   /// indices
   mu1Idx->clear(); mu2Idx->clear(); 
   ka1Idx->clear(); ka2Idx->clear();
-  KKIdx->clear();
-  Bs0_MuMuIdx->clear(); Bs0_k1Idx->clear(); Bs0_k2Idx->clear(); 
-  X_MuMuIdx->clear(); X_k1Idx->clear(); X_k2Idx->clear();
+  Bs0_MuMuIdx->clear(); Bs0_ka1Idx->clear(); Bs0_ka2Idx->clear(); 
+  X_MuMuIdx->clear(); X_ka1Idx->clear(); X_ka2Idx->clear();
 
   /// MC Analysis
   if (doMC) {
@@ -2195,12 +2243,15 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     PriVtxGen_tracks->clear();
     
     MCPdgIdAll->clear(); MCDanNumAll->clear();
-    //MCpsi2SPx->clear(); MCpsi2SPy->clear(); MCpsi2SPz->clear(); 
+    MCJPsiPx->clear(); MCJPsiPy->clear(); MCJPsiPz->clear(); 
     MCmupPx->clear(); MCmupPy->clear(); MCmupPz->clear(); 
-    MCmumPx->clear(); MCmumPy->clear(); MCmumPz->clear(); 
-    MCpionPx->clear(); MCpionPy->clear(); MCpionPz->clear(); 
-    MCkaonPx->clear(); MCkaonPy->clear(); MCkaonPz->clear(); 
-    MCpionCh->clear(); MCkaonCh->clear();
+    MCmumPx->clear(); MCmumPy->clear(); MCmumPz->clear();
+    MCPhiPx->clear(); MCPhiPy->clear(); MCPhiPz->clear();
+    MCkpPx->clear(); MCkpPy->clear(); MCkpPz->clear();
+    MCkmPx->clear(); MCkmPy->clear(); MCkmPz->clear(); 
+    //MCpionPx->clear(); MCpionPy->clear(); MCpionPz->clear(); 
+    //MCkaonPx->clear(); MCkaonPy->clear(); MCkaonPz->clear(); 
+    //MCpionCh->clear(); MCkaonCh->clear();
     MCPx->clear(); MCPy->clear(); MCPz->clear();
   }
   if (Debug_) cout <<"after MC stuff clear" <<endl ;
@@ -2225,6 +2276,7 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   MuMuType->clear();
   ka1_KK_Px->clear(); ka1_KK_Py->clear(); ka1_KK_Pz->clear(); ka1_KK_Chi2->clear(); ka1_KK_NDF->clear();
   ka2_KK_Px->clear(); ka2_KK_Py->clear();  ka2_KK_Pz->clear(); ka2_KK_Chi2->clear(); ka2_KK_NDF->clear();
+  DRMuMuK1->clear(); DRMuMuK2->clear(); DRbs0K1->clear(); DRbs0K2->clear(); DRxK1->clear(); DRxK2->clear();
   /// Primary Vertex with "MuMu correction"
   PriVtxMuMuCorr_n->clear();
   PriVtxMuMuCorr_X->clear(); PriVtxMuMuCorr_Y->clear(); PriVtxMuMuCorr_Z->clear(); 
@@ -2243,14 +2295,14 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   xDecayVtx_X->clear(); xDecayVtx_Y->clear(); xDecayVtx_Z->clear();
   xDecayVtx_XE->clear(); xDecayVtx_YE->clear(); xDecayVtx_ZE->clear();
   /// muons and tracks after Bs0 cand fit & X(4140) cand fit 
-  mu1Px_MuMuKK->clear(); mu1Py_MuMuKK->clear(); mu1Pz_MuMuKK->clear(); mu1E_MuMuKK->clear();
-  mu2Px_MuMuKK->clear(); mu2Py_MuMuKK->clear(); mu2Pz_MuMuKK->clear(); mu2E_MuMuKK->clear();
-  k1Px_MuMuKK->clear(); k1Py_MuMuKK->clear(); k1Pz_MuMuKK->clear(); k1E_MuMuKK->clear(); 
-  kaon1_nsigdedx->clear(); kaon1_dedx->clear(); kaon1_dedxMass->clear(); kaon1_theo->clear(); kaon1_sigma->clear(); 
-  kaon1_dedx_byHits->clear(); kaon1_dedxErr_byHits->clear(); kaon1_saturMeas_byHits->clear(); kaon1_Meas_byHits->clear(); 
-  k2Px_MuMuKK->clear(); k2Py_MuMuKK->clear(); k2Pz_MuMuKK->clear(); k2E_MuMuKK->clear(); 
-  kaon2_nsigdedx->clear(); kaon2_dedx->clear(); kaon2_dedxMass->clear(); kaon2_theo->clear(); kaon2_sigma->clear(); 
-  kaon2_dedx_byHits->clear(); kaon2_dedxErr_byHits->clear(); kaon2_saturMeas_byHits->clear(); kaon2_Meas_byHits->clear(); 
+  Bs0_mu1Px_MuMuKK->clear(); Bs0_mu1Py_MuMuKK->clear(); Bs0_mu1Pz_MuMuKK->clear(); Bs0_mu1E_MuMuKK->clear();
+  Bs0_mu2Px_MuMuKK->clear(); Bs0_mu2Py_MuMuKK->clear(); Bs0_mu2Pz_MuMuKK->clear(); Bs0_mu2E_MuMuKK->clear();
+  Bs0_k1Px_MuMuKK->clear(); Bs0_k1Py_MuMuKK->clear(); Bs0_k1Pz_MuMuKK->clear(); Bs0_k1E_MuMuKK->clear(); 
+  Bs0_kaon1_nsigdedx->clear(); Bs0_kaon1_dedx->clear(); Bs0_kaon1_dedxMass->clear(); Bs0_kaon1_theo->clear(); Bs0_kaon1_sigma->clear(); 
+  Bs0_kaon1_dedx_byHits->clear(); Bs0_kaon1_dedxErr_byHits->clear(); Bs0_kaon1_saturMeas_byHits->clear(); Bs0_kaon1_Meas_byHits->clear(); 
+  Bs0_k2Px_MuMuKK->clear(); Bs0_k2Py_MuMuKK->clear(); Bs0_k2Pz_MuMuKK->clear(); Bs0_k2E_MuMuKK->clear(); 
+  Bs0_kaon2_nsigdedx->clear(); Bs0_kaon2_dedx->clear(); Bs0_kaon2_dedxMass->clear(); Bs0_kaon2_theo->clear(); Bs0_kaon2_sigma->clear(); 
+  Bs0_kaon2_dedx_byHits->clear(); Bs0_kaon2_dedxErr_byHits->clear(); Bs0_kaon2_saturMeas_byHits->clear(); Bs0_kaon2_Meas_byHits->clear(); 
   X_mu1Px_MuMuKK->clear(); X_mu1Py_MuMuKK->clear(); X_mu1Pz_MuMuKK->clear(); X_mu1E_MuMuKK->clear();
   X_mu2Px_MuMuKK->clear(); X_mu2Py_MuMuKK->clear(); X_mu2Pz_MuMuKK->clear(); X_mu2E_MuMuKK->clear();
   X_k1Px_MuMuKK->clear(); X_k1Py_MuMuKK->clear(); X_k1Pz_MuMuKK->clear(); X_k1E_MuMuKK->clear(); 
@@ -2388,27 +2440,66 @@ void MuMuKKPAT::beginJob()
     X_One_Tree_->Branch("PriVtxGen_CL",&PriVtxGen_CL);
     X_One_Tree_->Branch("PriVtxGen_Ndof",&PriVtxGen_Ndof);
     X_One_Tree_->Branch("PriVtxGen_tracks",&PriVtxGen_tracks);
-    //X_One_Tree_->Branch("MCpsi2SPx",&MCpsi2SPx);
-    //X_One_Tree_->Branch("MCpsi2SPy",&MCpsi2SPy);
-    //X_One_Tree_->Branch("MCpsi2SPz",&MCpsi2SPz);
+    X_One_Tree_->Branch("MCJPsiPx",&MCJPsiPx);
+    X_One_Tree_->Branch("MCJPsiPy",&MCJPsiPy);
+    X_One_Tree_->Branch("MCJPsiPz",&MCJPsiPz);
     X_One_Tree_->Branch("MCmupPx",&MCmupPx);
     X_One_Tree_->Branch("MCmupPy",&MCmupPy);
     X_One_Tree_->Branch("MCmupPz",&MCmupPz);
     X_One_Tree_->Branch("MCmumPx",&MCmumPx);
     X_One_Tree_->Branch("MCmumPy",&MCmumPy);
     X_One_Tree_->Branch("MCmumPz",&MCmumPz);
-    X_One_Tree_->Branch("MCpionPx",&MCpionPx);
-    X_One_Tree_->Branch("MCpionPy",&MCpionPy);
-    X_One_Tree_->Branch("MCpionPz",&MCpionPz);
-    X_One_Tree_->Branch("MCpionCh",&MCpionCh);
-    X_One_Tree_->Branch("MCkaonPx",&MCkaonPx);
-    X_One_Tree_->Branch("MCkaonPy",&MCkaonPy);
-    X_One_Tree_->Branch("MCkaonPz",&MCkaonPz);
-    X_One_Tree_->Branch("MCkaonCh",&MCkaonCh);
+    X_One_Tree_->Branch("MCPhiPx",&MCPhiPx);
+    X_One_Tree_->Branch("MCPhiPy",&MCPhiPy);
+    X_One_Tree_->Branch("MCPhiPz",&MCPhiPz);
+    X_One_Tree_->Branch("MCkpPx",&MCkpPx);
+    X_One_Tree_->Branch("MCkpPy",&MCkpPy);
+    X_One_Tree_->Branch("MCkpPz",&MCkpPz);
+    X_One_Tree_->Branch("MCkmPx",&MCkmPx);
+    X_One_Tree_->Branch("MCkmPy",&MCkmPy);
+    X_One_Tree_->Branch("MCkmPz",&MCkmPz);
+    //X_One_Tree_->Branch("MCpionPx",&MCpionPx);
+    //X_One_Tree_->Branch("MCpionPy",&MCpionPy);
+    //X_One_Tree_->Branch("MCpionPz",&MCpionPz);
+    //X_One_Tree_->Branch("MCpionCh",&MCpionCh);
+    //X_One_Tree_->Branch("MCkaonPx",&MCkaonPx);
+    //X_One_Tree_->Branch("MCkaonPy",&MCkaonPy);
+    //X_One_Tree_->Branch("MCkaonPz",&MCkaonPz);
+    //X_One_Tree_->Branch("MCkaonCh",&MCkaonCh);
     X_One_Tree_->Branch("MCPx", &MCPx);
     X_One_Tree_->Branch("MCPy", &MCPy);
     X_One_Tree_->Branch("MCPz", &MCPz);
   }
+  /// generic tracks
+  X_One_Tree_->Branch("trNotRef", &trNotRef);
+  X_One_Tree_->Branch("trRef", &trRef);
+  X_One_Tree_->Branch("trackPx", &trPx);
+  X_One_Tree_->Branch("trackPy", &trPy);
+  X_One_Tree_->Branch("trackPz", &trPz);
+  X_One_Tree_->Branch("trackEnergy", &trE);
+  X_One_Tree_->Branch("trackNDF", &trNDF);
+  X_One_Tree_->Branch("trackPhits", &trPhits);
+  X_One_Tree_->Branch("trackShits", &trShits);
+  X_One_Tree_->Branch("trackChi2", &trChi2);
+  X_One_Tree_->Branch("trackD0", &trD0);
+  X_One_Tree_->Branch("trackD0Err", &trD0E);
+  X_One_Tree_->Branch("trackCharge", &trCharge);
+  X_One_Tree_->Branch("TrackHighPurity", &trQualityHighPurity);
+  X_One_Tree_->Branch("TrackTight", &trQualityTight);
+  X_One_Tree_->Branch("trackfHits", &trfHits);
+  X_One_Tree_->Branch("trackFirstBarrel", &trFirstBarrel);
+  X_One_Tree_->Branch("trackFirstEndCap", &trFirstEndCap);
+  X_One_Tree_->Branch("trackDzVtx", &trDzVtx);
+  X_One_Tree_->Branch("trackDxyVtx", &trDxyVtx);
+  X_One_Tree_->Branch("tr_nsigdedx", &tr_nsigdedx);
+  X_One_Tree_->Branch("tr_dedx", &tr_dedx);
+  X_One_Tree_->Branch("tr_dedxMass", &tr_dedxMass);
+  X_One_Tree_->Branch("tr_theo", &tr_theo);
+  X_One_Tree_->Branch("tr_sigma", &tr_sigma);
+  X_One_Tree_->Branch("tr_dedx_byHits", &tr_dedx_byHits );
+  X_One_Tree_->Branch("tr_dedxErr_byHits", &tr_dedxErr_byHits );
+  X_One_Tree_->Branch("tr_saturMeas_byHits", &tr_saturMeas_byHits );
+  X_One_Tree_->Branch("tr_Meas_byHits", &tr_Meas_byHits );
   /// Generic muons
   X_One_Tree_->Branch("nMu", &nMu, "nMu/i");
   X_One_Tree_->Branch("muPx",&muPx);
@@ -2444,38 +2535,8 @@ void MuMuKKPAT::beginJob()
   X_One_Tree_->Branch("muFirstBarrel", &muFirstBarrel);
   X_One_Tree_->Branch("muFirstEndCap", &muFirstEndCap);
   X_One_Tree_->Branch("muDzVtx", &muDzVtx);
-  X_One_Tree_->Branch("muDxyVtx", &muDxyVtx);
-  /// generic tracks 
-  X_One_Tree_->Branch("trNotRef", &trNotRef);
-  X_One_Tree_->Branch("trRef", &trRef);
-  X_One_Tree_->Branch("trackPx", &trPx);
-  X_One_Tree_->Branch("trackPy", &trPy);
-  X_One_Tree_->Branch("trackPz", &trPz);
-  X_One_Tree_->Branch("trackEnergy", &trE);
-  X_One_Tree_->Branch("trackNDF", &trNDF);
-  X_One_Tree_->Branch("trackPhits", &trPhits);
-  X_One_Tree_->Branch("trackShits", &trShits);
-  X_One_Tree_->Branch("trackChi2", &trChi2);
-  X_One_Tree_->Branch("trackD0", &trD0);
-  X_One_Tree_->Branch("trackD0Err", &trD0E);
-  X_One_Tree_->Branch("trackCharge", &trCharge);
-  X_One_Tree_->Branch("TrackHighPurity", &trQualityHighPurity);
-  X_One_Tree_->Branch("TrackTight", &trQualityTight);
-  X_One_Tree_->Branch("trackfHits", &trfHits);
-  X_One_Tree_->Branch("trackFirstBarrel", &trFirstBarrel);
-  X_One_Tree_->Branch("trackFirstEndCap", &trFirstEndCap);
-  X_One_Tree_->Branch("trackDzVtx", &trDzVtx);
-  X_One_Tree_->Branch("trackDxyVtx", &trDxyVtx);
-  X_One_Tree_->Branch("tr_nsigdedx", &tr_nsigdedx);
-  X_One_Tree_->Branch("tr_dedx", &tr_dedx);
-  X_One_Tree_->Branch("tr_dedxMass", &tr_dedxMass);
-  X_One_Tree_->Branch("tr_theo", &tr_theo);
-  X_One_Tree_->Branch("tr_sigma", &tr_sigma);
-  X_One_Tree_->Branch("tr_dedx_byHits", &tr_dedx_byHits );
-  X_One_Tree_->Branch("tr_dedxErr_byHits", &tr_dedxErr_byHits );
-  X_One_Tree_->Branch("tr_saturMeas_byHits", &tr_saturMeas_byHits );
-  X_One_Tree_->Branch("tr_Meas_byHits", &tr_Meas_byHits );
-  /// MuMu cand & KK cand 
+  X_One_Tree_->Branch("muDxyVtx", &muDxyVtx); 
+  /// MuMu cand  
   X_One_Tree_->Branch("nMuMu",&nMuMu,"nMuMu/i");
   X_One_Tree_->Branch("MuMuMass",&MuMuMass);
   X_One_Tree_->Branch("MuMuPx",&MuMuPx);
@@ -2489,20 +2550,7 @@ void MuMuKKPAT::beginJob()
   X_One_Tree_->Branch("MuMuDecayVtx_XE",&MuMuDecayVtx_XE);
   X_One_Tree_->Branch("MuMuDecayVtx_YE",&MuMuDecayVtx_YE);
   X_One_Tree_->Branch("MuMuDecayVtx_ZE",&MuMuDecayVtx_ZE);
-  X_One_Tree_->Branch("nKK",&nKK,"nKK/i");
-  X_One_Tree_->Branch("KKMass",&KKMass);
-  X_One_Tree_->Branch("KKPx",&KKPx);
-  X_One_Tree_->Branch("KKPy",&KKPy);
-  X_One_Tree_->Branch("KKPz",&KKPz);
-  X_One_Tree_->Branch("KKVtx_CL",&KKVtx_CL);
-  X_One_Tree_->Branch("KKVtx_Chi2",&KKVtx_Chi2);
-  X_One_Tree_->Branch("KKDecayVtx_X",&KKDecayVtx_X);
-  X_One_Tree_->Branch("KKDecayVtx_Y",&KKDecayVtx_Y);
-  X_One_Tree_->Branch("KKDecayVtx_Z",&KKDecayVtx_Z);
-  X_One_Tree_->Branch("KKDecayVtx_XE",&KKDecayVtx_XE);
-  X_One_Tree_->Branch("KKDecayVtx_YE",&KKDecayVtx_YE);
-  X_One_Tree_->Branch("KKDecayVtx_ZE",&KKDecayVtx_ZE);
-  /// muons from JPsi (MuMu) fit & kaons from Phi (KK) fit 
+  /// muons from JPsi (MuMu) fit  
   X_One_Tree_->Branch("mu1Idx",&mu1Idx);
   X_One_Tree_->Branch("mu2Idx",&mu2Idx);
   X_One_Tree_->Branch("mu1Px_MuMu",&mu1_MuMu_Px);
@@ -2517,7 +2565,33 @@ void MuMuKKPAT::beginJob()
   X_One_Tree_->Branch("mu2NDF_MuMu",&mu2_MuMu_NDF);
   X_One_Tree_->Branch("MuMuType",&MuMuType);
   X_One_Tree_->Branch("MuMuMuonTrigMatch",&MuMuMuonTrigMatch);
-  X_One_Tree_->Branch("KKIdx",&KKIdx);
+  /// Primary Vertex with "MuMu correction"
+  X_One_Tree_->Branch("PriVtxMuMuCorr_n", &PriVtxMuMuCorr_n);
+  X_One_Tree_->Branch("PriVtxMuMuCorr_X", &PriVtxMuMuCorr_X);
+  X_One_Tree_->Branch("PriVtxMuMuCorr_Y", &PriVtxMuMuCorr_Y);
+  X_One_Tree_->Branch("PriVtxMuMuCorr_Z", &PriVtxMuMuCorr_Z);
+  X_One_Tree_->Branch("PriVtxMuMuCorr_EX", &PriVtxMuMuCorr_EX);
+  X_One_Tree_->Branch("PriVtxMuMuCorr_EY", &PriVtxMuMuCorr_EY);
+  X_One_Tree_->Branch("PriVtxMuMuCorr_EZ", &PriVtxMuMuCorr_EZ);
+  X_One_Tree_->Branch("PriVtxMuMuCorr_Chi2", &PriVtxMuMuCorr_Chi2);
+  X_One_Tree_->Branch("PriVtxMuMuCorr_CL", &PriVtxMuMuCorr_CL);
+  X_One_Tree_->Branch("PriVtxMuMuCorr_tracks", &PriVtxMuMuCorr_tracks);
+  X_One_Tree_->Branch("nTrk_afterMuMu", &nTrk);
+  /// KK cand
+  X_One_Tree_->Branch("nKK",&nKK,"nKK/i");
+  X_One_Tree_->Branch("KKMass",&KKMass);
+  X_One_Tree_->Branch("KKPx",&KKPx);
+  X_One_Tree_->Branch("KKPy",&KKPy);
+  X_One_Tree_->Branch("KKPz",&KKPz);
+  X_One_Tree_->Branch("KKVtx_CL",&KKVtx_CL);
+  X_One_Tree_->Branch("KKVtx_Chi2",&KKVtx_Chi2);
+  X_One_Tree_->Branch("KKDecayVtx_X",&KKDecayVtx_X);
+  X_One_Tree_->Branch("KKDecayVtx_Y",&KKDecayVtx_Y);
+  X_One_Tree_->Branch("KKDecayVtx_Z",&KKDecayVtx_Z);
+  X_One_Tree_->Branch("KKDecayVtx_XE",&KKDecayVtx_XE);
+  X_One_Tree_->Branch("KKDecayVtx_YE",&KKDecayVtx_YE);
+  X_One_Tree_->Branch("KKDecayVtx_ZE",&KKDecayVtx_ZE);
+  /// kaons from Phi (KK) fit
   X_One_Tree_->Branch("ka1Idx",&ka1Idx);
   X_One_Tree_->Branch("ka2Idx",&ka2Idx);
   X_One_Tree_->Branch("ka1Px_KK",&ka1_KK_Px);
@@ -2530,18 +2604,12 @@ void MuMuKKPAT::beginJob()
   X_One_Tree_->Branch("ka2Pz_KK",&ka2_KK_Pz);
   X_One_Tree_->Branch("ka2Chi2_KK",&ka2_KK_Chi2);
   X_One_Tree_->Branch("ka2NDF_KK",&ka2_KK_NDF);
-  /// Primary Vertex with "MuMu correction" 
-  X_One_Tree_->Branch("PriVtxMuMuCorr_n", &PriVtxMuMuCorr_n);
-  X_One_Tree_->Branch("PriVtxMuMuCorr_X", &PriVtxMuMuCorr_X);
-  X_One_Tree_->Branch("PriVtxMuMuCorr_Y", &PriVtxMuMuCorr_Y);
-  X_One_Tree_->Branch("PriVtxMuMuCorr_Z", &PriVtxMuMuCorr_Z);
-  X_One_Tree_->Branch("PriVtxMuMuCorr_EX", &PriVtxMuMuCorr_EX);
-  X_One_Tree_->Branch("PriVtxMuMuCorr_EY", &PriVtxMuMuCorr_EY);
-  X_One_Tree_->Branch("PriVtxMuMuCorr_EZ", &PriVtxMuMuCorr_EZ);
-  X_One_Tree_->Branch("PriVtxMuMuCorr_Chi2", &PriVtxMuMuCorr_Chi2);
-  X_One_Tree_->Branch("PriVtxMuMuCorr_CL", &PriVtxMuMuCorr_CL);
-  X_One_Tree_->Branch("PriVtxMuMuCorr_tracks", &PriVtxMuMuCorr_tracks);
-  X_One_Tree_->Branch("nTrk_afterMuMu", &nTrk);
+  X_One_Tree_->Branch("DRMuMuK1",&DRMuMuK1);
+  X_One_Tree_->Branch("DRMuMuK2",&DRMuMuK2);
+  X_One_Tree_->Branch("DRbs0K1",&DRbs0K1);
+  X_One_Tree_->Branch("DRbs0K2",&DRbs0K2);
+  X_One_Tree_->Branch("DRxK1",&DRxK1);
+  X_One_Tree_->Branch("DRxK2",&DRxK2);  
   /// counters for Bs0 & X(4140)
   X_One_Tree_->Branch("nBs0",&nBs0,"nBs0/i");
   X_One_Tree_->Branch("nBs0_pre0",&nBs0_pre0,"nBs0_pre0/i");
@@ -2827,46 +2895,46 @@ void MuMuKKPAT::beginJob()
   X_One_Tree_->Branch("kaon2_dzE", &kaon2_dzE);
  
   X_One_Tree_->Branch("Bs0MuMuIdx", &Bs0_MuMuIdx);
-  X_One_Tree_->Branch("Bs0KaonIdx", &Bs0_k1Idx);
-  X_One_Tree_->Branch("Bs0KaonIdx", &Bs0_k2Idx); 
+  X_One_Tree_->Branch("Bs0Kaon1Idx", &Bs0_ka1Idx);
+  X_One_Tree_->Branch("Bs0Kaon2Idx", &Bs0_ka2Idx); 
   X_One_Tree_->Branch("XMuMuIdx", &X_MuMuIdx);
-  X_One_Tree_->Branch("XKaonIdx", &X_k1Idx); 
-  X_One_Tree_->Branch("XKaonIdx", &X_k2Idx);
+  X_One_Tree_->Branch("XKaon1Idx", &X_ka1Idx); 
+  X_One_Tree_->Branch("XKaon2Idx", &X_ka2Idx);
 
   X_One_Tree_->Branch("KKMass_err",&KKMass_err);
   X_One_Tree_->Branch("Kaon1FromPV",&Kaon1FromPV);
   X_One_Tree_->Branch("Kaon2FromPV",&Kaon2FromPV );
 
   /// Muons and tracks after Bs0 cand fit & X(4140) cand fit
-  X_One_Tree_->Branch("Muon1Px_MuMuKK", &mu1Px_MuMuKK);
-  X_One_Tree_->Branch("Muon1Py_MuMuKK", &mu1Py_MuMuKK);
-  X_One_Tree_->Branch("Muon1Pz_MuMuKK", &mu1Pz_MuMuKK);
-  X_One_Tree_->Branch("Muon1E_MuMuKK", &mu1E_MuMuKK);
+  X_One_Tree_->Branch("Bs0_Muon1Px_MuMuKK", &Bs0_mu1Px_MuMuKK);
+  X_One_Tree_->Branch("Bs0_Muon1Py_MuMuKK", &Bs0_mu1Py_MuMuKK);
+  X_One_Tree_->Branch("Bs0_Muon1Pz_MuMuKK", &Bs0_mu1Pz_MuMuKK);
+  X_One_Tree_->Branch("Bs0_Muon1E_MuMuKK", &Bs0_mu1E_MuMuKK);
   X_One_Tree_->Branch("X_Muon1Px_MuMuKK", &X_mu1Px_MuMuKK);
   X_One_Tree_->Branch("X_Muon1Py_MuMuKK", &X_mu1Py_MuMuKK);
   X_One_Tree_->Branch("X_Muon1Pz_MuMuKK", &X_mu1Pz_MuMuKK);
   X_One_Tree_->Branch("X_Muon1E_MuMuKK", &X_mu1E_MuMuKK); 
-  X_One_Tree_->Branch("Muon2Px_MuMuKK", &mu2Px_MuMuKK);
-  X_One_Tree_->Branch("Muon2Py_MuMuKK", &mu2Py_MuMuKK);
-  X_One_Tree_->Branch("Muon2Pz_MuMuKK", &mu2Pz_MuMuKK);
-  X_One_Tree_->Branch("Muon2E_MuMuKK", &mu2E_MuMuKK);
+  X_One_Tree_->Branch("Bs0_Muon2Px_MuMuKK", &Bs0_mu2Px_MuMuKK);
+  X_One_Tree_->Branch("Bs0_Muon2Py_MuMuKK", &Bs0_mu2Py_MuMuKK);
+  X_One_Tree_->Branch("Bs0_Muon2Pz_MuMuKK", &Bs0_mu2Pz_MuMuKK);
+  X_One_Tree_->Branch("Bs0_Muon2E_MuMuKK", &Bs0_mu2E_MuMuKK);
   X_One_Tree_->Branch("X_Muon2Px_MuMuKK", &X_mu2Px_MuMuKK);
   X_One_Tree_->Branch("X_Muon2Py_MuMuKK", &X_mu2Py_MuMuKK);
   X_One_Tree_->Branch("X_Muon2Pz_MuMuKK", &X_mu2Pz_MuMuKK);
   X_One_Tree_->Branch("X_Muon2E_MuMuKK", &X_mu2E_MuMuKK);
-  X_One_Tree_->Branch("Kaon1Px_MuMuKK", &k1Px_MuMuKK); 
-  X_One_Tree_->Branch("Kaon1Py_MuMuKK", &k1Py_MuMuKK); 
-  X_One_Tree_->Branch("Kaon1Pz_MuMuKK", &k1Pz_MuMuKK); 
-  X_One_Tree_->Branch("Kion1E_MuMuKK", &k1E_MuMuKK); 
-  X_One_Tree_->Branch("kaon1_nsigdedx", &kaon1_nsigdedx); 
-  X_One_Tree_->Branch("kaon1_dedx", &kaon1_dedx); 
-  X_One_Tree_->Branch("kaon1_dedxMass", &kaon1_dedxMass); 
-  X_One_Tree_->Branch("kaon1_theo", &kaon1_theo); 
-  X_One_Tree_->Branch("kaon1_sigma", &kaon1_sigma); 
-  X_One_Tree_->Branch("kaon1_dedx_byHits", &kaon1_dedx_byHits); 
-  X_One_Tree_->Branch("kaon1_dedxErr_byHits", &kaon1_dedxErr_byHits); 
-  X_One_Tree_->Branch("kaon1_saturMeas_byHits", &kaon1_saturMeas_byHits); 
-  X_One_Tree_->Branch("kaon1_Meas_byHits", &kaon1_Meas_byHits); 
+  X_One_Tree_->Branch("Bs0_Kaon1Px_MuMuKK", &Bs0_k1Px_MuMuKK); 
+  X_One_Tree_->Branch("Bs0_Kaon1Py_MuMuKK", &Bs0_k1Py_MuMuKK); 
+  X_One_Tree_->Branch("Bs0_Kaon1Pz_MuMuKK", &Bs0_k1Pz_MuMuKK); 
+  X_One_Tree_->Branch("Bs0_Kion1E_MuMuKK", &Bs0_k1E_MuMuKK); 
+  X_One_Tree_->Branch("Bs0_kaon1_nsigdedx", &Bs0_kaon1_nsigdedx); 
+  X_One_Tree_->Branch("Bs0_kaon1_dedx", &Bs0_kaon1_dedx); 
+  X_One_Tree_->Branch("Bs0_kaon1_dedxMass", &Bs0_kaon1_dedxMass); 
+  X_One_Tree_->Branch("Bs0_kaon1_theo", &Bs0_kaon1_theo); 
+  X_One_Tree_->Branch("Bs0_kaon1_sigma", &Bs0_kaon1_sigma); 
+  X_One_Tree_->Branch("Bs0_kaon1_dedx_byHits", &Bs0_kaon1_dedx_byHits); 
+  X_One_Tree_->Branch("Bs0_kaon1_dedxErr_byHits", &Bs0_kaon1_dedxErr_byHits); 
+  X_One_Tree_->Branch("Bs0_kaon1_saturMeas_byHits", &Bs0_kaon1_saturMeas_byHits); 
+  X_One_Tree_->Branch("Bs0_kaon1_Meas_byHits", &Bs0_kaon1_Meas_byHits); 
   X_One_Tree_->Branch("X_Kaon1Px_MuMuKK", &X_k1Px_MuMuKK); 
   X_One_Tree_->Branch("X_Kaon1Py_MuMuKK", &X_k1Py_MuMuKK); 
   X_One_Tree_->Branch("X_Kaon1Pz_MuMuKK", &X_k1Pz_MuMuKK); 
@@ -2880,19 +2948,19 @@ void MuMuKKPAT::beginJob()
   X_One_Tree_->Branch("X_kaon1_dedxErr_byHits", &X_kaon1_dedxErr_byHits); 
   X_One_Tree_->Branch("X_kaon1_saturMeas_byHits", &X_kaon1_saturMeas_byHits);
   X_One_Tree_->Branch("X_kaon1_Meas_byHits", &X_kaon1_Meas_byHits); 
-  X_One_Tree_->Branch("Kaon2Px_MuMuKK", &k2Px_MuMuKK); 
-  X_One_Tree_->Branch("Kaon2Py_MuMuKK", &k2Py_MuMuKK); 
-  X_One_Tree_->Branch("Kaon2Pz_MuMuKK", &k2Pz_MuMuKK); 
-  X_One_Tree_->Branch("Kaon2E_MuMuKK", &k2E_MuMuKK); 
-  X_One_Tree_->Branch("kaon2_nsigdedx", &kaon2_nsigdedx); 
-  X_One_Tree_->Branch("kaon2_dedx", &kaon2_dedx); 
-  X_One_Tree_->Branch("kaon2_dedxMass", &kaon2_dedxMass); 
-  X_One_Tree_->Branch("kaon2_theo", &kaon2_theo); 
-  X_One_Tree_->Branch("kaon2_sigma", &kaon2_sigma); 
-  X_One_Tree_->Branch("kaon2_dedx_byHits", &kaon2_dedx_byHits); 
-  X_One_Tree_->Branch("kaon2_dedxErr_byHits", &kaon2_dedxErr_byHits); 
-  X_One_Tree_->Branch("kaon2_saturMeas_byHits", &kaon2_saturMeas_byHits); 
-  X_One_Tree_->Branch("kaon2_Meas_byHits", &kaon2_Meas_byHits); 
+  X_One_Tree_->Branch("Bs0_Kaon2Px_MuMuKK", &Bs0_k2Px_MuMuKK); 
+  X_One_Tree_->Branch("Bs0_Kaon2Py_MuMuKK", &Bs0_k2Py_MuMuKK); 
+  X_One_Tree_->Branch("Bs0_Kaon2Pz_MuMuKK", &Bs0_k2Pz_MuMuKK); 
+  X_One_Tree_->Branch("Bs0_Kaon2E_MuMuKK", &Bs0_k2E_MuMuKK); 
+  X_One_Tree_->Branch("Bs0_kaon2_nsigdedx", &Bs0_kaon2_nsigdedx); 
+  X_One_Tree_->Branch("Bs0_kaon2_dedx", &Bs0_kaon2_dedx); 
+  X_One_Tree_->Branch("Bs0_kaon2_dedxMass", &Bs0_kaon2_dedxMass); 
+  X_One_Tree_->Branch("Bs0_kaon2_theo", &Bs0_kaon2_theo); 
+  X_One_Tree_->Branch("Bs0_kaon2_sigma", &Bs0_kaon2_sigma); 
+  X_One_Tree_->Branch("Bs0_kaon2_dedx_byHits", &Bs0_kaon2_dedx_byHits); 
+  X_One_Tree_->Branch("Bs0_kaon2_dedxErr_byHits", &Bs0_kaon2_dedxErr_byHits); 
+  X_One_Tree_->Branch("Bs0_kaon2_saturMeas_byHits", &Bs0_kaon2_saturMeas_byHits); 
+  X_One_Tree_->Branch("Bs0_kaon2_Meas_byHits", &Bs0_kaon2_Meas_byHits); 
   X_One_Tree_->Branch("X_Kaon2Px_MuMuKK", &X_k2Px_MuMuKK); 
   X_One_Tree_->Branch("X_Kaon2Py_MuMuKK", &X_k2Py_MuMuKK); 
   X_One_Tree_->Branch("X_Kaon2Pz_MuMuKK", &X_k2Pz_MuMuKK); 
