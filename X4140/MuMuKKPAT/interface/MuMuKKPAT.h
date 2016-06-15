@@ -63,7 +63,6 @@
 #include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerObjectMapRecord.h"
 #include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerReadoutSetup.h"
 #include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerReadoutRecord.h"
-
 #include "DataFormats/MuonReco/interface/Muon.h"
 #include "DataFormats/MuonReco/interface/MuonFwd.h"
 
@@ -79,7 +78,7 @@
 #include <string>
 #include "RecoVertex/VertexTools/interface/InvariantMassFromVertex.h"
 #include "RecoVertex/PrimaryVertexProducer/interface/VertexHigherPtSquared.h"
-
+//#include "DataFormats/PatCandidates/interface/GenericParticle.h" // for namespace pat  
 
 ///
 /// class decleration
@@ -173,9 +172,8 @@ private:
   vector<int>           *mu1Idx, *mu2Idx;
   vector<int>           *MuMuType;
   vector<int>           *ka1Idx, *ka2Idx;
-  vector<int>           *KKIdx;
-  vector<int>           *Bs0_MuMuIdx, *Bs0_k1Idx, *Bs0_k2Idx; 
-  vector<int>           *X_MuMuIdx, *X_k1Idx, *X_k2Idx; 
+  vector<int>           *Bs0_MuMuIdx, *Bs0_ka1Idx, *Bs0_ka2Idx; 
+  vector<int>           *X_MuMuIdx, *X_ka1Idx, *X_ka2Idx; 
   /// MC Analysis
   // Gen Primary Vertex
   unsigned int          n_genEvtVtx;
@@ -185,17 +183,20 @@ private:
   unsigned int          nMCAll, nMCBs0, nMCBs0Vtx; 
   vector<int>           *MCPdgIdAll, *MCDanNumAll;
   // Gen Primary Vertex 
-  vector<float>       *PriVtxGen_X, *PriVtxGen_Y, *PriVtxGen_Z ; 
-  vector<double>      *PriVtxGen_EX, *PriVtxGen_EY, *PriVtxGen_EZ ;
-  vector<float>	      *PriVtxGen_Chi2, *PriVtxGen_CL, *PriVtxGen_Ndof;
-  vector<int>         *PriVtxGen_tracks ;
-  //vector<float>       *MCpsi2SPx, *MCpsi2SPy, *MCpsi2SPz;
-  vector<float>       *MCmupPx, *MCmupPy, *MCmupPz;
-  vector<float>       *MCmumPx, *MCmumPy, *MCmumPz;
-  vector<float>       *MCpionPx, *MCpionPy, *MCpionPz;
-  vector<float>       *MCkaonPx, *MCkaonPy, *MCkaonPz;
-  vector<int>         *MCpionCh, *MCkaonCh;
-  vector<float>       *MCPx, *MCPy, *MCPz;
+  vector<float>         *PriVtxGen_X, *PriVtxGen_Y, *PriVtxGen_Z ; 
+  vector<double>        *PriVtxGen_EX, *PriVtxGen_EY, *PriVtxGen_EZ ;
+  vector<float>	        *PriVtxGen_Chi2, *PriVtxGen_CL, *PriVtxGen_Ndof;
+  vector<int>           *PriVtxGen_tracks ;
+  vector<float>         *MCJPsiPx, *MCJPsiPy, *MCJPsiPz;
+  vector<float>         *MCmupPx, *MCmupPy, *MCmupPz;
+  vector<float>         *MCmumPx, *MCmumPy, *MCmumPz;
+  vector<float>         *MCPhiPx, *MCPhiPy, *MCPhiPz;
+  vector<float>         *MCkpPx, *MCkpPy, *MCkpPz;
+  vector<float>         *MCkmPx, *MCkmPy, *MCkmPz;
+  //vector<float>         *MCpionPx, *MCpionPy, *MCpionPz;
+  //vector<float>         *MCkaonPx, *MCkaonPy, *MCkaonPz;
+  //vector<int>           *MCpionCh, *MCkaonCh;
+  vector<float>         *MCPx, *MCPy, *MCPz;
   /// Generic Muons
   vector<float>         *muPx, *muPy, *muPz, *muCharge;
   vector<int>           *muPhits, *muShits, *muLayersTr, *muLayersPix;
@@ -247,6 +248,7 @@ private:
   vector<float>         *ka2_KK_Px, *ka2_KK_Py, *ka2_KK_Pz ;
   vector<float>         *ka2_KK_Chi2 ;
   vector<int>           *ka2_KK_NDF ;
+  vector<float>         *DRMuMuK1, *DRMuMuK2, *DRbs0K1, *DRbs0K2, *DRxK1, *DRxK2;
   /// Primary Vertex with "MuMu correction"
   vector<int>           *PriVtxMuMuCorr_n;
   vector<float>         *PriVtxMuMuCorr_X, *PriVtxMuMuCorr_Y, *PriVtxMuMuCorr_Z ; 
@@ -266,18 +268,18 @@ private:
   vector<float>         *xDecayVtx_X, *xDecayVtx_Y, *xDecayVtx_Z ;
   vector<double>        *xDecayVtx_XE, *xDecayVtx_YE, *xDecayVtx_ZE ; 
   /// Muons and tracks after Bs0 cand fit & X(4140) cand fit 
-  vector<float>         *mu1Px_MuMuKK, *mu1Py_MuMuKK, *mu1Pz_MuMuKK, *mu1E_MuMuKK ;
-  vector<float>         *mu2Px_MuMuKK, *mu2Py_MuMuKK, *mu2Pz_MuMuKK, *mu2E_MuMuKK ;
-  vector<float>         *k1Px_MuMuKK, *k1Py_MuMuKK, *k1Pz_MuMuKK, *k1E_MuMuKK ;  
-  vector<double>        *kaon1_nsigdedx; 
-  vector<float>         *kaon1_dedx, *kaon1_dedxMass, *kaon1_theo, *kaon1_sigma ;
-  vector<float>         *kaon1_dedx_byHits, *kaon1_dedxErr_byHits ; 
-  vector<int>           *kaon1_saturMeas_byHits, *kaon1_Meas_byHits ; 
-  vector<float>         *k2Px_MuMuKK, *k2Py_MuMuKK, *k2Pz_MuMuKK, *k2E_MuMuKK ;
-  vector<double>        *kaon2_nsigdedx; 
-  vector<float>         *kaon2_dedx, *kaon2_dedxMass, *kaon2_theo, *kaon2_sigma ; 
-  vector<float>         *kaon2_dedx_byHits, *kaon2_dedxErr_byHits ; 
-  vector<int>           *kaon2_saturMeas_byHits, *kaon2_Meas_byHits ; 
+  vector<float>         *Bs0_mu1Px_MuMuKK, *Bs0_mu1Py_MuMuKK, *Bs0_mu1Pz_MuMuKK, *Bs0_mu1E_MuMuKK ;
+  vector<float>         *Bs0_mu2Px_MuMuKK, *Bs0_mu2Py_MuMuKK, *Bs0_mu2Pz_MuMuKK, *Bs0_mu2E_MuMuKK ;
+  vector<float>         *Bs0_k1Px_MuMuKK, *Bs0_k1Py_MuMuKK, *Bs0_k1Pz_MuMuKK, *Bs0_k1E_MuMuKK ;  
+  vector<double>        *Bs0_kaon1_nsigdedx; 
+  vector<float>         *Bs0_kaon1_dedx, *Bs0_kaon1_dedxMass, *Bs0_kaon1_theo, *Bs0_kaon1_sigma ;
+  vector<float>         *Bs0_kaon1_dedx_byHits, *Bs0_kaon1_dedxErr_byHits ; 
+  vector<int>           *Bs0_kaon1_saturMeas_byHits, *Bs0_kaon1_Meas_byHits ; 
+  vector<float>         *Bs0_k2Px_MuMuKK, *Bs0_k2Py_MuMuKK, *Bs0_k2Pz_MuMuKK, *Bs0_k2E_MuMuKK ;
+  vector<double>        *Bs0_kaon2_nsigdedx; 
+  vector<float>         *Bs0_kaon2_dedx, *Bs0_kaon2_dedxMass, *Bs0_kaon2_theo, *Bs0_kaon2_sigma ; 
+  vector<float>         *Bs0_kaon2_dedx_byHits, *Bs0_kaon2_dedxErr_byHits ; 
+  vector<int>           *Bs0_kaon2_saturMeas_byHits, *Bs0_kaon2_Meas_byHits ; 
   vector<float>         *X_mu1Px_MuMuKK, *X_mu1Py_MuMuKK, *X_mu1Pz_MuMuKK, *X_mu1E_MuMuKK ; 
   vector<float>         *X_mu2Px_MuMuKK, *X_mu2Py_MuMuKK, *X_mu2Pz_MuMuKK, *X_mu2E_MuMuKK ;
   vector<float>         *X_k1Px_MuMuKK, *X_k1Py_MuMuKK, *X_k1Pz_MuMuKK, *X_k1E_MuMuKK ; 
