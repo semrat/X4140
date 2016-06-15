@@ -448,11 +448,11 @@ process.mkcands = cms.EDAnalyzer("MuMuKKPAT",
 				 UseXDR = cms.untracked.bool(False), # SEMRA added
 				 MaxXCandTrackDR = cms.untracked.double (1.1), # SEMRA added				
 
-                                 resolvePileUpAmbiguity = cms.untracked.bool(True),
+                                 resolvePileUpAmbiguity = cms.untracked.bool(False),
                                  addMuMulessPrimaryVertex = cms.untracked.bool(True),
                                  #addMuMulessPrimaryVertex = cms.untracked.bool(False),
                                  addBs0lessPrimaryVertex = cms.untracked.bool(True), # SEMRA B0 changed with Bs0
-                                 Debug_Output = cms.untracked.bool(True),
+                                 Debug_Output = cms.untracked.bool(False), # true
                                  ##
                                  ##  use the correct trigger path
                                  ##
