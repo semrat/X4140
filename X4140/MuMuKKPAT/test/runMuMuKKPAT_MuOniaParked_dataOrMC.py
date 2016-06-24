@@ -430,28 +430,24 @@ process.mkcands = cms.EDAnalyzer("MuMuKKPAT",
 
                                  MinJPsiMass = cms.untracked.double(2.8), # SEMRA changed
                                  MaxJPsiMass = cms.untracked.double(3.4), # SEMRA changed
-                                 MinPsiPrimeMass = cms.untracked.double(3.55), # SEMRA ask closing
-                                 MaxPsiPrimeMass = cms.untracked.double(3.8), # SEMRA ask closing
 				 MinPhiMass = cms.untracked.double (0.97), # SEMRA added
  				 MaxPhiMass = cms.untracked.double (1.07), # SEMRA added
 				 MaxJPsiPhiXMass = cms.untracked.double (4.35), # SEMRA added
-				 MinJPsiPhiBs0Mass = cms.untracked.double (5.1), # SEMRA added
-				 MaxJPsiPhiBs0Mass = cms.untracked.double (5.6), # SEMRA added 
+				 MinJPsiPhiB0Mass = cms.untracked.double (5.1), # SEMRA added
+				 MaxJPsiPhiB0Mass = cms.untracked.double (5.6), # SEMRA added 
 
                                  MinNumTrSiHits = cms.untracked.int32(4),
                                  MinTrPt = cms.untracked.double(0.350),
                                  Chi2NDF_Track =  cms.untracked.double(7.0),
 				 # Delta R
-				 MaxMuMuTrackDR = cms.untracked.double(1.5), # SEMRA why this is different with in .cc file ? 
-                                 MaxBs0CandTrackDR = cms.untracked.double(1.5), # SEMRA B0 changed with Bs0    
-                                 UseBs0Dr = cms.untracked.bool(True), # SEMRA B0 changed with Bs0            
-				 UseXDR = cms.untracked.bool(False), # SEMRA added
-				 MaxXCandTrackDR = cms.untracked.double (1.1), # SEMRA added				
+				 MaxMuMuTrackDR = cms.untracked.double(1.5), 
+                                 MaxB0CandTrackDR = cms.untracked.double(1.5),     
+                                 UseB0Dr = cms.untracked.bool(True),             
 
                                  resolvePileUpAmbiguity = cms.untracked.bool(False),
                                  addMuMulessPrimaryVertex = cms.untracked.bool(True),
                                  #addMuMulessPrimaryVertex = cms.untracked.bool(False),
-                                 addBs0lessPrimaryVertex = cms.untracked.bool(True), # SEMRA B0 changed with Bs0
+                                 addB0lessPrimaryVertex = cms.untracked.bool(True), 
                                  Debug_Output = cms.untracked.bool(False), # true
                                  ##
                                  ##  use the correct trigger path
