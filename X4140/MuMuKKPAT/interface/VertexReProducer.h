@@ -46,4 +46,4 @@ class VertexReProducer {
 
 #endif
 
-// rsync -vut --existing interface/VertexReProducer.h cristella@cmssusy.ba.infn.it:/cmshome/cristella/work/Z_analysis/exclusive/clean_14ott/CMSSW_5_3_22/src/UserCode/MuMuPiKPAT/interface/VertexReProducer.h
+// rsync -vut --existing interface/VertexReProducer.h semrat@lxplus.cern.ch:/afs/cern.ch/user/s/semrat/scratch0/CMSSW_5_3_22/src/X4140/MuMuKKPAT/interface/VertexReProducer.h

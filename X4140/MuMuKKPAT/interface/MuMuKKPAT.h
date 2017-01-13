@@ -320,7 +320,6 @@ private:
   vector<float>         *kaon1_dxy_B0LessPV, *kaon1_dz_B0LessPV, *kaon2_dxy_B0LessPV, *kaon2_dz_B0LessPV;
   vector<float>         *kaon1_dxyE, *kaon1_dzE, *kaon2_dxyE, *kaon2_dzE; 
 
-  vector<float>         *KKMass_err;
   vector<bool>          *Kaon1FromPV, *Kaon2FromPV;
 };
 

@@ -80,4 +80,4 @@ VertexReProducer::makeVertices(const std::vector<reco::TransientTrack> &tracks,
     return algo_->vertices(tracks, bs);
 }
 
-// rsync -vut --existing src/VertexReProducer.cc cristella@cmssusy.ba.infn.it:/cmshome/cristella/work/Z_analysis/exclusive/clean_14ott/CMSSW_5_3_22/src/UserCode/MuMuPiKPAT/src/VertexReProducer.cc
+// rsync -vut --existing src/VertexReProducer.cc semrat@lxplus.cern.ch:/afs/cern.ch/user/s/semrat/scratch0/CMSSW_5_3_22/src/X4140/MuMuKKPAT/src/VertexReProducer.cc

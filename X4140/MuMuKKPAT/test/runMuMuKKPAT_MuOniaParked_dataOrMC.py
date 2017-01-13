@@ -41,14 +41,19 @@ if (not MC) :
 	    #'root://xrootd.unl.edu//store/data/Run2012C/MuOniaParked/AOD/22Jan2013-v1/20000/00109B2A-2E77-E211-893B-E41F1318165C.root'
 	    #'/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20002/1A5DE0F3-646B-E211-91AA-001A645C2BC0.root' # guilty file
 	    #'/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20000/00054BD0-5668-E211-8091-00215E21DC7E.root'
-            '/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20000/000A1D2E-3168-E211-B2F7-00215E21D56A.root',
-            #'/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20000/00170E1F-6568-E211-9736-00215E93E7DC.root',
-            #'/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20000/003C345D-C768-E211-8C82-00215E2283FA.root',
-            #'/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20000/0054DA9E-AA67-E211-800F-E41F131815CC.root',
-            #'/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20000/005C3F2E-FE67-E211-A6E7-00215E222850.root',
-            #'/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20000/005DD843-D667-E211-8A8D-E61F13190DCB.root',
-            #'/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20000/00B2C16E-C767-E211-A36F-00215E21DA44.root',
-            #'/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20000/00B47F62-CD67-E211-B7B2-00215E221B48.root',
+            #'/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20000/000A1D2E-3168-E211-B2F7-00215E21D56A.root'
+            #'/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20000/00170E1F-6568-E211-9736-00215E93E7DC.root'
+            #'/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20000/003C345D-C768-E211-8C82-00215E2283FA.root'
+            #'/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20000/0054DA9E-AA67-E211-800F-E41F131815CC.root'
+            #'/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20000/005C3F2E-FE67-E211-A6E7-00215E222850.root'
+            #'/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20000/005DD843-D667-E211-8A8D-E61F13190DCB.root'
+            #'/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20000/00B2C16E-C767-E211-A36F-00215E21DA44.root'
+            #'/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20000/00B47F62-CD67-E211-B7B2-00215E221B48.root'
+            #'/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20002/74EA8A9D-2D6C-E211-A15A-00215E21D588.root'
+            #'root://cmsxrootd.hep.wisc.edu//store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20003/CE2C94D8-036F-E211-A034-00215E21D8EE.root'
+            #'/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20001/EE35A843-3E69-E211-9292-00215E2226AC.root' # job 412 error code 8021
+            '/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20001/EE35A843-3E69-E211-9292-00215E2226AC.root'
+            #'/afs/cern.ch/user/s/semrat/scratch0/CMSSW_5_3_22/src/X4140/MuMuKKPAT/test/EE35A843-3E69-E211-9292-00215E2226AC.root'
     )
 elif MC :
         if MCMotherId == 511 :
@@ -192,7 +197,7 @@ process.source.inputCommands = cms.untracked.vstring(
 	)
 
 process.maxEvents = cms.untracked.PSet(
-        input = cms.untracked.int32( 100 ) # 256Kb in 2' for 100 events, 1Mb in 7' for 1k events, 6Mb in 50' for 8650 events, 11Mb in 66' for 10k events, 100Mb in 14h for 150k events, 1.4Gb in 4 days for 1.2M events of official MC
+        input = cms.untracked.int32( 500 ) # 256Kb in 2' for 100 events, 1Mb in 7' for 1k events, 6Mb in 50' for 8650 events, 11Mb in 66' for 10k events, 100Mb in 14h for 150k events, 1.4Gb in 4 days for 1.2M events of official MC
         #input = cms.untracked.int32( 1000 ) # 310Kb in 3' for 1k events of private MC
         #input = cms.untracked.int32( 100 ) # = 20Mb in 2h for 15k events, 2Mb in 10' for 1k events of Run2012C/MuOniaParked/AOD/22Jan2013-v1
 	#input = cms.untracked.int32( 1000 ) # = 3Mb for 6546 events, 85Kb for 100, 800kb for 1k events of BsToPsiMuMu
