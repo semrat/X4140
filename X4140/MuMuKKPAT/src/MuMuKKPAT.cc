@@ -287,7 +287,7 @@ MuMuKKPAT::MuMuKKPAT(const edm::ParameterSet& iConfig) :
   kaon1_dxy_B0LessPV(0), kaon1_dz_B0LessPV(0), kaon2_dxy_B0LessPV(0), kaon2_dz_B0LessPV(0),
   kaon1_dxyE(0), kaon1_dzE(0), kaon2_dxyE(0), kaon2_dzE(0),
 
-  KKMass_err(0), Kaon1FromPV(0), Kaon2FromPV(0)
+  Kaon1FromPV(0), Kaon2FromPV(0)
 
 {
   /// now do what ever initialization is needed
@@ -320,6 +320,7 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   runNum = iEvent.id().run();
   evtNum = iEvent.id().event();
   lumiNum = iEvent.id().luminosityBlock();
+
 
   bool hasRequestedTrigger = false;
   ESHandle<MagneticField> bFieldHandle;
@@ -419,7 +420,7 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
     if (addMuMulessPrimaryVertex_ || addB0lessPrimaryVertex_ || resolveAmbiguity_) {
       //thePrimaryVtx = Vertex(*(recVtxs->begin()));
-      cout <<"here" <<endl;
+      //cout <<"here" <<endl;
       thePrimaryVtx = *(recVtxs->begin());
     }
     else {
@@ -686,6 +687,7 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     } // for (size_t i = 0; i < genParticles->size(); ++ i)
   } // if (doMC)
 
+
   /// reconstruction only for events with B decaying in psi(nS)+Pi+K /// SEMRA JPsiPhi !!!
   if ( (doMC && !MCExclusiveDecay) || (doMC && (MCExclusiveDecay && decayChainOK)) || doData ) {
 
@@ -807,6 +809,8 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    muDzVtxErr->push_back(rmu1->track()->dzError());
 	    muKey->push_back(rmu1->track().key());
 	  }
+          
+
 	  muIsGlobal->push_back( rmu1->isGlobalMuon() ) ;
 	  muIsPF->push_back( rmu1->isPFMuon() ) ;
 	  if ( rmu1->globalTrack().isNull() ) {
@@ -857,7 +861,6 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  }
 	  muNOverlap->push_back( nOverlapMus ) ;
 	  muNSharingSegWith->push_back( nSharingSegWith ) ;
-
 
 	  ////////////////// check for muon1 //////////////////
 	  TrackRef muTrack1 = Muon1->track();
@@ -945,6 +948,7 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    mu2_MuMu_Chi2->push_back( Mu2Cand_fromFit->chiSquared());
 	    mu2_MuMu_NDF->push_back( Mu2Cand_fromFit->degreesOfFreedom());
 
+
 	    Int_t dimuonType = 0;   //0 nothing,  1 J/psi  , 2 psi(2S)
 	    if ( MuMuCand_fromFit->currentState().mass() > JPsiMinMass  &&  MuMuCand_fromFit->currentState().mass() < JPsiMaxMass ) {
 	      dimuonType = 1 ;
@@ -986,6 +990,7 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		  //cout << "POINT 10" << endl;
 		  MuMuMuonTrigMatch->push_back(false);
 	      }
+
 
 	    /// vertex without matched muons
 	    vector<TransientVertex> pvs ;
@@ -1036,6 +1041,7 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
             ++nMuMu;
 	    muons.clear();
 
+
 	    //////////////////////////////////////////////////////////////////////
             /// for B0 
 	    if (Debug_) cout <<"evt:"<<evtNum<< " is Invalid Muon ?  " <<isEventWithInvalidMu << endl;
@@ -1071,8 +1077,11 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 	      //cout<< "POINT 17" <<endl;
 
+
+
 	   ////////////////// check tracks for kaon2 for B0 //////////////////
 	   for ( vector<pat::GenericParticle>::const_iterator Track2 = Track1+1; Track2 != theKaonRefittedPATTrackHandle->end(); ++Track2 ){
+
 	     /// check that this second track doesn't overlap with the the first track candidate
 	     if (Track2->track().key() == Track1->track().key())
 	        continue ; nB0_pre4++ ; 
@@ -1085,7 +1094,6 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    /// cuts on charged tracks
             if ((Track2->track()->chi2() / Track2->track()->ndof() > TrMaxNormChi2)  ||  Track2->pt() < TrMinPt)
 	      continue; nB0_pre7++ ; 
-
 
 	   ////////////////// get the KK information //////////////////
 	   TransientTrack kaon1TT( Track1->track(), &(*bFieldHandle) );
@@ -1173,14 +1181,13 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
             if (((Track1->p4() + Track2->p4() + MuMu).M() > MuMuKKMaxB0Mass  ||  (Track1->p4() + Track2->p4() + MuMu).M() < MuMuKKMinB0Mass) && ((Track1->p4() + Track2->p4() + MuMu).M() >  MuMuKKMaxXMass))
 	       continue ; nB0_pre9++ ; 
 
-
-
                   /// having two oppositely charged muons, and two oppositely charged tracks: try to vertex them
                  //TransientTrack kaon1TT( Track1->track(), &(*bFieldHandle) );            
                  //TransientTrack kaon2TT( Track2->track(), &(*bFieldHandle) );
 
 		  TransientTrack kaon2TT_notRefit ;
 		  Bool_t notRefittedPartner = false ;
+
 		  for ( vector<pat::GenericParticle>::const_iterator Track2_notRefit = thePATTrackHandle->begin(); Track2_notRefit != thePATTrackHandle->end(); ++Track2_notRefit )
 		    if ( Track2_notRefit->track().key() == Track2->track().key() ) {
 		      notRefittedPartner = true ;
@@ -1289,8 +1296,8 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		    
                  
                   ////////////////// Last cuts for B0 //////////////////
-		  if ( !(B0_ctau/B0_ctauErr > 2.8) || !(B0_cosAlpha > 0.8) )
-		    continue ;
+		  //if ( !(B0_ctau/B0_ctauErr > 2.8) || !(B0_cosAlpha > 0.8) ) /// Alexis, BC_CTau_CTauErr plot has a cut which we don't want so we closed it.
+		    //continue ;
 		  		  
 
                   ////////////////// fill B0 candidate variables //////////////////
@@ -1398,6 +1405,7 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		  vector<TransientVertex> B0_pvs ;
 		  Vertex B0LessPV = thePrimaryVtx ;
 
+
 		  if (addB0lessPrimaryVertex_)
 		    {
 		      VertexReProducer revertex(recVtxs, iEvent);
@@ -1454,6 +1462,7 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 			}
 		      }
 		    }
+
 
 		  PriVtxB0Less_n->push_back( B0_pvs.size() ) ;
 		  PriVtxB0Less_X->push_back( B0LessPV.position().x() ) ;
@@ -1833,7 +1842,6 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		  b0Daughters.clear();
 
 
-
 		  ////////////////// flag for checking the Kaons from PV or not PV //////////////////
 		  /// flag for kaon1
 		  vector<TransientTrack> vertexTracksKaon1;
@@ -2007,7 +2015,7 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   kaon1_dxy_B0LessPV->clear(); kaon1_dz_B0LessPV->clear(); kaon2_dxy_B0LessPV->clear(); kaon2_dz_B0LessPV->clear();
   kaon1_dxyE->clear(); kaon1_dzE->clear(); kaon2_dxyE->clear(); kaon2_dzE->clear();
 
-  KKMass_err->clear(); Kaon1FromPV->clear(); Kaon2FromPV->clear();
+  Kaon1FromPV->clear(); Kaon2FromPV->clear();
 
   if (Debug_) cout <<"before muon stuff clear" <<endl ;
   /// muons
@@ -2441,7 +2449,6 @@ void MuMuKKPAT::beginJob()
   X_One_Tree_->Branch("B0Kaon1Idx", &B0_ka1Idx);
   X_One_Tree_->Branch("B0Kaon2Idx", &B0_ka2Idx);
 
-  X_One_Tree_->Branch("KKMass_err",&KKMass_err);
   X_One_Tree_->Branch("Kaon1FromPV",&Kaon1FromPV);
   X_One_Tree_->Branch("Kaon2FromPV",&Kaon2FromPV );
 
@@ -2457,7 +2464,7 @@ void MuMuKKPAT::beginJob()
   X_One_Tree_->Branch("Kaon1Px_MuMuKK", &k1Px_MuMuKK);
   X_One_Tree_->Branch("Kaon1Py_MuMuKK", &k1Py_MuMuKK);
   X_One_Tree_->Branch("Kaon1Pz_MuMuKK", &k1Pz_MuMuKK);
-  X_One_Tree_->Branch("Kion1E_MuMuKK", &k1E_MuMuKK);
+  X_One_Tree_->Branch("Kaon1E_MuMuKK", &k1E_MuMuKK);
   X_One_Tree_->Branch("kaon1_nsigdedx", &kaon1_nsigdedx);
   X_One_Tree_->Branch("kaon1_dedx", &kaon1_dedx);
   X_One_Tree_->Branch("kaon1_dedxMass", &kaon1_dedxMass);
