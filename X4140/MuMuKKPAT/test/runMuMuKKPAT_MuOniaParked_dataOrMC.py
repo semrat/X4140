@@ -197,7 +197,7 @@ process.source.inputCommands = cms.untracked.vstring(
 	)
 
 process.maxEvents = cms.untracked.PSet(
-        input = cms.untracked.int32( 500 ) # 256Kb in 2' for 100 events, 1Mb in 7' for 1k events, 6Mb in 50' for 8650 events, 11Mb in 66' for 10k events, 100Mb in 14h for 150k events, 1.4Gb in 4 days for 1.2M events of official MC
+        input = cms.untracked.int32( 1000 ) # 256Kb in 2' for 100 events, 1Mb in 7' for 1k events, 6Mb in 50' for 8650 events, 11Mb in 66' for 10k events, 100Mb in 14h for 150k events, 1.4Gb in 4 days for 1.2M events of official MC
         #input = cms.untracked.int32( 1000 ) # 310Kb in 3' for 1k events of private MC
         #input = cms.untracked.int32( 100 ) # = 20Mb in 2h for 15k events, 2Mb in 10' for 1k events of Run2012C/MuOniaParked/AOD/22Jan2013-v1
 	#input = cms.untracked.int32( 1000 ) # = 3Mb for 6546 events, 85Kb for 100, 800kb for 1k events of BsToPsiMuMu
@@ -446,13 +446,13 @@ process.mkcands = cms.EDAnalyzer("MuMuKKPAT",
                                  Chi2NDF_Track =  cms.untracked.double(7.0),
 				 # Delta R
 				 MaxMuMuTrackDR = cms.untracked.double(1.5), 
-                                 MaxB0CandTrackDR = cms.untracked.double(1.5),     
-                                 UseB0Dr = cms.untracked.bool(True),             
+                                 MaxXCandTrackDR = cms.untracked.double(1.5),     
+                                 UseXDr = cms.untracked.bool(True),             
 
                                  resolvePileUpAmbiguity = cms.untracked.bool(False),
                                  addMuMulessPrimaryVertex = cms.untracked.bool(True),
                                  #addMuMulessPrimaryVertex = cms.untracked.bool(False),
-                                 addB0lessPrimaryVertex = cms.untracked.bool(True), 
+                                 addXlessPrimaryVertex = cms.untracked.bool(True), 
                                  Debug_Output = cms.untracked.bool(False), # true
                                  ##
                                  ##  use the correct trigger path

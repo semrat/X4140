@@ -144,10 +144,10 @@ private:
   double MuMuMinMass, MuMuMaxMass, JPsiMinMass, JPsiMaxMass; 
   double KKMinMass, KKMaxMass, PhiMinMass, PhiMaxMass; 
   double JPsiPhiMaxXMass, JPsiPhiMinB0Mass, JPsiPhiMaxB0Mass; 
-  double MuMuTrackMaxDR, B0TrackMaxDR; 
-  bool   UseB0DR ; 
+  double MuMuTrackMaxDR, XTrackMaxDR; 
+  bool   UseXDR ; 
   double MuMuKKMinB0Mass, MuMuKKMaxB0Mass, MuMuKKMaxXMass;
-  bool   addB0lessPrimaryVertex_; 
+  bool   addXlessPrimaryVertex_; 
   bool   Debug_;
   std::string DeDxEstimator_, m_dEdxDiscrimTag, m_dEdxDiscrimTag_kaon ;
   TTree* X_One_Tree_;
@@ -157,10 +157,9 @@ private:
   vector<unsigned int>* L1TT;
   vector<std::string>*  MatchTriggerNames;
 
-  /// counters for B0 
-  unsigned int          nMu, nMuMu, nB0, nKK; 
-  unsigned int          nB0_pre0, nB0_pre1, nB0_pre2, nB0_pre3, nB0_pre4, nB0_pre5, nB0_pre6, nB0_pre7, nB0_pre8, nB0_pre9, nB0_pre10, nB0_pre11, nB0_pre12, nB0_pre13, nB0_pre14, nB0_pre15; 
-  //unsigned int          nX; 
+  /// counters for X(4140) 
+  unsigned int          nMu, nMuMu, nX, nKK; 
+  unsigned int          nX_pre0, nX_pre1, nX_pre2, nX_pre3, nX_pre4, nX_pre5, nX_pre6, nX_pre7, nX_pre8, nX_pre9, nX_pre10, nX_pre11, nX_pre12, nX_pre13, nX_pre14, nX_pre15; 
   int                   priVtx_n;
   float                 priVtx_X, priVtx_Y, priVtx_Z, priVtx_XE, priVtx_YE, priVtx_ZE, priVtx_NormChi2, priVtx_Chi2, priVtx_CL;
   int                   priVtx_tracks;
@@ -169,14 +168,14 @@ private:
   vector<int>           *mu1Idx, *mu2Idx;
   vector<int>           *MuMuType;
   vector<int>           *ka1Idx, *ka2Idx;
-  vector<int>           *B0_MuMuIdx, *B0_ka1Idx, *B0_ka2Idx; 
+  vector<int>           *X_MuMuIdx, *X_ka1Idx, *X_ka2Idx; 
   /// MC Analysis
   // Gen Primary Vertex
   unsigned int          n_genEvtVtx;
   vector<float>         *genEvtVtx_X, *genEvtVtx_Y, *genEvtVtx_Z; 
   vector<int>           *genEvtVtx_particles;
-  vector<int>           *n_B0Ancestors; 
-  unsigned int          nMCAll, nMCB0, nMCB0Vtx; 
+  vector<int>           *n_XAncestors; 
+  unsigned int          nMCAll, nMCX, nMCXVtx; 
   vector<int>           *MCPdgIdAll, *MCDanNumAll;
   // Gen Primary Vertex 
   vector<float>         *PriVtxGen_X, *PriVtxGen_Y, *PriVtxGen_Z ; 
@@ -244,7 +243,7 @@ private:
   vector<float>         *ka2_KK_Px, *ka2_KK_Py, *ka2_KK_Pz ;
   vector<float>         *ka2_KK_Chi2 ;
   vector<int>           *ka2_KK_NDF ;
-  vector<float>         *DRMuMuK1, *DRMuMuK2, *DRb0K1, *DRb0K2;
+  vector<float>         *DR_MuMu_K1, *DR_MuMu_K2, *DR_MuMuKK_K1, *DR_MuMuKK_K2;
   /// Primary Vertex with "MuMu correction"
   vector<int>           *PriVtxMuMuCorr_n;
   vector<float>         *PriVtxMuMuCorr_X, *PriVtxMuMuCorr_Y, *PriVtxMuMuCorr_Z ; 
@@ -252,12 +251,12 @@ private:
   vector<float>	        *PriVtxMuMuCorr_Chi2, *PriVtxMuMuCorr_CL;
   vector<int>           *PriVtxMuMuCorr_tracks ;
   vector<int>           *nTrk ;
-  /// B0 cand 
-  vector<float>         *b0Mass, *b0Vtx_CL, *b0Vtx_Chi2; 
-  vector<float>         *b0Px, *b0Py, *b0Pz ; 
-  vector<double>        *b0PxE, *b0PyE, *b0PzE ; 
-  vector<float>         *b0DecayVtx_X, *b0DecayVtx_Y, *b0DecayVtx_Z ; 
-  vector<double>        *b0DecayVtx_XE, *b0DecayVtx_YE, *b0DecayVtx_ZE ;
+  /// X(4140) cand 
+  vector<float>         *xMass, *xVtx_CL, *xVtx_Chi2; 
+  vector<float>         *xPx, *xPy, *xPz ; 
+  vector<double>        *xPxE, *xPyE, *xPzE ; 
+  vector<float>         *xDecayVtx_X, *xDecayVtx_Y, *xDecayVtx_Z ; 
+  vector<double>        *xDecayVtx_XE, *xDecayVtx_YE, *xDecayVtx_ZE ;
   /// Muons and tracks after B0 cand fit  
   vector<float>         *mu1Px_MuMuKK, *mu1Py_MuMuKK, *mu1Pz_MuMuKK, *mu1E_MuMuKK ;
   vector<float>         *mu2Px_MuMuKK, *mu2Py_MuMuKK, *mu2Pz_MuMuKK, *mu2E_MuMuKK ;
@@ -272,52 +271,53 @@ private:
   vector<float>         *kaon2_dedx_byHits, *kaon2_dedxErr_byHits ; 
   vector<int>           *kaon2_saturMeas_byHits, *kaon2_Meas_byHits ; 
   /// Primary Vertex with largest B0_cos(alpha) 
-  vector<int>           *PriVtx_B0CosAlpha_n; 
-  vector<float>         *PriVtx_B0CosAlpha_X, *PriVtx_B0CosAlpha_Y, *PriVtx_B0CosAlpha_Z ; 
-  vector<double>        *PriVtx_B0CosAlpha_EX, *PriVtx_B0CosAlpha_EY, *PriVtx_B0CosAlpha_EZ ; 
-  vector<float>	        *PriVtx_B0CosAlpha_Chi2, *PriVtx_B0CosAlpha_CL; 
-  vector<int>           *PriVtx_B0CosAlpha_tracks ; 
-  vector<int>           *PriVtx_B0CosAlpha3D_n; 
-  vector<float>         *PriVtx_B0CosAlpha3D_X, *PriVtx_B0CosAlpha3D_Y, *PriVtx_B0CosAlpha3D_Z ; 
-  vector<double>        *PriVtx_B0CosAlpha3D_EX, *PriVtx_B0CosAlpha3D_EY, *PriVtx_B0CosAlpha3D_EZ ; 
-  vector<float>	        *PriVtx_B0CosAlpha3D_Chi2, *PriVtx_B0CosAlpha3D_CL;
-  vector<int>           *PriVtx_B0CosAlpha3D_tracks ;
-  vector<float>         *B0LessPV_tracksPtSq, *B0LessPV_4tracksPtSq ;
-  vector<int>           *PriVtxB0Less_n;
-  vector<float>         *PriVtxB0Less_X, *PriVtxB0Less_Y, *PriVtxB0Less_Z ; 
-  vector<double>        *PriVtxB0Less_EX, *PriVtxB0Less_EY, *PriVtxB0Less_EZ ;
-  vector<float>	        *PriVtxB0Less_Chi2, *PriVtxB0Less_CL;
-  vector<int>           *PriVtxB0Less_tracks ;
-  vector<int>           *PriVtxB0Less_B0CosAlpha_n;
-  vector<float>         *PriVtxB0Less_B0CosAlpha_X, *PriVtxB0Less_B0CosAlpha_Y, *PriVtxB0Less_B0CosAlpha_Z ; 
-  vector<double>        *PriVtxB0Less_B0CosAlpha_EX, *PriVtxB0Less_B0CosAlpha_EY, *PriVtxB0Less_B0CosAlpha_EZ ;
-  vector<float>	        *PriVtxB0Less_B0CosAlpha_Chi2, *PriVtxB0Less_B0CosAlpha_CL;
-  vector<int>           *PriVtxB0Less_B0CosAlpha_tracks ;
-  vector<int>           *PriVtxB0Less_B0CosAlpha3D_n;
-  vector<float>         *PriVtxB0Less_B0CosAlpha3D_X, *PriVtxB0Less_B0CosAlpha3D_Y, *PriVtxB0Less_B0CosAlpha3D_Z ; 
-  vector<double>        *PriVtxB0Less_B0CosAlpha3D_EX, *PriVtxB0Less_B0CosAlpha3D_EY, *PriVtxB0Less_B0CosAlpha3D_EZ ;
-  vector<float>	        *PriVtxB0Less_B0CosAlpha3D_Chi2, *PriVtxB0Less_B0CosAlpha3D_CL;
-  vector<int>           *PriVtxB0Less_B0CosAlpha3D_tracks ;
+  vector<int>           *PriVtx_XCosAlpha_n; 
+  vector<float>         *PriVtx_XCosAlpha_X, *PriVtx_XCosAlpha_Y, *PriVtx_XCosAlpha_Z ; 
+  vector<double>        *PriVtx_XCosAlpha_EX, *PriVtx_XCosAlpha_EY, *PriVtx_XCosAlpha_EZ ; 
+  vector<float>	        *PriVtx_XCosAlpha_Chi2, *PriVtx_XCosAlpha_CL; 
+  vector<int>           *PriVtx_XCosAlpha_tracks ; 
+
+  vector<int>           *PriVtx_XCosAlpha3D_n; 
+  vector<float>         *PriVtx_XCosAlpha3D_X, *PriVtx_XCosAlpha3D_Y, *PriVtx_XCosAlpha3D_Z ; 
+  vector<double>        *PriVtx_XCosAlpha3D_EX, *PriVtx_XCosAlpha3D_EY, *PriVtx_XCosAlpha3D_EZ ; 
+  vector<float>	        *PriVtx_XCosAlpha3D_Chi2, *PriVtx_XCosAlpha3D_CL;
+  vector<int>           *PriVtx_XCosAlpha3D_tracks ;
+  vector<float>         *XLessPV_tracksPtSq, *XLessPV_4tracksPtSq ;
+  vector<int>           *PriVtxXLess_n;
+  vector<float>         *PriVtxXLess_X, *PriVtxXLess_Y, *PriVtxXLess_Z ; 
+  vector<double>        *PriVtxXLess_EX, *PriVtxXLess_EY, *PriVtxXLess_EZ ;
+  vector<float>	        *PriVtxXLess_Chi2, *PriVtxXLess_CL;
+  vector<int>           *PriVtxXLess_tracks ;
+  vector<int>           *PriVtxXLess_XCosAlpha_n;
+  vector<float>         *PriVtxXLess_XCosAlpha_X, *PriVtxXLess_XCosAlpha_Y, *PriVtxXLess_XCosAlpha_Z ; 
+  vector<double>        *PriVtxXLess_XCosAlpha_EX, *PriVtxXLess_XCosAlpha_EY, *PriVtxXLess_XCosAlpha_EZ ;
+  vector<float>	        *PriVtxXLess_XCosAlpha_Chi2, *PriVtxXLess_XCosAlpha_CL;
+  vector<int>           *PriVtxXLess_XCosAlpha_tracks ;
+  vector<int>           *PriVtxXLess_XCosAlpha3D_n;
+  vector<float>         *PriVtxXLess_XCosAlpha3D_X, *PriVtxXLess_XCosAlpha3D_Y, *PriVtxXLess_XCosAlpha3D_Z ; 
+  vector<double>        *PriVtxXLess_XCosAlpha3D_EX, *PriVtxXLess_XCosAlpha3D_EY, *PriVtxXLess_XCosAlpha3D_EZ ;
+  vector<float>	        *PriVtxXLess_XCosAlpha3D_Chi2, *PriVtxXLess_XCosAlpha3D_CL;
+  vector<int>           *PriVtxXLess_XCosAlpha3D_tracks ;
   /// Primary Vertex with "B0 correction"
-  vector<int>           *PriVtxB0Corr_n; 
-  vector<float>         *PriVtxB0Corr_X, *PriVtxB0Corr_Y, *PriVtxB0Corr_Z; 
-  vector<double>        *PriVtxB0Corr_EX, *PriVtxB0Corr_EY, *PriVtxB0Corr_EZ; 
-  vector<float>	        *PriVtxB0Corr_Chi2, *PriVtxB0Corr_CL; 
-  vector<int>           *PriVtxB0Corr_tracks; 
+  vector<int>           *PriVtxXCorr_n; 
+  vector<float>         *PriVtxXCorr_X, *PriVtxXCorr_Y, *PriVtxXCorr_Z; 
+  vector<double>        *PriVtxXCorr_EX, *PriVtxXCorr_EY, *PriVtxXCorr_EZ; 
+  vector<float>	        *PriVtxXCorr_Chi2, *PriVtxXCorr_CL; 
+  vector<int>           *PriVtxXCorr_tracks; 
   /// Lifetimes variables for B0 
-  vector<double>        *b0CosAlphaBS, *b0CosAlpha3DBS, *b0CTauBS, *b0CTauBSE, *b0LxyBS, *b0LxyBSE, *b0LxyzBS, *b0LxyzBSE ;
-  vector<double>        *b0CosAlphaPV, *b0CosAlpha3DPV, *b0CTauPV, *b0CTauPVE, *b0LxyPV, *b0LxyPVE, *b0LxyzPV, *b0LxyzPVE ;
-  vector<double>        *b0CosAlphaPVCosAlpha, *b0CosAlpha3DPVCosAlpha, *b0CTauPVCosAlpha, *b0CTauPVCosAlphaE, *b0LxyPVCosAlpha, *b0LxyPVCosAlphaE, *b0LxyzPVCosAlpha, *b0LxyzPVCosAlphaE ;
-  vector<double>        *b0CosAlphaPVCosAlpha3D, *b0CosAlpha3DPVCosAlpha3D, *b0CTauPVCosAlpha3D, *b0CTauPVCosAlpha3DE, *b0LxyPVCosAlpha3D, *b0LxyPVCosAlpha3DE, *b0LxyzPVCosAlpha3D, *b0LxyzPVCosAlpha3DE ;
-  vector<double>        *b0CosAlphaB0LessPV, *b0CosAlpha3DB0LessPV, *b0CTauB0LessPV, *b0CTauB0LessPVE, *b0LxyB0LessPV, *b0LxyB0LessPVE, *b0LxyzB0LessPV, *b0LxyzB0LessPVE ;
-  vector<double>        *b0CosAlphaB0LessPVCosAlpha, *b0CosAlpha3DB0LessPVCosAlpha, *b0CTauB0LessPVCosAlpha, *b0CTauB0LessPVCosAlphaE, *b0LxyB0LessPVCosAlpha, *b0LxyB0LessPVCosAlphaE, *b0LxyzB0LessPVCosAlpha, *b0LxyzB0LessPVCosAlphaE ;
-  vector<double>        *b0CosAlphaB0LessPVCosAlpha3D, *b0CosAlpha3DB0LessPVCosAlpha3D, *b0CTauB0LessPVCosAlpha3D, *b0CTauB0LessPVCosAlpha3DE, *b0LxyB0LessPVCosAlpha3D, *b0LxyB0LessPVCosAlpha3DE, *b0LxyzB0LessPVCosAlpha3D, *b0LxyzB0LessPVCosAlpha3DE ;
-  vector<double>        *b0CosAlphaPVX, *b0CTauPVX, *b0CTauPVXE, *b0LxyPVX, *b0LxyPVXE, *b0LxyzPVX, *b0LxyzPVXE ;
-  vector<float>	        *b0CTauPVX_3D, *b0CTauPVX_3D_err;
+  vector<double>        *xCosAlphaBS, *xCosAlpha3DBS, *xCTauBS, *xCTauBSE, *xLxyBS, *xLxyBSE, *xLxyzBS, *xLxyzBSE ;
+  vector<double>        *xCosAlphaPV, *xCosAlpha3DPV, *xCTauPV, *xCTauPVE, *xLxyPV, *xLxyPVE, *xLxyzPV, *xLxyzPVE ;
+  vector<double>        *xCosAlphaPVCosAlpha, *xCosAlpha3DPVCosAlpha, *xCTauPVCosAlpha, *xCTauPVCosAlphaE, *xLxyPVCosAlpha, *xLxyPVCosAlphaE, *xLxyzPVCosAlpha, *xLxyzPVCosAlphaE ;
+  vector<double>        *xCosAlphaPVCosAlpha3D, *xCosAlpha3DPVCosAlpha3D, *xCTauPVCosAlpha3D, *xCTauPVCosAlpha3DE, *xLxyPVCosAlpha3D, *xLxyPVCosAlpha3DE, *xLxyzPVCosAlpha3D, *xLxyzPVCosAlpha3DE ;
+  vector<double>        *xCosAlphaXLessPV, *xCosAlpha3DXLessPV, *xCTauXLessPV, *xCTauXLessPVE, *xLxyXLessPV, *xLxyXLessPVE, *xLxyzXLessPV, *xLxyzXLessPVE ;
+  vector<double>        *xCosAlphaXLessPVCosAlpha, *xCosAlpha3DXLessPVCosAlpha, *xCTauXLessPVCosAlpha, *xCTauXLessPVCosAlphaE, *xLxyXLessPVCosAlpha, *xLxyXLessPVCosAlphaE, *xLxyzXLessPVCosAlpha, *xLxyzXLessPVCosAlphaE ;
+  vector<double>        *xCosAlphaXLessPVCosAlpha3D, *xCosAlpha3DXLessPVCosAlpha3D, *xCTauXLessPVCosAlpha3D, *xCTauXLessPVCosAlpha3DE, *xLxyXLessPVCosAlpha3D, *xLxyXLessPVCosAlpha3DE, *xLxyzXLessPVCosAlpha3D, *xLxyzXLessPVCosAlpha3DE ;
+  vector<double>        *xCosAlphaPVX, *xCTauPVX, *xCTauPVXE, *xLxyPVX, *xLxyPVXE, *xLxyzPVX, *xLxyzPVXE ;
+  vector<float>	        *xCTauPVX_3D, *xCTauPVX_3D_err;
   /// dxy, dz, dxyE, dzE for kaons from PV, BS, B0LessPV
   vector<float>         *kaon1_dxy_PV, *kaon1_dz_PV, *kaon2_dxy_PV, *kaon2_dz_PV;
   vector<float>         *kaon1_dxy_BS, *kaon1_dz_BS, *kaon2_dxy_BS, *kaon2_dz_BS;
-  vector<float>         *kaon1_dxy_B0LessPV, *kaon1_dz_B0LessPV, *kaon2_dxy_B0LessPV, *kaon2_dz_B0LessPV;
+  vector<float>         *kaon1_dxy_XLessPV, *kaon1_dz_XLessPV, *kaon2_dxy_XLessPV, *kaon2_dz_XLessPV;
   vector<float>         *kaon1_dxyE, *kaon1_dzE, *kaon2_dxyE, *kaon2_dzE; 
 
   vector<bool>          *Kaon1FromPV, *Kaon2FromPV;
