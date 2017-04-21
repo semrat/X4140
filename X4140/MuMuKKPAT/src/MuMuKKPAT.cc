@@ -170,7 +170,7 @@ MuMuKKPAT::MuMuKKPAT(const edm::ParameterSet& iConfig) :
   X_One_Tree_(0),
   runNum(0), evtNum(0), lumiNum(0),
   trigRes(0), trigNames(0), L1TT(0), MatchTriggerNames(0),
-  /// counters for X(4140) 
+  /// counters for X 
   nMu(0), nMuMu(0), nX(0), nKK(0),
   nX_pre0(0), nX_pre1(0), nX_pre2(0), nX_pre3(0), nX_pre4(0), nX_pre5(0), nX_pre6(0), nX_pre7(0), nX_pre8(0), nX_pre9(0), nX_pre10(0), nX_pre11(0), nX_pre12(0), nX_pre13(0), nX_pre14(0), nX_pre15(0), 
   
@@ -178,7 +178,7 @@ MuMuKKPAT::MuMuKKPAT(const edm::ParameterSet& iConfig) :
   /// indices
   mu1Idx(0), mu2Idx(0), MuMuType(0), ka1Idx(0), ka2Idx(0),
   X_MuMuIdx(0), X_ka1Idx(0), X_ka2Idx(0),
-  /// MC Analysis /// n_B0Ancestors & no for X(4140)!!
+  /// MC Analysis /// n_B0Ancestors & no for X
   n_genEvtVtx(0), genEvtVtx_X(0), genEvtVtx_Y(0), genEvtVtx_Z(0), genEvtVtx_particles(0), n_XAncestors(0),
   nMCAll(0), nMCX(0), /*nMCXVtx(0),*/ MCPdgIdAll(0), MCDanNumAll(0),
   // Gen Primary Vertex
@@ -236,11 +236,11 @@ MuMuKKPAT::MuMuKKPAT(const edm::ParameterSet& iConfig) :
   PriVtxMuMuCorr_X(0), PriVtxMuMuCorr_Y(0), PriVtxMuMuCorr_Z(0), PriVtxMuMuCorr_EX(0), PriVtxMuMuCorr_EY(0), PriVtxMuMuCorr_EZ(0),
   PriVtxMuMuCorr_Chi2(0), PriVtxMuMuCorr_CL(0), PriVtxMuMuCorr_tracks(0),
   nTrk(0),
-  /// X(4140) cand
+  /// X candidates
   xMass(0), xVtx_CL(0), xVtx_Chi2(0),
   xPx(0), xPy(0), xPz(0), xPxE(0), xPyE(0), xPzE(0),
   xDecayVtx_X(0), xDecayVtx_Y(0), xDecayVtx_Z(0), xDecayVtx_XE(0), xDecayVtx_YE(0), xDecayVtx_ZE(0),
-  /// Muons and tracks after X(4140) cand fit 
+  /// Muons and tracks after X candidates fit 
   mu1Px_MuMuKK(0), mu1Py_MuMuKK(0), mu1Pz_MuMuKK(0), mu1E_MuMuKK(0),
   mu2Px_MuMuKK(0), mu2Py_MuMuKK(0), mu2Pz_MuMuKK(0), mu2E_MuMuKK(0),
   k1Px_MuMuKK(0), k1Py_MuMuKK(0), k1Pz_MuMuKK(0), k1E_MuMuKK(0),
@@ -249,7 +249,7 @@ MuMuKKPAT::MuMuKKPAT(const edm::ParameterSet& iConfig) :
   k2Px_MuMuKK(0), k2Py_MuMuKK(0), k2Pz_MuMuKK(0), k2E_MuMuKK(0),
   kaon2_nsigdedx(0), kaon2_dedx(0), kaon2_dedxMass(0), kaon2_theo(0), kaon2_sigma(0),
   kaon2_dedx_byHits(0), kaon2_dedxErr_byHits(0), kaon2_saturMeas_byHits(0), kaon2_Meas_byHits(0),
-  /// Primary Vertex with largest B0_cos(alpha) no less values for X(4140)
+  /// Primary Vertex with largest B0_cos(alpha) no less values for X
   PriVtx_XCosAlpha_n(0),
   PriVtx_XCosAlpha_X(0), PriVtx_XCosAlpha_Y(0), PriVtx_XCosAlpha_Z(0), PriVtx_XCosAlpha_EX(0), PriVtx_XCosAlpha_EY(0), PriVtx_XCosAlpha_EZ(0),
   PriVtx_XCosAlpha_Chi2(0), PriVtx_XCosAlpha_CL(0), PriVtx_XCosAlpha_tracks(0),
@@ -1300,7 +1300,7 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		    //continue ;
 		  		  
 
-                  ////////////////// fill X(4140) candidate variables //////////////////
+                  ////////////////// fill X candidate variables //////////////////
 		  xMass->push_back( XCand_fromMCFit->currentState().mass()) ; 
 		  xPx->push_back( XCand_fromMCFit->currentState().globalMomentum().x()) ;
 		  xPy->push_back( XCand_fromMCFit->currentState().globalMomentum().y()) ;
@@ -1964,13 +1964,13 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   PriVtxMuMuCorr_EX->clear(); PriVtxMuMuCorr_EY->clear(); PriVtxMuMuCorr_EZ->clear();
   PriVtxMuMuCorr_Chi2->clear(); PriVtxMuMuCorr_CL->clear(); PriVtxMuMuCorr_tracks->clear();
   nTrk->clear();
-  /// X(4140) cand 
+  /// X candidates 
   xMass->clear(); xVtx_CL->clear(); xVtx_Chi2->clear();
   xPx->clear(); xPy->clear(); xPz->clear();
   xPxE->clear(); xPyE->clear(); xPzE->clear();
   xDecayVtx_X->clear(); xDecayVtx_Y->clear(); xDecayVtx_Z->clear();
   xDecayVtx_XE->clear(); xDecayVtx_YE->clear(); xDecayVtx_ZE->clear();
-  /// Muons and tracks after X(4140) cand fit
+  /// Muons and tracks after X candidates fit
   mu1Px_MuMuKK->clear(); mu1Py_MuMuKK->clear(); mu1Pz_MuMuKK->clear(); mu1E_MuMuKK->clear();
   mu2Px_MuMuKK->clear(); mu2Py_MuMuKK->clear(); mu2Pz_MuMuKK->clear(); mu2E_MuMuKK->clear();
   k1Px_MuMuKK->clear(); k1Py_MuMuKK->clear(); k1Pz_MuMuKK->clear(); k1E_MuMuKK->clear();
@@ -2263,7 +2263,7 @@ void MuMuKKPAT::beginJob()
   X_One_Tree_->Branch("DR_MuMu_K2",&DR_MuMu_K2);
   X_One_Tree_->Branch("DR_MuMuKK_K1",&DR_MuMuKK_K1);
   X_One_Tree_->Branch("DR_MuMuKK_K2",&DR_MuMuKK_K2);
-  /// counters for X(4140)
+  /// counters for X
   X_One_Tree_->Branch("nX",&nX,"nX/i");
   X_One_Tree_->Branch("nX_pre0",&nX_pre0,"nX_pre0/i");
   X_One_Tree_->Branch("nX_pre1",&nX_pre1,"nX_pre1/i");
@@ -2451,7 +2451,7 @@ void MuMuKKPAT::beginJob()
   X_One_Tree_->Branch("Kaon1FromPV",&Kaon1FromPV);
   X_One_Tree_->Branch("Kaon2FromPV",&Kaon2FromPV );
 
-  /// Muons and tracks after X(4140) cand fit 
+  /// Muons and tracks after X candidates fit 
   X_One_Tree_->Branch("Muon1Px_MuMuKK", &mu1Px_MuMuKK);
   X_One_Tree_->Branch("Muon1Py_MuMuKK", &mu1Py_MuMuKK);
   X_One_Tree_->Branch("Muon1Pz_MuMuKK", &mu1Pz_MuMuKK);
