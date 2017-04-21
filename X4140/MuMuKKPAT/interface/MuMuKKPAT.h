@@ -157,7 +157,7 @@ private:
   vector<unsigned int>* L1TT;
   vector<std::string>*  MatchTriggerNames;
 
-  /// counters for X(4140) 
+  /// counters for X 
   unsigned int          nMu, nMuMu, nX, nKK; 
   unsigned int          nX_pre0, nX_pre1, nX_pre2, nX_pre3, nX_pre4, nX_pre5, nX_pre6, nX_pre7, nX_pre8, nX_pre9, nX_pre10, nX_pre11, nX_pre12, nX_pre13, nX_pre14, nX_pre15; 
   int                   priVtx_n;
@@ -251,7 +251,7 @@ private:
   vector<float>	        *PriVtxMuMuCorr_Chi2, *PriVtxMuMuCorr_CL;
   vector<int>           *PriVtxMuMuCorr_tracks ;
   vector<int>           *nTrk ;
-  /// X(4140) cand 
+  /// X candidates 
   vector<float>         *xMass, *xVtx_CL, *xVtx_Chi2; 
   vector<float>         *xPx, *xPy, *xPz ; 
   vector<double>        *xPxE, *xPyE, *xPzE ; 
