@@ -1,4 +1,46 @@
 import FWCore.ParameterSet.Config as cms
+import sys
+
+import FWCore.PythonUtilities.LumiList as LumiList
+import FWCore.ParameterSet.Types as CfgTypes
+
+jobname = sys.argv[1]
+
+#default values
+skipevt = 5
+maxevts = 1000
+fileIn = '/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20000/00054BD0-5668-E211-8091-00215E21DC7E.root'
+
+#reading files
+readFiles = cms.untracked.vstring()
+
+for i in range(2,len(sys.argv)):
+        if(sys.argv[i] == "s"):
+            if i+1 < sys.argv[0]:
+                i = i + 1
+                skipevt = int(sys.argv[i])
+        else:
+            if(sys.argv[i] == "m"):
+                if i+1 < sys.argv[0]:
+                    i = i + 1
+                    maxevts = int(sys.argv[i])
+            else:
+                if(sys.argv[i] == "f"):
+                    if i+1 < sys.argv[0]:
+                        i = i + 1
+                        fileIn = sys.argv[i]
+
+readFiles.extend( [fileIn] );
+
+print("Running :" +  jobname)
+print("Reading from event " + str(skipevt) + " to event " + str(maxevts+skipevt))
+
+fileName = fileIn.split('/')
+outPath = '/lustre/cms/store/user/adiflori/2017/X4140/' + str(fileName[3]) + "/"
+file
+outPath += fileName[-1].split(".")[0] + '_' + str(skipevt) + '_' + str(skipevt+maxevts) +'.root'
+
+print("Writing to " + outPath)
 
 process = cms.Process('NTUPLE')
 
@@ -25,36 +67,14 @@ elif MCMotherId == 531 :
     MCExclusiveDecay = False
 
 # Input source
+
 process.source = cms.Source("PoolSource",
-                            skipEvents = cms.untracked.uint32( 0 ), #with 11976 Processing run: 201707 lumi: 281 event: 383901681
-                            fileNames = cms.untracked.vstring()
+                            skipEvents = cms.untracked.uint32(skipevt), #with 11976 Processing run: 201707 lumi: 281 event: 383901681
+                            fileNames = readFiles
 )
 
 if (not MC) :
-    sourceFiles = cms.untracked.vstring( # 'root://cms-xrd-global.cern.ch/' prefix could help sometimes
-            # Sanjay
-            #'file:PYTHIA6_Bd2Psi2SKpi_TuneZ2star_8TeV_cff_py_RAW2DIGI_L1Reco_RECO.root'
-            # dataset C
-            #'root://cmsxrootd.fnal.gov//store/data/Run2012C/MuOniaParked/AOD/22Jan2013-v1/30000/1E71D761-D870-E211-9343-00215E25A5E2.root' # used to work, not on 30/07/2015
-            #'/store/data/Run2012C/MuOniaParked/AOD/22Jan2013-v1/30000/1E71D761-D870-E211-9343-00215E25A5E2.root'
-	    #'root://cms-xrd-global.cern.ch//store/data/Run2012C/MuOniaParked/AOD/22Jan2013-v1/30000/1E71D761-D870-E211-9343-00215E25A5E2.root'
-	    #'root://xrootd.unl.edu//store/data/Run2012C/MuOniaParked/AOD/22Jan2013-v1/20000/00109B2A-2E77-E211-893B-E41F1318165C.root'
-	    #'/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20002/1A5DE0F3-646B-E211-91AA-001A645C2BC0.root' # guilty file
-	    #'/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20000/00054BD0-5668-E211-8091-00215E21DC7E.root'
-            #'/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20000/000A1D2E-3168-E211-B2F7-00215E21D56A.root'
-            #'/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20000/00170E1F-6568-E211-9736-00215E93E7DC.root'
-            #'/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20000/003C345D-C768-E211-8C82-00215E2283FA.root'
-            #'/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20000/0054DA9E-AA67-E211-800F-E41F131815CC.root'
-            #'/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20000/005C3F2E-FE67-E211-A6E7-00215E222850.root'
-            #'/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20000/005DD843-D667-E211-8A8D-E61F13190DCB.root'
-            #'/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20000/00B2C16E-C767-E211-A36F-00215E21DA44.root'
-            #'/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20000/00B47F62-CD67-E211-B7B2-00215E221B48.root'
-            #'/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20002/74EA8A9D-2D6C-E211-A15A-00215E21D588.root'
-            #'root://cmsxrootd.hep.wisc.edu//store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20003/CE2C94D8-036F-E211-A034-00215E21D8EE.root'
-            #'/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20001/EE35A843-3E69-E211-9292-00215E2226AC.root' # job 412 error code 8021
-            '/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20001/EE35A843-3E69-E211-9292-00215E2226AC.root'
-            #'/afs/cern.ch/user/s/semrat/scratch0/CMSSW_5_3_22/src/X4140/MuMuKKPAT/test/EE35A843-3E69-E211-9292-00215E2226AC.root'
-    )
+    sourceFiles = readFiles
 elif MC :
         if MCMotherId == 511 :
                 if (not official) :
@@ -196,8 +216,14 @@ process.source.inputCommands = cms.untracked.vstring(
         "drop *_MEtoEDMConverter_*_*"
 	)
 
+JSONfile = 'Cert_190456-208686_8TeV_22Jan2013ReReco_Collisions12_JSON_MuonPhys.txt'
+myLumis = LumiList.LumiList(filename = JSONfile).getCMSSWString().split(',')
+process.source.lumisToProcess = CfgTypes.untracked(CfgTypes.VLuminosityBlockRange())
+process.source.lumisToProcess.extend(myLumis)
+
+
 process.maxEvents = cms.untracked.PSet(
-        input = cms.untracked.int32( -1 ) # 256Kb in 2' for 100 events, 1Mb in 7' for 1k events, 6Mb in 50' for 8650 events, 11Mb in 66' for 10k events, 100Mb in 14h for 150k events, 1.4Gb in 4 days for 1.2M events of official MC
+        input = cms.untracked.int32(maxevts) # 256Kb in 2' for 100 events, 1Mb in 7' for 1k events, 6Mb in 50' for 8650 events, 11Mb in 66' for 10k events, 100Mb in 14h for 150k events, 1.4Gb in 4 days for 1.2M events of official MC
         #input = cms.untracked.int32( 1000 ) # 310Kb in 3' for 1k events of private MC
         #input = cms.untracked.int32( 100 ) # = 20Mb in 2h for 15k events, 2Mb in 10' for 1k events of Run2012C/MuOniaParked/AOD/22Jan2013-v1
 	#input = cms.untracked.int32( 1000 ) # = 3Mb for 6546 events, 85Kb for 100, 800kb for 1k events of BsToPsiMuMu
@@ -435,24 +461,24 @@ process.mkcands = cms.EDAnalyzer("MuMuKKPAT",
 
                                  MinJPsiMass = cms.untracked.double(2.8), # SEMRA changed
                                  MaxJPsiMass = cms.untracked.double(3.4), # SEMRA changed
-				 MinPhiMass = cms.untracked.double (0.97), # SEMRA added
- 				 MaxPhiMass = cms.untracked.double (1.07), # SEMRA added
-				 MaxJPsiPhiXMass = cms.untracked.double (4.35), # SEMRA added
-				 MinJPsiPhiB0Mass = cms.untracked.double (5.1), # SEMRA added
-				 MaxJPsiPhiB0Mass = cms.untracked.double (5.6), # SEMRA added
+                				 MinPhiMass = cms.untracked.double (0.97), # SEMRA added
+                 				 MaxPhiMass = cms.untracked.double (1.07), # SEMRA added
+                				 MaxJPsiPhiXMass = cms.untracked.double (4.8), # 4.35
+                				 MinJPsiPhiB0Mass = cms.untracked.double (5.15), # 5.1SEMRA added
+                				 MaxJPsiPhiB0Mass = cms.untracked.double (5.55), # 5.55SEMRA added
 
                                  MinNumTrSiHits = cms.untracked.int32(4),
                                  MinTrPt = cms.untracked.double(0.350),
                                  Chi2NDF_Track =  cms.untracked.double(7.0),
 				 # Delta R
 				 MaxMuMuTrackDR = cms.untracked.double(1.5),
-                                 MaxXCandTrackDR = cms.untracked.double(1.5),
-                                 UseXDr = cms.untracked.bool(True),
+                                 MaxB0CandTrackDR = cms.untracked.double(1.5),
+                                 UseB0Dr = cms.untracked.bool(True),
 
                                  resolvePileUpAmbiguity = cms.untracked.bool(False),
                                  addMuMulessPrimaryVertex = cms.untracked.bool(True),
                                  #addMuMulessPrimaryVertex = cms.untracked.bool(False),
-                                 addXlessPrimaryVertex = cms.untracked.bool(True),
+                                 addB0lessPrimaryVertex = cms.untracked.bool(True),
                                  Debug_Output = cms.untracked.bool(False), # true
                                  ##
                                  ##  use the correct trigger path

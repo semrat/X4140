@@ -1,4 +1,45 @@
 import FWCore.ParameterSet.Config as cms
+import sys
+
+import FWCore.PythonUtilities.LumiList as LumiList
+import FWCore.ParameterSet.Types as CfgTypes
+
+jobname = sys.argv[1]
+
+#default values
+skipevt = 5
+maxevts = 1000
+fileIn = '/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20000/00054BD0-5668-E211-8091-00215E21DC7E.root'
+
+#reading files
+readFiles = cms.untracked.vstring()
+
+for i in range(2,len(sys.argv)):
+        if(sys.argv[i] == "s"):
+            if i+1 < sys.argv[0]:
+                i = i + 1
+                skipevt = int(sys.argv[i])
+        else:
+            if(sys.argv[i] == "m"):
+                if i+1 < sys.argv[0]:
+                    i = i + 1
+                    maxevts = int(sys.argv[i])
+            else:
+                if(sys.argv[i] == "f"):
+                    if i+1 < sys.argv[0]:
+                        i = i + 1
+                        fileIn = sys.argv[i]
+
+readFiles.extend( [fileIn] );
+
+print("Running :" +  jobname)
+print("Reading from event " + str(skipevt) + " to event " + str(maxevts+skipevt))
+
+fileName = fileIn.split('/')
+outPath = '/lustre/cms/store/user/adiflori/2017/X4140/' + str(fileName[3]) + "/"
+outPath += fileName[-1].split(".")[0] + '_' + str(skipevt) + '_' + str(skipevt+maxevts) +'.root'
+
+print("Writing to " + outPath)
 
 process = cms.Process('NTUPLE')
 
@@ -26,35 +67,12 @@ elif MCMotherId == 531 :
 
 # Input source
 process.source = cms.Source("PoolSource",
-                            skipEvents = cms.untracked.uint32( 0 ), #with 11976 Processing run: 201707 lumi: 281 event: 383901681
-                            fileNames = cms.untracked.vstring()
+                            skipEvents = cms.untracked.uint32(skipevt), #with 11976 Processing run: 201707 lumi: 281 event: 383901681
+                            fileNames = readFiles
 )
 
 if (not MC) :
-    sourceFiles = cms.untracked.vstring( # 'root://cms-xrd-global.cern.ch/' prefix could help sometimes
-            # Sanjay
-            #'file:PYTHIA6_Bd2Psi2SKpi_TuneZ2star_8TeV_cff_py_RAW2DIGI_L1Reco_RECO.root'
-            # dataset C
-            #'root://cmsxrootd.fnal.gov//store/data/Run2012C/MuOniaParked/AOD/22Jan2013-v1/30000/1E71D761-D870-E211-9343-00215E25A5E2.root' # used to work, not on 30/07/2015
-            #'/store/data/Run2012C/MuOniaParked/AOD/22Jan2013-v1/30000/1E71D761-D870-E211-9343-00215E25A5E2.root'
-	    #'root://cms-xrd-global.cern.ch//store/data/Run2012C/MuOniaParked/AOD/22Jan2013-v1/30000/1E71D761-D870-E211-9343-00215E25A5E2.root'
-	    #'root://xrootd.unl.edu//store/data/Run2012C/MuOniaParked/AOD/22Jan2013-v1/20000/00109B2A-2E77-E211-893B-E41F1318165C.root'
-	    #'/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20002/1A5DE0F3-646B-E211-91AA-001A645C2BC0.root' # guilty file
-	    #'/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20000/00054BD0-5668-E211-8091-00215E21DC7E.root'
-            #'/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20000/000A1D2E-3168-E211-B2F7-00215E21D56A.root'
-            #'/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20000/00170E1F-6568-E211-9736-00215E93E7DC.root'
-            #'/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20000/003C345D-C768-E211-8C82-00215E2283FA.root'
-            #'/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20000/0054DA9E-AA67-E211-800F-E41F131815CC.root'
-            #'/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20000/005C3F2E-FE67-E211-A6E7-00215E222850.root'
-            #'/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20000/005DD843-D667-E211-8A8D-E61F13190DCB.root'
-            #'/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20000/00B2C16E-C767-E211-A36F-00215E21DA44.root'
-            #'/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20000/00B47F62-CD67-E211-B7B2-00215E221B48.root'
-            #'/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20002/74EA8A9D-2D6C-E211-A15A-00215E21D588.root'
-            #'root://cmsxrootd.hep.wisc.edu//store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20003/CE2C94D8-036F-E211-A034-00215E21D8EE.root'
-            #'/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20001/EE35A843-3E69-E211-9292-00215E2226AC.root' # job 412 error code 8021
-            '/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20001/EE35A843-3E69-E211-9292-00215E2226AC.root'
-            #'/afs/cern.ch/user/s/semrat/scratch0/CMSSW_5_3_22/src/X4140/MuMuKKPAT/test/EE35A843-3E69-E211-9292-00215E2226AC.root'
-    )
+    sourceFiles = readFiles
 elif MC :
         if MCMotherId == 511 :
                 if (not official) :
