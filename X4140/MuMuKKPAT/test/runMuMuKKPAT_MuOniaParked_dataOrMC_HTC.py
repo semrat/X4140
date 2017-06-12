@@ -37,6 +37,7 @@ print("Reading from event " + str(skipevt) + " to event " + str(maxevts+skipevt)
 
 fileName = fileIn.split('/')
 outPath = '/lustre/cms/store/user/adiflori/2017/X4140/' + str(fileName[3]) + "/"
+
 outPath += fileName[-1].split(".")[0] + '_' + str(skipevt) + '_' + str(skipevt+maxevts) +'.root'
 
 print("Writing to " + outPath)
@@ -66,6 +67,7 @@ elif MCMotherId == 531 :
     MCExclusiveDecay = False
 
 # Input source
+
 process.source = cms.Source("PoolSource",
                             skipEvents = cms.untracked.uint32(skipevt), #with 11976 Processing run: 201707 lumi: 281 event: 383901681
                             fileNames = readFiles
@@ -214,8 +216,14 @@ process.source.inputCommands = cms.untracked.vstring(
         "drop *_MEtoEDMConverter_*_*"
 	)
 
+JSONfile = 'Cert_190456-208686_8TeV_22Jan2013ReReco_Collisions12_JSON_MuonPhys.txt'
+myLumis = LumiList.LumiList(filename = JSONfile).getCMSSWString().split(',')
+process.source.lumisToProcess = CfgTypes.untracked(CfgTypes.VLuminosityBlockRange())
+process.source.lumisToProcess.extend(myLumis)
+
+
 process.maxEvents = cms.untracked.PSet(
-        input = cms.untracked.int32( -1 ) # 256Kb in 2' for 100 events, 1Mb in 7' for 1k events, 6Mb in 50' for 8650 events, 11Mb in 66' for 10k events, 100Mb in 14h for 150k events, 1.4Gb in 4 days for 1.2M events of official MC
+        input = cms.untracked.int32(maxevts) # 256Kb in 2' for 100 events, 1Mb in 7' for 1k events, 6Mb in 50' for 8650 events, 11Mb in 66' for 10k events, 100Mb in 14h for 150k events, 1.4Gb in 4 days for 1.2M events of official MC
         #input = cms.untracked.int32( 1000 ) # 310Kb in 3' for 1k events of private MC
         #input = cms.untracked.int32( 100 ) # = 20Mb in 2h for 15k events, 2Mb in 10' for 1k events of Run2012C/MuOniaParked/AOD/22Jan2013-v1
 	#input = cms.untracked.int32( 1000 ) # = 3Mb for 6546 events, 85Kb for 100, 800kb for 1k events of BsToPsiMuMu
@@ -453,11 +461,11 @@ process.mkcands = cms.EDAnalyzer("MuMuKKPAT",
 
                                  MinJPsiMass = cms.untracked.double(2.8), # SEMRA changed
                                  MaxJPsiMass = cms.untracked.double(3.4), # SEMRA changed
-				 MinPhiMass = cms.untracked.double (0.97), # SEMRA added
- 				 MaxPhiMass = cms.untracked.double (1.07), # SEMRA added
-				 MaxJPsiPhiXMass = cms.untracked.double (4.35), # SEMRA added
-				 MinJPsiPhiB0Mass = cms.untracked.double (5.1), # SEMRA added
-				 MaxJPsiPhiB0Mass = cms.untracked.double (5.6), # SEMRA added
+                				 MinPhiMass = cms.untracked.double (0.97), # SEMRA added
+                 				 MaxPhiMass = cms.untracked.double (1.07), # SEMRA added
+                				 MaxJPsiPhiXMass = cms.untracked.double (4.8), # 4.35
+                				 MinJPsiPhiB0Mass = cms.untracked.double (5.15), # 5.1SEMRA added
+                				 MaxJPsiPhiB0Mass = cms.untracked.double (5.55), # 5.55SEMRA added
 
                                  MinNumTrSiHits = cms.untracked.int32(4),
                                  MinTrPt = cms.untracked.double(0.350),
