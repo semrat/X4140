@@ -216,7 +216,7 @@ process.source.inputCommands = cms.untracked.vstring(
         "drop *_MEtoEDMConverter_*_*"
 	)
 
-JSONfile = 'Cert_190456-208686_8TeV_22Jan2013ReReco_Collisions12_JSON_MuonPhys.txt'
+JSONfile = '/lustre/home/adrianodif/CMSSW_5_3_22/src/X4140/MuMuKKPAT/test/Cert_190456-208686_8TeV_22Jan2013ReReco_Collisions12_JSON_MuonPhys.txt'
 myLumis = LumiList.LumiList(filename = JSONfile).getCMSSWString().split(',')
 process.source.lumisToProcess = CfgTypes.untracked(CfgTypes.VLuminosityBlockRange())
 process.source.lumisToProcess.extend(myLumis)
