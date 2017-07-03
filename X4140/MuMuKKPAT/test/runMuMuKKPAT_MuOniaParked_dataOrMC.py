@@ -476,7 +476,7 @@ process.mkcands = cms.EDAnalyzer("MuMuKKPAT",
                                          #"HLT_Dimuon7_PsiPrime_v1", "HLT_Dimuon7_PsiPrime_v2", "HLT_Dimuon7_PsiPrime_v3", "HLT_Dimuon9_PsiPrime_v9",
                                          #"HLT_DoubleMu3p5_LowMass_Displaced_v3", "HLT_DoubleMu3p5_LowMass_Displaced_v4", "HLT_DoubleMu3p5_LowMass_Displaced_v5", "HLT_DoubleMu3p5_LowMass_Displaced_v6"
 					 # inclusive J/psi
-					 #"HLT_Dimuon8_Jpsi_v3",
+					 "HLT_Dimuon8_Jpsi_v3",
 					 "HLT_Dimuon8_Jpsi_v4",
 					 "HLT_Dimuon8_Jpsi_v5", "HLT_Dimuon8_Jpsi_v6", "HLT_Dimuon8_Jpsi_v7",
                                  ),
@@ -498,7 +498,7 @@ process.TFileService = cms.Service("TFileService",
     fileName = cms.string('set_below.root')
 )
 if (not MC) :
-    process.TFileService.fileName = cms.string(outPath)
+    process.TFileService.fileName = cms.string('MuOniaParked_Run2012B_MuMuKKPAT_ntpl.root')
 elif MC :
     if MCMotherId == 511 :
             if (not official) :
