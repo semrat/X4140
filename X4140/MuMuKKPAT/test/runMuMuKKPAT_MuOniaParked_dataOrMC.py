@@ -52,7 +52,8 @@ if (not MC) :
             #'/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20002/74EA8A9D-2D6C-E211-A15A-00215E21D588.root'
             #'root://cmsxrootd.hep.wisc.edu//store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20003/CE2C94D8-036F-E211-A034-00215E21D8EE.root'
             #'/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20001/EE35A843-3E69-E211-9292-00215E2226AC.root' # job 412 error code 8021
-            '/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20001/EE35A843-3E69-E211-9292-00215E2226AC.root'
+	    '/store/data/Run2012D/MuOniaParked/AOD/22Jan2013-v1/10010/466F7295-4893-E211-81FE-0025901D6286.root'
+ #           '/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20001/EE35A843-3E69-E211-9292-00215E2226AC.root'
             #'/afs/cern.ch/user/s/semrat/scratch0/CMSSW_5_3_22/src/X4140/MuMuKKPAT/test/EE35A843-3E69-E211-9292-00215E2226AC.root'
     )
 elif MC :
@@ -459,9 +460,9 @@ process.mkcands = cms.EDAnalyzer("MuMuKKPAT",
                                  ##
                                  TriggersForMatching = cms.untracked.vstring(
                                          #2012 displaced J/psi = Alessandra
-                                         "HLT_DoubleMu4_Jpsi_Displaced_v9",
-					 "HLT_DoubleMu4_Jpsi_Displaced_v10",
-					 "HLT_DoubleMu4_Jpsi_Displaced_v11", "HLT_DoubleMu4_Jpsi_Displaced_v12",
+                                         #"HLT_DoubleMu4_Jpsi_Displaced_v9",
+					 #"HLT_DoubleMu4_Jpsi_Displaced_v10",
+					 #"HLT_DoubleMu4_Jpsi_Displaced_v11", "HLT_DoubleMu4_Jpsi_Displaced_v12",
                                          # Lucia
                                          # 2010
                                          #"HLT_DoubleMu3_Quarkonium_v1", "HLT_DoubleMu3_Quarkonium_v2",
@@ -498,7 +499,8 @@ process.TFileService = cms.Service("TFileService",
     fileName = cms.string('set_below.root')
 )
 if (not MC) :
-    process.TFileService.fileName = cms.string(outPath)
+   process.TFileService.fileName = cms.string('MuOniaParked_Run2012_MuMuKKPAT_ntpl.root')
+
 elif MC :
     if MCMotherId == 511 :
             if (not official) :

@@ -36,7 +36,7 @@ print("Running :" +  jobname)
 print("Reading from event " + str(skipevt) + " to event " + str(maxevts+skipevt))
 
 fileName = fileIn.split('/')
-outPath = '/lustre/cms/store/user/adiflori/2017/X4140/' + str(fileName[3]) + "/"
+outPath = '/lustre/cms/store/user/adiflori/2017/X4140/test/' + str(fileName[3]) + "/"
 
 outPath += fileName[-1].split(".")[0] + '_' + str(skipevt) + '_' + str(skipevt+maxevts) +'.root'
 
@@ -479,15 +479,15 @@ process.mkcands = cms.EDAnalyzer("MuMuKKPAT",
                                  addMuMulessPrimaryVertex = cms.untracked.bool(True),
                                  #addMuMulessPrimaryVertex = cms.untracked.bool(False),
                                  addXlessPrimaryVertex = cms.untracked.bool(True),
-                                 Debug_Output = cms.untracked.bool(False), # true
+                                 Debug_Output = cms.untracked.bool(True), # true
                                  ##
                                  ##  use the correct trigger path
                                  ##
                                  TriggersForMatching = cms.untracked.vstring(
                                          #2012 displaced J/psi = Alessandra
-                                         "HLT_DoubleMu4_Jpsi_Displaced_v9",
-					 "HLT_DoubleMu4_Jpsi_Displaced_v10",
-					 "HLT_DoubleMu4_Jpsi_Displaced_v11", "HLT_DoubleMu4_Jpsi_Displaced_v12",
+                                         #"HLT_DoubleMu4_Jpsi_Displaced_v9",
+					 #"HLT_DoubleMu4_Jpsi_Displaced_v10",
+					 #"HLT_DoubleMu4_Jpsi_Displaced_v11", "HLT_DoubleMu4_Jpsi_Displaced_v12",
                                          # Lucia
                                          # 2010
                                          #"HLT_DoubleMu3_Quarkonium_v1", "HLT_DoubleMu3_Quarkonium_v2",
