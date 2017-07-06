@@ -139,7 +139,7 @@ private:
   double TrMaxNormChi2;
   vector<string> TriggersForMatching_, FiltersForMatching_;
   bool resolveAmbiguity_; 
-  int  MatchingTriggerResult[50];
+  int  MatchingTriggerResult[100];
   bool   addMuMulessPrimaryVertex_;
   double MuMuMinMass, MuMuMaxMass, JPsiMinMass, JPsiMaxMass; 
   double KKMinMass, KKMaxMass, PhiMinMass, PhiMaxMass; 

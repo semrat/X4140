@@ -51,8 +51,8 @@ if (not MC) :
             #'/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20000/00B47F62-CD67-E211-B7B2-00215E221B48.root'
             #'/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20002/74EA8A9D-2D6C-E211-A15A-00215E21D588.root'
             #'root://cmsxrootd.hep.wisc.edu//store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20003/CE2C94D8-036F-E211-A034-00215E21D8EE.root'
-            #'/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20001/EE35A843-3E69-E211-9292-00215E2226AC.root' # job 412 error code 8021
-	    '/store/data/Run2012D/MuOniaParked/AOD/22Jan2013-v1/10010/466F7295-4893-E211-81FE-0025901D6286.root'
+            '/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20001/EE35A843-3E69-E211-9292-00215E2226AC.root' # job 412 error code 8021
+	    #'/store/data/Run2012D/MuOniaParked/AOD/22Jan2013-v1/10010/466F7295-4893-E211-81FE-0025901D6286.root'
  #           '/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20001/EE35A843-3E69-E211-9292-00215E2226AC.root'
             #'/afs/cern.ch/user/s/semrat/scratch0/CMSSW_5_3_22/src/X4140/MuMuKKPAT/test/EE35A843-3E69-E211-9292-00215E2226AC.root'
     )
@@ -438,9 +438,9 @@ process.mkcands = cms.EDAnalyzer("MuMuKKPAT",
                                  MaxJPsiMass = cms.untracked.double(3.4), # SEMRA changed
 				 MinPhiMass = cms.untracked.double (0.97), # SEMRA added
  				 MaxPhiMass = cms.untracked.double (1.07), # SEMRA added
-				 MaxJPsiPhiXMass = cms.untracked.double (4.35), # SEMRA added
-				 MinJPsiPhiB0Mass = cms.untracked.double (5.1), # SEMRA added
-				 MaxJPsiPhiB0Mass = cms.untracked.double (5.6), # SEMRA added
+				 MaxJPsiPhiXMass = cms.untracked.double (4.8), # SEMRA added
+				 MinJPsiPhiB0Mass = cms.untracked.double (5.15), # SEMRA added
+				 MaxJPsiPhiB0Mass = cms.untracked.double (5.55), # SEMRA added
 
                                  MinNumTrSiHits = cms.untracked.int32(4),
                                  MinTrPt = cms.untracked.double(0.350),
@@ -454,15 +454,15 @@ process.mkcands = cms.EDAnalyzer("MuMuKKPAT",
                                  addMuMulessPrimaryVertex = cms.untracked.bool(True),
                                  #addMuMulessPrimaryVertex = cms.untracked.bool(False),
                                  addXlessPrimaryVertex = cms.untracked.bool(True),
-                                 Debug_Output = cms.untracked.bool(False), # true
+                                 Debug_Output = cms.untracked.bool(True), # true
                                  ##
                                  ##  use the correct trigger path
                                  ##
                                  TriggersForMatching = cms.untracked.vstring(
                                          #2012 displaced J/psi = Alessandra
-                                         #"HLT_DoubleMu4_Jpsi_Displaced_v9",
-					 #"HLT_DoubleMu4_Jpsi_Displaced_v10",
-					 #"HLT_DoubleMu4_Jpsi_Displaced_v11", "HLT_DoubleMu4_Jpsi_Displaced_v12",
+                                         "HLT_DoubleMu4_Jpsi_Displaced_v9",
+					 "HLT_DoubleMu4_Jpsi_Displaced_v10",
+					 "HLT_DoubleMu4_Jpsi_Displaced_v11", "HLT_DoubleMu4_Jpsi_Displaced_v12",
                                          # Lucia
                                          # 2010
                                          #"HLT_DoubleMu3_Quarkonium_v1", "HLT_DoubleMu3_Quarkonium_v2",
@@ -477,13 +477,14 @@ process.mkcands = cms.EDAnalyzer("MuMuKKPAT",
                                          #"HLT_Dimuon7_PsiPrime_v1", "HLT_Dimuon7_PsiPrime_v2", "HLT_Dimuon7_PsiPrime_v3", "HLT_Dimuon9_PsiPrime_v9",
                                          #"HLT_DoubleMu3p5_LowMass_Displaced_v3", "HLT_DoubleMu3p5_LowMass_Displaced_v4", "HLT_DoubleMu3p5_LowMass_Displaced_v5", "HLT_DoubleMu3p5_LowMass_Displaced_v6"
 					 # inclusive J/psi
-					 #"HLT_Dimuon8_Jpsi_v3",
+					 "HLT_Dimuon8_Jpsi_v3",
 					 "HLT_Dimuon8_Jpsi_v4",
 					 "HLT_Dimuon8_Jpsi_v5", "HLT_Dimuon8_Jpsi_v6", "HLT_Dimuon8_Jpsi_v7",
+
                                  ),
 				 FiltersForMatching = cms.untracked.vstring(
                                          # Alessandra
-                                         "hltDisplacedmumuFilterDoubleMu4Jpsi", "hltDisplacedmumuFilterDoubleMu4Jpsi", "hltDisplacedmumuFilterDoubleMu4Jpsi", "hltDisplacedmumuFilterDoubleMu4Jpsi"
+                                         "hltDisplacedmumuFilterDoubleMu4Jpsi", "hltDisplacedmumuFilterDoubleMu4Jpsi", "hltDisplacedmumuFilterDoubleMu4Jpsi", "hltDisplacedmumuFilterDoubleMu4Jpsi",
                                          # Kay
                                          #"hltVertexmumuFilterDimuon5PsiPrime", "hltVertexmumuFilterDimuon5PsiPrime", "hltVertexmumuFilterDimuon5PsiPrime", "hltVertexmumuFilterDimuon5PsiPrime", #"hltVertexmumuFilterDimuon7PsiPrime", "hltVertexmumuFilterDimuon7PsiPrime", "hltVertexmumuFilterDimuon7PsiPrime", "hltVertexmumuFilterDimuon7PsiPrime"
                                          #hltDoubleMu4JpsiDisplacedL3Filtered
