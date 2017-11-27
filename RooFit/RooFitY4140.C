@@ -41,21 +41,21 @@ Float_t TH2_offset = 1.6;
 void Y4140RooFit(TFile *inputfile,std::string histoname = "X5568_Cand_Mass_Ref")
 {
 
-  RooRealVar mass("mass","mass",5.2,5.5);
+  RooRealVar mass("mass","M(#mu#muKK)[GeV]",5.2,5.5);
   mass.setBins(60);
   RooRealVar mean("mean","mean of gaussian",5.38,5.31,5.41);
   RooRealVar sigma1("sigma1","width of gaussian1",0.01,0.001,0.05);
-  RooRealVar sigma2("sigma2","width of gaussian2",0.01,0.001,0.01);
+  RooRealVar sigma2("sigma2","width of gaussian2",0.005,0.001,0.01);
 
   // Build gaussian p.d.f in terms of x,mean and sigma
   RooGaussian gauss1("gauss1","gaussian PDF 1",mass,mean,sigma1);
   RooGaussian gauss2("gauss2","gaussian PDF 2",mass,mean,sigma2);
 
-  RooRealVar a0("a0","a0",0.5,-2.,2.);
-  RooRealVar a1("a1","a1",0.3,-2.,2.);
-  RooRealVar a2("a2","a2",-0.1,-2.,2.);
-  RooRealVar a3("a3","a3",-0.2,-2.,2.);
-  RooRealVar a4("a4","a4",0.2,-2.,2.);
+  RooRealVar a0("a0","a0",0.001,-1.,1.);
+  RooRealVar a1("a1","a1",0.001,-0.5,0.5);
+  RooRealVar a2("a2","a2",0.0001,-2.,2.);
+  RooRealVar a3("a3","a3",0.00001,-2.,2.);
+  RooRealVar a4("a4","a4",0.00001,-2.,2.);
   RooArgSet set(a0,a1,a2);
   RooChebychev cheb("cheb","Background",mass,set);//,a3,a4)) ;
   RooRealVar alpha("alpha","alpha",-0.5,-2.0,0.1);
@@ -66,7 +66,7 @@ void Y4140RooFit(TFile *inputfile,std::string histoname = "X5568_Cand_Mass_Ref")
 
   RooRealVar nSig("nSig","nSig",5000,0.,10E6);
   RooRealVar nBkg("nBkg","nBkg",5000,0.,10E6);
-  RooAddPdf  tot("tot","g1+g2+cheb",RooArgList(model,exp),RooArgList(nSig,nBkg)) ;
+  RooAddPdf  tot("tot","g1+g2+cheb",RooArgList(model,cheb),RooArgList(nSig,nBkg)) ;
 
   //TFile *inputFile = TFile::Open("../X4140_MuMuKK_KRe_MuMixed_NP3.5_Alpha99_CW5.2-5.55.root");
   //TH1F* hist = (TH1F*)inputFile->Get("Xcand_histo_hlt8_cw_nonprompt_cosalpha");
@@ -77,7 +77,7 @@ void Y4140RooFit(TFile *inputfile,std::string histoname = "X5568_Cand_Mass_Ref")
 
   tot.fitTo(dh) ;
 
-  RooPlot* massFrame = mass.frame(Title("Gaussian p.d.f.")) ;
+  RooPlot* massFrame = mass.frame(Title("B_{0}^{s} signal")) ;
   dh.plotOn(massFrame);
   tot.plotOn(massFrame);
   tot.plotOn(massFrame,Components(gauss1),LineColor(kGreen),LineStyle(kDashed),Name("gauss1"));

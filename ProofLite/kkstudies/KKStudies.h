@@ -5,8 +5,8 @@
 // found on file: MuOniaParked_Run2012C_MuMuKKPAT_merged0.root
 //////////////////////////////////////////////////////////
 
-#ifndef X4140_MuMuKK_h
-#define X4140_MuMuKK_h
+#ifndef KKStudies_h
+#define KKStudies_h
 
 #include <TROOT.h>
 #include <TChain.h>
@@ -50,7 +50,7 @@
 
 // Fixed size dimensions of array or collections stored in the TTree if any.
 
-class X4140_MuMuKK : public TSelector {
+class KKStudies : public TSelector {
 public :
    TTree          *fChain;   //!pointer to the analyzed TTree or TChain
 
@@ -786,8 +786,8 @@ public :
    TBranch        *b_kaon2_saturMeas_byHits;   //!
    TBranch        *b_kaon2_Meas_byHits;   //!
 
-   X4140_MuMuKK(TTree * /*tree*/ =0) : fChain(0) { }
-   virtual ~X4140_MuMuKK() { }
+   KKStudies(TTree * /*tree*/ =0) : fChain(0) { }
+   virtual ~KKStudies() { }
    virtual Int_t   Version() const { return 2; }
    virtual void    Begin(TTree *tree);
    virtual void    SlaveBegin(TTree *tree);
@@ -806,37 +806,28 @@ public :
    TFile            *fOut;
 
 
-   TH1F *X_Cand_Mass,*X_Cand_Mass_NoM;
-   TH1F *B0_Cand_Mass,*B0_Cand_Mass_NoM;
-   TH1F *B0_Cand_Mass_R_Side,*B0_Cand_Mass_R_Side_NoM;
-   TH1F *B0_Cand_Mass_L_Side,*B0_Cand_Mass_L_Side_NoM;
-   TH1F *B0_PhiMassHisto,*B0_PhiMassHisto_NoM;
+   TH1F *X5568_Cand_Mass,*X5568_Cand_Mass_Ref,*X5568_Cand_Mass_NoM;
 
-   TH1F *XCandMassHisto,*XCandMassHisto_NoM;
-
-
-
-   //         JPsiMassHistos_Ref[histokey]  = new TH1F ((jpsiHisto + suffix).data(),(jpsiHisto + suffix).data(),1000, 2.5, 3.5);
-   //         PhiMassHistos_Ref[histokey]   = new TH1F ((phiHisto + suffix).data(),(phiHisto + suffix).data(),1000, 0.5, 1.5);
-   //
-
+   //KK ref
    // TH1F *Lxy_LxyE_PV, *Y4140_mass, *Bs0_mass, *XCand_mass;
-   TH2F *refKKvsKK, *refK1vsK1, *refK2vsK2;
-   TH2F *refMuMuvsMuMu,*refMu1vsMu1,*refMu2vsMu2;
+   TH2F *phiKKvsKK, *phiKKvsb0KK, *b0KKvsKK;
 
-   TH1F* mumuRef,*mumu,*kkRef,*kk;
+   TH1F* phiKK, *b0KK, *KK, *mKK;
 
-   std::map< std::tuple < std::string, std::string, std::string, std::string >,TH1F*>  XCandMassHistos,XCandMassHistosDeltaM, JPsiMassHistos,PhiMassHistos;
-   //std::map< std::tuple < std::string, std::string, std::string, std::string >,TH1F*>  XCandMassHistos_Ref, JPsiMassHistos_Ref,PhiMassHistos_Ref;
+   std::map< std::tuple < std::string, std::string, std::string, std::string >,TH1F*>  XCandMassHistos, JPsiMassHistos,PhiMassHistos;
+   std::map< std::tuple < std::string, std::string, std::string, std::string >,TH1F*>  XCandMassHistos_Ref, JPsiMassHistos_Ref,PhiMassHistos_Ref;
 
 
-   std::vector< std::string > clabels, regions, windows, hlts;
+   std::string clabels[6] = {"all","muons","jpsi","kaons","phi","cosalpha"};
+   std::string regions[4] = {"all","prompt","mixed","nonprompt"};
+   std::string windows[3] = {"all","cw","sw"};
+   std::string hlts[5] = {"all","any","hlt4","hlt8","hlt8hlt4"};
 
 
    std::map < std::pair <int,int>, int> lumiMap;
 
    double JPsi_mass;
-   double Phi_mass,Phi_sigma,Phi_mean;
+   double Phi_mass;
    double Bs0_Low_Mass;
    double Bs0_High_Mass;
    double Y_High_Mass;
@@ -844,13 +835,13 @@ public :
   //  int muonQual[4] = {1,3,4,12};
 
 
-   ClassDef(X4140_MuMuKK,0);
+   ClassDef(KKStudies,0);
 };
 
 #endif
 
-#ifdef X4140_MuMuKK_cxx
-void X4140_MuMuKK::Init(TTree *tree)
+#ifdef KKStudies_cxx
+void KKStudies::Init(TTree *tree)
 {
    // The Init() function is called when the selector needs to initialize
    // a new tree or chain. Typically here the branch addresses and branch
@@ -1557,7 +1548,7 @@ void X4140_MuMuKK::Init(TTree *tree)
    fChain->SetBranchAddress("kaon2_Meas_byHits", &kaon2_Meas_byHits, &b_kaon2_Meas_byHits);
 }
 
-Bool_t X4140_MuMuKK::Notify()
+Bool_t KKStudies::Notify()
 {
    // The Notify() function is called when a new file is opened. This
    // can be either for a new TTree in a TChain or when when a new TTree

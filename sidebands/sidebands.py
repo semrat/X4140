@@ -1,20 +1,15 @@
+#usage : python2.7 sidebands.py
+# change roofilepath to proof output file
+#change also phimass histo name
 
 # coding: utf-8
 
 # In[1]:
 
 
-get_ipython().system(u' . /usr/local/bin/thisroot.sh')
 import ROOT
 from ROOT import TFile,TH1,TH1F,TCanvas,TLine
 from ROOT import RooFit
-
-
-# In[2]:
-
-
-get_ipython().system(u' ls ../rootfiles/X4140*.root')
-
 
 # In[3]:
 
@@ -152,7 +147,7 @@ linemidup.SetLineColor(kRed)
 lineup.SetLineColor(kRed)
 
 linesiglow.SetLineColor(kGreen)
-linesigup.SetLineColor(kGreen) 
+linesigup.SetLineColor(kGreen)
 
 linelow.SetLineWidth(2)
 linemidlow.SetLineWidth(2)
@@ -160,7 +155,7 @@ linemidup.SetLineWidth(2)
 lineup.SetLineWidth(2)
 
 linesiglow.SetLineWidth(2)
-linesigup.SetLineWidth(2) 
+linesigup.SetLineWidth(2)
 
 linelow.Draw()
 linemidlow.Draw()
@@ -281,7 +276,3 @@ cB0.SaveAs("plots/" + signalB0.GetName() + "_subtracted.png")
 
 
 # In[ ]:
-
-
-
-

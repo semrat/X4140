@@ -52,7 +52,7 @@
   dataset->Add("/lustre/cms/store/user/adiflori/MuOniaParked/runC_resplit_Oct17/runC_split_17.root");
   dataset->Add("/lustre/cms/store/user/adiflori/MuOniaParked/runC_resplit_Oct17/runC_split_18.root");
   dataset->Add("/lustre/cms/store/user/adiflori/MuOniaParked/runC_resplit_Oct17/runC_split_19.root");
-  dataset->Add("/lustre/cms/store/user/adiflori/MuOniaParked/runB_resplit_Oct17/runC_add_01.root");
+  dataset->Add("/lustre/cms/store/user/adiflori/MuOniaParked/runC_resplit_Oct17/runC_add_01.root");
 
   dataset->Add("/lustre/cms/store/user/adiflori/MuOniaParked/runD_resplit_Oct17/runD_split_00.root");
   dataset->Add("/lustre/cms/store/user/adiflori/MuOniaParked/runD_resplit_Oct17/runD_split_01.root");
@@ -74,11 +74,11 @@
   dataset->Add("/lustre/cms/store/user/adiflori/MuOniaParked/runD_resplit_Oct17/runD_split_17.root");
   dataset->Add("/lustre/cms/store/user/adiflori/MuOniaParked/runD_resplit_Oct17/runD_split_18.root");
   dataset->Add("/lustre/cms/store/user/adiflori/MuOniaParked/runD_resplit_Oct17/runD_split_19.root");
-  dataset->Add("/lustre/cms/store/user/adiflori/MuOniaParked/runB_resplit_Oct17/runD_add_01.root");
+  dataset->Add("/lustre/cms/store/user/adiflori/MuOniaParked/runD_resplit_Oct17/runD_add_01.root");
 
   // dataset->Add("/Users/adrianodiflorio/Documents/Git/X4140/ProofLite/Y4140_testrootuple.root");
   TString selector = "X4140_MuMuKK";
-  TProof *p = TProof::Open("workers=1"); // 12 workers for qsub
+  TProof *p = TProof::Open("workers=40"); // 12 workers for qsub
 
   // Processing
   cout << ">> Processing " << selector << " ... " << endl;

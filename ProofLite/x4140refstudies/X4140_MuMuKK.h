@@ -806,19 +806,7 @@ public :
    TFile            *fOut;
 
 
-   TH1F *X_Cand_Mass,*X_Cand_Mass_NoM;
-   TH1F *B0_Cand_Mass,*B0_Cand_Mass_NoM;
-   TH1F *B0_Cand_Mass_R_Side,*B0_Cand_Mass_R_Side_NoM;
-   TH1F *B0_Cand_Mass_L_Side,*B0_Cand_Mass_L_Side_NoM;
-   TH1F *B0_PhiMassHisto,*B0_PhiMassHisto_NoM;
-
-   TH1F *XCandMassHisto,*XCandMassHisto_NoM;
-
-
-
-   //         JPsiMassHistos_Ref[histokey]  = new TH1F ((jpsiHisto + suffix).data(),(jpsiHisto + suffix).data(),1000, 2.5, 3.5);
-   //         PhiMassHistos_Ref[histokey]   = new TH1F ((phiHisto + suffix).data(),(phiHisto + suffix).data(),1000, 0.5, 1.5);
-   //
+   TH1F *X5568_Cand_Mass,*X5568_Cand_Mass_Ref,*X5568_Cand_Mass_NoM;
 
    // TH1F *Lxy_LxyE_PV, *Y4140_mass, *Bs0_mass, *XCand_mass;
    TH2F *refKKvsKK, *refK1vsK1, *refK2vsK2;
@@ -830,13 +818,16 @@ public :
    //std::map< std::tuple < std::string, std::string, std::string, std::string >,TH1F*>  XCandMassHistos_Ref, JPsiMassHistos_Ref,PhiMassHistos_Ref;
 
 
-   std::vector< std::string > clabels, regions, windows, hlts;
+   std::string clabels[6] = {"all","muons","jpsi","kaons","phi","cosalpha"};
+   std::string regions[4] = {"all","prompt","mixed","nonprompt"};
+   std::string windows[3] = {"all","cw","sw"};
+   std::string hlts[5] = {"all","any","hlt4","hlt8","hlt8hlt4"};
 
 
    std::map < std::pair <int,int>, int> lumiMap;
 
    double JPsi_mass;
-   double Phi_mass,Phi_sigma,Phi_mean;
+   double Phi_mass;
    double Bs0_Low_Mass;
    double Bs0_High_Mass;
    double Y_High_Mass;

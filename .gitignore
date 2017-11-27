@@ -14,3 +14,9 @@
 *.png
 
 *.pdf
+
+.ipynb_checkpoints/makeplots-checkpoint.ipynb
+
+jpsis/.ipynb_checkpoints/jpsis-checkpoint.ipynb
+
+*.eps_tmp_44041

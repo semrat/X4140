@@ -12,17 +12,16 @@ process.MessageLogger.suppressInfo = cms.untracked.vstring( "mkcands" )
 process.MessageLogger.suppressWarning = cms.untracked.vstring( "mkcands" )
 process.MessageLogger.cerr.FwkReport.reportEvery = 1
 
-MC = False
-#MC = True
+#MC = False
+MC = True
 if MC :
-        #official = False
         official = True
-MCMotherId = 511 # 511 B0 (=anti-B0), 531 Bs0
-#MCMotherId = 531
+MCMotherId = 531
+
 if MCMotherId == 511 :
-    MCExclusiveDecay = True	
+    MCExclusiveDecay = True
 elif MCMotherId == 531 :
-    MCExclusiveDecay = False		
+    MCExclusiveDecay = False
 
 # Input source
 process.source = cms.Source("PoolSource",
@@ -31,163 +30,59 @@ process.source = cms.Source("PoolSource",
 )
 
 if (not MC) :
-    sourceFiles = cms.untracked.vstring( # 'root://cms-xrd-global.cern.ch/' prefix could help sometimes
-            # Sanjay
-            #'file:PYTHIA6_Bd2Psi2SKpi_TuneZ2star_8TeV_cff_py_RAW2DIGI_L1Reco_RECO.root'
-            # dataset C
-            #'root://cmsxrootd.fnal.gov//store/data/Run2012C/MuOniaParked/AOD/22Jan2013-v1/30000/1E71D761-D870-E211-9343-00215E25A5E2.root' # used to work, not on 30/07/2015
-            #'/store/data/Run2012C/MuOniaParked/AOD/22Jan2013-v1/30000/1E71D761-D870-E211-9343-00215E25A5E2.root'
-	    #'root://cms-xrd-global.cern.ch//store/data/Run2012C/MuOniaParked/AOD/22Jan2013-v1/30000/1E71D761-D870-E211-9343-00215E25A5E2.root'
-	    #'root://xrootd.unl.edu//store/data/Run2012C/MuOniaParked/AOD/22Jan2013-v1/20000/00109B2A-2E77-E211-893B-E41F1318165C.root'
-	    #'/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20002/1A5DE0F3-646B-E211-91AA-001A645C2BC0.root' # guilty file
-	    #'/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20000/00054BD0-5668-E211-8091-00215E21DC7E.root'
-            #'/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20000/000A1D2E-3168-E211-B2F7-00215E21D56A.root'
-            #'/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20000/00170E1F-6568-E211-9736-00215E93E7DC.root'
-            #'/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20000/003C345D-C768-E211-8C82-00215E2283FA.root'
-            #'/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20000/0054DA9E-AA67-E211-800F-E41F131815CC.root'
-            #'/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20000/005C3F2E-FE67-E211-A6E7-00215E222850.root'
-            #'/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20000/005DD843-D667-E211-8A8D-E61F13190DCB.root'
-            #'/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20000/00B2C16E-C767-E211-A36F-00215E21DA44.root'
-            #'/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20000/00B47F62-CD67-E211-B7B2-00215E221B48.root'
-            #'/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20002/74EA8A9D-2D6C-E211-A15A-00215E21D588.root'
-            #'root://cmsxrootd.hep.wisc.edu//store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20003/CE2C94D8-036F-E211-A034-00215E21D8EE.root'
-            #'/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20001/EE35A843-3E69-E211-9292-00215E2226AC.root' # job 412 error code 8021
-            '/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20001/EE35A843-3E69-E211-9292-00215E2226AC.root'
-            #'/afs/cern.ch/user/s/semrat/scratch0/CMSSW_5_3_22/src/X4140/MuMuKKPAT/test/EE35A843-3E69-E211-9292-00215E2226AC.root'
-    )
+    sourceFiles = cms.untracked.vstring('/store/data/Run2012B/MuOniaParked/AOD/22Jan2013-v1/20001/EE35A843-3E69-E211-9292-00215E2226AC.root')
 elif MC :
-        if MCMotherId == 511 :
-                if (not official) :
-                        sourceFiles = cms.untracked.vstring(
-                                # CRAB 
-                                # private
-                                #'file:/lustre/cms/store/group/cristella/Bd2Psi2SKpi-PHSP/MC_generation/141028_153606/merge/MC_Bd2Psi2SKpi_first111.root'
-                                #'file:/lustre/cms/store/group/cristella/Bd2Psi2SKpi-PHSP/MC_generation/141028_153606/merge/MC_Bd2Psi2SKpi_1of2.root'
-                                'file:/lustre/cms/store/group/cristella/Bd2Psi2SKpi-PHSP/MC_generation/141028_153606/merge/MC_Bd2Psi2SKpi.root'
-                        )
-		else :
-                        sourceFiles = cms.untracked.vstring(
-                                # offcial MC
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/00448020-25C4-E411-8D01-008CFA052A88.root',	
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/5AE5AE39-28C4-E411-9098-00266CFEFC38.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/A879FCE0-BFC3-E411-B78A-00266CFE7ADC.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/0637E61B-48C4-E411-BCB2-C4346BB28750.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/5E04151D-48C4-E411-A8C0-C4346BC076D0.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/A8A8F6C9-A8C3-E411-905A-6CC2173BC1D0.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/0AE361B0-A1C3-E411-AF9A-00266CFEFE1C.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/600063BF-9BC3-E411-AC48-00266CFFBF34.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/B0D2C91F-C6C3-E411-A468-00266CFF0ACC.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/0C90DA2C-9EC3-E411-A7B7-AC162DABAF78.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/6046D79D-2FC4-E411-B82A-00266CFFBCFC.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/B8D9ACDC-39C4-E411-80F4-00266CFFBF50.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/10CB4FC5-C9C3-E411-8421-008CFA052A88.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/6095427E-C7C3-E411-A635-6CC2173BB810.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/BAE3DAAD-38C4-E411-9DAF-00266CFFC980.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/14FDEDB4-A1C3-E411-B7EA-00266CFF0ACC.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/6212816F-3BC4-E411-9E47-00266CFFCAF0.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/BC34EB4F-EDC3-E411-9904-00266CFFCA1C.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/1CBB34C9-A8C3-E411-B0C6-C4346BC808B8.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/62179E9E-AEC3-E411-AFBB-008CFA052A88.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/C0F93096-33C4-E411-979E-00266CFFC980.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/20CF17F6-34C4-E411-8AD0-00266CFF0ACC.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/64E6F32C-C2C3-E411-A4ED-00266CFF0ACC.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/C211B5B9-A9C3-E411-AE4C-6CC2173BBEC0.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/222D8CA0-A7C3-E411-B77A-00266CFEFCE8.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/669215ED-02C6-E411-9951-00266CFFBF38.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/C29431E0-C4C3-E411-9C17-C4346BBF3E78.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/2232D902-ADC3-E411-A423-00266CFE6404.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/66B15C4A-C4C3-E411-B4C9-C4346BBF3E78.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/C8187CD8-3DC4-E411-BEDE-008CFA105EFC.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/244E8B4C-B1C3-E411-A630-008CFA0527CC.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/66D6B41B-9EC3-E411-99C3-6CC2173BB810.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/CE574DC3-C9C3-E411-8F26-00266CFFBF4C.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/2A1734A0-2BC4-E411-831B-00266CFF0ACC.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/6ACA30DA-3DC4-E411-B849-6CC2173BB820.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/CEB978AB-2BC4-E411-8FAE-AC162DABAF78.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/2A5193B6-E5C3-E411-B0AC-00266CFFBC38.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/6CA4F380-BCC3-E411-A08D-00266CFEFCE8.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/CEDACC05-16C4-E411-A8A4-00266CFFC550.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/2CDCD5EF-02C6-E411-9703-008CFA05206C.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/70BD3ABE-B6C3-E411-8B63-00266CFFBDAC.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/D0B947FF-BBC3-E411-BAE6-AC162DABAF78.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/300CC650-CBC3-E411-AD9C-C4346BC84780.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/720878DF-37C4-E411-844A-00266CFFC980.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/D0D2882D-DEC3-E411-BB80-6CC2173BC2E0.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/304FBEC0-B6C3-E411-9691-00266CFFC948.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/74C202CB-BAC3-E411-990E-AC162DABAF78.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/D27EB2B0-A1C3-E411-8415-00266CF82C98.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/3258550E-C7C3-E411-9B1A-00266CFFBF90.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/76757474-B3C3-E411-B009-008CFA052A88.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/D4011C85-BBC3-E411-A944-6CC2173BC2E0.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/34C80250-B1C3-E411-8B5D-00266CFE6404.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/7824B34B-32C4-E411-B74E-00266CFF0ACC.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/D47700A5-B9C3-E411-B27D-00266CFFCAF0.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/382480B4-2DC4-E411-A733-00266CFFBCFC.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/7866B903-03C6-E411-94B5-00266CFEFE70.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/D4830D7A-3EC4-E411-A498-008CFA105EFC.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/3E2DF3C3-C9C3-E411-AA1A-00266CFEFCE8.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/7AF5837C-35C4-E411-A601-AC162DABAF78.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/D6281850-CBC3-E411-A140-6CC2173BC7B0.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/3E7C0A93-BCC3-E411-95C9-00266CFFBEB4.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/8067216C-C2C3-E411-A72E-00266CFE6404.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/D88732F8-B1C3-E411-AF21-00266CFE6404.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/3EAC064E-C6C3-E411-A606-00266CFE7ADC.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/828F2CC2-AFC3-E411-A710-00266CFFBF90.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/DACA84DF-37C4-E411-8065-6CC2173BC7B0.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/3ECB44EE-B4C3-E411-AA4C-00266CFFCB7C.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/8ABADE21-E8C3-E411-A0BF-00266CFFCA1C.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/DC5910F3-34C4-E411-9340-00266CFFC980.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/3ED647FB-B2C3-E411-B755-008CFA052A88.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/906F7204-FDC3-E411-9EF8-00266CFFBEB4.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/DC66ECDC-39C4-E411-80E4-00266CFFBF50.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/425D3D8A-C1C3-E411-A4E9-00266CFFC9C4.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/928B32CD-9CC3-E411-AC4B-6CC2173BB810.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/DE150DEE-ACC3-E411-9A96-00266CFFBF50.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/42EBEEA2-E6C3-E411-8BC5-008CFA052A88.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/9434A1AF-9BC3-E411-89FE-00266CFFCA1C.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/E019C075-B2C3-E411-9A20-008CFA052A88.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/44DFCAEE-B4C3-E411-96B8-00266CFFBF94.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/98A9909D-2BC4-E411-8E92-6CC2173BC7B0.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/E02AAEC3-32C4-E411-BD24-00266CFF0ACC.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/46384706-C1C3-E411-887A-00266CFF0ACC.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/98CD61E6-ACC3-E411-BE1A-00266CFEFCE8.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/E0C8BB4A-C4C3-E411-9C3A-6CC2173BC7B0.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/485DE1CE-AAC3-E411-A595-00266CFFBF90.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/9A7D6CE8-B1C3-E411-BF1C-008CFA0527CC.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/E0D425EE-02C6-E411-B115-6CC2173BBED0.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/4ABDCA17-C6C3-E411-A0B9-6CC2173BB810.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/9C5188BF-B6C3-E411-951B-AC162DACB208.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/E6C4F686-3BC4-E411-B340-00266CFFC044.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/502B51E6-ACC3-E411-9DC2-C4346BBF3E78.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/A0015EDD-AFC3-E411-B2F8-00266CFFBEB4.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/E84F3AD8-BFC3-E411-8A08-008CFA0527CC.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/528732E8-ACC3-E411-B367-00266CFF0ACC.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/A01E5DA1-A7C3-E411-852D-00266CFFCA1C.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/F6B50DDB-C0C3-E411-89EE-00266CFFCA1C.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/52B3E4EF-C6C3-E411-8D60-6CC2173BB810.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/A0450ED9-BFC3-E411-A6F7-00266CFF0ACC.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/F6BD7B40-3AC4-E411-A343-00266CFF0ACC.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/56735BC2-AFC3-E411-90D2-6CC2173BBEC0.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/A61DF3A8-B9C3-E411-B53C-C4346BC7AAE0.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/5A7A64C1-C9C3-E411-99C8-C4346BC808B8.root',
-                                'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/A8203BEC-BFC3-E411-BCE7-00266CFFC948.root'
-           )
-	elif MCMotherId == 531 :
-                sourceFiles = cms.untracked.vstring(
-                # Bs
-                '/store/mc/Summer12_DR53X/BsToPsiMuMu_2MuPtEtaFilter_8TeV-pythia6-evtgen/AODSIM/PU_S10_START53_V7A-v1/0000/005DE3B0-FDDC-E111-9812-00266CFFC198.root',
-                '/store/mc/Summer12_DR53X/BsToPsiMuMu_2MuPtEtaFilter_8TeV-pythia6-evtgen/AODSIM/PU_S10_START53_V7A-v1/0000/0090EB21-15DD-E111-9BE2-0017A4770800.root',
-                '/store/mc/Summer12_DR53X/BsToPsiMuMu_2MuPtEtaFilter_8TeV-pythia6-evtgen/AODSIM/PU_S10_START53_V7A-v1/0000/00A0B7F6-98DF-E111-866D-00266CFFC13C.root',
-                '/store/mc/Summer12_DR53X/BsToPsiMuMu_2MuPtEtaFilter_8TeV-pythia6-evtgen/AODSIM/PU_S10_START53_V7A-v1/0000/00A0B7F6-98DF-E111-866D-00266CFFC13C.root',
-                '/store/mc/Summer12_DR53X/BsToPsiMuMu_2MuPtEtaFilter_8TeV-pythia6-evtgen/AODSIM/PU_S10_START53_V7A-v1/0000/00A0B7F6-98DF-E111-866D-00266CFFC13C.root',
-                '/store/mc/Summer12_DR53X/BsToPsiMuMu_2MuPtEtaFilter_8TeV-pythia6-evtgen/AODSIM/PU_S10_START53_V7A-v1/0000/00A0B7F6-98DF-E111-866D-00266CFFC13C.root',
-                '/store/mc/Summer12_DR53X/BsToPsiMuMu_2MuPtEtaFilter_8TeV-pythia6-evtgen/AODSIM/PU_S10_START53_V7A-v1/0000/00A0B7F6-98DF-E111-866D-00266CFFC13C.root',
-                '/store/mc/Summer12_DR53X/BsToPsiMuMu_2MuPtEtaFilter_8TeV-pythia6-evtgen/AODSIM/PU_S10_START53_V7A-v1/0000/00A0B7F6-98DF-E111-866D-00266CFFC13C.root',
-                '/store/mc/Summer12_DR53X/BsToPsiMuMu_2MuPtEtaFilter_8TeV-pythia6-evtgen/AODSIM/PU_S10_START53_V7A-v1/0000/0213D14A-4CE0-E111-AC17-1CC1DE056080.root',
-                '/store/mc/Summer12_DR53X/BsToPsiMuMu_2MuPtEtaFilter_8TeV-pythia6-evtgen/AODSIM/PU_S10_START53_V7A-v1/0000/0239D053-E7DF-E111-96FB-00266CFFBF90.root'
-            )
+    readFiles = cms.untracked.vstring()
+    sourceFiles.extend( [
+    '/store/mc/Summer12DR53X/Y4140ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v2/50000/00AC758F-4558-E611-AF39-02163E014BCA.root',
+    '/store/mc/Summer12DR53X/Y4140ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v2/50000/188EC304-1F58-E611-B1E5-FA163E7918CE.root',
+    '/store/mc/Summer12DR53X/Y4140ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v2/50000/3C06A515-2258-E611-98CA-FA163E9AE9D0.root',
+    '/store/mc/Summer12DR53X/Y4140ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v2/50000/4018D9C2-2058-E611-A698-02163E00F483.root',
+    '/store/mc/Summer12DR53X/Y4140ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v2/50000/502525F1-1A58-E611-9A06-FA163EBE010E.root',
+    '/store/mc/Summer12DR53X/Y4140ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v2/50000/5264DCBB-2058-E611-B18C-FA163E99F0C3.root',
+    '/store/mc/Summer12DR53X/Y4140ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v2/50000/56C0264B-1E58-E611-ADF7-FA163E881C27.root',
+    '/store/mc/Summer12DR53X/Y4140ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v2/50000/729EFC9E-1D58-E611-9D8F-FA163E28C01D.root',
+    '/store/mc/Summer12DR53X/Y4140ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v2/50000/74D6D987-4558-E611-84FC-FA163E7846B2.root',
+    '/store/mc/Summer12DR53X/Y4140ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v2/50000/842E1AA9-1C58-E611-B214-02163E00E9D1.root',
+    '/store/mc/Summer12DR53X/Y4140ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v2/50000/982A5A01-1F58-E611-81E1-FA163E918327.root',
+    '/store/mc/Summer12DR53X/Y4140ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v2/50000/A8201DEB-1B58-E611-8D87-FA163E2ADA19.root',
+    '/store/mc/Summer12DR53X/Y4140ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v2/50000/AEF65ABB-1858-E611-B346-0CC47A07FA1E.root',
+    '/store/mc/Summer12DR53X/Y4140ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v2/50000/BC358A48-1958-E611-B192-FA163ECBD6A3.root',
+    '/store/mc/Summer12DR53X/Y4140ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v2/50000/CA04869D-1D58-E611-B451-FA163EA543D3.root',
+    '/store/mc/Summer12DR53X/Y4140ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v2/50000/DABCF18D-1C58-E611-9FA6-001E67E95B68.root',
+    '/store/mc/Summer12DR53X/Y4140ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v2/50000/E2FBF0EE-1A58-E611-B579-FA163E784361.root',
+    '/store/mc/Summer12DR53X/Y4140ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v2/50000/E6960119-2358-E611-9108-FA163E6265F2.root',
+    '/store/mc/Summer12DR53X/Y4140ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v2/60000/008D511F-4458-E611-B9C6-FA163E28C01D.root',
+    '/store/mc/Summer12DR53X/Y4140ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v2/60000/0278351E-1058-E611-B38C-FA163E437AF6.root',
+    '/store/mc/Summer12DR53X/Y4140ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v2/60000/04AAC8B0-1558-E611-9BB6-FA163EC5AB84.root',
+    '/store/mc/Summer12DR53X/Y4140ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v2/60000/0C3ADC4E-1258-E611-94B1-FA163EB99C8C.root',
+    '/store/mc/Summer12DR53X/Y4140ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v2/60000/0C5F248A-1958-E611-8518-001E67579498.root',
+    '/store/mc/Summer12DR53X/Y4140ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v2/60000/167F9524-1658-E611-A520-FA163E954418.root',
+    '/store/mc/Summer12DR53X/Y4140ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v2/60000/18D52F20-FB57-E611-BF0E-008CFAFBE8F2.root',
+    '/store/mc/Summer12DR53X/Y4140ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v2/60000/1C355DE5-1758-E611-9EF6-FA163E97FA4D.root',
+    '/store/mc/Summer12DR53X/Y4140ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v2/60000/1C7A3DDD-1D58-E611-8168-FA163E4CCB09.root',
+    '/store/mc/Summer12DR53X/Y4140ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v2/60000/1E0979EF-4358-E611-9B2B-FA163EE20B5D.root',
+    '/store/mc/Summer12DR53X/Y4140ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v2/60000/208FFFDB-1658-E611-9BD0-FA163E5CC901.root',
+    '/store/mc/Summer12DR53X/Y4140ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v2/60000/224454F7-1258-E611-8179-FA163E824933.root',
+    '/store/mc/Summer12DR53X/Y4140ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v2/60000/3083217B-1A58-E611-959F-FA163E665D2C.root',
+    '/store/mc/Summer12DR53X/Y4140ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v2/60000/4A9CFFB3-1158-E611-B2BE-02163E014D37.root',
+    '/store/mc/Summer12DR53X/Y4140ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v2/60000/62AB1A60-FB57-E611-BC23-F04DA275BF11.root',
+    '/store/mc/Summer12DR53X/Y4140ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v2/60000/86364225-FB57-E611-80AA-008CFAFC043A.root',
+    '/store/mc/Summer12DR53X/Y4140ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v2/60000/865EF4AD-1558-E611-8E0D-FA163EC0B67E.root',
+    '/store/mc/Summer12DR53X/Y4140ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v2/60000/86A26E4D-1C58-E611-9D00-FA163EE6D545.root',
+    '/store/mc/Summer12DR53X/Y4140ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v2/60000/8CD8CCF4-4358-E611-BD05-7845C4FC3AC1.root',
+    '/store/mc/Summer12DR53X/Y4140ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v2/60000/94FC71A1-1B58-E611-8B86-FA163E7CDD49.root',
+    '/store/mc/Summer12DR53X/Y4140ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v2/60000/9CB277BD-1358-E611-982D-FA163E6CDEDC.root',
+    '/store/mc/Summer12DR53X/Y4140ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v2/60000/A0846A7B-1458-E611-B381-0025903D0B32.root',
+    '/store/mc/Summer12DR53X/Y4140ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v2/60000/A23AD6DC-1658-E611-860B-FA163E83B5F4.root',
+    '/store/mc/Summer12DR53X/Y4140ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v2/60000/B09E5782-1958-E611-8689-FA163E023B23.root',
+    '/store/mc/Summer12DR53X/Y4140ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v2/60000/B6670C17-1058-E611-92C3-FA163EA1151A.root',
+    '/store/mc/Summer12DR53X/Y4140ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v2/60000/CAC24AF8-1758-E611-9696-02163E014AFC.root',
+    '/store/mc/Summer12DR53X/Y4140ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v2/60000/CEC6E26C-0D58-E611-90BC-02163E016486.root',
+    '/store/mc/Summer12DR53X/Y4140ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v2/60000/EEF0A85B-0E58-E611-B261-FA163E8D3CEB.root' ] );
 
-process.PoolSource.fileNames = sourceFiles ;
+
+process.PoolSource.fileNames = sourceFiles;
 
 
 process.source.inputCommands = cms.untracked.vstring(
@@ -205,14 +100,14 @@ process.maxEvents = cms.untracked.PSet(
 	#input = cms.untracked.int32( -1 ) # = 5718Kb # timeout after 3700 for Run2012A/MuOnia
 	)
 
-#Output size of CRAB jobs ~200MB usually works well. (max 300-500 Mb according to Cesare) 
+#Output size of CRAB jobs ~200MB usually works well. (max 300-500 Mb according to Cesare)
 
 process.load('Configuration.Geometry.GeometryIdeal_cff') # 53x
 
 process.load("Configuration.StandardSequences.GeometryExtended_cff") # from Lucia
 process.load("Configuration.StandardSequences.Reconstruction_cff") # from Lucia
 
-process.load("Configuration.StandardSequences.MagneticField_cff") # for using TransientTrackBuilder 
+process.load("Configuration.StandardSequences.MagneticField_cff") # for using TransientTrackBuilder
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff") # for using TransientTrackBuilder
 #process.GlobalTag.globaltag = 'FT_53_V6_AN3::All' # for using TransientTrackBuilder
 #process.GlobalTag.globaltag = 'START53_V19F::All'
@@ -230,7 +125,7 @@ process.load('HLTrigger/HLTfilters/hltLevel1GTSeed_cfi')
 
 ####################################################################################
 ##################################good collisions############################################
-    
+
 #### 44x
 #process.primaryVertexFilter = cms.EDFilter("GoodVertexFilter",
 #                                                      vertexCollection = cms.InputTag('offlinePrimaryVertices'),
@@ -239,7 +134,7 @@ process.load('HLTrigger/HLTfilters/hltLevel1GTSeed_cfi')
 #                                                      maxd0 = cms.double(2)
 #                                           )
 
-## 53x                                    
+## 53x
 pvSelection = cms.PSet(
         minNdof = cms.double( 4. )
         , maxZ    = cms.double( 24. )
@@ -383,12 +278,12 @@ process.load("RecoVertex.BeamSpotProducer.BeamSpot_cff")
 #                                     #trajectoryTrackAssociation = cms.InputTag("TrackRefitter"),
 #                                     tracks = cms.InputTag("refittedGeneralTracksPion"),
 #                                     trajectoryTrackAssociation = cms.InputTag("refittedGeneralTracksPion"),
-#                                     
+#
 #                                     UseStrip  = cms.bool(True),
 #                                     UsePixel  = cms.bool(True),
 #                                     MeVperADCStrip = cms.double(3.61e-06*265),
 #                                     MeVperADCPixel = cms.double(3.61e-06),
-#                                     
+#
 #                                     UseCalibration = cms.bool(False),
 #                                     calibrationPath = cms.string("/afs/cern.ch/user/q/querten/workspace/public/dEdx/CMSSW_5_2_4/src/dEdx/ppGridProject/Gains.root"),
 #                                     ShapeTest = cms.bool(True),
@@ -397,12 +292,12 @@ process.load("RecoVertex.BeamSpotProducer.BeamSpot_cff")
 #process.dedxHitInfoKaon = cms.EDProducer("HSCPDeDxInfoProducer",
 #                                         tracks = cms.InputTag("refittedGeneralTracksKaon"),
 #                                         trajectoryTrackAssociation = cms.InputTag("refittedGeneralTracksKaon"),
-#                                         
+#
 #                                         UseStrip  = cms.bool(True),
 #                                         UsePixel  = cms.bool(True),
 #                                         MeVperADCStrip = cms.double(3.61e-06*265),
 #                                         MeVperADCPixel = cms.double(3.61e-06),
-#                                         
+#
 #                                         UseCalibration = cms.bool(False),
 #                                         calibrationPath = cms.string("/afs/cern.ch/user/q/querten/workspace/public/dEdx/CMSSW_5_2_4/src/dEdx/ppGridProject/Gains.root"),
 #                                         ShapeTest = cms.bool(True),
@@ -420,7 +315,7 @@ process.mkcands = cms.EDAnalyzer("MuMuKKPAT",
                                  DoMonteCarloTree = cms.untracked.bool( MC ),
                                  MonteCarloParticleId = cms.untracked.int32(20443),
                                  MonteCarloExclusiveDecay = cms.untracked.bool( MCExclusiveDecay ),
-                                 MonteCarloMotherId = cms.untracked.int32( MCMotherId ), 
+                                 MonteCarloMotherId = cms.untracked.int32( MCMotherId ),
                                  MonteCarloDaughtersN = cms.untracked.int32( 3 ), # 3 for exclusive B0->psi'KPi
                                  #
                                  DoMuMuMassConstraint = cms.untracked.bool(True),
@@ -435,24 +330,24 @@ process.mkcands = cms.EDAnalyzer("MuMuKKPAT",
 
                                  MinJPsiMass = cms.untracked.double(2.8), # SEMRA changed
                                  MaxJPsiMass = cms.untracked.double(3.4), # SEMRA changed
-				 MinPhiMass = cms.untracked.double (0.97), # SEMRA added
- 				 MaxPhiMass = cms.untracked.double (1.07), # SEMRA added
-				 MaxJPsiPhiXMass = cms.untracked.double (4.35), # SEMRA added
-				 MinJPsiPhiB0Mass = cms.untracked.double (5.1), # SEMRA added
-				 MaxJPsiPhiB0Mass = cms.untracked.double (5.6), # SEMRA added 
+                				 MinPhiMass = cms.untracked.double (0.97), # SEMRA added
+                 				 MaxPhiMass = cms.untracked.double (1.07), # SEMRA added
+                				 MaxJPsiPhiXMass = cms.untracked.double (4.35), # SEMRA added
+                				 MinJPsiPhiB0Mass = cms.untracked.double (5.1), # SEMRA added
+                				 MaxJPsiPhiB0Mass = cms.untracked.double (5.6), # SEMRA added
 
                                  MinNumTrSiHits = cms.untracked.int32(4),
                                  MinTrPt = cms.untracked.double(0.350),
                                  Chi2NDF_Track =  cms.untracked.double(7.0),
-				 # Delta R
-				 MaxMuMuTrackDR = cms.untracked.double(1.5), 
-                                 MaxXCandTrackDR = cms.untracked.double(1.5),     
-                                 UseXDr = cms.untracked.bool(True),             
+                				 # Delta R
+                				 MaxMuMuTrackDR = cms.untracked.double(1.5),
+                                 MaxXCandTrackDR = cms.untracked.double(1.5),
+                                 UseXDr = cms.untracked.bool(True),
 
                                  resolvePileUpAmbiguity = cms.untracked.bool(False),
                                  addMuMulessPrimaryVertex = cms.untracked.bool(True),
                                  #addMuMulessPrimaryVertex = cms.untracked.bool(False),
-                                 addXlessPrimaryVertex = cms.untracked.bool(True), 
+                                 addXlessPrimaryVertex = cms.untracked.bool(True),
                                  Debug_Output = cms.untracked.bool(False), # true
                                  ##
                                  ##  use the correct trigger path
@@ -460,37 +355,27 @@ process.mkcands = cms.EDAnalyzer("MuMuKKPAT",
                                  TriggersForMatching = cms.untracked.vstring(
                                          #2012 displaced J/psi = Alessandra
                                          "HLT_DoubleMu4_Jpsi_Displaced_v9",
-					 "HLT_DoubleMu4_Jpsi_Displaced_v10", 
-					 "HLT_DoubleMu4_Jpsi_Displaced_v11", "HLT_DoubleMu4_Jpsi_Displaced_v12",
-                                         # Lucia
-                                         # 2010
-                                         #"HLT_DoubleMu3_Quarkonium_v1", "HLT_DoubleMu3_Quarkonium_v2",
-                                         #"HLT_Dimuon6p5_Barrel_PsiPrime_v1",
-                                         # 2011
-                                         #"HLT_Dimuon7_PsiPrime_v1", "HLT_Dimuon7_PsiPrime_v2", "HLT_Dimuon7_PsiPrime_v3", "HLT_Dimuon7_PsiPrime_v4", "HLT_Dimuon7_PsiPrime_v5",
-                                         #"HLT_Dimuon9_PsiPrime_v1", "HLT_Dimuon9_PsiPrime_v4", "HLT_Dimuon9_PsiPrime_v5",
-                                         #"HLT_Dimuon11_PsiPrime_v1", "HLT_Dimuon11_PsiPrime_v4", "HLT_Dimuon11_PsiPrime_v5",
-                                         # inclusive psi(2S)
-                                         #"HLT_Dimuon0_PsiPrime_v3", "HLT_Dimuon0_PsiPrime_v4", "HLT_Dimuon0_PsiPrime_v5", "HLT_Dimuon0_PsiPrime_v6",
-                                         #"HLT_Dimuon5_PsiPrime_v3", "HLT_Dimuon5_PsiPrime_v4", "HLT_Dimuon5_PsiPrime_v5", "HLT_Dimuon5_PsiPrime_v6",
-                                         #"HLT_Dimuon7_PsiPrime_v1", "HLT_Dimuon7_PsiPrime_v2", "HLT_Dimuon7_PsiPrime_v3", "HLT_Dimuon9_PsiPrime_v9",
-                                         #"HLT_DoubleMu3p5_LowMass_Displaced_v3", "HLT_DoubleMu3p5_LowMass_Displaced_v4", "HLT_DoubleMu3p5_LowMass_Displaced_v5", "HLT_DoubleMu3p5_LowMass_Displaced_v6"
-					 # inclusive J/psi
-					 #"HLT_Dimuon8_Jpsi_v3", 
-					 "HLT_Dimuon8_Jpsi_v4", 
-					 "HLT_Dimuon8_Jpsi_v5", "HLT_Dimuon8_Jpsi_v6", "HLT_Dimuon8_Jpsi_v7",  
+                    					 "HLT_DoubleMu4_Jpsi_Displaced_v10",
+                    					 "HLT_DoubleMu4_Jpsi_Displaced_v11",
+                                         "HLT_DoubleMu4_Jpsi_Displaced_v12",
+                    					 "HLT_Dimuon8_Jpsi_v4",
+                    					 "HLT_Dimuon8_Jpsi_v5",
+                                         "HLT_Dimuon8_Jpsi_v6",
+                                         "HLT_Dimuon8_Jpsi_v7",
                                  ),
 				 FiltersForMatching = cms.untracked.vstring(
-                                         # Alessandra
-                                         "hltDisplacedmumuFilterDoubleMu4Jpsi", "hltDisplacedmumuFilterDoubleMu4Jpsi", "hltDisplacedmumuFilterDoubleMu4Jpsi", "hltDisplacedmumuFilterDoubleMu4Jpsi"
-                                         # Kay
-                                         #"hltVertexmumuFilterDimuon5PsiPrime", "hltVertexmumuFilterDimuon5PsiPrime", "hltVertexmumuFilterDimuon5PsiPrime", "hltVertexmumuFilterDimuon5PsiPrime", #"hltVertexmumuFilterDimuon7PsiPrime", "hltVertexmumuFilterDimuon7PsiPrime", "hltVertexmumuFilterDimuon7PsiPrime", "hltVertexmumuFilterDimuon7PsiPrime"
-                                         #hltDoubleMu4JpsiDisplacedL3Filtered
-					 # inclusive J/psi (https://espace.cern.ch/cms-quarkonia/trigger-bph/SitePages/2012-InclusiveJPsi.aspx)         
-					 "hltVertexmumuFilterDimuon8Jpsi", "hltVertexmumuFilterDimuon8Jpsi", "hltVertexmumuFilterDimuon8Jpsi", "hltVertexmumuFilterDimuon8Jpsi", "hltVertexmumuFilterDimuon8Jpsi",
+                                         "hltDisplacedmumuFilterDoubleMu4Jpsi",
+                                         "hltDisplacedmumuFilterDoubleMu4Jpsi",
+                                         "hltDisplacedmumuFilterDoubleMu4Jpsi",
+                                         "hltDisplacedmumuFilterDoubleMu4Jpsi"
+					                     "hltVertexmumuFilterDimuon8Jpsi",
+                                         "hltVertexmumuFilterDimuon8Jpsi",
+                                         "hltVertexmumuFilterDimuon8Jpsi",
+                                         "hltVertexmumuFilterDimuon8Jpsi",
+                                         "hltVertexmumuFilterDimuon8Jpsi",
                                 )
-                                 
-                                 
+
+
                          )
 
 
@@ -500,13 +385,8 @@ process.TFileService = cms.Service("TFileService",
 if (not MC) :
     process.TFileService.fileName = cms.string('MuOniaParked_Run2012B_MuMuKKPAT_ntpl.root')
 elif MC :
-    if MCMotherId == 511 :
-            if (not official) :
-                    process.TFileService.fileName = cms.string('BdToPsiKpi_18Mar_MuMuPiKPAT_ntpl.root')
-            else :
-                    process.TFileService.fileName = cms.string('officialBdToPsiKpi_18Mar_MuMuPiKPAT_ntpl.root')
-    elif MCMotherId == 531 :
-        process.TFileService.fileName = cms.string('BsToPsiMuMu_03Mar_MuMuPiKPAT_ntpl.root')
+    process.TFileService.fileName = cms.string('BsToJPsiPhi_Summer12DR53X_MuMuPiKPAT_ntpl.root')
+
 
 
 # turn off MC matching for the process
@@ -551,7 +431,7 @@ process.ntup = cms.Path(
         #process.refittedGeneralTracksMuon *
         #process.refittedGeneralTracksKaon *
         #process.offlineBeamSpot * process.TrackRefitter * process.dedxHitInfo
-        #process.dedxHarmonic2Kaon * 
+        #process.dedxHarmonic2Kaon *
         process.offlineBeamSpot #* process.dedxHitInfo
         * process.filter
         * process.patDefaultSequence
@@ -563,4 +443,3 @@ process.ntup = cms.Path(
 process.schedule = cms.Schedule(process.ntup)
 
 # rsync -vut --existing test/runMuMuKKPAT_dataOrMC.py semrat@lxplus.cern.ch:/afs/cern.ch/user/s/semrat/scratch0/CMSSW_5_3_22/src/X4140/MuMuKKPAT/test/runMuMuKKPAT_dataOrMC.py
-

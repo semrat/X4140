@@ -81,13 +81,18 @@ void X4140_MuMuKK::SlaveBegin(TTree * /*tree*/)
 
   TString option = GetOption();
 
-  std::string outputString = "X4140_MuMuKK_KRe_MuRef_Sidebands5-7_NP3.0_B0Cuts_CW5.15-5.55.root";
+  std::string outputString = "X4140_MuMuKK_KRe_MuRef_NoQual_Sidebands5-7_NP3.0_B0Cuts_CW5.15-5.55.root";
   OutFile = new TProofOutputFile( outputString.data() );
   fOut = OutFile->OpenFile("RECREATE");
   if (!(fOut=OutFile->OpenFile("RECREATE")))
   {
     Warning("SlaveBegin","Problems opening file: %s%s", OutFile->GetDir(), OutFile->GetFileName() );
   }
+
+  clabels.push_back("all"); clabels.push_back("all"); clabels.push_back("jpsi"); clabels.push_back("kaons"); clabels.push_back("extra");
+  regions.push_back("all"); regions.push_back("prompt"); regions.push_back("mixed"); regions.push_back("nonprompt");
+  windows.push_back("all"); windows.push_back("cw"); windows.push_back("sw");
+  hlts.push_back("all");hlts.push_back("any");hlts.push_back("hlt4");hlts.push_back("hlt8");
 
   ////////////////// Histograms //////////////////
   JPsi_mass = 3.096916; /// pdg mass
@@ -112,13 +117,13 @@ void X4140_MuMuKK::SlaveBegin(TTree * /*tree*/)
   std::string phiHisto   = "Phi_hist_";
 
 
-  for (size_t l = 0; l < 4; l++)
+  for (size_t l = 0; l < hlts.size(); l++)
   {
-    for (size_t j = 0; j < 3; ++j)
+    for (size_t j = 0; j < windows.size(); ++j)
     {
-      for (size_t k = 0; k < 4; ++k)
+      for (size_t k = 0; k < regions.size(); ++k)
       {
-        for (size_t i = 0; i < 5; ++i)
+        for (size_t i = 0; i < clabels.size(); ++i)
         {
           std::tuple < std::string, std::string, std::string, std::string > histokey(hlts[l],windows[j],regions[k],clabels[i]);
           std::string suffix = hlts[l] + "_" + windows[j] + "_" + regions[k] + "_" + clabels[i];
@@ -327,6 +332,8 @@ bool X4140_MuMuKK::Process(Long64_t entry)
     //muonsCuts = muonQualityCut && muonChiCut && muonShitsCut && muonPhitsCut && muonDZPVCut && muonDXYPVCut;
     muonsCuts = muonDZPVCut && muonDXYPVCut;
 
+    cutsFlags.push_back(true);
+
     cutsFlags.push_back((muonsCuts));
 
     jPsiPtCut      = (JPsi.Pt() > 7.0);
@@ -413,6 +420,7 @@ bool X4140_MuMuKK::Process(Long64_t entry)
     {
 
       B0_PhiMassHisto->Fill(Phi.M());
+      B0_phi_masses.push_back(Phi.M());
 
       if(b0_signal)
         {
@@ -429,8 +437,6 @@ bool X4140_MuMuKK::Process(Long64_t entry)
         B0_Cand_Mass_R_Side->Fill(XCand.M());
         B0_Cand_Masses_R_Sides.push_back(XCand.M());
       }
-
-      B0_phi_masses.push_back(Phi.M());
 
     }
 
@@ -449,9 +455,9 @@ bool X4140_MuMuKK::Process(Long64_t entry)
   if(B0_Cand_Masses.size()==1)
     B0_Cand_Mass_NoM->Fill(B0_Cand_Masses[0]);
   if(B0_Cand_Masses_R_Sides.size()==1)
-    B0_Cand_Mass_L_Side_NoM->Fill(B0_Cand_Masses_R_Sides[0]);
+    B0_Cand_Mass_R_Side_NoM->Fill(B0_Cand_Masses_R_Sides[0]);
   if(B0_Cand_Masses_L_Sides.size()==1)
-    B0_Cand_Mass_R_Side_NoM->Fill(B0_Cand_Masses_L_Sides[0]);
+    B0_Cand_Mass_L_Side_NoM->Fill(B0_Cand_Masses_L_Sides[0]);
 
   return kTRUE;
 }
@@ -470,13 +476,13 @@ void X4140_MuMuKK::SlaveTerminate()
     fOut->cd();
     gStyle->SetOptStat(111111) ;
 
-    for (size_t l = 0; l < 5; l++)
+    for (size_t l = 0; l < hlts.size(); l++)
     {
-      for (size_t j = 0; j < 3; ++j)
+      for (size_t j = 0; j < windows.size(); ++j)
       {
-        for (size_t k = 0; k < 4; ++k)
+        for (size_t k = 0; k < regions.size(); ++k)
         {
-          for (size_t i = 0; i < 6; ++i)
+          for (size_t i = 0; i < clabels.size(); ++i)
           {
             std::tuple < std::string, std::string, std::string, std::string > histokey(hlts[l],windows[j],regions[k],clabels[i]);
             std::string suffix = hlts[l] + "_" + windows[j] + "_" + regions[k] + "_" + clabels[i];
