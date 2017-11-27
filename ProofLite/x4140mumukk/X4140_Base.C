@@ -103,7 +103,7 @@ void X4140_Base::SlaveBegin(TTree * /*tree*/)
 
   SW_Phi_mean = 1.0194159;
   SW_Phi_sigma = 5.10795e-03; //2.35607e-03;//2.28400e-03;
-  SW_NP_Phi_sigma = 5.26254e-03
+  SW_NP_Phi_sigma = 5.26254e-03;
   SW_NP_Phi_mean = 1.01955223318;
 
   std::string xcandHisto        = "Xcand_histo_";
@@ -183,7 +183,7 @@ void X4140_Base::SlaveBegin(TTree * /*tree*/)
   double cwsteps = (5.0 - 4.0)/bwwidth;
   double swsteps = (5.6 - 5.1)/bwwidth;
 
-  for (size_t i = 0; i < bwwidth; i++) {
+  for (int i = 0; i < bwwidth; i++) {
     bufferstring = "SW_PhiMass_BinWise_" + std::to_string(i);
     SW_PhiMass_BinWise.push_back(new TH1F (bufferstring.data(),bufferstring.data(),2000, 0.5, 1.5));
     bufferstring = "CW_PhiMass_BinWise_" + std::to_string(i);
@@ -610,7 +610,7 @@ bool X4140_Base::Process(Long64_t entry)
     for (int i = 0; i < bwwidth; i++)
     {
       if(SW_Mass_NoMVec[0] >= sw_binwise[i] && SW_Mass_NoMVec[0] < sw_binwise[i+1])
-        SW_PhiMass_BinWise_NoM[i]->Fill(Phi.M());
+        SW_PhiMass_BinWise_NoM[i]->Fill(SW_PhiMass_NoM[i]);
     }
   }
 
