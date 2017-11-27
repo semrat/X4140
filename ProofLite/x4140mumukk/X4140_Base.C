@@ -710,6 +710,13 @@ void X4140_Base::SlaveTerminate()
     SW_NP_Mass_R_Side->Write(); SW_NP_Mass_R_Side_NoM->Write();
     SW_NP_Mass_L_Side->Write(); SW_NP_Mass_L_Side_NoM->Write();
 
+    for (size_t i = 0; i < bwwidth; i++) {
+      SW_PhiMass_BinWise[i]->Write();
+      CW_PhiMass_BinWise[i]->Write();
+
+      SW_PhiMass_BinWise_NoM[i]->Write();
+      CW_PhiMass_BinWise_NoM[i]->Write();
+    }
     OutFile->Print();
     fOutput->Add(OutFile);
     gDirectory = savedir;
