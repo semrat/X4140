@@ -199,8 +199,8 @@ void X4140_Base::SlaveBegin(TTree * /*tree*/)
 
   }
 
-  cw_binwise.push_back(CW_Mass->GetBinLowEdge(1) + double(double(i) * bwwidth));
-  sw_binwise.push_back(SW_Mass->GetBinLowEdge(1) + double(double(i) * bwwidth));
+  cw_binwise.push_back(CW_Mass->GetBinLowEdge(1) + bwwidth * cwsteps));
+  sw_binwise.push_back(SW_Mass->GetBinLowEdge(1) + bwwidth * swsteps));
 
 }
 
