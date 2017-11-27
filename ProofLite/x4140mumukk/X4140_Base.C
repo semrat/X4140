@@ -610,7 +610,7 @@ bool X4140_Base::Process(Long64_t entry)
     for (int i = 0; i < bwwidth; i++)
     {
       if(SW_Mass_NoMVec[0] >= sw_binwise[i] && SW_Mass_NoMVec[0] < sw_binwise[i+1])
-        SW_PhiMass_BinWise_NoM[i]->Fill(SW_PhiMass_NoM[i]);
+        SW_PhiMass_BinWise_NoM[i]->Fill(SW_PhiMass_NoMVec[0]);
     }
   }
 
