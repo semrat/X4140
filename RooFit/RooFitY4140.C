@@ -41,8 +41,8 @@ Float_t TH2_offset = 1.6;
 void Y4140RooFit(TFile *inputfile,std::string histoname = "X5568_Cand_Mass_Ref")
 {
 
-  RooRealVar mass("mass","M(#mu#muKK)[GeV]",5.2,5.5);
-  mass.setBins(60);
+  RooRealVar mass("mass","M(#mu#muKK)[GeV]",5.15,5.55);
+  mass.setBins(80);
   RooRealVar mean("mean","mean of gaussian",5.38,5.31,5.41);
   RooRealVar sigma1("sigma1","width of gaussian1",0.01,0.001,0.05);
   RooRealVar sigma2("sigma2","width of gaussian2",0.005,0.001,0.01);
@@ -82,6 +82,7 @@ void Y4140RooFit(TFile *inputfile,std::string histoname = "X5568_Cand_Mass_Ref")
   tot.plotOn(massFrame);
   tot.plotOn(massFrame,Components(gauss1),LineColor(kGreen),LineStyle(kDashed),Name("gauss1"));
   tot.plotOn(massFrame,Components(gauss2),LineColor(kMagenta),LineStyle(kDashed),Name("gauss2"));
+  //tot.plotOn(massFrame,Components(cheb),LineColor(kRed),LineStyle(kDotted),Name("exp"));
   tot.plotOn(massFrame,Components(cheb),LineColor(kRed),LineStyle(kDotted),Name("exp"));
 
   // gauss1.plotOn(massFrame);
