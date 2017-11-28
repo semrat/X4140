@@ -180,8 +180,8 @@ void X4140_Base_B::SlaveBegin(TTree * /*tree*/)
   SW_NP_Mass_L_Side = new TH1F ("SW_NP_Mass_L_Side","SW_NP_Mass_L_Side",2000, 4.0, 5.0);
   SW_NP_Mass_L_Side_NoM = new TH1F ("SW_NP_Mass_L_Side_NoM","SW_NP_Mass_L_Side_NoM",2000, 4.0, 5.0);
 
-  double cwsteps = (5.0 - 4.0)/bwwidth;
-  double swsteps = (5.6 - 5.1)/bwwidth;
+  double swsteps = (5.0 - 4.0)/bwwidth;
+  double cwsteps = (5.6 - 5.1)/bwwidth;
 
   for (int i = 0; i < bwwidth; i++) {
     bufferstring = "SW_PhiMass_BinWise_" + std::to_string(i);
