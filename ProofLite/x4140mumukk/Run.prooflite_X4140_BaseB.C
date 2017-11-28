@@ -33,7 +33,7 @@
   dataset->Add("/lustre/cms/store/user/adiflori/MuOniaParked/runB_resplit_Oct17/runB_add_01.root");
 
   // dataset->Add("/Users/adrianodiflorio/Documents/Git/X4140/ProofLite/Y4140_testrootuple.root");
-  TString selector = "X4140_Base";
+  TString selector = "X4140_Base_B";
   TProof *p = TProof::Open("workers=40"); // 12 workers for qsub
 
   // Processing

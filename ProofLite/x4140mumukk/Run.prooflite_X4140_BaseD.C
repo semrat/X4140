@@ -10,7 +10,7 @@
 
   TDSet* dataset = new TDSet("TTree", "X_data", "mkcands");
   //
-  
+
   dataset->Add("/lustre/cms/store/user/adiflori/MuOniaParked/runD_resplit_Oct17/runD_split_00.root");
   dataset->Add("/lustre/cms/store/user/adiflori/MuOniaParked/runD_resplit_Oct17/runD_split_01.root");
   dataset->Add("/lustre/cms/store/user/adiflori/MuOniaParked/runD_resplit_Oct17/runD_split_02.root");
@@ -34,7 +34,7 @@
   dataset->Add("/lustre/cms/store/user/adiflori/MuOniaParked/runD_resplit_Oct17/runD_add_01.root");
 
   // dataset->Add("/Users/adrianodiflorio/Documents/Git/X4140/ProofLite/Y4140_testrootuple.root");
-  TString selector = "X4140_Base";
+  TString selector = "X4140_Base_D";
   TProof *p = TProof::Open("workers=40"); // 12 workers for qsub
 
   // Processing
