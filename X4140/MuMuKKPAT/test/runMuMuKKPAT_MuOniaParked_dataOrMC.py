@@ -399,13 +399,10 @@ process.patDefaultSequence.remove(process.patJetCharge)
 process.patDefaultSequence.remove(process.patJetPartonMatch)
 process.patDefaultSequence.remove(process.patJetGenJetMatch)
 process.patDefaultSequence.remove(process.patJetPartons)
-## error in 5_3_22, so removing it
-#process.patDefaultSequence.remove(process.patJetPartonAssociation)
+
 process.patDefaultSequence.remove(process.patJetFlavourAssociation)
 process.patDefaultSequence.remove(process.patJets)
-## error in 53x, so removing it
-#process.patDefaultSequence.remove(process.metJESCorAK5CaloJet)
-#process.patDefaultSequence.remove(process.metJESCorAK5CaloJetMuons)
+
 process.patDefaultSequence.remove(process.patMETs)
 process.patDefaultSequence.remove(process.selectedPatJets)
 process.patDefaultSequence.remove(process.cleanPatJets)
