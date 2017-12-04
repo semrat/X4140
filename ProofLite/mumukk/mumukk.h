@@ -5,8 +5,8 @@
 // found on file: MuOniaParked_Run2012C_MuMuKKPAT_merged0.root
 //////////////////////////////////////////////////////////
 
-#ifndef X4140_Base_B_h
-#define X4140_Base_B_h
+#ifndef mumukk_h
+#define mumukk_h
 
 #include <TROOT.h>
 #include <TChain.h>
@@ -50,10 +50,11 @@
 
 // Fixed size dimensions of array or collections stored in the TTree if any.
 
-class X4140_Base_B : public TSelector {
+class mumukk : public TSelector {
 public :
+  ////////////////////////////////////////////////////////////
+  //INPUT TREE
    TTree          *fChain;   //!pointer to the analyzed TTree or TChain
-
    // Declaration of leaf types
    vector<unsigned int> *TrigRes;
    vector<string>  *TrigNames;
@@ -785,9 +786,9 @@ public :
    TBranch        *b_kaon2_dedxErr_byHits;   //!
    TBranch        *b_kaon2_saturMeas_byHits;   //!
    TBranch        *b_kaon2_Meas_byHits;   //!
-
-   X4140_Base_B(TTree * /*tree*/ =0) : fChain(0) { }
-   virtual ~X4140_Base_B() { }
+   ////////////////////////////////////////////////////////////
+   mumukk(TTree * /*tree*/ =0) : fChain(0) { }
+   virtual ~mumukk() { }
    virtual Int_t   Version() const { return 2; }
    virtual void    Begin(TTree *tree);
    virtual void    SlaveBegin(TTree *tree);
@@ -805,60 +806,60 @@ public :
    TProofOutputFile *OutFile;
    TFile            *fOut;
 
+   TTree *outTree;
 
-   //cw histograms
-   TH1F *CW_Mass,*CW_Mass_NoM;
-   TH1F *CW_Mass_Signal,*CW_Mass_Signal_NoM;
-   TH1F *CW_JPsi,*CW_JPsi_NoM;
-   TH1F *CW_PhiMass,*CW_PhiMass_NoM;
-   TH1F *CW_Mass_R_Side,*CW_Mass_R_Side_NoM;
-   TH1F *CW_Mass_L_Side,*CW_Mass_L_Side_NoM;
-   std::vector<TH1F*> CW_PhiMass_BinWise,CW_PhiMass_BinWise_NoM;
+   //cw values
+   UInt_t          run_out;
+   UInt_t          evt_out;
+   UInt_t          lum_out;
+   Float_t         X_mass;
+   Float_t         kk_mass;
+   Float_t         mumu_mass;
+   Float_t         X_LFly;
+   Float_t         X_pt;
+   Float_t         X_eta;
+   Float_t         X_vtx;
+   Float_t         X_cosAlpha;
+   Float_t         X_hlt;
 
-   //sw histograms
-   TH1F *SW_Mass,*SW_Mass_NoM;
-   TH1F *SW_JPsi,*SW_JPsi_NoM;
-   TH1F *SW_Mass_Signal,*SW_Mass_Signal_NoM;
-   TH1F *SW_PhiMass,*SW_PhiMass_NoM;
-   TH1F *SW_Mass_R_Side,*SW_Mass_R_Side_NoM;
-   TH1F *SW_Mass_L_Side,*SW_Mass_L_Side_NoM;
-   std::vector<TH1F*> SW_PhiMass_BinWise,SW_PhiMass_BinWise_NoM;
+  TBranch*      X_mass_b;
+  TBranch*      kk_mass_b;
+  TBranch*      mumu_mass_b;
+  TBranch*      X_LFly_b;
+  TBranch*      X_pt_b;
+  TBranch*      X_eta_b;
+  TBranch*      X_vtx_b;
+  TBranch*      X_cosAlpha_b;
+  TBranch*      X_hlt_b;
+  TBranch*      X_run_b;
+  TBranch*      X_evt_b;
+  TBranch*      X_lum_b;
 
-   //sw np histos
-   TH1F *SW_NP_Mass,*SW_NP_Mass_NoM;
-   TH1F *SW_NP_JPsi,*SW_NP_JPsi_NoM;
-   TH1F *SW_NP_Mass_Signal,*SW_NP_Mass_Signal_NoM;
-   TH1F *SW_NP_PhiMass,*SW_NP_PhiMass_NoM;
-   TH1F *SW_NP_Mass_R_Side,*SW_NP_Mass_R_Side_NoM;
-   TH1F *SW_NP_Mass_L_Side,*SW_NP_Mass_L_Side_NoM;
+   std::map< std::tuple < std::string, std::string, std::string, std::string >,TH1F*>  XCandMassHistos,XCandMassHistosDeltaM, JPsiMassHistos,PhiMassHistos;
+   //std::map< std::tuple < std::string, std::string, std::string, std::string >,TH1F*>  XCandMassHistos_Ref, JPsiMassHistos_Ref,PhiMassHistos_Ref;
 
-   //tot histograms
-   // hlts  regions  windows cuts
-   std::map< std::tuple < std::string, std::string, std::string, std::string >,TH1F*>  XCandMass, XCandMass_Signal;
-   std::map< std::tuple < std::string, std::string, std::string, std::string >,TH1F*>  XCandMass_L_Side, XCandMass_R_Side;
-   std::map< std::tuple < std::string, std::string, std::string, std::string >,TH1F*> JPsiMass,JPsiMass_Original,PhiMass;
 
    std::vector< std::string > clabels, regions, windows, hlts;
-   std::vector< double > cw_binwise, sw_binwise;
+
+
+   std::map < std::pair <int,int>, int> lumiMap;
 
    double JPsi_mass;
-   double Phi_mass,CW_Phi_sigma,CW_Phi_mean;
-   double SW_Phi_sigma,SW_Phi_mean,SW_NP_Phi_mean,SW_NP_Phi_sigma;
+   double Phi_mass,Phi_sigma,Phi_mean;
    double Bs0_Low_Mass;
    double Bs0_High_Mass;
    double Y_High_Mass;
-   double bwwidth = 0.0;
 
   //  int muonQual[4] = {1,3,4,12};
 
 
-   ClassDef(X4140_Base_B,0);
+   ClassDef(mumukk,0);
 };
 
 #endif
 
-#ifdef X4140_Base_B_cxx
-void X4140_Base_B::Init(TTree *tree)
+#ifdef mumukk_cxx
+void mumukk::Init(TTree *tree)
 {
    // The Init() function is called when the selector needs to initialize
    // a new tree or chain. Typically here the branch addresses and branch
@@ -1563,9 +1564,30 @@ void X4140_Base_B::Init(TTree *tree)
    fChain->SetBranchAddress("kaon2_dedxErr_byHits", &kaon2_dedxErr_byHits, &b_kaon2_dedxErr_byHits);
    fChain->SetBranchAddress("kaon2_saturMeas_byHits", &kaon2_saturMeas_byHits, &b_kaon2_saturMeas_byHits);
    fChain->SetBranchAddress("kaon2_Meas_byHits", &kaon2_Meas_byHits, &b_kaon2_Meas_byHits);
+
+   outTree->SetBranchAddress("X_mass_out", &X_mass, &X_mass_b);
+   outTree->SetBranchAddress("kk_mass_out", &kk_mass, &kk_mass);
+   outTree->SetBranchAddress("mumu_mass_out", &mumu_mass, &mumu_mass);
+   outTree->SetBranchAddress("X_mass_out", &X_mult, &X_mult_b);
+   outTree->SetBranchAddress("X_mass_out", &X_LFly, &X_LFly_b);
+   outTree->SetBranchAddress("X_mass_out", &X_eta, &X_eta_b);
+   outTree->SetBranchAddress("X_mass_out", &X_vtx, &X_vtx_b);
+   outTree->SetBranchAddress("X_mass_out", &X_cosAlpha, &X_cosAlpha_b);
+   //cw values
+  X_mass = 0;
+  kk_mass = 0;
+  mumu_mass = 0;
+  X_mult = 0;
+  X_LFly = 0;
+  X_pt = 0;
+  X_eta = 0;
+  X_vtx = 0;
+  X_cosAlpha = 0;
+
+
 }
 
-Bool_t X4140_Base_B::Notify()
+Bool_t mumukk::Notify()
 {
    // The Notify() function is called when a new file is opened. This
    // can be either for a new TTree in a TChain or when when a new TTree
@@ -1576,4 +1598,4 @@ Bool_t X4140_Base_B::Notify()
    return kTRUE;
 }
 
-#endif // #ifdef Y4140_cxx
+#endif

@@ -5,8 +5,8 @@
 // found on file: MuOniaParked_Run2012C_MuMuKKPAT_merged0.root
 //////////////////////////////////////////////////////////
 
-#ifndef X4140_Base_B_h
-#define X4140_Base_B_h
+#ifndef X4140_Base_D_h
+#define X4140_Base_D_h
 
 #include <TROOT.h>
 #include <TChain.h>
@@ -50,7 +50,7 @@
 
 // Fixed size dimensions of array or collections stored in the TTree if any.
 
-class X4140_Base_B : public TSelector {
+class X4140_Base_D : public TSelector {
 public :
    TTree          *fChain;   //!pointer to the analyzed TTree or TChain
 
@@ -786,8 +786,8 @@ public :
    TBranch        *b_kaon2_saturMeas_byHits;   //!
    TBranch        *b_kaon2_Meas_byHits;   //!
 
-   X4140_Base_B(TTree * /*tree*/ =0) : fChain(0) { }
-   virtual ~X4140_Base_B() { }
+   X4140_Base_D(TTree * /*tree*/ =0) : fChain(0) { }
+   virtual ~X4140_Base_D() { }
    virtual Int_t   Version() const { return 2; }
    virtual void    Begin(TTree *tree);
    virtual void    SlaveBegin(TTree *tree);
@@ -847,18 +847,18 @@ public :
    double Bs0_Low_Mass;
    double Bs0_High_Mass;
    double Y_High_Mass;
-   double bwwidth = 0.0;
+   double bwwidth = 50.0;
 
   //  int muonQual[4] = {1,3,4,12};
 
 
-   ClassDef(X4140_Base_B,0);
+   ClassDef(X4140_Base_D,0);
 };
 
 #endif
 
-#ifdef X4140_Base_B_cxx
-void X4140_Base_B::Init(TTree *tree)
+#ifdef X4140_Base_D_cxx
+void X4140_Base_D::Init(TTree *tree)
 {
    // The Init() function is called when the selector needs to initialize
    // a new tree or chain. Typically here the branch addresses and branch
@@ -1565,7 +1565,7 @@ void X4140_Base_B::Init(TTree *tree)
    fChain->SetBranchAddress("kaon2_Meas_byHits", &kaon2_Meas_byHits, &b_kaon2_Meas_byHits);
 }
 
-Bool_t X4140_Base_B::Notify()
+Bool_t X4140_Base_D::Notify()
 {
    // The Notify() function is called when a new file is opened. This
    // can be either for a new TTree in a TChain or when when a new TTree
