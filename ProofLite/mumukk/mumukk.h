@@ -808,7 +808,6 @@ public :
 
    TTree *outTree;
 
-   //cw values
    UInt_t          run_out;
    UInt_t          evt_out;
    UInt_t          lum_out;
