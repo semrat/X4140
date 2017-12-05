@@ -1565,8 +1565,8 @@ void mumukk::Init(TTree *tree)
    fChain->SetBranchAddress("kaon2_Meas_byHits", &kaon2_Meas_byHits, &b_kaon2_Meas_byHits);
 
    outTree->SetBranchAddress("X_mass_out", &X_mass, &X_mass_b);
-   outTree->SetBranchAddress("kk_mass_out", &kk_mass, &kk_mass);
-   outTree->SetBranchAddress("mumu_mass_out", &mumu_mass, &mumu_mass);
+   outTree->SetBranchAddress("kk_mass_out", &kk_mass, &kk_mass_b);
+   outTree->SetBranchAddress("mumu_mass_out", &mumu_mass, &mumu_mass_b);
    outTree->SetBranchAddress("X_LFly_out", &X_LFly, &X_LFly_b);
    outTree->SetBranchAddress("X_eta_out", &X_eta, &X_eta_b);
    outTree->SetBranchAddress("X_vtx_out", &X_vtx, &X_vtx_b);
@@ -1575,7 +1575,6 @@ void mumukk::Init(TTree *tree)
   X_mass = 0;
   kk_mass = 0;
   mumu_mass = 0;
-  X_mult = 0;
   X_LFly = 0;
   X_pt = 0;
   X_eta = 0;
