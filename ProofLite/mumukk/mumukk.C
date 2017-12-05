@@ -96,7 +96,7 @@ void mumukk::SlaveBegin(TTree * /*tree*/)
   Phi_sigma = 2.35607e-03;//2.28400e-03;
 
   outTree = new TTree("outTree","outTree");
-  
+
   //cw values
  X_mass = 0;
  kk_mass = 0;
@@ -290,7 +290,8 @@ bool mumukk::Process(Long64_t entry)
     promptRegion    = (((*XLxyPV)[iX] / (*XLxyPVE)[iX]) < 2.);
 
 
-    if(muonsCuts && kaonsCuts && jPsiCuts && extraCuts && HLT_Any)
+    // if(muonsCuts && kaonsCuts && jPsiCuts && extraCuts && HLT_Any)
+    if(HLT_Any)
     {
       X_hlt = 0.0;
       if (HLT_4_vAny) X_hlt += 4.0;
