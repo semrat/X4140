@@ -95,6 +95,26 @@ void mumukk::SlaveBegin(TTree * /*tree*/)
   Phi_mean = 1.019723;
   Phi_sigma = 2.35607e-03;//2.28400e-03;
 
+  outTree = new TTree("outTree","outTree");
+  
+  //cw values
+ X_mass = 0;
+ kk_mass = 0;
+ mumu_mass = 0;
+ X_LFly = 0;
+ X_pt = 0;
+ X_eta = 0;
+ X_vtx = 0;
+ X_cosAlpha = 0;
+
+     outTree->SetBranchAddress("X_mass_out", &X_mass, &X_mass_b);
+     outTree->SetBranchAddress("kk_mass_out", &kk_mass, &kk_mass_b);
+     outTree->SetBranchAddress("mumu_mass_out", &mumu_mass, &mumu_mass_b);
+     outTree->SetBranchAddress("X_LFly_out", &X_LFly, &X_LFly_b);
+     outTree->SetBranchAddress("X_eta_out", &X_eta, &X_eta_b);
+     outTree->SetBranchAddress("X_vtx_out", &X_vtx, &X_vtx_b);
+     outTree->SetBranchAddress("X_cosAlpha_out", &X_cosAlpha, &X_cosAlpha_b);
+
 }
 
 bool mumukk::Process(Long64_t entry)
@@ -156,7 +176,7 @@ bool mumukk::Process(Long64_t entry)
   B0_Cand_Masses_L_Sides.clear();
   B0_Cand_Masses.clear();
 
-  for(int iX=0; iX<nX; ++iX)
+  for(unsigned int iX=0; iX<nX; ++iX)
   {
 
     bool muonQualityCut = false, muonChiCut = false, muonPhitsCut = false, muonShitsCut = false;
@@ -313,7 +333,7 @@ void mumukk::SlaveTerminate()
     gStyle->SetOptStat(111111) ;
 
 
-
+    outTree->Write();
     OutFile->Print();
     fOutput->Add(OutFile);
     gDirectory = savedir;
