@@ -286,8 +286,8 @@ bool mumukk::Process(Long64_t entry)
     promptRegion    = (((*XLxyPV)[iX] / (*XLxyPVE)[iX]) < 2.);
 
 
-    // if(muonsCuts && kaonsCuts && jPsiCuts && extraCuts && HLT_Any)
-    if(HLT_Any)
+    if(muonsCuts && kaonsCuts && jPsiCuts && extraCuts && HLT_Any)
+    //if(HLT_Any)
     {
       X_hlt = 0.0;
       if (HLT_4_vAny) X_hlt += 4.0;
