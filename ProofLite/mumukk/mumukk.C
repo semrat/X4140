@@ -144,6 +144,7 @@ bool mumukk::Process(Long64_t entry)
   if (HLT_8_v3 || HLT_8_v4 || HLT_8_v5 || HLT_8_v6 || HLT_8_v7) HLT_8_vAny = true;
   if (HLT_8_vAny || HLT_4_vAny) HLT_Any = true;
 
+  if(!HLT_Any) return kTRUE;
 
   int muonQual[] = {1,3,4,12};
 
@@ -255,6 +256,8 @@ bool mumukk::Process(Long64_t entry)
     //muonsCuts = muonQualityCut && muonChiCut && muonShitsCut && muonPhitsCut && muonDZPVCut && muonDXYPVCut;
     muonsCuts = muonDZPVCut && muonDXYPVCut;
 
+    if(!muonsCuts) break;
+
     jPsiPtCut      = (JPsi.Pt() > 7.0);
     jPsiMassCut    =  (JPsi.M()<3.15 && JPsi.M()>3.04);
     jPsiVtxCut     = ((*MuMuVtx_CL)[iJPsi]) > 0.1;
@@ -262,6 +265,8 @@ bool mumukk::Process(Long64_t entry)
     jPsiMusPtCut   = ((mu1.Pt() > 4.0) && (mu2.Pt() > 4.0));
 
     jPsiCuts = jPsiPtCut && jPsiMassCut && jPsiVtxCut  && jPsiMuEtaPtCut && jPsiMuEtaPtCut && jPsiMusPtCut;
+
+    if(!jPsiCuts) break;
 
     // kaonOneChiCut    = (((*trackChi2)[iK1] / (*trackNDF)[iK1]) < 5.0);
     // kaonOnePhitsCut  = ((*trackPhits)[iK1] > 0);
@@ -276,6 +281,8 @@ bool mumukk::Process(Long64_t entry)
     kaonsCuts = kaonOneCuts && kaonTwoCuts && kaonsPt;
     kaonsCuts = kaonsPt;
 
+    if(!kaonsCuts) break;
+
     cosAlphaCut = (fabs((*XCosAlphaPV)[iX]) > 0.99);
     vtxCLCut =  (((*XVtx_CL)[iX]) > 0.01);
 
@@ -285,6 +292,7 @@ bool mumukk::Process(Long64_t entry)
     nonPromptRegion = (((*XLxyPV)[iX] / (*XLxyPVE)[iX]) > 3.0);
     promptRegion    = (((*XLxyPV)[iX] / (*XLxyPVE)[iX]) < 2.);
 
+    if(!extraCuts) break;
 
     if(muonsCuts && kaonsCuts && jPsiCuts && extraCuts && HLT_Any)
     //if(HLT_Any)
