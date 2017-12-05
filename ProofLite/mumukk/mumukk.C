@@ -276,7 +276,7 @@ bool mumukk::Process(Long64_t entry)
       if (HLT_4_vAny) X_hlt += 4.0;
       if (HLT_8_vAny) X_hlt += 8.0;
 
-      X_mass  = XCand.Mass();
+      X_mass  = XCand.M();
       kk_mass = Phi.M();
       mumu_mass = JPsi.M();
 
