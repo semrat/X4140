@@ -834,15 +834,6 @@ public :
   TBranch*      X_evt_b;
   TBranch*      X_lum_b;
 
-   std::map< std::tuple < std::string, std::string, std::string, std::string >,TH1F*>  XCandMassHistos,XCandMassHistosDeltaM, JPsiMassHistos,PhiMassHistos;
-   //std::map< std::tuple < std::string, std::string, std::string, std::string >,TH1F*>  XCandMassHistos_Ref, JPsiMassHistos_Ref,PhiMassHistos_Ref;
-
-
-   std::vector< std::string > clabels, regions, windows, hlts;
-
-
-   std::map < std::pair <int,int>, int> lumiMap;
-
    double JPsi_mass;
    double Phi_mass,Phi_sigma,Phi_mean;
    double Bs0_Low_Mass;
@@ -1564,22 +1555,7 @@ void mumukk::Init(TTree *tree)
    fChain->SetBranchAddress("kaon2_saturMeas_byHits", &kaon2_saturMeas_byHits, &b_kaon2_saturMeas_byHits);
    fChain->SetBranchAddress("kaon2_Meas_byHits", &kaon2_Meas_byHits, &b_kaon2_Meas_byHits);
 
-   outTree->SetBranchAddress("X_mass_out", &X_mass, &X_mass_b);
-   outTree->SetBranchAddress("kk_mass_out", &kk_mass, &kk_mass_b);
-   outTree->SetBranchAddress("mumu_mass_out", &mumu_mass, &mumu_mass_b);
-   outTree->SetBranchAddress("X_LFly_out", &X_LFly, &X_LFly_b);
-   outTree->SetBranchAddress("X_eta_out", &X_eta, &X_eta_b);
-   outTree->SetBranchAddress("X_vtx_out", &X_vtx, &X_vtx_b);
-   outTree->SetBranchAddress("X_cosAlpha_out", &X_cosAlpha, &X_cosAlpha_b);
-   //cw values
-  X_mass = 0;
-  kk_mass = 0;
-  mumu_mass = 0;
-  X_LFly = 0;
-  X_pt = 0;
-  X_eta = 0;
-  X_vtx = 0;
-  X_cosAlpha = 0;
+
 
 
 }
