@@ -281,8 +281,8 @@ bool mumukk::Process(Long64_t entry)
       mumu_mass = JPsi.M();
 
       X_LFly = ((*XLxyPV)[iX] / (*XLxyPVE)[iX]);
-      X_pt = X.Pt();
-      X_eta = X.Eta();
+      X_pt = XCand.Pt();
+      X_eta = XCand.Eta();
       X_vtx = ((*XVtx_CL)[iX]);
       X_cosAlpha = fabs((*XCosAlphaPV)[iX]);
 
