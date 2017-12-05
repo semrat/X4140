@@ -81,7 +81,7 @@ void mumukk::SlaveBegin(TTree * /*tree*/)
 
   TString option = GetOption();
 
-  std::string outputString = "mumukk_KRe_MuRef_NoQual_Sidebands5-7_NP3.0_B0Cuts_CW5.15-5.55.root";
+  std::string outputString = "mumukk_tree.root";
   OutFile = new TProofOutputFile( outputString.data() );
   fOut = OutFile->OpenFile("RECREATE");
   if (!(fOut=OutFile->OpenFile("RECREATE")))
