@@ -95,7 +95,7 @@ void mumukk::SlaveBegin(TTree * /*tree*/)
   Phi_mean = 1.019723;
   Phi_sigma = 2.35607e-03;//2.28400e-03;
 
-  outTuple = new TNtuple("outuple","outuple","run:evt:lum:xM:kkM:mumuM:xL:xPt:xEta:xVtx:xCos:xHlt")
+  outTuple = new TNtuple("outuple","outuple","run:evt:lum:xM:kkM:mumuM:xL:xPt:xEta:xVtx:xCos:xHlt");
 
 
 }
@@ -330,7 +330,7 @@ void mumukk::SlaveTerminate()
     gStyle->SetOptStat(111111) ;
 
 
-    outTree->Write();
+    outTuple->Write();
     OutFile->Print();
     fOutput->Add(OutFile);
     gDirectory = savedir;
