@@ -162,13 +162,13 @@ c.SaveAs("testmassFit.png")
 
 
 cD=TCanvas("cD","cD",750,600);cD.cd()
-splot   = RooStats.SPlot ( "sPlot","sPlot", b0dataNonPrompt, tot, RooArgList(nSig,nBkg))
+splot   = RooStats.SPlot ( "sPlot","sPlot", xdataPrompt, tot, RooArgList(nSig,nBkg))
 
 
 # In[18]:
 
 
-dstree  = b0dataNonPrompt.store().tree()
+dstree  = xdataPrompt.store().tree()
 dstree.GetEntryNumber(88)
 
 

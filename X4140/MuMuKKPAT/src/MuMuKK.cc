@@ -21,7 +21,7 @@ Implementation:
 #include <memory>
 
 /// user include files
-#include "../interface/MuMuKKPAT.h"
+#include "../interface/MuMuKK.h"
 #include "../interface/VertexReProducer.h"
 //#include "DataFormats/Candidate/interface/OverlapChecker.h"
 

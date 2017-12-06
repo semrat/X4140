@@ -16,8 +16,8 @@
 //
 //
 
-#ifndef _MuMuKKPAT_h
-#define _MuMuKKPAT_h
+#ifndef _MuMuKK_h
+#define _MuMuKK_h
 
 // system include files
 #include <memory>
