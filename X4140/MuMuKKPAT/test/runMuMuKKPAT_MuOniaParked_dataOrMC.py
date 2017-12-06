@@ -332,9 +332,9 @@ process.mkcands = cms.EDAnalyzer("mumukk",
                                  MaxJPsiMass = cms.untracked.double(3.4), # SEMRA changed
                 				 MinPhiMass = cms.untracked.double (0.97), # SEMRA added
                  				 MaxPhiMass = cms.untracked.double (1.07), # SEMRA added
-                				 MaxJPsiPhiXMass = cms.untracked.double (4.35), # SEMRA added
-                				 MinJPsiPhiB0Mass = cms.untracked.double (5.1), # SEMRA added
-                				 MaxJPsiPhiB0Mass = cms.untracked.double (5.6), # SEMRA added
+                				 MaxJPsiPhiXMass = cms.untracked.double (5.1), # SEMRA added
+                				 MinJPsiPhiB0Mass = cms.untracked.double (0.0), # SEMRA added
+                				 MaxJPsiPhiB0Mass = cms.untracked.double (0.0), # SEMRA added
 
                                  MinNumTrSiHits = cms.untracked.int32(4),
                                  MinTrPt = cms.untracked.double(0.350),
