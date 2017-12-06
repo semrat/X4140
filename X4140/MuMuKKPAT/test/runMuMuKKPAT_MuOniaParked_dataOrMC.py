@@ -307,7 +307,7 @@ process.load("RecoVertex.BeamSpotProducer.BeamSpot_cff")
 #process.PATfilter = cms.EDFilter("X3872FilterPAT")
 process.PATfilter = cms.EDFilter("X4140FilterPAT")
 
-process.mkcands = cms.EDAnalyzer("MuMuKKPAT",
+process.mkcands = cms.EDAnalyzer("mumukk",
                                  HLTriggerResults = cms.untracked.InputTag("TriggerResults","","HLT"),
                                  inputGEN  = cms.untracked.InputTag("genParticles"),
                                  VtxSample   = cms.untracked.string('offlinePrimaryVertices'),

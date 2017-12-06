@@ -7,19 +7,19 @@
 #include "DataFormats/Provenance/interface/Provenance.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 
-VertexReProducer::VertexReProducer(const edm::Handle<reco::VertexCollection> &handle, const edm::Event &iEvent) 
+VertexReProducer::VertexReProducer(const edm::Handle<reco::VertexCollection> &handle, const edm::Event &iEvent)
 {
     const edm::Provenance *prov = handle.provenance();
     if (prov == 0) throw cms::Exception("CorruptData") << "Vertex handle doesn't have provenance.";
     edm::ParameterSetID psid = prov->psetID();
     edm::pset::Registry *psregistry = edm::pset::Registry::instance();
     edm::ParameterSet psetFromProvenance;
-    if ( !psregistry->getMapped(psid, psetFromProvenance) ) 
+    if ( !psregistry->getMapped(psid, psetFromProvenance) )
         throw cms::Exception("CorruptData") << "Vertex handle parameter set ID id = " << psid;
-    if ( prov->moduleName() != "PrimaryVertexProducer" ) 
+    if ( prov->moduleName() != "PrimaryVertexProducer" )
         throw cms::Exception("Configuration") << "Vertices to re-produce don't come from a PrimaryVertexProducer, but from a " << prov->moduleName() <<".\n";
 
-    configure(psetFromProvenance); 
+    configure(psetFromProvenance);
 
     // Now we also dig out the ProcessName used for the reco::Tracks and reco::Vertices
     std::vector<edm::BranchID> parents = prov->parents();
@@ -36,25 +36,25 @@ VertexReProducer::VertexReProducer(const edm::Handle<reco::VertexCollection> &ha
         }
     }
     if (!foundTracks || !foundBeamSpot) {
-        edm::LogWarning("VertexReProducer_MissingParentage") << 
-            "Can't find parentage info for vertex collection inputs: " << 
+        edm::LogWarning("VertexReProducer_MissingParentage") <<
+            "Can't find parentage info for vertex collection inputs: " <<
             (foundTracks ? "" : "tracks ") << (foundBeamSpot ? "" : "beamSpot") << "\n";
     }
 }
 
 void
-VertexReProducer::configure(const edm::ParameterSet &iConfig) 
+VertexReProducer::configure(const edm::ParameterSet &iConfig)
 {
     config_ = iConfig;
     tracksTag_   = iConfig.getParameter<edm::InputTag>("TrackLabel");
     beamSpotTag_ = iConfig.getParameter<edm::InputTag>("beamSpotLabel");
-    algo_.reset(new PrimaryVertexProducerAlgorithm(iConfig)); 
+    algo_.reset(new PrimaryVertexProducerAlgorithm(iConfig));
 }
 
-std::vector<TransientVertex> 
-VertexReProducer::makeVertices(const reco::TrackCollection &tracks, 
-                               const reco::BeamSpot &bs, 
-                               const edm::EventSetup &iSetup) const 
+std::vector<TransientVertex>
+VertexReProducer::makeVertices(const reco::TrackCollection &tracks,
+                               const reco::BeamSpot &bs,
+                               const edm::EventSetup &iSetup) const
 {
     edm::ESHandle<TransientTrackBuilder> theB;
     iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder",theB);
@@ -69,10 +69,10 @@ VertexReProducer::makeVertices(const reco::TrackCollection &tracks,
 }
 
 // added by Leo
-std::vector<TransientVertex> 
-VertexReProducer::makeVertices(const std::vector<reco::TransientTrack> &tracks, 
-                               const reco::BeamSpot &bs, 
-                               const edm::EventSetup &iSetup) const 
+std::vector<TransientVertex>
+VertexReProducer::makeVertices(const std::vector<reco::TransientTrack> &tracks,
+                               const reco::BeamSpot &bs,
+                               const edm::EventSetup &iSetup) const
 {
     edm::ESHandle<TransientTrackBuilder> theB;
     iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder",theB);

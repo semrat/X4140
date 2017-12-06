@@ -1,6 +1,6 @@
 import FWCore.ParameterSet.Config as cms
 
-process = cms.Process('NTUPLE')
+process = cms.Process('Rootuple')
 
 process.options = cms.untracked.PSet(
         wantSummary = cms.untracked.bool(True)
