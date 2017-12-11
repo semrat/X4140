@@ -2,6 +2,7 @@
 
 #include "../interface/FourMuonsProducer.h"
 #include <iostream>
+#include <string>
 
 //Headers for the data items
 #include <DataFormats/TrackReco/interface/TrackFwd.h>
@@ -105,12 +106,13 @@ oniaMuMuMuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder",theTTBuilder);
   KalmanVertexFitter vtxFitter(true);
   TrackCollection muonLess;
-
+  std::string bufferstring;
   // xcand candidates only from muons
   for(View<pat::Muon>::const_iterator it = muons->begin(), itend = muons->end(); it != itend; ++it){
     // both must pass low quality
     if(!lowerPuritySelection_(*it)) continue;
-    std::cout<<"Good 1 muon!"<<std::cout;
+    bufferstring = "Good 1 muon!";
+    std::cout<<bufferstring<<std::cout;
     for(View<pat::Muon>::const_iterator it2 = muons->begin(), itend = muons->end(); it2 != itend; ++it2){
       // both must pass low quality
       if(!lowerPuritySelection_(*it2)) continue;
@@ -127,8 +129,8 @@ oniaMuMuMuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
           if(!lowerPuritySelection_(*it4)) continue;
           // one must pass tight quality
           if (!(higherPuritySelection_(*it) || higherPuritySelection_(*it2) || higherPuritySelection_(*it3) || higherPuritySelection_(*it4))) continue;
-
-          std::cout<<"Good 4 muons!"<<std::cout;
+          bufferstring = "Good 4 muons!";
+          std::cout<<bufferstring<<std::cout;
 
           pat::CompositeCandidate myCand;
           vector<TransientVertex> pvs;
