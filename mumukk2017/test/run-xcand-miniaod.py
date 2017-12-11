@@ -62,7 +62,7 @@ process.xCandSequence = cms.Sequence(
                    process.triggerSelection *
 				   process.slimmedMuonsWithTriggerSequence *
 				   process.oniaSelectedMuons *
-				   process.Onia2MuMuMuMu *
+				   process.Onia2MuMuMuMu
 				   )
 
 process.p = cms.Path(process.xCandSequence)

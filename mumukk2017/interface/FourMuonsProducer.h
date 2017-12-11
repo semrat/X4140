@@ -1,5 +1,5 @@
-#ifndef HeavyFlavorAnalysis_Onia2MuMu_Onia2MuMuPAT_h
-#define HeavyFlavorAnalysis_Onia2MuMu_Onia2MuMuPAT_h
+#ifndef HeavyFlavorAnalysis_Onia2MuMuMuMu_FourMuonsProducer_h
+#define HeavyFlavorAnalysis_Onia2MuMuMuMu_FourMuonsProducer_h
 
 
 // system include files
@@ -34,10 +34,10 @@ struct GreaterByVProb {
 // class decleration
 //
 
-class Onia2MuMuPAT : public edm::EDProducer {
+class oniaMuMuMuMuPAT : public edm::EDProducer {
  public:
-  explicit Onia2MuMuPAT(const edm::ParameterSet&);
-  ~Onia2MuMuPAT() override;
+  explicit FourMuonsProducer(const edm::ParameterSet&);
+  ~FourMuonsProducer() override;
 
  private:
   void beginJob() override ;

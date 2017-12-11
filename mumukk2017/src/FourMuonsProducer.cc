@@ -1,4 +1,6 @@
-#include "HeavyFlavorAnalysis/Onia2MuMu/interface/oniaMuMuMuMuPAT.h"
+//#include "HeavyFlavorAnalysis/Onia2MuMu/interface/oniaMuMuMuMuPAT.h"
+
+#include "../interface/FourMuonsProducer.h"
 
 //Headers for the data items
 #include <DataFormats/TrackReco/interface/TrackFwd.h>
