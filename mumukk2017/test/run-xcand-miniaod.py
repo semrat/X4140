@@ -47,15 +47,14 @@ process.triggerSelection = cms.EDFilter("TriggerResultsFilter",
                                         throw = cms.bool(False)
                                         )
 
-process.Onia2MuMuMuMu = cms.EDProducer('FourMuonsProducer',
-      OniaTag             = cms.InputTag("oniaSelectedMuons"),
-      singlemuonSelection = cms.string(""),
-      dimuonSelection     = cms.string("8.6 < mass && mass < 11.4 && pt > 10. && abs(y) < 1.2 && charge==0 && userFloat('vProb') > 0.01"),
-      do_trigger_match    = cms.bool(True),
-      HLTFilters          = cms.vstring(
-                'hltDisplacedmumuFilterDimuon10UpsilonBarrelnoCow',
-                'hltDisplacedmumuFilterDimuon12Upsilons'
-                          ),
+process.Onia2MuMuMuMu = cms.EDProducer('oniaMuMuMuMuPAT',
+      muons=cms.InputTag('oniaSelectedMuons'),
+      primaryVertexTag=cms.InputTag('offlineSlimmedPrimaryVertices'),
+      beamSpotTag=cms.InputTag('offlineBeamSpot'),
+      quadmuonSelection=cms.string("8.5 < mass && mass < 11.5"),
+      addMCTruth = cms.bool(False),
+      higherPuritySelection=cms.string(""),
+      lowerPuritySelection=cms.string(""),
 )
 
 process.xCandSequence = cms.Sequence(
