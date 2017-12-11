@@ -1,6 +1,7 @@
 //#include "HeavyFlavorAnalysis/Onia2MuMu/interface/oniaMuMuMuMuPAT.h"
 
 #include "../interface/FourMuonsProducer.h"
+#include <iostream>
 
 //Headers for the data items
 #include <DataFormats/TrackReco/interface/TrackFwd.h>
@@ -117,6 +118,7 @@ oniaMuMuMuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
         if(!lowerPuritySelection_(*it3)) continue;
         if((it3->charge() + it2->charge() + it->charge())>1)
           continue;
+
         if((it3->charge() + it2->charge() + it->charge())<-1)
           continue;
         for(View<pat::Muon>::const_iterator it4 = muons->begin(), itend = muons->end(); it4 != itend; ++it4){
