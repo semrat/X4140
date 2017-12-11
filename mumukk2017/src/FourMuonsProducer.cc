@@ -105,7 +105,7 @@ oniaMuMuMuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   KalmanVertexFitter vtxFitter(true);
   TrackCollection muonLess;
 
-  // JPsi candidates only from muons
+  // xcand candidates only from muons
   for(View<pat::Muon>::const_iterator it = muons->begin(), itend = muons->end(); it != itend; ++it){
     // both must pass low quality
     if(!lowerPuritySelection_(*it)) continue;
@@ -120,7 +120,7 @@ oniaMuMuMuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
           continue;
         for(View<pat::Muon>::const_iterator it4 = muons->begin(), itend = muons->end(); it4 != itend; ++it4){
           if((it3->charge() + it2->charge() + it4->charge() + it->charge())!=0)
-            continue
+            continue;
           if(!lowerPuritySelection_(*it4)) continue;
           // one must pass tight quality
           if (!(higherPuritySelection_(*it) || higherPuritySelection_(*it2) || higherPuritySelection_(*it3) || higherPuritySelection_(*it4))) continue;
@@ -134,7 +134,7 @@ oniaMuMuMuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
           fourMuons.push_back(*it4);
 
 
-          if (!uniqueMuons(fourMuons))
+          if (!oniaMuMuMuMuPAT::uniqueMuons(fourMuons))
             continue;
 
           // ---- no explicit order defined ----
@@ -166,7 +166,7 @@ oniaMuMuMuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
             CachingVertex<5> VtxForInvMass = vtxFitter.vertex( t_tks );
 
-            Measurement1D MassWErr(jpsi.M(),-9999.);
+            Measurement1D MassWErr(xcand.M(),-9999.);
             if ( field->nominalValue() > 0 ) {
               MassWErr = massCalculator.invariantMass( VtxForInvMass, muMasses );
             } else {
@@ -188,7 +188,7 @@ oniaMuMuMuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
               VertexDistanceXY vdistXY;
 
               vtx.SetXYZ(myVertex.position().x(),myVertex.position().y(),0);
-              TVector3 pperp(jpsi.px(), jpsi.py(), 0);
+              TVector3 pperp(xcand.px(), xcand.py(), 0);
               AlgebraicVector3 vpperp(pperp.x(),pperp.y(),0);
 
               if (false && resolveAmbiguity_) {
@@ -455,7 +455,7 @@ oniaMuMuMuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
     }
 
-    bool oniaMuMuMuMuPAT::uniqueMuons(const std::vector<pat::Muon> fourMuons) const {
+    bool oniaMuMuMuMuPAT::uniqueMuons(const std::vector<pat::Muon> fourMuons){
 
       bool same = false;
       for (size_t i = 0; i < fourMuons.size(); i++)
