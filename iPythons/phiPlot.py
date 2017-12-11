@@ -8,10 +8,6 @@ RooAbsData.setDefaultStorageType ( RooAbsData.Tree )
 from array import array
 import sys
 
-
-# In[3]:
-
-
 from ROOT import RooRealVar,RooAbsPdf,RooChebychev,RooExponential,RooGaussian
 from ROOT import RooBernstein,RooAbsPdf,RooPlot,RooAddPdf,RooDataHist,RooArgSet,RooArgList
 from ROOT import kGreen,kRed,kBlack,kBlue,kDashed,kDotted,kMagenta,RooVoigtian
@@ -40,7 +36,9 @@ phimean = 1.020
 phimin = 1.020-0.015
 phimax = 1.020+0.015
 massbins = (6.0 - 4.0)/0.005
-mass = RooRealVar("xM","M(#mu#muKK)[GeV]",4.0,6.0)
+massmin = 5.2
+massmax = 5.55
+mass = RooRealVar("xM","M(#mu#muKK)[GeV]",5.2,5.55)
 mass.setBins(400)
 lxy = RooRealVar("xL","l(xy)",0.0,10000.)
 hlt = RooRealVar("xHlt","xHlt",0.0,20.0)
@@ -64,39 +62,27 @@ alldata.numEntries()
 # In[ ]:
 
 
-xdataPrompt = (alldata.reduce('xM<4.8')).reduce('xM>4.0').reduce("xL<2.0").reduce("kkM<1.035").reduce("kkM>1.005")
+xdataPrompt = (alldata.reduce('xM>5.15')).reduce('xM<5.55').reduce("xL>=3.0").reduce("kkM<1.035").reduce("kkM>1.005")
 xdataPrompt.numEntries()
-
-
-# In[ ]:
-
-
-a0 = RooRealVar("a0","a0",0.001,-10.,10.)
-a1 = RooRealVar("a1","a1",0.001,-5.0,5.0)
-a2 = RooRealVar("a2","a2",-0.00001,-2.,2.)
-a3 = RooRealVar("a3","a3",0.0,-0.5,0.5)
-a4 = RooRealVar("a4","a4",0.0,-0.2,0.2)
-a5 = RooRealVar("a5","a5",0.0,-0.025,0.05)
-a6 = RooRealVar("a6","a6",0.0,-0.001,0.001)
-
-aset = RooArgList(a0,a1,a2,a3,a4,a5)
-
-sigma = RooRealVar("sigma","width of gaussian",0.0013)
-gamma = RooRealVar("gamma","gamma of bw",0.004253,0.001,0.01)
-mean = RooRealVar("mean","mean of gaussian",phimean,phimean-0.005,phimean+0.005);
-
-nSig = RooRealVar("nSig","nSig",1E6,0.,5.0E6)
-nBkg = RooRealVar("nBkg","nBkg",5E5,0.,5.0E6)
-cheb = RooChebychev("cheb","Background",masskk,aset)
-#gauss = RooGaussian("gauss","gaussian PDF ",mass,mean,sigma)
-signal = RooVoigtian("signal","signal",masskk,mean,gamma,sigma)
 
 B_c     = RooRealVar ( "B_c"    , "B_c "    , 0.3  , -20   , 100   )
 B_b     = RooRealVar ( "B_b"    , "B_b "    , 0.3  , -20   , 100   )
 
-bkg    = RooBernstein("pdfB" , "pdfB"    , masskk   , RooArgList(B_c, B_b))
+S1      = RooRealVar ( "S1"     , "Signal"  , 30000 , 1     , 900000    )
+S2      = RooRealVar ( "S2"     , "Signal"  , 30000 , 1     , 900000    )
+B       = RooRealVar ( "B"      , "B"       , 50000 , 1     , 900000000 )
 
-tot = RooAddPdf("tot","g+cheb",RooArgList(signal,bkg),RooArgList(nSig,nBkg))
+mean = RooRealVar("mean","mean of gaussian",5.38,5.31,5.41);
+sigma1 = RooRealVar("sigma1","width of gaussian1",0.002,0.0005,0.05);
+sigma2 = RooRealVar("sigma2","width of gaussian2",0.004,0.004,0.01);
+
+pdfS1   = RooGaussian( "pdfS1"  , "gaus"    , mass   ,mean, sigma1)
+pdfS2   = RooGaussian( "pdfS2"  , "gaus"    , mass   ,mean, sigma2)
+# pdfB    = RooExponential("pdfB" , "pdfB"    , mbs   , B_c)
+pdfB    = RooBernstein("pdfB" , "pdfB"    , mass   , RooArgList(B_c, B_b))
+
+alist1  = RooArgList (pdfS1, pdfS2, pdfB);  alist2 = RooArgList (S1, S2, B);
+tot  = RooAddPdf  ("model", "model", alist1, alist2)
 
 
 # In[ ]:
@@ -104,26 +90,22 @@ tot = RooAddPdf("tot","g+cheb",RooArgList(signal,bkg),RooArgList(nSig,nBkg))
 
 #xDataPromptKK = xdataPrompt.reduce(SelectVars(RooArgSet(masskk)))
 mean.setConstant(True)
-gamma.setConstant(True)
-rPhifit = tot.fitTo(xdataPrompt,Range(phimin,phimax),RooFit.NumCPU(4))
+rPhifit = tot.fitTo(xdataPrompt,Range(massmin,massmax),RooFit.NumCPU(8))
 
 mean.setConstant(False)
-rPhifit = tot.fitTo(xdataPrompt,Range(phimin,phimax),RooFit.NumCPU(4))
-
-gamma.setConstant(False)
-rPhifit = tot.fitTo(xdataPrompt,Range(phimin,phimax),RooFit.NumCPU(4))
+rPhifit = tot.fitTo(xdataPrompt,Range(massmin,massmax),RooFit.NumCPU(8))
 
 # In[ ]:
 
 
 c = TCanvas("canvas","canvas",1200,800) 
-phiFrame = masskk.frame(Range(phimin,phimax),Normalization((nSig.getValV() + nBkg.getValV())))
+phiFrame = masskk.frame(Range(massmin,massmax))
 xdataPrompt.plotOn(phiFrame)
 tot.plotOn(phiFrame)
 
 phiFrame.Draw()
-c.SaveAs("phiMassSPlot.png")
-c.SaveAs("phiMassSPlot.root")
+c.SaveAs("phiMassSPlotPhi.png")
+c.SaveAs("phiMassSPlotPhi.root")
 c.Clear()
 
 
@@ -132,7 +114,7 @@ c.Clear()
 
 cD=TCanvas("cD","cD",750,600)
 cD.cd()
-splot   = RooStats.SPlot ("sPlot","sPlot",xdataPrompt, tot, RooArgList(nSig,nBkg))
+splot   = RooStats.SPlot ("sPlot","sPlot",xdataPrompt, tot, alist2)
 dstree  = xdataPrompt.store().tree()
 
 
@@ -140,7 +122,7 @@ dstree  = xdataPrompt.store().tree()
 # In[19]:
 
 
-shist   = TH1F('shist','shist', 100, 4.0, 5.0)
+shist   = TH1F('shist','shist', 200, 0.97, 1.07)
 
 
 # In[20]:
@@ -149,13 +131,14 @@ shist   = TH1F('shist','shist', 100, 4.0, 5.0)
 shist.Sumw2()
 shist.SetLineColor(2)    
 shist.SetMarkerColor(2); shist.SetMinimum(0.)
-dstree.Project('shist','xM','nSig_sw');  
+dstree.Project('shist','kkM','S1_sw + S2_sw');  
 
 
 # In[21]:
 
 
 shist.Draw('e0');
-cD.SaveAs('OtherPlotX.gif')
-cD.SaveAs('OtherPlotX.root')
+cD.SaveAs('OtherPlotPhi.gif')
+cD.SaveAs('OtherPlotPhi.root')
+
 

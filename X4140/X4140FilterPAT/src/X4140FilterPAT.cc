@@ -1,22 +1,3 @@
-// -*- C++ -*-
-//
-// Package:    X4140FilterPAT
-// Class:      X4140FilterPAT
-// 
-/**\class X4140FilterPAT X4140FilterPAT.cc UserCode/X4140FilterPAT/src/X4140FilterPAT.cc
- Description: [one line class summary]
-
- Implementation:
-     [Notes on implementation]
-*/
-//
-// Original Author:  
-//         Created:  Fri Apr 18 12:20:06 CEST 2014
-// $Id$
-//
-//
-
-
 // system include files
 #include <memory>
 
@@ -53,7 +34,7 @@
 // class declaration
 //
 
-class X4140FilterPAT : public edm::EDFilter {
+class X4140FilterPAT : public edm::EDProducer {
    public:
       explicit X4140FilterPAT(const edm::ParameterSet&);
       ~X4140FilterPAT();
@@ -64,7 +45,7 @@ class X4140FilterPAT : public edm::EDFilter {
       virtual void beginJob() ;
       virtual bool filter(edm::Event&, const edm::EventSetup&);
       virtual void endJob() ;
-      
+
       virtual bool beginRun(edm::Run&, edm::EventSetup const&);
       virtual bool endRun(edm::Run&, edm::EventSetup const&);
       virtual bool beginLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&);
@@ -93,7 +74,7 @@ X4140FilterPAT::X4140FilterPAT(const edm::ParameterSet& iConfig)
 
 X4140FilterPAT::~X4140FilterPAT()
 {
- 
+
    // do anything here that needs to be done at desctruction time
    // (e.g. close files, deallocate resources etc.)
 
@@ -142,7 +123,7 @@ X4140FilterPAT::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
         cout << "continue due to no track ref" << endl;
         continue;
       }
-      const reco::Muon* mup = dynamic_cast<const reco::Muon * >(iMuonP->originalObject());     
+      const reco::Muon* mup = dynamic_cast<const reco::Muon * >(iMuonP->originalObject());
 
       //next check for mu-
       for ( std::vector<pat::Muon>::const_iterator iMuonM = thePATMuonHandle->begin();
@@ -153,7 +134,7 @@ X4140FilterPAT::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
           cout << "continue from no track ref" << endl;
           continue;
         }
-        const reco::Muon* mum = dynamic_cast<const reco::Muon * >(iMuonM->originalObject());   
+        const reco::Muon* mum = dynamic_cast<const reco::Muon * >(iMuonM->originalObject());
         if(!muon::overlap(*mup, *mum)) {
           cout << "\n================================= NEW EVENT PASSING THE FILTER ========================================\n" << endl;
           return true;
@@ -166,39 +147,39 @@ X4140FilterPAT::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
 }
 
 // ------------ method called once each job just before starting event loop  ------------
-void 
+void
 X4140FilterPAT::beginJob()
 {
 }
 
 // ------------ method called once each job just after ending the event loop  ------------
-void 
+void
 X4140FilterPAT::endJob() {
 }
 
 // ------------ method called when starting to processes a run  ------------
-bool 
+bool
 X4140FilterPAT::beginRun(edm::Run&, edm::EventSetup const&)
-{ 
+{
   return true;
 }
 
 // ------------ method called when ending the processing of a run  ------------
-bool 
+bool
 X4140FilterPAT::endRun(edm::Run&, edm::EventSetup const&)
 {
   return true;
 }
 
 // ------------ method called when starting to processes a luminosity block  ------------
-bool 
+bool
 X4140FilterPAT::beginLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&)
 {
   return true;
 }
 
 // ------------ method called when ending the processing of a luminosity block  ------------
-bool 
+bool
 X4140FilterPAT::endLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&)
 {
   return true;

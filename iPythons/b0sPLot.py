@@ -50,7 +50,7 @@ mass.setBins(int(massbins))
 lxy = RooRealVar("xL","l(xy)",0.0,10000.)
 hlt = RooRealVar("xHlt","xHlt",0.0,20.0)
 masskk = RooRealVar("kkM","kkM",0.5,1.5)
-massbins = 200
+massbins = 100
 masskk.setBins(int(massbins))
 massmumu = RooRealVar("mumuM","mumuM",2.5,3.5)
 cutFormula = RooFormulaVar("cutFormula","cutFormula","xHlt!=8.0",RooArgList(hlt))
@@ -100,49 +100,25 @@ c.SaveAs("testmass.png")
 # In[13]:
 
 
-mean = RooRealVar("mean","mean of gaussian",5.38,5.31,5.41);
-sigma1 = RooRealVar("sigma1","width of gaussian1",0.002,0.0005,0.05);
-sigma2 = RooRealVar("sigma2","width of gaussian2",0.004,0.004,0.01);
+sigma = RooRealVar("sigma","width of gaussian",0.0013)
+gamma = RooRealVar("gamma","gamma of bw",0.004253,0.001,0.01)
+mean = RooRealVar("mean","mean of gaussian",phimean,phimean-0.005,phimean+0.005);
 
-a0 = RooRealVar("a0","a0",0.001,-1.,1.)
-a1 = RooRealVar("a1","a1",0.001,-0.5,0.5)
-a2 = RooRealVar("a2","a2",-0.00001,-2.,2.)
-a3 = RooRealVar("a3","a3",-0.000001,-0.1,0.1)
-a4 = RooRealVar("a4","a4",-0.000001,-2.,2.)
-a5 = RooRealVar("a5","a5",-0.000001)
-a6 = RooRealVar("a6","a6",-0.000001,-0.01,0.01)
+nSig = RooRealVar("nSig","nSig",1E6,0.,5.0E6)
+nBkg = RooRealVar("nBkg","nBkg",5E5,0.,5.0E6)
+cheb = RooChebychev("cheb","Background",masskk,aset)
+#gauss = RooGaussian("gauss","gaussian PDF ",mass,mean,sigma)
+signal = RooVoigtian("signal","signal",masskk,mean,gamma,sigma)
 
-aset = RooArgList(a0,a1,a2)#,a3)
-gaussFrac = RooRealVar("sig1frac","fraction of component 1 in signal",0.3,0.0,1.0)
-nSig = RooRealVar("nSig","nSig",100000,0.,10E6)
-nBkg = RooRealVar("nBkg","nBkg",55000,0.,10E6)
+B_c     = RooRealVar ( "B_c"    , "B_c "    , 0.3  , -20   , 100   )
+B_b     = RooRealVar ( "B_b"    , "B_b "    , 0.3  , -20   , 100   )
 
+bkg    = RooBernstein("pdfB" , "pdfB"    , masskk   , RooArgList(B_c, B_b))
 
-# In[14]:
-
-
-cheb = RooChebychev("cheb","Background",mass,aset)
-gauss1 = RooGaussian("gauss1","gaussian PDF 1",mass,mean,sigma1)
-gauss2 = RooGaussian("gauss2","gaussian PDF 2",mass,mean,sigma2)
-
-model  = RooAddPdf("model","g1+g2",gauss1,gauss2,gaussFrac)
-tot = RooAddPdf("tot","g1+g2+cheb",RooArgList(model,cheb),RooArgList(nSig,nBkg))
-
-
-# In[ ]:
-
-
-
-
-
-# In[15]:
+tot = RooAddPdf("tot","g+cheb",RooArgList(signal,bkg),RooArgList(nSig,nBkg))
 
 
 rfit = tot.fitTo(b0dataNonPrompt,Range(massmin,massmax))
-
-
-# In[16]:
-
 
 massFrame = mass.frame(Range(massmin,massmax))
 b0dataNonPrompt.plotOn(massFrame,RooLinkedList())
@@ -151,17 +127,8 @@ tot.plotOn(massFrame)
 massFrame.Draw()
 c.SaveAs("testmassFit.png")
 
-
-# In[ ]:
-
-
-
-
-
-# In[17]:
-
-
-cD=TCanvas("cD","cD",750,600);cD.cd()
+cD=TCanvas("cD","cD",750,600)
+cD.cd()
 splot   = RooStats.SPlot ( "sPlot","sPlot", xdataPrompt, tot, RooArgList(nSig,nBkg))
 
 
@@ -169,7 +136,6 @@ splot   = RooStats.SPlot ( "sPlot","sPlot", xdataPrompt, tot, RooArgList(nSig,nB
 
 
 dstree  = xdataPrompt.store().tree()
-dstree.GetEntryNumber(88)
 
 
 # In[19]:
@@ -192,12 +158,6 @@ dstree.Project('shist','kkM','nSig_sw');
 
 shist.Draw('e0');
 cD.SaveAs('OtherPlot.gif')
-
-
-# In[39]:
-
-
-sys.exit()
 
 
 
