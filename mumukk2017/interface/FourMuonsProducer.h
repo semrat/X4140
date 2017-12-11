@@ -46,6 +46,7 @@ class oniaMuMuMuMuPAT : public edm::EDProducer {
   bool isAbHadron(int pdgID);
   bool isAMixedbHadron(int pdgID, int momPdgID);
   std::pair<int, float> findJpsiMCInfo(reco::GenParticleRef genJpsi);
+  bool uniqueMuons(const std::vector<pat::Muon> fourMuons);
 
   // ----------member data ---------------------------
  private:
