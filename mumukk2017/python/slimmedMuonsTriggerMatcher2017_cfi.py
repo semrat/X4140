@@ -49,7 +49,7 @@ slimmedMuonsWithTrigger = cms.EDProducer( "PATTriggerMatchMuonEmbedder",
 )
 slimmedMuonsWithTrigger.matches += slimmedMuonsTriggerMatchers1MuInputTags
 
-### Run the whole trigger Sequence 
+### Run the whole trigger Sequence
 slimmedMuonsWithTriggerSequence = cms.Sequence(
     unpackedPatTrigger *
     slimmedMuonsTriggerMatchers1Mu *
