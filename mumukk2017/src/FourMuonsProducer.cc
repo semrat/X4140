@@ -34,7 +34,7 @@ thebeamspot_(consumes<reco::BeamSpot>(iConfig.getParameter<edm::InputTag>("beamS
 thePVs_(consumes<reco::VertexCollection>(iConfig.getParameter<edm::InputTag>("primaryVertexTag"))),
 higherPuritySelection_(iConfig.getParameter<std::string>("higherPuritySelection")),
 lowerPuritySelection_(iConfig.getParameter<std::string>("lowerPuritySelection")),
-quadmuonSelection_(iConfig.existsAs<std::string>("quadmuonSelection") ? iConfig.getParameter<std::string>("dimuonSelection") : ""),
+quadmuonSelection_(iConfig.existsAs<std::string>("quadmuonSelection") ? iConfig.getParameter<std::string>("quadmuonSelection") : ""),
 addCommonVertex_(iConfig.getParameter<bool>("addCommonVertex")),
 addMuonlessPrimaryVertex_(iConfig.getParameter<bool>("addMuonlessPrimaryVertex")),
 resolveAmbiguity_(iConfig.getParameter<bool>("resolvePileUpAmbiguity")),

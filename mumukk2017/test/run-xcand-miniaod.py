@@ -20,7 +20,7 @@ process.source = cms.Source("PoolSource",fileNames = cms.untracked.vstring(input
 process.TFileService = cms.Service("TFileService",fileName = cms.string(ouput_filename))
 process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(False))
 
-process.load("Ponia.OniaPhoton.slimmedMuonsTriggerMatcher2017_cfi")
+process.load("mmkk.mmkk.slimmedMuonsTriggerMatcher2017_cfi")
 
 # In MiniAOD, the PATMuons are already present. We just need to run Onia2MuMu, with a selection of muons.
 process.oniaSelectedMuons = cms.EDFilter('PATMuonSelector',
@@ -55,6 +55,9 @@ process.Onia2MuMuMuMu = cms.EDProducer('oniaMuMuMuMuPAT',
       addMCTruth = cms.bool(False),
       higherPuritySelection=cms.string(""),
       lowerPuritySelection=cms.string(""),
+      addCommonVertex_=cms.bool(False),
+      esolveAmbiguity_=cms.bool(False),
+      addMuonlessPrimaryVertex_=cms.bool(False),
 )
 
 process.xCandSequence = cms.Sequence(
