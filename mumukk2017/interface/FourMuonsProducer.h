@@ -36,8 +36,8 @@ struct GreaterByVProb {
 
 class oniaMuMuMuMuPAT : public edm::EDProducer {
  public:
-  explicit FourMuonsProducer(const edm::ParameterSet&);
-  ~FourMuonsProducer() override;
+  explicit oniaMuMuMuMuPAT(const edm::ParameterSet&);
+  ~oniaMuMuMuMuPAT() override;
 
  private:
   void beginJob() override ;
@@ -57,7 +57,7 @@ class oniaMuMuMuMuPAT : public edm::EDProducer {
   edm::EDGetTokenT<reco::BeamSpot> revtxbs_;
   StringCutObjectSelector<pat::Muon> higherPuritySelection_;
   StringCutObjectSelector<pat::Muon> lowerPuritySelection_;
-  StringCutObjectSelector<reco::Candidate, true> dimuonSelection_;
+  StringCutObjectSelector<reco::Candidate, true> quadmuonSelection_;
   bool addCommonVertex_, addMuonlessPrimaryVertex_;
   bool resolveAmbiguity_;
   bool addMCTruth_;

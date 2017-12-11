@@ -455,7 +455,7 @@ oniaMuMuMuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
     }
 
-    bool FourMuonsProducer::uniqueMuons(const std::vector<pat::Muon> fourMuons) const {
+    bool oniaMuMuMuMuPAT::uniqueMuons(const std::vector<pat::Muon> fourMuons) const {
 
       bool same = false;
       for (size_t i = 0; i < fourMuons.size(); i++)
