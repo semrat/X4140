@@ -56,7 +56,7 @@ process.Onia2MuMuMuMu = cms.EDProducer('oniaMuMuMuMuPAT',
       higherPuritySelection=cms.string(""),
       lowerPuritySelection=cms.string(""),
       addCommonVertex=cms.bool(False),
-      esolveAmbiguity=cms.bool(False),
+      resolvePileUpAmbiguity=cms.bool(False),
       addMuonlessPrimaryVertex=cms.bool(False),
 )
 
