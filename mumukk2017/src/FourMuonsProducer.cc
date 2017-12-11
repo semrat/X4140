@@ -114,16 +114,16 @@ oniaMuMuMuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
       if(!lowerPuritySelection_(*it2)) continue;
       for(View<pat::Muon>::const_iterator it3 = muons->begin(), itend = muons->end(); it3 != itend; ++it3){
         if(!lowerPuritySelection_(*it3)) continue;
-        if((it3->charge() + it2->charge() + it1->charge())>1)
+        if((it3->charge() + it2->charge() + it->charge())>1)
           continue;
-        if((it3->charge() + it2->charge() + it1->charge())<-1)
+        if((it3->charge() + it2->charge() + it->charge())<-1)
           continue;
         for(View<pat::Muon>::const_iterator it4 = muons->begin(), itend = muons->end(); it4 != itend; ++it4){
-          if((it3->charge() + it2->charge() + it4->charge() + it1->charge())!=0)
+          if((it3->charge() + it2->charge() + it4->charge() + it->charge())!=0)
             continue
           if(!lowerPuritySelection_(*it4)) continue;
           // one must pass tight quality
-          if (!(higherPuritySelection_(*it1) || higherPuritySelection_(*it2) || higherPuritySelection_(*it3) || higherPuritySelection_(*it4))) continue;
+          if (!(higherPuritySelection_(*it) || higherPuritySelection_(*it2) || higherPuritySelection_(*it3) || higherPuritySelection_(*it4))) continue;
 
           pat::CompositeCandidate myCand;
           vector<TransientVertex> pvs;
