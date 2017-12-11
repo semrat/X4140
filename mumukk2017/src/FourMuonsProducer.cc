@@ -109,6 +109,7 @@ oniaMuMuMuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   for(View<pat::Muon>::const_iterator it = muons->begin(), itend = muons->end(); it != itend; ++it){
     // both must pass low quality
     if(!lowerPuritySelection_(*it)) continue;
+    std::cout<<"Good 1 muon!"<<std::cout;
     for(View<pat::Muon>::const_iterator it2 = muons->begin(), itend = muons->end(); it2 != itend; ++it2){
       // both must pass low quality
       if(!lowerPuritySelection_(*it2)) continue;
@@ -124,6 +125,8 @@ oniaMuMuMuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
           if(!lowerPuritySelection_(*it4)) continue;
           // one must pass tight quality
           if (!(higherPuritySelection_(*it) || higherPuritySelection_(*it2) || higherPuritySelection_(*it3) || higherPuritySelection_(*it4))) continue;
+
+          std::cout<<"Good 4 muons!"<<std::cout;
 
           pat::CompositeCandidate myCand;
           vector<TransientVertex> pvs;

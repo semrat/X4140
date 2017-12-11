@@ -31,7 +31,7 @@ process.oniaSelectedMuons = cms.EDFilter('PATMuonSelector',
                     ' && innerTrack.hitPattern.trackerLayersWithMeasurement > 5'
                     ' && innerTrack.hitPattern.pixelLayersWithMeasurement > 0'
                     ' && innerTrack.quality(\"highPurity\")'
-                    ' && (abs(eta) <= 1.4 && pt > 4.)'
+                    ' && (abs(eta) <= 1.4 && pt > 1.)'
    ),
    filter = cms.bool(True)
 )
@@ -51,7 +51,7 @@ process.Onia2MuMuMuMu = cms.EDProducer('oniaMuMuMuMuPAT',
       muons=cms.InputTag('oniaSelectedMuons'),
       primaryVertexTag=cms.InputTag('offlineSlimmedPrimaryVertices'),
       beamSpotTag=cms.InputTag('offlineBeamSpot'),
-      quadmuonSelection=cms.string("8.5 < mass && mass < 11.5"),
+      quadmuonSelection=cms.string("4.0 < mass && mass < 6.0"),
       addMCTruth = cms.bool(False),
       higherPuritySelection=cms.string(""),
       lowerPuritySelection=cms.string(""),
