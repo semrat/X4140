@@ -464,7 +464,7 @@ oniaMuMuMuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
       for (size_t i = 0; i < fourMuons.size(); i++)
       for (size_t j = i+1; j < fourMuons.size(); j++)
-      same = same || (fourMuons[i].track() == fourMuons[j].track())
+      same = same || (fourMuons[i].track() == fourMuons[j].track());
 
       return same;
     }
