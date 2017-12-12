@@ -206,7 +206,7 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
   // edm::Handle<reco::GenParticleCollection> pruned;
   // iEvent.getByToken(genCands_,pruned);
 
-  if (false && isMC_ && pruned.isValid()) {
+  if (false && isMC_) {
    gen_chi_p4.SetPtEtaPhiM(0, 0, 0, 0);
    gen_yns_p4.SetPtEtaPhiM(0, 0, 0, 0);
    gen_dimuon_p4.SetPtEtaPhiM(0, 0, 0, 0);
