@@ -112,7 +112,7 @@ oniaMuMuMuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     // both must pass low quality
     if(!lowerPuritySelection_(*it)) continue;
     bufferstring = "Good 1 muon!";
-    std::cout<<bufferstring<<std::endl;
+    // std::cout<<bufferstring<<std::endl;
     for(View<pat::Muon>::const_iterator it2 = muons->begin(), itend = muons->end(); it2 != itend; ++it2){
       // both must pass low quality
       if(!lowerPuritySelection_(*it2)) continue;
