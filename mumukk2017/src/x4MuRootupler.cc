@@ -289,6 +289,8 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
     photon_flags = 0; //else std::cout << "no valid chi handle" << std::endl;
 
     mumu_rank = 0;
+    if (!ups_hand.isValid()) std::cout << "Invalid" << std::endl;
+    f (ups_hand->empty()) std::cout << "Empty" << std::endl;
     if (ups_hand.isValid() && !ups_hand->empty()) {
       for (unsigned int i=0; i< ups_hand->size(); i++) {
         pat::CompositeCandidate ups_ = ups_hand->at(i);
