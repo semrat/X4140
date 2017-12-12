@@ -292,6 +292,7 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
     if (ups_hand.isValid() && !ups_hand->empty()) {
       for (unsigned int i=0; i< ups_hand->size(); i++) {
         pat::CompositeCandidate ups_ = ups_hand->at(i);
+        std::cout<<"Cycling on ups"<<std::endl;
         x_p4.SetPtEtaPhiM(ups_.pt(), ups_.eta(), ups_.phi(), ups_.mass());
 
         x_tree->Fill();
