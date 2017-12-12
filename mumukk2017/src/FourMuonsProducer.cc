@@ -141,7 +141,7 @@ oniaMuMuMuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
           fourMuons.push_back(*it4);
 
 
-          if (!oniaMuMuMuMuPAT::uniqueMuons(fourMuons))
+          if (oniaMuMuMuMuPAT::uniqueMuons(fourMuons))
             continue;
 
           // ---- no explicit order defined ----
