@@ -187,8 +187,8 @@ oniaMuMuMuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
               float vNDF  = myVertex.degreesOfFreedom();
               float vProb(TMath::Prob(vChi2,(int)vNDF));
 
-              myCand.addUserFloat("vNChi2",vChi2/vNDF);
-              myCand.addUserFloat("vProb",vProb);
+              // myCand.addUserFloat("vNChi2",vChi2/vNDF);
+              // myCand.addUserFloat("vProb",vProb);
 
               TVector3 vtx;
               TVector3 pvtx;
@@ -279,6 +279,7 @@ oniaMuMuMuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
                   int countTksOfPV = -1;
                   const reco::Muon *rmu1 = dynamic_cast<const reco::Muon *>(it->originalObject());
                   const reco::Muon *rmu2 = dynamic_cast<const reco::Muon *>(it2->originalObject());
+                  if(false)
                   try{
                     for(reco::Vertex::trackRef_iterator itVtx = theOriginalPV.tracks_begin(); itVtx != theOriginalPV.tracks_end(); itVtx++) if(itVtx->isNonnull()){
                       const reco::Track& track = **itVtx;
@@ -303,9 +304,9 @@ oniaMuMuMuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
                     }
                   } catch (std::exception & err) {std::cout << " muon Selection%G�%@failed " << std::endl; return ; }
 
-                  myCand.addUserInt("countTksOfPV", countTksOfPV);
-                  myCand.addUserFloat("vertexWeight", (float) vertexWeight);
-                  myCand.addUserFloat("sumPTPV", (float) sumPTPV);
+                  // myCand.addUserInt("countTksOfPV", countTksOfPV);
+                  // myCand.addUserFloat("vertexWeight", (float) vertexWeight);
+                  // myCand.addUserFloat("sumPTPV", (float) sumPTPV);
 
                   ///DCA
                   TrajectoryStateClosestToPoint mu1TS = t_tks[0].impactPointTSCP();
@@ -316,13 +317,13 @@ oniaMuMuMuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
                     cApp.calculate(mu1TS.theState(), mu2TS.theState());
                     if (cApp.status() ) dca = cApp.distance();
                   }
-                  myCand.addUserFloat("DCA", dca );
+                  // myCand.addUserFloat("DCA", dca );
                   ///end DCA
 
-                  if (addMuonlessPrimaryVertex_)
-                  myCand.addUserData("muonlessPV",Vertex(thePrimaryV));
-                  else
-                  myCand.addUserData("PVwithmuons",thePrimaryV);
+                  // if (addMuonlessPrimaryVertex_)
+                  // myCand.addUserData("muonlessPV",Vertex(thePrimaryV));
+                  // else
+                  // myCand.addUserData("PVwithmuons",thePrimaryV);
 
                   // lifetime using PV
                   pvtx.SetXYZ(thePrimaryV.position().x(),thePrimaryV.position().y(),0);
@@ -337,9 +338,9 @@ oniaMuMuMuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
                   //double ctauErrPV = sqrt(vXYe.similarity(vpperp))*3.09688/(pperp.Perp2());
                   double ctauErrPV = sqrt(ROOT::Math::Similarity(vpperp,vXYe))*myCand.mass()/(pperp.Perp2());
 
-                  myCand.addUserFloat("ppdlPV",ctauPV);
-                  myCand.addUserFloat("ppdlErrPV",ctauErrPV);
-                  myCand.addUserFloat("cosAlpha",cosAlpha);
+                  // myCand.addUserFloat("ppdlPV",ctauPV);
+                  // myCand.addUserFloat("ppdlErrPV",ctauErrPV);
+                  // myCand.addUserFloat("cosAlpha",cosAlpha);
 
                   // lifetime using BS
                   pvtx.SetXYZ(theBeamSpotV.position().x(),theBeamSpotV.position().y(),0);
@@ -354,30 +355,30 @@ oniaMuMuMuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
                   //double ctauErrBS = sqrt(vXYeB.similarity(vpperp))*3.09688/(pperp.Perp2());
                   double ctauErrBS = sqrt(ROOT::Math::Similarity(vpperp,vXYeB))*myCand.mass()/(pperp.Perp2());
 
-                  myCand.addUserFloat("ppdlBS",ctauBS);
-                  myCand.addUserFloat("ppdlErrBS",ctauErrBS);
+                  // myCand.addUserFloat("ppdlBS",ctauBS);
+                  // myCand.addUserFloat("ppdlErrBS",ctauErrBS);
 
-                  if (addCommonVertex_) {
-                    myCand.addUserData("commonVertex",Vertex(myVertex));
-                  }
-                } else {
-                  myCand.addUserFloat("vNChi2",-1);
-                  myCand.addUserFloat("vProb", -1);
-                  myCand.addUserFloat("ppdlPV",-100);
-                  myCand.addUserFloat("ppdlErrPV",-100);
-                  myCand.addUserFloat("cosAlpha",-100);
-                  myCand.addUserFloat("ppdlBS",-100);
-                  myCand.addUserFloat("ppdlErrBS",-100);
-                  myCand.addUserFloat("DCA", -1 );
-                  if (addCommonVertex_) {
-                    myCand.addUserData("commonVertex",Vertex());
-                  }
-                  if (addMuonlessPrimaryVertex_) {
-                    myCand.addUserData("muonlessPV",Vertex());
-                  } else {
-                    myCand.addUserData("PVwithmuons",Vertex());
-                  }
-                }
+                //   if (addCommonVertex_) {
+                //     myCand.addUserData("commonVertex",Vertex(myVertex));
+                //   }
+                // } else {
+                //   myCand.addUserFloat("vNChi2",-1);
+                //   myCand.addUserFloat("vProb", -1);
+                //   myCand.addUserFloat("ppdlPV",-100);
+                //   myCand.addUserFloat("ppdlErrPV",-100);
+                //   myCand.addUserFloat("cosAlpha",-100);
+                //   myCand.addUserFloat("ppdlBS",-100);
+                //   myCand.addUserFloat("ppdlErrBS",-100);
+                //   myCand.addUserFloat("DCA", -1 );
+                //   if (addCommonVertex_) {
+                //     myCand.addUserData("commonVertex",Vertex());
+                //   }
+                //   if (addMuonlessPrimaryVertex_) {
+                //     myCand.addUserData("muonlessPV",Vertex());
+                //   } else {
+                //     myCand.addUserData("PVwithmuons",Vertex());
+                //   }
+                // }
               }
 
               // ---- MC Truth, if enabled ----
