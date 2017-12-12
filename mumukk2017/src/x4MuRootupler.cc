@@ -203,7 +203,7 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
   pat::CompositeCandidate chi_cand;
   pat::CompositeCandidate refit1S;
 
-  // edm::Handle<reco::GenParticleCollection> pruned;
+  edm::Handle<reco::GenParticleCollection> pruned;
   // iEvent.getByToken(genCands_,pruned);
 
   if (false && isMC_) {
