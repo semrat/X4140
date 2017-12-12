@@ -66,4 +66,14 @@ process.xCandSequence = cms.Sequence(
 				   process.Onia2MuMuMuMu
 				   )
 
-process.p = cms.Path(process.xCandSequence)
+process.rootuple = cms.EDAnalyzer('chibRootupler',
+                          #chi_cand = cms.InputTag("chiProducer"),
+			              ups_cand = cms.InputTag("Onia2MuMuMuMu"),
+                          # refit1S  = cms.InputTag("chiFitter1S","y1S"),
+			              # refit2S  = cms.InputTag("chiFitter2S","y2S"),
+			              # refit3S  = cms.InputTag("chiFitter3S","y3S"),
+                          primaryVertices = cms.InputTag("offlineSlimmedPrimaryVertices"),
+                          TriggerResults  = cms.InputTag("TriggerResults", "", "HLT"),
+                          isMC = cms.bool(False)
+                         )
+process.p = cms.Path(process.xCandSequence * process.rootuple)
