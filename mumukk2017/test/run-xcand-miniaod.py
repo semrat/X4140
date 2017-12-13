@@ -135,6 +135,7 @@ process.triggerSelection = cms.EDFilter("TriggerResultsFilter",
 
 process.xCandSequence = cms.Sequence(
                    process.triggerSelection *
+                   process.slimmedMuonsWithTriggerSequence *
 				   process.oniaSelectedMuons *
                    process.FourOnia2MuMuPhi *
                    process.DiMuonCounterPhi *
