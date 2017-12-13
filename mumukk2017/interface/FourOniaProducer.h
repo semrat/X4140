@@ -20,12 +20,9 @@
 #include "DataFormats/PatCandidates/interface/CompositeCandidate.h"
 #include "DataFormats/PatCandidates/interface/UserData.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
+#include "DataFormats/PatCandidates/interface/Muon.h"
 #include <TLorentzVector.h>
 #include <vector>
-
-/**
-   Create a Chi(b,c) candidate by mathing dimuon and conversion
- */
 
 class FourOniaProducer : public edm::EDProducer {
 
@@ -40,7 +37,7 @@ class FourOniaProducer : public edm::EDProducer {
   edm::EDGetTokenT<pat::CompositeCandidateCollection> phi_dimuon_Label;
   edm::EDGetTokenT<pat::CompositeCandidateCollection> jpsi_dimuon_Label;
 
-  const pat::CompositeCandidate makeChiCandidate(const pat::CompositeCandidate&,
+  const pat::CompositeCandidate makeCandidate(const pat::CompositeCandidate&,
 						 const pat::CompositeCandidate&);
 
   float Getdz(const pat::CompositeCandidate&, const reco::Candidate::Point &);
@@ -49,7 +46,7 @@ class FourOniaProducer : public edm::EDProducer {
 
   bool cutdz(float dz){return dz<dzMax_; }
 
-  bool isOverlappedMuons(const pat::CompositeCandidate *phi,const pat::CompositeCandidate *jpsi)
+  bool isOverlappedMuons(const pat::CompositeCandidate *phi,const pat::CompositeCandidate *jpsi);
 
   bool pi0OnlineSwitch_;
 

@@ -39,14 +39,14 @@ void FourOniaProducer::produce(edm::Event& event, const edm::EventSetup& esetup)
       if (!jpsiCand->userInt("isTriggerMatched"))
       continue;
 
-      if(isUniqueMuons(*phiCand,*jpsiCand))
+      if(isOverlappedMuons(*phiCand,*jpsiCand))
       continue;
 
       pat::CompositeCandidate xCand = makeCandidate(*phiCand, *jpsiCand);
 
       const reco::Vertex *ipv = phiCand->userData<reco::Vertex>("commonVertex");
-      float dzPhi = fabs(Getdz(*conv,ipv->position()));              // onia2mumu stores vertex as userData
-      xCand.addUserFloat("dzPhi",dz);
+      float dzPhi = fabs(Getdz(*phiCand,ipv->position()));              // onia2mumu stores vertex as userData
+      xCand.addUserFloat("dzPhi",dzPhi);
 
       if (!cutdz(dzPhi)){
         dz_phi_cut_fail++;
@@ -54,10 +54,10 @@ void FourOniaProducer::produce(edm::Event& event, const edm::EventSetup& esetup)
       }
 
       ipv = jpsiCand->userData<reco::Vertex>("commonVertex");
-      float dz = fabs(Getdz(*conv,ipv->position()));              // onia2mumu stores vertex as userData
-      xCand.addUserFloat("dz",dz);
+      float dzJpsi = fabs(Getdz(*jpsiCand,ipv->position()));              // onia2mumu stores vertex as userData
+      xCand.addUserFloat("dzJpsi",dzJpsi);
 
-      if (!cutdz(dz)){
+      if (!cutdz(dzJpsi)){
         dz_jps_cut_fail++;
         continue;
       }
