@@ -39,7 +39,7 @@ void FourOniaProducer::produce(edm::Event& event, const edm::EventSetup& esetup)
       if (!jpsiCand->userInt("isTriggerMatched"))
       continue;
 
-      if(isOverlappedMuons(*phiCand,*jpsiCand))
+      if(isOverlappedMuons(phiCand,jpsiCand))
       continue;
 
       pat::CompositeCandidate xCand = makeCandidate(*phiCand, *jpsiCand);
@@ -110,7 +110,7 @@ bool FourOniaProducer::isOverlappedMuons(const pat::CompositeCandidate *phi,cons
 
   bool same = false;
 
-  std::vector<pat::Muon*> fourMuons;
+  std::vector<const pat::Muon*> fourMuons;
 
   fourMuons.push_back(dynamic_cast<const pat::Muon*>(phi->daughter("muon1")));
   fourMuons.push_back(dynamic_cast<const pat::Muon*>(phi->daughter("muon2")));
