@@ -153,7 +153,7 @@ process.xCandSequence = cms.Sequence(
 
 				   )
 
-process.rootuple = cms.EDAnalyzer('chibRootupler',
+process.rootuple = cms.EDAnalyzer('x4MuRootupler',
                           #chi_cand = cms.InputTag("chiProducer"),
 			              x_cand = cms.InputTag("Onia2MuMuMuMu"),
                           xrefit = cms.InputTag("xFitter","xCand"),
