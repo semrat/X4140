@@ -107,7 +107,7 @@ void FourOniaKinFit::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) 
 
     index++;
 
-    reco::TrackRef JpsiTk[2]={
+    reco::TrackRef theTracks[4]={
       ( dynamic_cast<const pat::Muon*>(xCand->daughter("phi")->daughter("muon1") ) )->innerTrack(),
       ( dynamic_cast<const pat::Muon*>(xCand->daughter("phi")->daughter("muon2") ) )->innerTrack(),
       ( dynamic_cast<const pat::Muon*>(xCand->daughter("jpsi")->daughter("muon3") ) )->innerTrack(),
@@ -116,12 +116,12 @@ void FourOniaKinFit::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) 
 
 
     std::vector<reco::TransientTrack> PhiMuMuTT;
-    PhiMuMuTT.push_back((*theB).build(&JpsiTk[0]));
-    PhiMuMuTT.push_back((*theB).build(&JpsiTk[1]));
+    PhiMuMuTT.push_back((*theB).build(&theTracks[0]));
+    PhiMuMuTT.push_back((*theB).build(&theTracks[1]));
 
     std::vector<reco::TransientTrack> JPsiMuMuTT;
-    JPsiMuMuTT.push_back((*theB).build(&JpsiTk[0]));
-    JPsiMuMuTT.push_back((*theB).build(&JpsiTk[1]));
+    JPsiMuMuTT.push_back((*theB).build(&theTracks[0]));
+    JPsiMuMuTT.push_back((*theB).build(&theTracks[1]));
 
     const ParticleMass muonMass(0.1056584);
     float muonSigma = muonMass*1E-6;
