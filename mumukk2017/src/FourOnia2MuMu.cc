@@ -190,7 +190,7 @@ FourOnia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  muonLess.reserve(thePrimaryV.tracksSize());
 	  if( addMuonlessPrimaryVertex_  && thePrimaryV.tracksSize()>2) {
 	    // Primary vertex matched to the dimuon, now refit it removing the two muons
-	    OniaVtxReProducer revertex(priVtxs, iEvent);
+	    FourOniaVtxReProducer revertex(priVtxs, iEvent);
 	    edm::Handle<reco::TrackCollection> pvtracks;
 	    iEvent.getByToken(revtxtrks_,   pvtracks);
  	    if( !pvtracks.isValid()) { std::cout << "pvtracks NOT valid " << std::endl; }
