@@ -1,4 +1,4 @@
-#include "HeavyFlavorAnalysis/FourOnia2MuMu/interface/FourOnia2MuMuPAT.h"
+#include "HeavyFlavorAnalysis/Onia2MuMu/interface/Onia2MuMuPAT.h"
 
 //Headers for the data items
 #include <DataFormats/TrackReco/interface/TrackFwd.h>
@@ -18,7 +18,7 @@
 #include "TMath.h"
 #include "Math/VectorUtil.h"
 #include "TVector3.h"
-#include "../interface/OniaVtxReProducer.h"
+#include "HeavyFlavorAnalysis/Onia2MuMu/interface/OniaVtxReProducer.h"
 
 #include "MagneticField/Engine/interface/MagneticField.h"
 #include "MagneticField/Records/interface/IdealMagneticFieldRecord.h"
@@ -26,7 +26,7 @@
 #include "TrackingTools/IPTools/interface/IPTools.h"
 #include "TrackingTools/PatternTools/interface/ClosestApproachInRPhi.h"
 
-FourOnia2MuMuPAT::FourOnia2MuMuPAT(const edm::ParameterSet& iConfig):
+Onia2MuMuPAT::Onia2MuMuPAT(const edm::ParameterSet& iConfig):
   muons_(consumes<edm::View<pat::Muon>>(iConfig.getParameter<edm::InputTag>("muons"))),
   thebeamspot_(consumes<reco::BeamSpot>(iConfig.getParameter<edm::InputTag>("beamSpotTag"))),
   thePVs_(consumes<reco::VertexCollection>(iConfig.getParameter<edm::InputTag>("primaryVertexTag"))),
@@ -44,7 +44,7 @@ FourOnia2MuMuPAT::FourOnia2MuMuPAT(const edm::ParameterSet& iConfig):
 }
 
 
-FourOnia2MuMuPAT::~FourOnia2MuMuPAT()
+Onia2MuMuPAT::~Onia2MuMuPAT()
 {
 
    // do anything here that needs to be done at desctruction time
@@ -59,7 +59,7 @@ FourOnia2MuMuPAT::~FourOnia2MuMuPAT()
 
 // ------------ method called to produce the data  ------------
 void
-FourOnia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
+Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
   using namespace edm;
   using namespace std;
@@ -406,7 +406,7 @@ FourOnia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 
 bool
-FourOnia2MuMuPAT::isAbHadron(int pdgID) {
+Onia2MuMuPAT::isAbHadron(int pdgID) {
 
   if (abs(pdgID) == 511 || abs(pdgID) == 521 || abs(pdgID) == 531 || abs(pdgID) == 5122) return true;
   return false;
@@ -414,7 +414,7 @@ FourOnia2MuMuPAT::isAbHadron(int pdgID) {
 }
 
 bool
-FourOnia2MuMuPAT::isAMixedbHadron(int pdgID, int momPdgID) {
+Onia2MuMuPAT::isAMixedbHadron(int pdgID, int momPdgID) {
 
   if ((abs(pdgID) == 511 && abs(momPdgID) == 511 && pdgID*momPdgID < 0) ||
       (abs(pdgID) == 531 && abs(momPdgID) == 531 && pdgID*momPdgID < 0))
@@ -424,7 +424,7 @@ FourOnia2MuMuPAT::isAMixedbHadron(int pdgID, int momPdgID) {
 }
 
 std::pair<int, float>
-FourOnia2MuMuPAT::findJpsiMCInfo(reco::GenParticleRef genJpsi) {
+Onia2MuMuPAT::findJpsiMCInfo(reco::GenParticleRef genJpsi) {
 
   int momJpsiID = 0;
   float trueLife = -99.;
@@ -484,14 +484,14 @@ FourOnia2MuMuPAT::findJpsiMCInfo(reco::GenParticleRef genJpsi) {
 
 // ------------ method called once each job just before starting event loop  ------------
 void
-FourOnia2MuMuPAT::beginJob()
+Onia2MuMuPAT::beginJob()
 {
 }
 
 // ------------ method called once each job just after ending the event loop  ------------
 void
-FourOnia2MuMuPAT::endJob() {
+Onia2MuMuPAT::endJob() {
 }
 
 //define this as a plug-in
-DEFINE_FWK_MODULE(FourOnia2MuMuPAT);
+DEFINE_FWK_MODULE(Onia2MuMuPAT);

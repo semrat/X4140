@@ -35,25 +35,49 @@ process.oniaSelectedMuons = cms.EDFilter('PATMuonSelector',
    filter = cms.bool(True)
 )
 
-#dimuon producer for phi
-process.load("HeavyFlavorAnalysis.Onia2MuMu.onia2MuMuPAT_cfi")
-process.onia2MuMuPhi.muons=cms.InputTag('oniaSelectedMuons')
-process.onia2MuMuPhi.primaryVertexTag=cms.InputTag('offlineSlimmedPrimaryVertices')
-process.onia2MuMuPhi.beamSpotTag=cms.InputTag('offlineBeamSpot')
-process.onia2MuMuPhi.higherPuritySelection=cms.string("")
-process.onia2MuMuPhi.lowerPuritySelection=cms.string("")
-process.onia2MuMuPhi.dimuonSelection=cms.string("0.9 < mass && mass < 1.2")
-process.onia2MuMuPhi.addMCTruth = cms.bool(False)
+process.FourOnia2MuMuJPsi = cms.EDProducer('FourOnia2MuMuPAT',
+        muons                   =cms.InputTag('oniaSelectedMuons')
+        primaryVertexTag        =cms.InputTag('offlineSlimmedPrimaryVertices')
+        beamSpotTag             =cms.InputTag('offlineBeamSpot')
+        higherPuritySelection   =cms.string("")
+        lowerPuritySelection    =cms.string("")
+        dimuonSelection         =cms.string("0.9 < mass && mass < 1.2")
+        addMCTruth              = cms.bool(False)
+)
 
-#dimuon producer for jpsi
-process.load("HeavyFlavorAnalysis.Onia2MuMu.onia2MuMuPAT_cfi")
-process.onia2MuMuJPsi.muons=cms.InputTag('oniaSelectedMuons')
-process.onia2MuMuJPsi.primaryVertexTag=cms.InputTag('offlineSlimmedPrimaryVertices')
-process.onia2MuMuJPsi.beamSpotTag=cms.InputTag('offlineBeamSpot')
-process.onia2MuMuJPsi.higherPuritySelection=cms.string("")
-process.onia2MuMuJPsi.lowerPuritySelection=cms.string("")
-process.onia2MuMuJPsi.dimuonSelection=cms.string("2.9 < mass && mass < 3.3")
-process.onia2MuMuJPsi.addMCTruth = cms.bool(False)
+process.FourOnia2MuMuJPsi = cms.EDProducer('FourOnia2MuMuPAT',
+        muons                   =cms.InputTag('oniaSelectedMuons'),
+        primaryVertexTag        =cms.InputTag('offlineSlimmedPrimaryVertices'),
+        beamSpotTag             =cms.InputTag('offlineBeamSpot'),
+        higherPuritySelection   =cms.string(""),
+        lowerPuritySelection    =cms.string(""),
+        dimuonSelection         =cms.string("2.9 < mass && mass < 3.3"),
+        addMCTruth              = cms.bool(False),
+)
+
+process.Onia2MuMuFilteredJpsi = cms.EDProducer('DiMuonFilter',
+      OniaTag             = cms.InputTag("onia2MuMuJPsi"),
+      singlemuonSelection = cms.string(""),
+      dimuonSelection     = cms.string("2.95 < mass && mass < 3.15 && pt > 10. && abs(y) < 2.5 && charge==0 && userFloat('vProb') > 0.01"),
+      do_trigger_match    = cms.bool(True),
+      HLTFilters          = cms.vstring('hltJpsiTkTkVertexFilterPhiDoubleTrk1v2'),
+)
+
+process.Onia2MuMuFilteredJpsi = cms.EDProducer('DiMuonFilter',
+      OniaTag             = cms.InputTag("onia2MuMuJPsi"),
+      singlemuonSelection = cms.string(""),
+      dimuonSelection     = cms.string("2.95 < mass && mass < 3.15 && pt > 10. && abs(y) < 2.5 && charge==0 && userFloat('vProb') > 0.01"),
+      do_trigger_match    = cms.bool(True),
+      HLTFilters          = cms.vstring('hltJpsiTkTkVertexFilterPhiDoubleTrk1v2'),
+)
+
+process.Onia2MuMuFilteredJpsi = cms.EDProducer('DiMuonFilter',
+      OniaTag             = cms.InputTag("onia2MuMuJPsi"),
+      singlemuonSelection = cms.string(""),
+      dimuonSelection     = cms.string("2.95 < mass && mass < 3.15 && pt > 10. && abs(y) < 2.5 && charge==0 && userFloat('vProb') > 0.01"),
+      do_trigger_match    = cms.bool(True),
+      HLTFilters          = cms.vstring('hltJpsiTkTkVertexFilterPhiDoubleTrk1v2'),
+)
 
 process.Onia2MuMuFilteredJpsi = cms.EDProducer('DiMuonFilter',
       OniaTag             = cms.InputTag("onia2MuMuJPsi"),
