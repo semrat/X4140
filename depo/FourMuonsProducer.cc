@@ -120,7 +120,6 @@ oniaMuMuMuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
         if(!lowerPuritySelection_(*it3)) continue;
         if((it3->charge() + it2->charge() + it->charge())>1)
           continue;
-
         if((it3->charge() + it2->charge() + it->charge())<-1)
           continue;
         for(View<pat::Muon>::const_iterator it4 = muons->begin(), itend = muons->end(); it4 != itend; ++it4){
@@ -169,7 +168,7 @@ oniaMuMuMuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
       }
     }
 
-      std::sort(oniaOutput->begin(),oniaOutput->end(),vPComparator_);
+      // std::sort(oniaOutput->begin(),oniaOutput->end(),vPComparator_);
 
       iEvent.put(std::move(oniaOutput));
 

@@ -40,8 +40,7 @@ class x4MuRootupler:public edm::EDAnalyzer {
 	void analyze(const edm::Event &, const edm::EventSetup &) override;
 
 	std::string file_name;
-        edm::EDGetTokenT<pat::CompositeCandidateCollection> chi_;
-        edm::EDGetTokenT<pat::CompositeCandidateCollection> ups_;
+        edm::EDGetTokenT<pat::CompositeCandidateCollection> xcand_;
         edm::EDGetTokenT<pat::CompositeCandidateCollection> refit1_;
         edm::EDGetTokenT<reco::VertexCollection>            primaryVertices_;
         edm::EDGetTokenT<edm::TriggerResults>               triggerResults_;
@@ -111,7 +110,7 @@ static const double Y_sig_par_C = -20.77;
 
 x4MuRootupler::x4MuRootupler(const edm::ParameterSet & iConfig):
 // chi_(consumes<pat::CompositeCandidateCollection>(iConfig.getParameter < edm::InputTag > ("chi_cand"))),
-ups_(consumes<pat::CompositeCandidateCollection>(iConfig.getParameter < edm::InputTag > ("ups_cand"))),
+xcand_(consumes<pat::CompositeCandidateCollection>(iConfig.getParameter < edm::InputTag > ("x_cand"))),
 // refit1_(consumes<pat::CompositeCandidateCollection>(iConfig.getParameter < edm::InputTag > ("refit1S"))),
 primaryVertices_(consumes<reco::VertexCollection>(iConfig.getParameter < edm::InputTag > ("primaryVertices"))),
 triggerResults_(consumes<edm::TriggerResults>(iConfig.getParameter < edm::InputTag > ("TriggerResults"))),
@@ -183,8 +182,8 @@ bool x4MuRootupler::isAncestor(const reco::Candidate* ancestor, const reco::Cand
 void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & iSetup) {
 
 
-  edm::Handle < pat::CompositeCandidateCollection >ups_hand;
-  iEvent.getByToken(ups_, ups_hand);
+  edm::Handle < pat::CompositeCandidateCollection >xcand_hand;
+  iEvent.getByToken(xcand_, xcand_hand);
 
   // edm::Handle < pat::CompositeCandidateCollection >refit1S_handle;
   // iEvent.getByToken(refit1_, refit1S_handle);
@@ -289,13 +288,13 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
     photon_flags = 0; //else std::cout << "no valid chi handle" << std::endl;
 
     mumu_rank = 0;
-    if (!ups_hand.isValid()) std::cout << "Invalid" << std::endl;
-    if (ups_hand->empty()) std::cout << "Empty" << std::endl;
-    if (ups_hand.isValid() && !ups_hand->empty()) {
-      for (unsigned int i=0; i< ups_hand->size(); i++) {
-        pat::CompositeCandidate ups_ = ups_hand->at(i);
+    if (!xcand_hand.isValid()) std::cout << "Invalid" << std::endl;
+    if (xcand_hand->empty()) std::cout << "Empty" << std::endl;
+    if (xcand_hand.isValid() && !xcand_hand->empty()) {
+      for (unsigned int i=0; i< xcand_hand->size(); i++) {
+        pat::CompositeCandidate x_ = xcand_hand->at(i);
         std::cout<<"Cycling on ups"<<std::endl;
-        x_p4.SetPtEtaPhiM(ups_.pt(), ups_.eta(), ups_.phi(), ups_.mass());
+        x_p4.SetPtEtaPhiM(x_.pt(), x_.eta(), x_.phi(), x_.mass());
 
         x_tree->Fill();
 

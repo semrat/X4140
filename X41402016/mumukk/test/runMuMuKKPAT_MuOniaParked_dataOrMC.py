@@ -4,10 +4,10 @@ process = cms.Process('Rootuple')
 
 process.options = cms.untracked.PSet(
         wantSummary = cms.untracked.bool(True)
-	#,SkipEvent = cms.untracked.vstring('ProductNotFound')
 )
-# import of standard configurations
-process.load('FWCore/MessageService/MessageLogger_cfi')
+
+process.load("FWCore.MessageLogger.MessageLogger_cfi")
+
 process.MessageLogger.suppressInfo = cms.untracked.vstring( "mkcands" )
 process.MessageLogger.suppressWarning = cms.untracked.vstring( "mkcands" )
 process.MessageLogger.cerr.FwkReport.reportEvery = 1

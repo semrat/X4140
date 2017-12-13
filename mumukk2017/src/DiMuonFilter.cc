@@ -14,10 +14,10 @@
 #include "CommonTools/UtilAlgos/interface/StringCutObjectSelector.h"
 
 
-class JPsiDiMuonFilter : public edm::EDProducer {
+class DiMuonFilter : public edm::EDProducer {
  public:
-  explicit JPsiDiMuonFilter(const edm::ParameterSet&);
-  ~JPsiDiMuonFilter() override {};
+  explicit DiMuonFilter(const edm::ParameterSet&);
+  ~DiMuonFilter() override {};
   UInt_t isTriggerMatched(const pat::CompositeCandidate *);
  private:
   void produce(edm::Event&, const edm::EventSetup&) override;
@@ -28,32 +28,32 @@ class JPsiDiMuonFilter : public edm::EDProducer {
   std::vector<std::string> HLTFilters_;
 };
 
-JPsiDiMuonFilter::JPsiDiMuonFilter(const edm::ParameterSet& iConfig):
+DiMuonFilter::DiMuonFilter(const edm::ParameterSet& iConfig):
   theOnias_(consumes<pat::CompositeCandidateCollection>(iConfig.getParameter<edm::InputTag>("OniaTag"))),
   SingleMuonSelection_(iConfig.existsAs<std::string>("singlemuonSelection") ? iConfig.getParameter<std::string>("singlemuonSelection") : ""),
   DiMuonSelection_(iConfig.existsAs<std::string>("dimuonSelection") ? iConfig.getParameter<std::string>("dimuonSelection") : ""),
   do_trigger_match_(iConfig.getParameter<bool>("do_trigger_match")),
   HLTFilters_(iConfig.getParameter<std::vector<std::string>>("HLTFilters"))
-{
-  produces<pat::CompositeCandidateCollection>();
+{  
+  produces<pat::CompositeCandidateCollection>();  
 }
 
-UInt_t JPsiDiMuonFilter::isTriggerMatched(const pat::CompositeCandidate *diMuon_cand) {
+UInt_t DiMuonFilter::isTriggerMatched(const pat::CompositeCandidate *diMuon_cand) {
   const pat::Muon* muon1 = dynamic_cast<const pat::Muon*>(diMuon_cand->daughter("muon1"));
   const pat::Muon* muon2 = dynamic_cast<const pat::Muon*>(diMuon_cand->daughter("muon2"));
-  UInt_t matched = 0;  // if no list is given, is not matched
+  UInt_t matched = 0;  // if no list is given, is not matched 
 
 // if matched a given trigger, set the bit, in the same order as listed
   for (unsigned int iTr = 0; iTr<HLTFilters_.size(); iTr++ ) {
      const pat::TriggerObjectStandAloneCollection mu1HLTMatches = muon1->triggerObjectMatchesByFilter(HLTFilters_[iTr]);
      const pat::TriggerObjectStandAloneCollection mu2HLTMatches = muon2->triggerObjectMatchesByFilter(HLTFilters_[iTr]);
-     if (!mu1HLTMatches.empty() && !mu2HLTMatches.empty()) matched += (1<<iTr);
+     if (!mu1HLTMatches.empty() && !mu2HLTMatches.empty()) matched += (1<<iTr); 
   }
   return matched;
 }
 
 // ------------ method called to produce the data  ------------
-void JPsiDiMuonFilter::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
+void DiMuonFilter::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {  
   std::unique_ptr<pat::CompositeCandidateCollection> mumuOutput(new pat::CompositeCandidateCollection);
   edm::Handle<pat::CompositeCandidateCollection> onias_;
   iEvent.getByToken(theOnias_, onias_);
@@ -61,8 +61,8 @@ void JPsiDiMuonFilter::produce(edm::Event& iEvent, const edm::EventSetup& iSetup
     const pat::CompositeCandidate *ionia = nullptr;
     for (size_t ii = 0, nn=onias_->size(); ii < nn; ii++ ) {
        ionia = &(onias_->at(ii));
-       if (ionia && DiMuonSelection_(*ionia) &&
-           SingleMuonSelection_(*ionia->daughter("muon1")) &&
+       if (ionia && DiMuonSelection_(*ionia) && 
+           SingleMuonSelection_(*ionia->daughter("muon1")) && 
            SingleMuonSelection_(*ionia->daughter("muon2")) &&
            ( !do_trigger_match_ || isTriggerMatched(ionia))
           ) mumuOutput->push_back(*ionia);
@@ -72,4 +72,4 @@ void JPsiDiMuonFilter::produce(edm::Event& iEvent, const edm::EventSetup& iSetup
 }
 
 //define this as a plug-in
-DEFINE_FWK_MODULE(JPsiDiMuonFilter);
+DEFINE_FWK_MODULE(DiMuonFilter);

@@ -1,14 +1,14 @@
 /**
    \file
-   Declaration of OniaPhotonProducer
-   \author 
+   Declaration of FourOniaProducer
+   \author
    Alberto Sanchez-Hernandez
    September 2014
 
 */
 
-#ifndef __OniaPhotonProducer_h_
-#define __OniaPhotonProducer_h_
+#ifndef __FourOniaProducer_h_
+#define __FourOniaProducer_h_
 
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "FWCore/Framework/interface/EDProducer.h"
@@ -27,42 +27,43 @@
    Create a Chi(b,c) candidate by mathing dimuon and conversion
  */
 
-class OniaPhotonProducer : public edm::EDProducer {
+class FourOniaProducer : public edm::EDProducer {
 
  public:
-  explicit OniaPhotonProducer(const edm::ParameterSet& ps);
- 
+  explicit FourOniaProducer(const edm::ParameterSet& ps);
+
  private:
 
-  void produce(edm::Event& event, const edm::EventSetup& esetup) override;  
+  void produce(edm::Event& event, const edm::EventSetup& esetup) override;
   void endJob() override;
 
-  edm::EDGetTokenT<pat::CompositeCandidateCollection> dimuon_Label;
-  edm::EDGetTokenT<pat::CompositeCandidateCollection> photon_Label;
+  edm::EDGetTokenT<pat::CompositeCandidateCollection> phi_dimuon_Label;
+  edm::EDGetTokenT<pat::CompositeCandidateCollection> jpsi_dimuon_Label;
 
-  const pat::CompositeCandidate makeChiCandidate(const pat::CompositeCandidate&, 
+  const pat::CompositeCandidate makeChiCandidate(const pat::CompositeCandidate&,
 						 const pat::CompositeCandidate&);
- 
+
   float Getdz(const pat::CompositeCandidate&, const reco::Candidate::Point &);
   // check if the mass difference is in desired range
-  bool cutDeltaMass(const pat::CompositeCandidate&,const pat::CompositeCandidate&); 
+  bool cutDeltaMass(const pat::CompositeCandidate&,const pat::CompositeCandidate&);
 
   bool cutdz(float dz){return dz<dzMax_; }
 
+  bool isOverlappedMuons(const pat::CompositeCandidate *phi,const pat::CompositeCandidate *jpsi)
+
   bool pi0OnlineSwitch_;
-  
+
   // delta mass range
   std::vector<double> deltaMass_;
   double dzMax_;
 
-  // use only trigger-matched J/Psi or Upsilon   
-  bool triggerMatch_;  
-    
+  // use only trigger-matched J/Psi or Upsilon
+  bool triggerMatch_;
+
   int candidates;
   int delta_mass_fail;
-  int dz_cut_fail;
-  int pizero_fail;
+  int dz_phi_cut_fail;
+  int dz_jps_cut_fail;
 };
 
-#endif // __OniaPhotonProducer_h_
-
+#endif // __FourOniaProducer_h_
