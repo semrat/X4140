@@ -1,4 +1,4 @@
-#include <../interface/FourOniaProducer.h>
+#include "../interface/FourOniaProducer.h"
 
 FourOniaProducer::FourOniaProducer(const edm::ParameterSet& ps):
 phi_dimuon_Label(consumes<pat::CompositeCandidateCollection>(ps.getParameter< edm::InputTag>("phidimuons"))),
