@@ -62,31 +62,7 @@ process.FourOnia2MuMuJPsi = cms.EDProducer('FourOnia2MuMuPAT',
 )
 
 process.Onia2MuMuFilteredJpsi = cms.EDProducer('DiMuonFilter',
-      OniaTag             = cms.InputTag("onia2MuMuJPsi"),
-      singlemuonSelection = cms.string(""),
-      dimuonSelection     = cms.string("2.95 < mass && mass < 3.15 && pt > 10. && abs(y) < 2.5 && charge==0 && userFloat('vProb') > 0.01"),
-      do_trigger_match    = cms.bool(True),
-      HLTFilters          = cms.vstring('hltJpsiTkTkVertexFilterPhiDoubleTrk1v2'),
-)
-
-process.Onia2MuMuFilteredJpsi = cms.EDProducer('DiMuonFilter',
-      OniaTag             = cms.InputTag("onia2MuMuJPsi"),
-      singlemuonSelection = cms.string(""),
-      dimuonSelection     = cms.string("2.95 < mass && mass < 3.15 && pt > 10. && abs(y) < 2.5 && charge==0 && userFloat('vProb') > 0.01"),
-      do_trigger_match    = cms.bool(True),
-      HLTFilters          = cms.vstring('hltJpsiTkTkVertexFilterPhiDoubleTrk1v2'),
-)
-
-process.Onia2MuMuFilteredJpsi = cms.EDProducer('DiMuonFilter',
-      OniaTag             = cms.InputTag("onia2MuMuJPsi"),
-      singlemuonSelection = cms.string(""),
-      dimuonSelection     = cms.string("2.95 < mass && mass < 3.15 && pt > 10. && abs(y) < 2.5 && charge==0 && userFloat('vProb') > 0.01"),
-      do_trigger_match    = cms.bool(True),
-      HLTFilters          = cms.vstring('hltJpsiTkTkVertexFilterPhiDoubleTrk1v2'),
-)
-
-process.Onia2MuMuFilteredJpsi = cms.EDProducer('DiMuonFilter',
-      OniaTag             = cms.InputTag("onia2MuMuJPsi"),
+      OniaTag             = cms.InputTag("FourOnia2MuMuJPsi"),
       singlemuonSelection = cms.string(""),
       dimuonSelection     = cms.string("2.95 < mass && mass < 3.15 && pt > 10. && abs(y) < 2.5 && charge==0 && userFloat('vProb') > 0.01"),
       do_trigger_match    = cms.bool(True),
@@ -94,7 +70,7 @@ process.Onia2MuMuFilteredJpsi = cms.EDProducer('DiMuonFilter',
 )
 
 process.Onia2MuMuFilteredPhi = cms.EDProducer('DiMuonFilter',
-      OniaTag             = cms.InputTag("onia2MuMuJPhi"),
+      OniaTag             = cms.InputTag("FourOnia2MuMuPhi"),
       singlemuonSelection = cms.string(""),
       dimuonSelection     = cms.string("0.92 < mass && mass < 1.12 && pt > 10. && abs(y) < 2.5 && charge==0 && userFloat('vProb') > 0.01"),
       do_trigger_match    = cms.bool(True),
