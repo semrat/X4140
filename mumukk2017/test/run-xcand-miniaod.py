@@ -35,7 +35,7 @@ process.oniaSelectedMuons = cms.EDFilter('PATMuonSelector',
    filter = cms.bool(True)
 )
 
-process.FourOnia2MuMuJPsi = cms.EDProducer('FourOnia2MuMuPAT',
+process.FourOnia2MuMuPhi = cms.EDProducer('FourOnia2MuMuPAT',
         muons                   =cms.InputTag('oniaSelectedMuons'),
         primaryVertexTag        =cms.InputTag('offlineSlimmedPrimaryVertices'),
         beamSpotTag             =cms.InputTag('offlineBeamSpot'),
@@ -136,9 +136,9 @@ process.triggerSelection = cms.EDFilter("TriggerResultsFilter",
 process.xCandSequence = cms.Sequence(
                    process.triggerSelection *
 				   process.oniaSelectedMuons *
-                   process.onia2MuMuPhi *
+                   process.FourOnia2MuMuPhi *
                    process.DiMuonCounterPhi *
-				   process.onia2MuMuJPsi *
+				   process.FourOnia2MuMuJPsi *
                    process.DiMuonCounterJPsi *
                    process.xProducer *
                    process.xFitter
