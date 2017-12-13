@@ -125,7 +125,7 @@ process.xProducer = cms.EDProducer('FourOniaProducer',
 
 process.xFitter = cms.EDProducer('FourOniaKinFit',
                           x_cand = cms.InputTag("xProducer"),
-                          kinfit_mass = cms.double(5.36679), # GeV   1S = 9.46030   2S = 10.02326    3S = 10.35520  J/psi=3.0969
+                          x_mass = cms.double(5.36679), # GeV   1S = 9.46030   2S = 10.02326    3S = 10.35520  J/psi=3.0969
                           product_name = cms.string("xCand"),
                           pdgID = cms.int32(531)
                          )
