@@ -18,7 +18,7 @@
 #include "TMath.h"
 #include "Math/VectorUtil.h"
 #include "TVector3.h"
-#include "..interface/FourOniaVtxReProducer.h"
+#include "../interface/FourOniaVtxReProducer.h"
 
 #include "MagneticField/Engine/interface/MagneticField.h"
 #include "MagneticField/Records/interface/IdealMagneticFieldRecord.h"
