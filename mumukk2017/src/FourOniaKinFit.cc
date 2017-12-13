@@ -1,497 +1,278 @@
-#include "../interface/FourOnia2MuMu.h"
+// -*- C++ -*-
+//
+// Package:    FourOniaKinFit
+// Class:      FourOniaKinFit
+//
+/**
 
-//Headers for the data items
-#include <DataFormats/TrackReco/interface/TrackFwd.h>
-#include <DataFormats/TrackReco/interface/Track.h>
-#include <DataFormats/MuonReco/interface/MuonFwd.h>
-#include <DataFormats/MuonReco/interface/Muon.h>
-#include <DataFormats/Common/interface/View.h>
-#include <DataFormats/HepMCCandidate/interface/GenParticle.h>
+Description: Kinematic Fit for 4Mu-Onia
+
+Implementation:
+Original work from Stefano Argiro, and the Torino group
+Adapter for MINIAOD by Alberto Sanchez-Hernandez
+Adapter for JPsiPhi->4Mu search by Adriano Di Florio
+*/
+
+
+// system include files
+#include <memory>
+
+// user include files
+#include "FWCore/Framework/interface/Frameworkfwd.h"
+#include "FWCore/Framework/interface/EDProducer.h"
+
+#include "FWCore/Framework/interface/Event.h"
+#include "FWCore/Framework/interface/MakerMacros.h"
+
+#include "FWCore/ParameterSet/interface/ParameterSet.h"
+
+///For kinematic fit:
 #include <DataFormats/PatCandidates/interface/Muon.h>
-#include <DataFormats/VertexReco/interface/VertexFwd.h>
+#include <DataFormats/PatCandidates/interface/CompositeCandidate.h>
+#include <DataFormats/PatCandidates/interface/PackedCandidate.h>
 
-//Headers for services and tools
 #include "TrackingTools/TransientTrack/interface/TransientTrackBuilder.h"
 #include "TrackingTools/Records/interface/TransientTrackRecord.h"
-#include "RecoVertex/KalmanVertexFit/interface/KalmanVertexFitter.h"
-#include "RecoVertex/VertexTools/interface/VertexDistanceXY.h"
-#include "TMath.h"
-#include "Math/VectorUtil.h"
-#include "TVector3.h"
-#include "../interface/FourOniaVtxReProducer.h"
-
+#include "TrackingTools/TransientTrack/interface/TransientTrack.h"
 #include "MagneticField/Engine/interface/MagneticField.h"
-#include "MagneticField/Records/interface/IdealMagneticFieldRecord.h"
-#include "TrackingTools/PatternTools/interface/TwoTrackMinimumDistance.h"
-#include "TrackingTools/IPTools/interface/IPTools.h"
-#include "TrackingTools/PatternTools/interface/ClosestApproachInRPhi.h"
+#include "CommonTools/Statistics/interface/ChiSquaredProbability.h"
 
-FourOnia2MuMuPAT::FourOnia2MuMuPAT(const edm::ParameterSet& iConfig):
-  muons_(consumes<edm::View<pat::Muon>>(iConfig.getParameter<edm::InputTag>("muons"))),
-  thebeamspot_(consumes<reco::BeamSpot>(iConfig.getParameter<edm::InputTag>("beamSpotTag"))),
-  thePVs_(consumes<reco::VertexCollection>(iConfig.getParameter<edm::InputTag>("primaryVertexTag"))),
-  higherPuritySelection_(iConfig.getParameter<std::string>("higherPuritySelection")),
-  lowerPuritySelection_(iConfig.getParameter<std::string>("lowerPuritySelection")),
-  dimuonSelection_(iConfig.existsAs<std::string>("dimuonSelection") ? iConfig.getParameter<std::string>("dimuonSelection") : ""),
-  addCommonVertex_(iConfig.getParameter<bool>("addCommonVertex")),
-  addMuonlessPrimaryVertex_(iConfig.getParameter<bool>("addMuonlessPrimaryVertex")),
-  resolveAmbiguity_(iConfig.getParameter<bool>("resolvePileUpAmbiguity")),
-  addMCTruth_(iConfig.getParameter<bool>("addMCTruth"))
-{
-    revtxtrks_ = consumes<reco::TrackCollection>((edm::InputTag)"generalTracks"); //if that is not true, we will raise an exception
-    revtxbs_ = consumes<reco::BeamSpot>((edm::InputTag)"offlineBeamSpot");
-    produces<pat::CompositeCandidateCollection>();
-}
+#include "RecoVertex/KinematicFit/interface/KinematicParticleVertexFitter.h"
+#include "RecoVertex/KinematicFitPrimitives/interface/KinematicParticleFactoryFromTransientTrack.h"
+#include "RecoVertex/KinematicFit/interface/MassKinematicConstraint.h"
+#include "RecoVertex/KinematicFit/interface/KinematicParticleFitter.h"
+#include "RecoVertex/KinematicFitPrimitives/interface/MultiTrackKinematicConstraint.h"
+#include "RecoVertex/KinematicFit/interface/KinematicConstrainedVertexFitter.h"
+#include "RecoVertex/KinematicFit/interface/TwoTrackMassKinematicConstraint.h"
+#include "RecoVertex/KinematicFitPrimitives/interface/KinematicParticle.h"
+#include "RecoVertex/KinematicFitPrimitives/interface/RefCountedKinematicParticle.h"
+#include "RecoVertex/KinematicFitPrimitives/interface/TransientTrackKinematicParticle.h"
 
-
-FourOnia2MuMuPAT::~FourOnia2MuMuPAT()
-{
-
-   // do anything here that needs to be done at desctruction time
-   // (e.g. close files, deallocate resources etc.)
-
-}
-
+#include <boost/foreach.hpp>
+#include <string>
 
 //
-// member functions
+// class declaration
 //
+
+class FourOniaKinFit : public edm::EDProducer {
+public:
+  explicit FourOniaKinFit(const edm::ParameterSet&);
+  ~FourOniaKinFit() override {};
+  static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
+
+private:
+  void produce(edm::Event&, const edm::EventSetup&) override;
+
+  double x_mass_;
+  std::string product_name_;
+  int pdgID_;
+  edm::EDGetTokenT<pat::CompositeCandidateCollection> x_Label;
+
+  template<typename T>
+  struct GreaterByVProb {
+    typedef T first_argument_type;
+    typedef T second_argument_type;
+    bool operator()( const T & t1, const T & t2 ) const {
+      return t1.userFloat("vProb") > t2.userFloat("vProb");
+    }
+  };
+};
+
+FourOniaKinFit::FourOniaKinFit(const edm::ParameterSet& iConfig) {
+  x_Label     = consumes<pat::CompositeCandidateCollection>(iConfig.getParameter< edm::InputTag>("x_cand"));
+  x_mass_ = iConfig.getParameter<double>("x_mass");
+  pdgID_ = iConfig.getParameter<int>("pdgID");
+  product_name_ = iConfig.getParameter<std::string>("product_name");
+  produces<pat::CompositeCandidateCollection>(product_name_);
+}
 
 // ------------ method called to produce the data  ------------
-void
-FourOnia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
-{
-  using namespace edm;
-  using namespace std;
-  using namespace reco;
-  typedef Candidate::LorentzVector LorentzVector;
+void FourOniaKinFit::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
-  vector<double> muMasses;
-  muMasses.push_back( 0.1056583715 );
-  muMasses.push_back( 0.1056583715 );
+  // Grab paramenters
+  edm::Handle<pat::CompositeCandidateCollection> xCandHandle;
+  iEvent.getByToken(x_Label, xCandHandle);
 
-  std::unique_ptr<pat::CompositeCandidateCollection> oniaOutput(new pat::CompositeCandidateCollection);
+  //Kinemati refit collection
+  std::unique_ptr<pat::CompositeCandidateCollection> xCompCandRefitColl(new pat::CompositeCandidateCollection);
 
-  Vertex thePrimaryV;
-  Vertex theBeamSpotV;
+  // Kinematic fit
+  edm::ESHandle<TransientTrackBuilder> theB;
+  iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder",theB);
 
-  ESHandle<MagneticField> magneticField;
-  iSetup.get<IdealMagneticFieldRecord>().get(magneticField);
-  const MagneticField* field = magneticField.product();
+  int index=-1;
 
-  Handle<BeamSpot> theBeamSpot;
-  iEvent.getByToken(thebeamspot_,theBeamSpot);
-  BeamSpot bs = *theBeamSpot;
-  theBeamSpotV = Vertex(bs.position(), bs.covariance3D());
+  for (pat::CompositeCandidateCollection::const_iterator xCand=xCandHandle->begin();xCand!=xCandHandle->end();++xCand) {
 
-  Handle<VertexCollection> priVtxs;
-  iEvent.getByToken(thePVs_, priVtxs);
-  if ( priVtxs->begin() != priVtxs->end() ) {
-    thePrimaryV = Vertex(*(priVtxs->begin()));
-  }
-  else {
-    thePrimaryV = Vertex(bs.position(), bs.covariance3D());
-  }
+    index++;
 
-  Handle< View<pat::Muon> > muons;
-  iEvent.getByToken(muons_,muons);
-
-  edm::ESHandle<TransientTrackBuilder> theTTBuilder;
-  iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder",theTTBuilder);
-  KalmanVertexFitter vtxFitter(true);
-  TrackCollection muonLess;
-
-  // JPsi candidates only from muons
-  for(View<pat::Muon>::const_iterator it = muons->begin(), itend = muons->end(); it != itend; ++it){
-    // both must pass low quality
-    if(!lowerPuritySelection_(*it)) continue;
-    for(View<pat::Muon>::const_iterator it2 = it+1; it2 != itend;++it2){
-      // both must pass low quality
-      if(!lowerPuritySelection_(*it2)) continue;
-      // one must pass tight quality
-      if (!(higherPuritySelection_(*it) || higherPuritySelection_(*it2))) continue;
-
-      pat::CompositeCandidate myCand;
-      vector<TransientVertex> pvs;
-
-      // ---- no explicit order defined ----
-      myCand.addDaughter(*it, "muon1");
-      myCand.addDaughter(*it2,"muon2");
-
-      // ---- define and set candidate's 4momentum  ----
-      LorentzVector jpsi = it->p4() + it2->p4();
-      myCand.setP4(jpsi);
-      myCand.setCharge(it->charge()+it2->charge());
-
-      // ---- apply the dimuon cut ----
-      if(!dimuonSelection_(myCand)) continue;
-
-      // ---- fit vertex using Tracker tracks (if they have tracks) ----
-      if (it->track().isNonnull() && it2->track().isNonnull()) {
-
-	//build the dimuon secondary vertex
-	vector<TransientTrack> t_tks;
-	t_tks.push_back(theTTBuilder->build(*it->track()));  // pass the reco::Track, not  the reco::TrackRef (which can be transient)
-	t_tks.push_back(theTTBuilder->build(*it2->track())); // otherwise the vertex will have transient refs inside.
-	TransientVertex myVertex = vtxFitter.vertex(t_tks);
-
-	CachingVertex<5> VtxForInvMass = vtxFitter.vertex( t_tks );
-
-        Measurement1D MassWErr(jpsi.M(),-9999.);
-        if ( field->nominalValue() > 0 ) {
-          MassWErr = massCalculator.invariantMass( VtxForInvMass, muMasses );
-        } else {
-          myVertex = TransientVertex();                      // with no arguments it is invalid
-        }
-
-	myCand.addUserFloat("MassErr",MassWErr.error());
-
-	if (myVertex.isValid()) {
-	  float vChi2 = myVertex.totalChiSquared();
-	  float vNDF  = myVertex.degreesOfFreedom();
-	  float vProb(TMath::Prob(vChi2,(int)vNDF));
-
-	  myCand.addUserFloat("vNChi2",vChi2/vNDF);
-	  myCand.addUserFloat("vProb",vProb);
-
-	  TVector3 vtx;
-          TVector3 pvtx;
-          VertexDistanceXY vdistXY;
-
-	  vtx.SetXYZ(myVertex.position().x(),myVertex.position().y(),0);
-	  TVector3 pperp(jpsi.px(), jpsi.py(), 0);
-	  AlgebraicVector3 vpperp(pperp.x(),pperp.y(),0);
-
-	  if (resolveAmbiguity_) {
-
-            float minDz = 999999.;
-	    TwoTrackMinimumDistance ttmd;
-	    bool status = ttmd.calculate( GlobalTrajectoryParameters(
-                                                                     GlobalPoint(myVertex.position().x(), myVertex.position().y(), myVertex.position().z()),
-                                                                     GlobalVector(myCand.px(),myCand.py(),myCand.pz()),TrackCharge(0),&(*magneticField)),
-					  GlobalTrajectoryParameters(
-								     GlobalPoint(bs.position().x(), bs.position().y(), bs.position().z()),
-								     GlobalVector(bs.dxdz(), bs.dydz(), 1.),TrackCharge(0),&(*magneticField)));
-	    float extrapZ=-9E20;
-	    if (status) extrapZ=ttmd.points().first.z();
-
-	      for(VertexCollection::const_iterator itv = priVtxs->begin(), itvend = priVtxs->end(); itv != itvend; ++itv){
-		float deltaZ = fabs(extrapZ - itv->position().z()) ;
-		if ( deltaZ < minDz ) {
-		  minDz = deltaZ;
-		  thePrimaryV = Vertex(*itv);
-		}
-	      }
-	  }
-
-	  Vertex theOriginalPV = thePrimaryV;
-
-	  muonLess.clear();
-	  muonLess.reserve(thePrimaryV.tracksSize());
-	  if( addMuonlessPrimaryVertex_  && thePrimaryV.tracksSize()>2) {
-	    // Primary vertex matched to the dimuon, now refit it removing the two muons
-	    OniaVtxReProducer revertex(priVtxs, iEvent);
-	    edm::Handle<reco::TrackCollection> pvtracks;
-	    iEvent.getByToken(revtxtrks_,   pvtracks);
- 	    if( !pvtracks.isValid()) { std::cout << "pvtracks NOT valid " << std::endl; }
- 	    else {
-	      edm::Handle<reco::BeamSpot> pvbeamspot;
-	      iEvent.getByToken(revtxbs_, pvbeamspot);
-	      if (pvbeamspot.id() != theBeamSpot.id()) edm::LogWarning("Inconsistency") << "The BeamSpot used for PV reco is not the same used in this analyzer.";
-	      // I need to go back to the reco::Muon object, as the TrackRef in the pat::Muon can be an embedded ref.
-	      const reco::Muon *rmu1 = dynamic_cast<const reco::Muon *>(it->originalObject());
-	      const reco::Muon *rmu2 = dynamic_cast<const reco::Muon *>(it2->originalObject());
-	      // check that muons are truly from reco::Muons (and not, e.g., from PF Muons)
-	      // also check that the tracks really come from the track collection used for the BS
-	      if (rmu1 != nullptr && rmu2 != nullptr && rmu1->track().id() == pvtracks.id() && rmu2->track().id() == pvtracks.id()) {
-		// Save the keys of the tracks in the primary vertex
-		// std::vector<size_t> vertexTracksKeys;
-		// vertexTracksKeys.reserve(thePrimaryV.tracksSize());
-		if( thePrimaryV.hasRefittedTracks() ) {
-		  // Need to go back to the original tracks before taking the key
-		  std::vector<reco::Track>::const_iterator itRefittedTrack = thePrimaryV.refittedTracks().begin();
-		  std::vector<reco::Track>::const_iterator refittedTracksEnd = thePrimaryV.refittedTracks().end();
-		  for( ; itRefittedTrack != refittedTracksEnd; ++itRefittedTrack ) {
-		    if( thePrimaryV.originalTrack(*itRefittedTrack).key() == rmu1->track().key() ) continue;
-		    if( thePrimaryV.originalTrack(*itRefittedTrack).key() == rmu2->track().key() ) continue;
-		    // vertexTracksKeys.push_back(thePrimaryV.originalTrack(*itRefittedTrack).key());
-		    muonLess.push_back(*(thePrimaryV.originalTrack(*itRefittedTrack)));
-		  }
-		}
-		else {
-		  std::vector<reco::TrackBaseRef>::const_iterator itPVtrack = thePrimaryV.tracks_begin();
-		  for( ; itPVtrack != thePrimaryV.tracks_end(); ++itPVtrack ) if (itPVtrack->isNonnull()) {
-		    if( itPVtrack->key() == rmu1->track().key() ) continue;
-		    if( itPVtrack->key() == rmu2->track().key() ) continue;
-		    // vertexTracksKeys.push_back(itPVtrack->key());
-		    muonLess.push_back(**itPVtrack);
-		  }
-		}
-		if (muonLess.size()>1 && muonLess.size() < thePrimaryV.tracksSize()){
-		  pvs = revertex.makeVertices(muonLess, *pvbeamspot, iSetup) ;
-		  if (!pvs.empty()) {
-		    Vertex muonLessPV = Vertex(pvs.front());
-		    thePrimaryV = muonLessPV;
-		  }
-		}
-	      }
- 	    }
-	  }
-
-	  // count the number of high Purity tracks with pT > 900 MeV attached to the chosen vertex
-	  double vertexWeight = -1., sumPTPV = -1.;
-	  int countTksOfPV = -1;
-	  const reco::Muon *rmu1 = dynamic_cast<const reco::Muon *>(it->originalObject());
-	  const reco::Muon *rmu2 = dynamic_cast<const reco::Muon *>(it2->originalObject());
- 	  try{
-	    for(reco::Vertex::trackRef_iterator itVtx = theOriginalPV.tracks_begin(); itVtx != theOriginalPV.tracks_end(); itVtx++) if(itVtx->isNonnull()){
-	      const reco::Track& track = **itVtx;
-	      if(!track.quality(reco::TrackBase::highPurity)) continue;
-	      if(track.pt() < 0.5) continue; //reject all rejects from counting if less than 900 MeV
-	      TransientTrack tt = theTTBuilder->build(track);
-	      pair<bool,Measurement1D> tkPVdist = IPTools::absoluteImpactParameter3D(tt,thePrimaryV);
-	      if (!tkPVdist.first) continue;
-	      if (tkPVdist.second.significance()>3) continue;
-	      if (track.ptError()/track.pt()>0.1) continue;
-	      // do not count the two muons
-	      if (rmu1 != nullptr && rmu1->innerTrack().key() == itVtx->key())
-		continue;
-	      if (rmu2 != nullptr && rmu2->innerTrack().key() == itVtx->key())
-		continue;
-
-	      vertexWeight += theOriginalPV.trackWeight(*itVtx);
-	      if(theOriginalPV.trackWeight(*itVtx) > 0.5){
-		countTksOfPV++;
-		sumPTPV += track.pt();
-	      }
-	    }
- 	  } catch (std::exception & err) {std::cout << " muon Selection%G�%@failed " << std::endl; return ; }
-
-	  myCand.addUserInt("countTksOfPV", countTksOfPV);
-	  myCand.addUserFloat("vertexWeight", (float) vertexWeight);
-	  myCand.addUserFloat("sumPTPV", (float) sumPTPV);
-
-	  ///DCA
-	  TrajectoryStateClosestToPoint mu1TS = t_tks[0].impactPointTSCP();
-	  TrajectoryStateClosestToPoint mu2TS = t_tks[1].impactPointTSCP();
-	  float dca = 1E20;
-	  if (mu1TS.isValid() && mu2TS.isValid()) {
-	    ClosestApproachInRPhi cApp;
-	    cApp.calculate(mu1TS.theState(), mu2TS.theState());
-	    if (cApp.status() ) dca = cApp.distance();
-	  }
-	  myCand.addUserFloat("DCA", dca );
-	  ///end DCA
-
-	  if (addMuonlessPrimaryVertex_)
-	    myCand.addUserData("muonlessPV",Vertex(thePrimaryV));
-	  else
-	    myCand.addUserData("PVwithmuons",thePrimaryV);
-
-	  // lifetime using PV
-          pvtx.SetXYZ(thePrimaryV.position().x(),thePrimaryV.position().y(),0);
-	  TVector3 vdiff = vtx - pvtx;
-	  double cosAlpha = vdiff.Dot(pperp)/(vdiff.Perp()*pperp.Perp());
-	  Measurement1D distXY = vdistXY.distance(Vertex(myVertex), thePrimaryV);
-	  //double ctauPV = distXY.value()*cosAlpha*3.09688/pperp.Perp();
-	  double ctauPV = distXY.value()*cosAlpha * myCand.mass()/pperp.Perp();
-	  GlobalError v1e = (Vertex(myVertex)).error();
-	  GlobalError v2e = thePrimaryV.error();
-          AlgebraicSymMatrix33 vXYe = v1e.matrix()+ v2e.matrix();
-	  //double ctauErrPV = sqrt(vXYe.similarity(vpperp))*3.09688/(pperp.Perp2());
-	  double ctauErrPV = sqrt(ROOT::Math::Similarity(vpperp,vXYe))*myCand.mass()/(pperp.Perp2());
-
-	  myCand.addUserFloat("ppdlPV",ctauPV);
-          myCand.addUserFloat("ppdlErrPV",ctauErrPV);
-	  myCand.addUserFloat("cosAlpha",cosAlpha);
-
-	  // lifetime using BS
-          pvtx.SetXYZ(theBeamSpotV.position().x(),theBeamSpotV.position().y(),0);
-	  vdiff = vtx - pvtx;
-	  cosAlpha = vdiff.Dot(pperp)/(vdiff.Perp()*pperp.Perp());
-	  distXY = vdistXY.distance(Vertex(myVertex), theBeamSpotV);
-	  //double ctauBS = distXY.value()*cosAlpha*3.09688/pperp.Perp();
-	  double ctauBS = distXY.value()*cosAlpha*myCand.mass()/pperp.Perp();
-	  GlobalError v1eB = (Vertex(myVertex)).error();
-	  GlobalError v2eB = theBeamSpotV.error();
-          AlgebraicSymMatrix33 vXYeB = v1eB.matrix()+ v2eB.matrix();
-	  //double ctauErrBS = sqrt(vXYeB.similarity(vpperp))*3.09688/(pperp.Perp2());
-	  double ctauErrBS = sqrt(ROOT::Math::Similarity(vpperp,vXYeB))*myCand.mass()/(pperp.Perp2());
-
-	  myCand.addUserFloat("ppdlBS",ctauBS);
-          myCand.addUserFloat("ppdlErrBS",ctauErrBS);
-
-	  if (addCommonVertex_) {
-	    myCand.addUserData("commonVertex",Vertex(myVertex));
-	  }
-	} else {
-	  myCand.addUserFloat("vNChi2",-1);
-	  myCand.addUserFloat("vProb", -1);
-	  myCand.addUserFloat("ppdlPV",-100);
-          myCand.addUserFloat("ppdlErrPV",-100);
-	  myCand.addUserFloat("cosAlpha",-100);
-	  myCand.addUserFloat("ppdlBS",-100);
-          myCand.addUserFloat("ppdlErrBS",-100);
-          myCand.addUserFloat("DCA", -1 );
-	  if (addCommonVertex_) {
-	    myCand.addUserData("commonVertex",Vertex());
-	  }
-	  if (addMuonlessPrimaryVertex_) {
-            myCand.addUserData("muonlessPV",Vertex());
-	  } else {
-	    myCand.addUserData("PVwithmuons",Vertex());
-	  }
-	}
-      }
-
-      // ---- MC Truth, if enabled ----
-      if (addMCTruth_) {
-	reco::GenParticleRef genMu1 = it->genParticleRef();
-	reco::GenParticleRef genMu2 = it2->genParticleRef();
-	if (genMu1.isNonnull() && genMu2.isNonnull()) {
-	  if (genMu1->numberOfMothers()>0 && genMu2->numberOfMothers()>0){
-	    reco::GenParticleRef mom1 = genMu1->motherRef();
-	    reco::GenParticleRef mom2 = genMu2->motherRef();
-	    if (mom1.isNonnull() && (mom1 == mom2)) {
-	      myCand.setGenParticleRef(mom1); // set
-	      myCand.embedGenParticle();      // and embed
-	      std::pair<int, float> MCinfo = findJpsiMCInfo(mom1);
-	      myCand.addUserInt("momPDGId",MCinfo.first);
-	      myCand.addUserFloat("ppdlTrue",MCinfo.second);
-	    } else {
-	      myCand.addUserInt("momPDGId",0);
-	      myCand.addUserFloat("ppdlTrue",-99.);
-	    }
-	  } else {
-	    edm::Handle<reco::GenParticleCollection> theGenParticles;
-            edm::EDGetTokenT<reco::GenParticleCollection> genCands_ = consumes<reco::GenParticleCollection>((edm::InputTag)"genParticles");
-	    iEvent.getByToken(genCands_, theGenParticles);
-	    if (theGenParticles.isValid()){
-	      for(size_t iGenParticle=0; iGenParticle<theGenParticles->size();++iGenParticle) {
-		const Candidate & genCand = (*theGenParticles)[iGenParticle];
-		if (genCand.pdgId()==443 || genCand.pdgId()==100443 ||
-		    genCand.pdgId()==553 || genCand.pdgId()==100553 || genCand.pdgId()==200553) {
-		  reco::GenParticleRef mom1(theGenParticles,iGenParticle);
-		  myCand.setGenParticleRef(mom1);
-		  myCand.embedGenParticle();
-		  std::pair<int, float> MCinfo = findJpsiMCInfo(mom1);
-		  myCand.addUserInt("momPDGId",MCinfo.first);
-		  myCand.addUserFloat("ppdlTrue",MCinfo.second);
-		}
-	      }
-	    } else {
-	      myCand.addUserInt("momPDGId",0);
-	      myCand.addUserFloat("ppdlTrue",-99.);
-	    }
-	  }
-	} else {
-	  myCand.addUserInt("momPDGId",0);
-	  myCand.addUserFloat("ppdlTrue",-99.);
-	}
-      }
+    reco::TrackRef theTracks[4]={
+      ( dynamic_cast<const pat::Muon*>(xCand->daughter("phi")->daughter("muon1") ) )->innerTrack(),
+      ( dynamic_cast<const pat::Muon*>(xCand->daughter("phi")->daughter("muon2") ) )->innerTrack(),
+      ( dynamic_cast<const pat::Muon*>(xCand->daughter("jpsi")->daughter("muon3") ) )->innerTrack(),
+      ( dynamic_cast<const pat::Muon*>(xCand->daughter("jpsi")->daughter("muon4") ) )->innerTrack()
+    };
 
 
+    std::vector<reco::TransientTrack> PhiMuMuTT;
+    PhiMuMuTT.push_back((*theB).build(&theTracks[0]));
+    PhiMuMuTT.push_back((*theB).build(&theTracks[1]));
+
+    std::vector<reco::TransientTrack> JPsiMuMuTT;
+    JPsiMuMuTT.push_back((*theB).build(&theTracks[0]));
+    JPsiMuMuTT.push_back((*theB).build(&theTracks[1]));
+
+    const ParticleMass muonMass(0.1056584);
+    float muonSigma = muonMass*1E-6;
+
+    KinematicParticleFactoryFromTransientTrack pFactory;
+
+    std::vector<RefCountedKinematicParticle> allXDaughters;
+    allXDaughters.push_back(pFactory.particle (PhiMuMuTT[0], muonMass, float(0), float(0), muonSigma));
+    allXDaughters.push_back(pFactory.particle (PhiMuMuTT[1], muonMass, float(0), float(0), muonSigma));
+    allXDaughters.push_back(pFactory.particle (JPsiMuMuTT[0], muonMass, float(0), float(0), muonSigma));
+    allXDaughters.push_back(pFactory.particle (JPsiMuMuTT[1], muonMass, float(0), float(0), muonSigma));
+
+    KinematicConstrainedVertexFitter constVertexFitter;
+
+    MultiTrackKinematicConstraint *xcand_mtc = new  TwoTrackMassKinematicConstraint(x_mass_);
+    RefCountedKinematicTree XTree = constVertexFitter.fit(allXDaughters,xcand_mtc);
+
+    if (!XTree->isEmpty()) {
+
+      XTree->movePointerToTheTop();
+      RefCountedKinematicParticle fitX = XTree->currentParticle();
+      RefCountedKinematicVertex XDecayVertex = XTree->currentDecayVertex();
+
+      if (fitX->currentState().isValid()) { //Get get x
+
+        float XM_fit  = fitX->currentState().mass();
+        float XPx_fit = fitX->currentState().kinematicParameters().momentum().x();
+        float XPy_fit = fitX->currentState().kinematicParameters().momentum().y();
+        float XPz_fit = fitX->currentState().kinematicParameters().momentum().z();
+        float XVtxX_fit = XDecayVertex->position().x();
+        float XVtxY_fit = XDecayVertex->position().y();
+        float XVtxZ_fit = XDecayVertex->position().z();
+        float XVtxP_fit = ChiSquaredProbability((double)(XDecayVertex->chiSquared()),
+        (double)(XDecayVertex->degreesOfFreedom()));
+
+        reco::CompositeCandidate recoX(0, math::XYZTLorentzVector(XPx_fit, XPy_fit, XPz_fit,
+        sqrt(XM_fit*XM_fit + XPx_fit*XPx_fit + XPy_fit*XPy_fit + XPz_fit*XPz_fit)), math::XYZPoint(XVtxX_fit,
+        XVtxY_fit, XVtxZ_fit), pdgID_);
+
+        pat::CompositeCandidate patX(recoX);
+        patX.addUserFloat("vProb",XVtxP_fit);
+        patX.addUserInt("Index",index);  // this also holds the index of the current xCand
+
+        //get first muon
+        bool child = XTree->movePointerToTheFirstChild();
+        RefCountedKinematicParticle fitMu1 = XTree->currentParticle();
+        if (!child) break;
+
+        float mu1M_fit  = fitMu1->currentState().mass();
+        float mu1Q_fit  = fitMu1->currentState().particleCharge();
+        float mu1Px_fit = fitMu1->currentState().kinematicParameters().momentum().x();
+        float mu1Py_fit = fitMu1->currentState().kinematicParameters().momentum().y();
+        float mu1Pz_fit = fitMu1->currentState().kinematicParameters().momentum().z();
+
+        reco::CompositeCandidate recoMu1(mu1Q_fit, math::XYZTLorentzVector(mu1Px_fit, mu1Py_fit, mu1Pz_fit,
+        sqrt(mu1M_fit*mu1M_fit + mu1Px_fit*mu1Px_fit + mu1Py_fit*mu1Py_fit +
+        mu1Pz_fit*mu1Pz_fit)), math::XYZPoint(XVtxX_fit, XVtxY_fit, XVtxZ_fit), 13);
+
+        pat::CompositeCandidate patMu1(recoMu1);
+
+        //get second muon
+        child = XTree->movePointerToTheNextChild();
+        RefCountedKinematicParticle fitMu2 = XTree->currentParticle();
+
+        if (!child) break;
+
+        float mu2M_fit  = fitMu2->currentState().mass();
+        float mu2Q_fit  = fitMu2->currentState().particleCharge();
+        float mu2Px_fit = fitMu2->currentState().kinematicParameters().momentum().x();
+        float mu2Py_fit = fitMu2->currentState().kinematicParameters().momentum().y();
+        float mu2Pz_fit = fitMu2->currentState().kinematicParameters().momentum().z();
+        reco::CompositeCandidate recoMu2(mu2Q_fit, math::XYZTLorentzVector(mu2Px_fit, mu2Py_fit, mu2Pz_fit,
+        sqrt(mu2M_fit*mu2M_fit + mu2Px_fit*mu2Px_fit + mu2Py_fit*mu2Py_fit +
+        mu2Pz_fit*mu2Pz_fit)), math::XYZPoint(XVtxX_fit, XVtxY_fit, XVtxZ_fit), 13);
+
+        pat::CompositeCandidate patMu2(recoMu2);
+
+        //get third muon
+        child = XTree->movePointerToTheFirstChild();
+        RefCountedKinematicParticle fitMu3 = XTree->currentParticle();
+        if (!child) break;
+
+        float mu3M_fit  = fitMu3->currentState().mass();
+        float mu3Q_fit  = fitMu3->currentState().particleCharge();
+        float mu3Px_fit = fitMu3->currentState().kinematicParameters().momentum().x();
+        float mu3Py_fit = fitMu3->currentState().kinematicParameters().momentum().y();
+        float mu3Pz_fit = fitMu3->currentState().kinematicParameters().momentum().z();
+
+        reco::CompositeCandidate recoMu3(mu3Q_fit, math::XYZTLorentzVector(mu3Px_fit, mu3Py_fit, mu3Pz_fit,
+        sqrt(mu3M_fit*mu3M_fit + mu3Px_fit*mu3Px_fit + mu3Py_fit*mu3Py_fit +
+        mu3Pz_fit*mu3Pz_fit)), math::XYZPoint(XVtxX_fit, XVtxY_fit, XVtxZ_fit), 13);
+
+        pat::CompositeCandidate patMu3(recoMu3);
 
 
-      // ---- Push back output ----
-      oniaOutput->push_back(myCand);
-    }
-  }
+        //get fourth muon
+        child = XTree->movePointerToTheFirstChild();
+        RefCountedKinematicParticle fitMu4 = XTree->currentParticle();
+        if (!child) break;
 
-  std::sort(oniaOutput->begin(),oniaOutput->end(),vPComparator_);
+        float mu4M_fit  = fitMu4->currentState().mass();
+        float mu4Q_fit  = fitMu4->currentState().particleCharge();
+        float mu4Px_fit = fitMu4->currentState().kinematicParameters().momentum().x();
+        float mu4Py_fit = fitMu4->currentState().kinematicParameters().momentum().y();
+        float mu4Pz_fit = fitMu4->currentState().kinematicParameters().momentum().z();
 
-  iEvent.put(std::move(oniaOutput));
+        reco::CompositeCandidate recoMu4(mu4Q_fit, math::XYZTLorentzVector(mu4Px_fit, mu4Py_fit, mu4Pz_fit,
+        sqrt(mu4M_fit*mu4M_fit + mu4Px_fit*mu4Px_fit + mu4Py_fit*mu4Py_fit +
+        mu4Pz_fit*mu4Pz_fit)), math::XYZPoint(XVtxX_fit, XVtxY_fit, XVtxZ_fit), 13);
 
-}
+        pat::CompositeCandidate patMu4(recoMu4);
 
+        //Define Onia from two muons
+        pat::CompositeCandidate phi;
+        phi.addDaughter(patMu1,"muon1");
+        phi.addDaughter(patMu2,"muon2");
+        phi.setP4(patMu1.p4()+patMu2.p4());
 
-bool
-FourOnia2MuMuPAT::isAbHadron(int pdgID) {
+        pat::CompositeCandidate jps;
+        jps.addDaughter(patMu3,"muon1");
+        jps.addDaughter(patMu4,"muon2");
+        jps.setP4(patMu3.p4()+patMu4.p4());
 
-  if (abs(pdgID) == 511 || abs(pdgID) == 521 || abs(pdgID) == 531 || abs(pdgID) == 5122) return true;
-  return false;
+        patX.addDaughter(phi,"phi");
+        patX.addDaughter(jps,"jpsi");
 
-}
+        xCompCandRefitColl->push_back(patX);
 
-bool
-FourOnia2MuMuPAT::isAMixedbHadron(int pdgID, int momPdgID) {
-
-  if ((abs(pdgID) == 511 && abs(momPdgID) == 511 && pdgID*momPdgID < 0) ||
-      (abs(pdgID) == 531 && abs(momPdgID) == 531 && pdgID*momPdgID < 0))
-      return true;
-  return false;
-
-}
-
-std::pair<int, float>
-FourOnia2MuMuPAT::findJpsiMCInfo(reco::GenParticleRef genJpsi) {
-
-  int momJpsiID = 0;
-  float trueLife = -99.;
-
-  if (genJpsi->numberOfMothers()>0) {
-
-    TVector3 trueVtx(0.0,0.0,0.0);
-    TVector3 trueP(0.0,0.0,0.0);
-    TVector3 trueVtxMom(0.0,0.0,0.0);
-
-    trueVtx.SetXYZ(genJpsi->vertex().x(),genJpsi->vertex().y(),genJpsi->vertex().z());
-    trueP.SetXYZ(genJpsi->momentum().x(),genJpsi->momentum().y(),genJpsi->momentum().z());
-
-    bool aBhadron = false;
-    reco::GenParticleRef Jpsimom = genJpsi->motherRef();       // find mothers
-    if (Jpsimom.isNull()) {
-      std::pair<int, float> result = std::make_pair(momJpsiID, trueLife);
-      return result;
-    } else {
-      reco::GenParticleRef Jpsigrandmom = Jpsimom->motherRef();
-      if (isAbHadron(Jpsimom->pdgId())) {
-	if (Jpsigrandmom.isNonnull() && isAMixedbHadron(Jpsimom->pdgId(),Jpsigrandmom->pdgId())) {
-	  momJpsiID = Jpsigrandmom->pdgId();
-	  trueVtxMom.SetXYZ(Jpsigrandmom->vertex().x(),Jpsigrandmom->vertex().y(),Jpsigrandmom->vertex().z());
-	} else {
-	  momJpsiID = Jpsimom->pdgId();
-	  trueVtxMom.SetXYZ(Jpsimom->vertex().x(),Jpsimom->vertex().y(),Jpsimom->vertex().z());
-	}
-	aBhadron = true;
-      } else {
-	if (Jpsigrandmom.isNonnull() && isAbHadron(Jpsigrandmom->pdgId())) {
-	  reco::GenParticleRef JpsiGrandgrandmom = Jpsigrandmom->motherRef();
-	  if (JpsiGrandgrandmom.isNonnull() && isAMixedbHadron(Jpsigrandmom->pdgId(),JpsiGrandgrandmom->pdgId())) {
-	    momJpsiID = JpsiGrandgrandmom->pdgId();
-	    trueVtxMom.SetXYZ(JpsiGrandgrandmom->vertex().x(),JpsiGrandgrandmom->vertex().y(),JpsiGrandgrandmom->vertex().z());
-	  } else {
-	    momJpsiID = Jpsigrandmom->pdgId();
-	    trueVtxMom.SetXYZ(Jpsigrandmom->vertex().x(),Jpsigrandmom->vertex().y(),Jpsigrandmom->vertex().z());
-	  }
-	  aBhadron = true;
-	}
-      }
-      if (!aBhadron) {
-	momJpsiID = Jpsimom->pdgId();
-	trueVtxMom.SetXYZ(Jpsimom->vertex().x(),Jpsimom->vertex().y(),Jpsimom->vertex().z());
       }
     }
-
-    TVector3 vdiff = trueVtx - trueVtxMom;
-    //trueLife = vdiff.Perp()*3.09688/trueP.Perp();
-    trueLife = vdiff.Perp()*genJpsi->mass()/trueP.Perp();
   }
-  std::pair<int, float> result = std::make_pair(momJpsiID, trueLife);
-  return result;
+                  // End kinematic fit
+
+                  // ...ash not sorted, since we will use the best un-refitted candidate
+                  // now sort by vProb
+
+        FourOniaKinFit::GreaterByVProb<pat::CompositeCandidate> vPComparator;
+        std::sort(xCompCandRefitColl->begin(),xCompCandRefitColl->end(), vPComparator);
+
+        iEvent.put(std::move(xCompCandRefitColl),product_name_);
 
 }
 
-// ------------ method called once each job just before starting event loop  ------------
-void
-FourOnia2MuMuPAT::beginJob()
-{
-}
-
-// ------------ method called once each job just after ending the event loop  ------------
-void
-FourOnia2MuMuPAT::endJob() {
+// ------------ method fills 'descriptions' with the allowed parameters for the module  ------------
+void FourOniaKinFit::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
+  //The following says we do not know what parameters are allowed so do no validation
+  // Please change this to state exactly what you do use, even if it is no parameters
+  edm::ParameterSetDescription desc;
+  desc.setUnknown();
+  descriptions.addDefault(desc);
 }
 
 //define this as a plug-in
-DEFINE_FWK_MODULE(FourOnia2MuMuPAT);
+DEFINE_FWK_MODULE(FourOniaKinFit);
