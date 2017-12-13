@@ -1,4 +1,4 @@
-#include "HeavyFlavorAnalysis/FourOnia2MuMu/interface/FourOnia2MuMuPAT.h"
+#include "../interface/FourOnia2MuMuPAT.h"
 
 //Headers for the data items
 #include <DataFormats/TrackReco/interface/TrackFwd.h>
