@@ -66,6 +66,7 @@ private:
 
   double x_mass_;
   std::string product_name_;
+  int pdgID_;
   edm::EDGetTokenT<pat::CompositeCandidateCollection> x_Label;
 
   template<typename T>
@@ -124,9 +125,6 @@ void FourOniaKinFit::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) 
 
     const ParticleMass muonMass(0.1056584);
     float muonSigma = muonMass*1E-6;
-
-    photonVertexFitTree->movePointerToTheTop();
-    RefCountedKinematicParticle fitPhoton = photonVertexFitTree->currentParticle();
 
     std::vector<RefCountedKinematicParticle> allXDaughters;
     allXDaughters.push_back(pFactory.particle (PhiMuMuTT[0], muonMass, float(0), float(0), muonSigma));
@@ -200,7 +198,7 @@ void FourOniaKinFit::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) 
         pat::CompositeCandidate patMu2(recoMu2);
 
         //get third muon
-        bool child = XTree->movePointerToTheFirstChild();
+        child = XTree->movePointerToTheFirstChild();
         RefCountedKinematicParticle fitMu3 = XTree->currentParticle();
         if (!child) break;
 
@@ -218,7 +216,7 @@ void FourOniaKinFit::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) 
 
 
         //get fourth muon
-        bool child = XTree->movePointerToTheFirstChild();
+        child = XTree->movePointerToTheFirstChild();
         RefCountedKinematicParticle fitMu4 = XTree->currentParticle();
         if (!child) break;
 
@@ -232,7 +230,7 @@ void FourOniaKinFit::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) 
         sqrt(mu4M_fit*mu4M_fit + mu4Px_fit*mu4Px_fit + mu4Py_fit*mu4Py_fit +
         mu4Pz_fit*mu4Pz_fit)), math::XYZPoint(XVtxX_fit, XVtxY_fit, XVtxZ_fit), 13);
 
-        pat::CompositeCandidate patMu4(recomu4);
+        pat::CompositeCandidate patMu4(recoMu4);
 
         //Define Onia from two muons
         pat::CompositeCandidate phi;
