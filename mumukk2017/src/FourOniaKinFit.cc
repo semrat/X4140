@@ -126,6 +126,8 @@ void FourOniaKinFit::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) 
     const ParticleMass muonMass(0.1056584);
     float muonSigma = muonMass*1E-6;
 
+    KinematicParticleFactoryFromTransientTrack pFactory;
+
     std::vector<RefCountedKinematicParticle> allXDaughters;
     allXDaughters.push_back(pFactory.particle (PhiMuMuTT[0], muonMass, float(0), float(0), muonSigma));
     allXDaughters.push_back(pFactory.particle (PhiMuMuTT[1], muonMass, float(0), float(0), muonSigma));
