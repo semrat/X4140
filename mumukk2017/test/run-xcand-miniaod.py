@@ -36,13 +36,13 @@ process.oniaSelectedMuons = cms.EDFilter('PATMuonSelector',
 )
 
 process.FourOnia2MuMuJPsi = cms.EDProducer('FourOnia2MuMuPAT',
-        muons                   =cms.InputTag('oniaSelectedMuons')
-        primaryVertexTag        =cms.InputTag('offlineSlimmedPrimaryVertices')
-        beamSpotTag             =cms.InputTag('offlineBeamSpot')
-        higherPuritySelection   =cms.string("")
-        lowerPuritySelection    =cms.string("")
-        dimuonSelection         =cms.string("0.9 < mass && mass < 1.2")
-        addMCTruth              = cms.bool(False)
+        muons                   =cms.InputTag('oniaSelectedMuons'),
+        primaryVertexTag        =cms.InputTag('offlineSlimmedPrimaryVertices'),
+        beamSpotTag             =cms.InputTag('offlineBeamSpot'),
+        higherPuritySelection   =cms.string(""),
+        lowerPuritySelection    =cms.string(""),
+        dimuonSelection         =cms.string("0.9 < mass && mass < 1.2"),
+        addMCTruth              = cms.bool(False),
 )
 
 process.FourOnia2MuMuJPsi = cms.EDProducer('FourOnia2MuMuPAT',
