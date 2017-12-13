@@ -4,6 +4,7 @@ FourOniaProducer::FourOniaProducer(const edm::ParameterSet& ps):
 phi_dimuon_Label(consumes<pat::CompositeCandidateCollection>(ps.getParameter< edm::InputTag>("phidimuons"))),
 jpsi_dimuon_Label(consumes<pat::CompositeCandidateCollection>(ps.getParameter< edm::InputTag>("jpsidimuons"))),
 pi0OnlineSwitch_(ps.getParameter<bool>("pi0OnlineSwitch")),
+deltaMass_(ps.getParameter<std::vector<double> >("deltaMass")),
 dzMax_(ps.getParameter<double>("dzmax")),
 triggerMatch_(ps.getParameter<bool>("triggerMatch"))
 {

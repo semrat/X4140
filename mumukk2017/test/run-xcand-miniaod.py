@@ -119,7 +119,8 @@ process.xProducer = cms.EDProducer('FourOniaProducer',
     jpsidimuons         = cms.InputTag("Onia2MuMuFiltered"),
     pi0OnlineSwitch     = cms.bool(False),
     dzmax               = cms.double(0.5),
-    triggerMatch        = cms.bool(False)  # trigger match is performed in Onia2MuMuFiltered
+    triggerMatch        = cms.bool(False),
+    deltaMass           = cms.double(2.0)  # trigger match is performed in Onia2MuMuFiltered
 )
 
 process.xFitter = cms.EDProducer('FourOniaKinFit',
