@@ -30,7 +30,7 @@ process.oniaSelectedMuons = cms.EDFilter('PATMuonSelector',
                     ' && innerTrack.hitPattern.trackerLayersWithMeasurement > 5'
                     ' && innerTrack.hitPattern.pixelLayersWithMeasurement > 0'
                     ' && innerTrack.quality(\"highPurity\")'
-                    ' && && (abs(eta) <= 2.5 && pt > 0.4)'
+                    ' && (abs(eta) <= 2.5 && pt > 0.4)'
    ),
    filter = cms.bool(True)
 )
