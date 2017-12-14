@@ -105,12 +105,14 @@ FourOnia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   for(View<pat::Muon>::const_iterator it = muons->begin(), itend = muons->end(); it != itend; ++it){
     // both must pass low quality
     if(!lowerPuritySelection_(*it)) continue;
+    std::cout << "First muon quality flag" << std::endl;
     for(View<pat::Muon>::const_iterator it2 = it+1; it2 != itend;++it2){
       // both must pass low quality
       if(!lowerPuritySelection_(*it2)) continue;
+      std::cout << "Second muon quality flag" << std::endl;
       // one must pass tight quality
       if (!(higherPuritySelection_(*it) || higherPuritySelection_(*it2))) continue;
-
+      std::cout << "High quality flags" << std::endl;
       pat::CompositeCandidate myCand;
       vector<TransientVertex> pvs;
 
@@ -125,10 +127,10 @@ FourOnia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
       // ---- apply the dimuon cut ----
       if(!dimuonSelection_(myCand)) continue;
-
+      std::cout << "Dimuon selection passed !" << std::endl;
       // ---- fit vertex using Tracker tracks (if they have tracks) ----
       if (it->track().isNonnull() && it2->track().isNonnull()) {
-
+        std::cout << "Tracker tracks: they exist !" << std::endl;
 	//build the dimuon secondary vertex
 	vector<TransientTrack> t_tks;
 	t_tks.push_back(theTTBuilder->build(*it->track()));  // pass the reco::Track, not  the reco::TrackRef (which can be transient)
