@@ -52,6 +52,17 @@ Onia2MuMuPAT::~Onia2MuMuPAT()
 
 }
 
+double Tau3MuReco::getDeltaR(const reco::Track& track1, const reco::Track& track2)
+{
+    double dEta = track1.eta() - track2.eta();
+    double dPhi = track1.phi() - track2.phi();
+
+    while(dPhi >= TMath::Pi())       dPhi -= (2.0*TMath::Pi());
+    while(dPhi < (-1.0*TMath::Pi())) dPhi += (2.0*TMath::Pi());
+
+    return sqrt(pow(dEta,2)+pow(dPhi,2));
+}
+
 
 //
 // member functions
@@ -146,249 +157,251 @@ Onia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 	myCand.addUserFloat("MassErr",MassWErr.error());
 
-	if (myVertex.isValid()) {
-	  float vChi2 = myVertex.totalChiSquared();
-	  float vNDF  = myVertex.degreesOfFreedom();
-	  float vProb(TMath::Prob(vChi2,(int)vNDF));
+  if (myVertex.isValid()) {
+    float vChi2 = myVertex.totalChiSquared();
+    float vNDF  = myVertex.degreesOfFreedom();
+    float vProb(TMath::Prob(vChi2,(int)vNDF));
 
-	  myCand.addUserFloat("vNChi2",vChi2/vNDF);
-	  myCand.addUserFloat("vProb",vProb);
+    myCand.addUserFloat("vNChi2",vChi2/vNDF);
+    myCand.addUserFloat("vProb",vProb);
 
-	  TVector3 vtx;
-          TVector3 pvtx;
-          VertexDistanceXY vdistXY;
+    TVector3 vtx;
+    TVector3 pvtx;
+    VertexDistanceXY vdistXY;
 
-	  vtx.SetXYZ(myVertex.position().x(),myVertex.position().y(),0);
-	  TVector3 pperp(jpsi.px(), jpsi.py(), 0);
-	  AlgebraicVector3 vpperp(pperp.x(),pperp.y(),0);
+    vtx.SetXYZ(myVertex.position().x(),myVertex.position().y(),0);
+    TVector3 pperp(jpsi.px(), jpsi.py(), 0);
+    AlgebraicVector3 vpperp(pperp.x(),pperp.y(),0);
 
-	  if (resolveAmbiguity_) {
+    if (resolveAmbiguity_) {
 
-            float minDz = 999999.;
-	    TwoTrackMinimumDistance ttmd;
-	    bool status = ttmd.calculate( GlobalTrajectoryParameters(
-                                                                     GlobalPoint(myVertex.position().x(), myVertex.position().y(), myVertex.position().z()),
-                                                                     GlobalVector(myCand.px(),myCand.py(),myCand.pz()),TrackCharge(0),&(*magneticField)),
-					  GlobalTrajectoryParameters(
-								     GlobalPoint(bs.position().x(), bs.position().y(), bs.position().z()),
-								     GlobalVector(bs.dxdz(), bs.dydz(), 1.),TrackCharge(0),&(*magneticField)));
-	    float extrapZ=-9E20;
-	    if (status) extrapZ=ttmd.points().first.z();
+      float minDz = 999999.;
+      TwoTrackMinimumDistance ttmd;
+      bool status = ttmd.calculate( GlobalTrajectoryParameters(
+        GlobalPoint(myVertex.position().x(), myVertex.position().y(), myVertex.position().z()),
+        GlobalVector(myCand.px(),myCand.py(),myCand.pz()),TrackCharge(0),&(*magneticField)),
+        GlobalTrajectoryParameters(
+          GlobalPoint(bs.position().x(), bs.position().y(), bs.position().z()),
+          GlobalVector(bs.dxdz(), bs.dydz(), 1.),TrackCharge(0),&(*magneticField)));
+          float extrapZ=-9E20;
+          if (status) extrapZ=ttmd.points().first.z();
 
-	      for(VertexCollection::const_iterator itv = priVtxs->begin(), itvend = priVtxs->end(); itv != itvend; ++itv){
-		float deltaZ = fabs(extrapZ - itv->position().z()) ;
-		if ( deltaZ < minDz ) {
-		  minDz = deltaZ;
-		  thePrimaryV = Vertex(*itv);
-		}
-	      }
-	  }
+          for(VertexCollection::const_iterator itv = priVtxs->begin(), itvend = priVtxs->end(); itv != itvend; ++itv){
+            float deltaZ = fabs(extrapZ - itv->position().z()) ;
+            if ( deltaZ < minDz ) {
+              minDz = deltaZ;
+              thePrimaryV = Vertex(*itv);
+            }
+          }
+        }
 
-	  Vertex theOriginalPV = thePrimaryV;
+        Vertex theOriginalPV = thePrimaryV;
 
-	  muonLess.clear();
-	  muonLess.reserve(thePrimaryV.tracksSize());
-	  if( addMuonlessPrimaryVertex_  && thePrimaryV.tracksSize()>2) {
-	    // Primary vertex matched to the dimuon, now refit it removing the two muons
-	    OniaVtxReProducer revertex(priVtxs, iEvent);
-	    edm::Handle<reco::TrackCollection> pvtracks;
-	    iEvent.getByToken(revtxtrks_,   pvtracks);
- 	    if( !pvtracks.isValid()) { std::cout << "pvtracks NOT valid " << std::endl; }
- 	    else {
-	      edm::Handle<reco::BeamSpot> pvbeamspot;
-	      iEvent.getByToken(revtxbs_, pvbeamspot);
-	      if (pvbeamspot.id() != theBeamSpot.id()) edm::LogWarning("Inconsistency") << "The BeamSpot used for PV reco is not the same used in this analyzer.";
-	      // I need to go back to the reco::Muon object, as the TrackRef in the pat::Muon can be an embedded ref.
-	      const reco::Muon *rmu1 = dynamic_cast<const reco::Muon *>(it->originalObject());
-	      const reco::Muon *rmu2 = dynamic_cast<const reco::Muon *>(it2->originalObject());
-	      // check that muons are truly from reco::Muons (and not, e.g., from PF Muons)
-	      // also check that the tracks really come from the track collection used for the BS
-	      if (rmu1 != nullptr && rmu2 != nullptr && rmu1->track().id() == pvtracks.id() && rmu2->track().id() == pvtracks.id()) {
-		// Save the keys of the tracks in the primary vertex
-		// std::vector<size_t> vertexTracksKeys;
-		// vertexTracksKeys.reserve(thePrimaryV.tracksSize());
-		if( thePrimaryV.hasRefittedTracks() ) {
-		  // Need to go back to the original tracks before taking the key
-		  std::vector<reco::Track>::const_iterator itRefittedTrack = thePrimaryV.refittedTracks().begin();
-		  std::vector<reco::Track>::const_iterator refittedTracksEnd = thePrimaryV.refittedTracks().end();
-		  for( ; itRefittedTrack != refittedTracksEnd; ++itRefittedTrack ) {
-		    if( thePrimaryV.originalTrack(*itRefittedTrack).key() == rmu1->track().key() ) continue;
-		    if( thePrimaryV.originalTrack(*itRefittedTrack).key() == rmu2->track().key() ) continue;
-		    // vertexTracksKeys.push_back(thePrimaryV.originalTrack(*itRefittedTrack).key());
-		    muonLess.push_back(*(thePrimaryV.originalTrack(*itRefittedTrack)));
-		  }
-		}
-		else {
-		  std::vector<reco::TrackBaseRef>::const_iterator itPVtrack = thePrimaryV.tracks_begin();
-		  for( ; itPVtrack != thePrimaryV.tracks_end(); ++itPVtrack ) if (itPVtrack->isNonnull()) {
-		    if( itPVtrack->key() == rmu1->track().key() ) continue;
-		    if( itPVtrack->key() == rmu2->track().key() ) continue;
-		    // vertexTracksKeys.push_back(itPVtrack->key());
-		    muonLess.push_back(**itPVtrack);
-		  }
-		}
-		if (muonLess.size()>1 && muonLess.size() < thePrimaryV.tracksSize()){
-		  pvs = revertex.makeVertices(muonLess, *pvbeamspot, iSetup) ;
-		  if (!pvs.empty()) {
-		    Vertex muonLessPV = Vertex(pvs.front());
-		    thePrimaryV = muonLessPV;
-		  }
-		}
-	      }
- 	    }
-	  }
+        muonLess.clear();
+        muonLess.reserve(thePrimaryV.tracksSize());
+        if( addMuonlessPrimaryVertex_  && thePrimaryV.tracksSize()>2) {
+          // Primary vertex matched to the dimuon, now refit it removing the two muons
+          OniaVtxReProducer revertex(priVtxs, iEvent);
+          edm::Handle<reco::TrackCollection> pvtracks;
+          iEvent.getByToken(revtxtrks_,   pvtracks);
+          if( !pvtracks.isValid()) { std::cout << "pvtracks NOT valid " << std::endl; }
+          else {
+            edm::Handle<reco::BeamSpot> pvbeamspot;
+            iEvent.getByToken(revtxbs_, pvbeamspot);
+            if (pvbeamspot.id() != theBeamSpot.id()) edm::LogWarning("Inconsistency") << "The BeamSpot used for PV reco is not the same used in this analyzer.";
+            // I need to go back to the reco::Muon object, as the TrackRef in the pat::Muon can be an embedded ref.
+            const reco::Muon *rmu1 = dynamic_cast<const reco::Muon *>(it->originalObject());
+            const reco::Muon *rmu2 = dynamic_cast<const reco::Muon *>(it2->originalObject());
+            // check that muons are truly from reco::Muons (and not, e.g., from PF Muons)
+            // also check that the tracks really come from the track collection used for the BS
+            if (rmu1 != nullptr && rmu2 != nullptr && rmu1->track().id() == pvtracks.id() && rmu2->track().id() == pvtracks.id()) {
+              // Save the keys of the tracks in the primary vertex
+              // std::vector<size_t> vertexTracksKeys;
+              // vertexTracksKeys.reserve(thePrimaryV.tracksSize());
+              if( thePrimaryV.hasRefittedTracks() ) {
+                // Need to go back to the original tracks before taking the key
+                std::vector<reco::Track>::const_iterator itRefittedTrack = thePrimaryV.refittedTracks().begin();
+                std::vector<reco::Track>::const_iterator refittedTracksEnd = thePrimaryV.refittedTracks().end();
+                for( ; itRefittedTrack != refittedTracksEnd; ++itRefittedTrack ) {
+                  if( thePrimaryV.originalTrack(*itRefittedTrack).key() == rmu1->track().key() ) continue;
+                  if( thePrimaryV.originalTrack(*itRefittedTrack).key() == rmu2->track().key() ) continue;
+                  // vertexTracksKeys.push_back(thePrimaryV.originalTrack(*itRefittedTrack).key());
+                  muonLess.push_back(*(thePrimaryV.originalTrack(*itRefittedTrack)));
+                }
+              }
+              else {
+                std::vector<reco::TrackBaseRef>::const_iterator itPVtrack = thePrimaryV.tracks_begin();
+                for( ; itPVtrack != thePrimaryV.tracks_end(); ++itPVtrack ) if (itPVtrack->isNonnull()) {
+                  if( itPVtrack->key() == rmu1->track().key() ) continue;
+                  if( itPVtrack->key() == rmu2->track().key() ) continue;
+                  // vertexTracksKeys.push_back(itPVtrack->key());
+                  muonLess.push_back(**itPVtrack);
+                }
+              }
+              if (muonLess.size()>1 && muonLess.size() < thePrimaryV.tracksSize()){
+                pvs = revertex.makeVertices(muonLess, *pvbeamspot, iSetup) ;
+                if (!pvs.empty()) {
+                  Vertex muonLessPV = Vertex(pvs.front());
+                  thePrimaryV = muonLessPV;
+                }
+              }
+            }
+          }
+        }
 
-	  // count the number of high Purity tracks with pT > 900 MeV attached to the chosen vertex
-	  double vertexWeight = -1., sumPTPV = -1.;
-	  int countTksOfPV = -1;
-	  const reco::Muon *rmu1 = dynamic_cast<const reco::Muon *>(it->originalObject());
-	  const reco::Muon *rmu2 = dynamic_cast<const reco::Muon *>(it2->originalObject());
- 	  try{
-	    for(reco::Vertex::trackRef_iterator itVtx = theOriginalPV.tracks_begin(); itVtx != theOriginalPV.tracks_end(); itVtx++) if(itVtx->isNonnull()){
-	      const reco::Track& track = **itVtx;
-	      if(!track.quality(reco::TrackBase::highPurity)) continue;
-	      if(track.pt() < 0.5) continue; //reject all rejects from counting if less than 900 MeV
-	      TransientTrack tt = theTTBuilder->build(track);
-	      pair<bool,Measurement1D> tkPVdist = IPTools::absoluteImpactParameter3D(tt,thePrimaryV);
-	      if (!tkPVdist.first) continue;
-	      if (tkPVdist.second.significance()>3) continue;
-	      if (track.ptError()/track.pt()>0.1) continue;
-	      // do not count the two muons
-	      if (rmu1 != nullptr && rmu1->innerTrack().key() == itVtx->key())
-		continue;
-	      if (rmu2 != nullptr && rmu2->innerTrack().key() == itVtx->key())
-		continue;
+        // count the number of high Purity tracks with pT > 900 MeV attached to the chosen vertex
+        double vertexWeight = -1., sumPTPV = -1.;
+        int countTksOfPV = -1;
+        const reco::Muon *rmu1 = dynamic_cast<const reco::Muon *>(it->originalObject());
+        const reco::Muon *rmu2 = dynamic_cast<const reco::Muon *>(it2->originalObject());
+        try{
+          for(reco::Vertex::trackRef_iterator itVtx = theOriginalPV.tracks_begin(); itVtx != theOriginalPV.tracks_end(); itVtx++) if(itVtx->isNonnull()){
+            const reco::Track& track = **itVtx;
+            if(!track.quality(reco::TrackBase::highPurity)) continue;
+            if(track.pt() < 0.5) continue; //reject all rejects from counting if less than 900 MeV
+            TransientTrack tt = theTTBuilder->build(track);
+            pair<bool,Measurement1D> tkPVdist = IPTools::absoluteImpactParameter3D(tt,thePrimaryV);
+            if (!tkPVdist.first) continue;
+            if (tkPVdist.second.significance()>3) continue;
+            if (track.ptError()/track.pt()>0.1) continue;
+            // do not count the two muons
+            if (rmu1 != nullptr && rmu1->innerTrack().key() == itVtx->key())
+            continue;
+            if (rmu2 != nullptr && rmu2->innerTrack().key() == itVtx->key())
+            continue;
 
-	      vertexWeight += theOriginalPV.trackWeight(*itVtx);
-	      if(theOriginalPV.trackWeight(*itVtx) > 0.5){
-		countTksOfPV++;
-		sumPTPV += track.pt();
-	      }
-	    }
- 	  } catch (std::exception & err) {std::cout << " muon Selection%G�%@failed " << std::endl; return ; }
+            vertexWeight += theOriginalPV.trackWeight(*itVtx);
+            if(theOriginalPV.trackWeight(*itVtx) > 0.5){
+              countTksOfPV++;
+              sumPTPV += track.pt();
+            }
+          }
+        } catch (std::exception & err) {std::cout << " muon Selection%G�%@failed " << std::endl; return ; }
 
-	  myCand.addUserInt("countTksOfPV", countTksOfPV);
-	  myCand.addUserFloat("vertexWeight", (float) vertexWeight);
-	  myCand.addUserFloat("sumPTPV", (float) sumPTPV);
+        myCand.addUserInt("countTksOfPV", countTksOfPV);
+        myCand.addUserFloat("vertexWeight", (float) vertexWeight);
+        myCand.addUserFloat("sumPTPV", (float) sumPTPV);
 
-	  ///DCA
-	  TrajectoryStateClosestToPoint mu1TS = t_tks[0].impactPointTSCP();
-	  TrajectoryStateClosestToPoint mu2TS = t_tks[1].impactPointTSCP();
-	  float dca = 1E20;
-	  if (mu1TS.isValid() && mu2TS.isValid()) {
-	    ClosestApproachInRPhi cApp;
-	    cApp.calculate(mu1TS.theState(), mu2TS.theState());
-	    if (cApp.status() ) dca = cApp.distance();
-	  }
-	  myCand.addUserFloat("DCA", dca );
-	  ///end DCA
+        ///DCA
+        TrajectoryStateClosestToPoint mu1TS = t_tks[0].impactPointTSCP();
+        TrajectoryStateClosestToPoint mu2TS = t_tks[1].impactPointTSCP();
+        float dca = 1E20;
+        if (mu1TS.isValid() && mu2TS.isValid()) {
+          ClosestApproachInRPhi cApp;
+          cApp.calculate(mu1TS.theState(), mu2TS.theState());
+          if (cApp.status() ) dca = cApp.distance();
+        }
+        myCand.addUserFloat("DCA", dca );
+        ///end DCA
 
-	  if (addMuonlessPrimaryVertex_)
-	    myCand.addUserData("muonlessPV",Vertex(thePrimaryV));
-	  else
-	    myCand.addUserData("PVwithmuons",thePrimaryV);
+        if (addMuonlessPrimaryVertex_)
+        myCand.addUserData("muonlessPV",Vertex(thePrimaryV));
+        else
+        myCand.addUserData("PVwithmuons",thePrimaryV);
 
-	  // lifetime using PV
-          pvtx.SetXYZ(thePrimaryV.position().x(),thePrimaryV.position().y(),0);
-	  TVector3 vdiff = vtx - pvtx;
-	  double cosAlpha = vdiff.Dot(pperp)/(vdiff.Perp()*pperp.Perp());
-	  Measurement1D distXY = vdistXY.distance(Vertex(myVertex), thePrimaryV);
-	  //double ctauPV = distXY.value()*cosAlpha*3.09688/pperp.Perp();
-	  double ctauPV = distXY.value()*cosAlpha * myCand.mass()/pperp.Perp();
-	  GlobalError v1e = (Vertex(myVertex)).error();
-	  GlobalError v2e = thePrimaryV.error();
-          AlgebraicSymMatrix33 vXYe = v1e.matrix()+ v2e.matrix();
-	  //double ctauErrPV = sqrt(vXYe.similarity(vpperp))*3.09688/(pperp.Perp2());
-	  double ctauErrPV = sqrt(ROOT::Math::Similarity(vpperp,vXYe))*myCand.mass()/(pperp.Perp2());
+        // lifetime using PV
+        pvtx.SetXYZ(thePrimaryV.position().x(),thePrimaryV.position().y(),0);
+        TVector3 vdiff = vtx - pvtx;
+        double cosAlpha = vdiff.Dot(pperp)/(vdiff.Perp()*pperp.Perp());
+        Measurement1D distXY = vdistXY.distance(Vertex(myVertex), thePrimaryV);
+        //double ctauPV = distXY.value()*cosAlpha*3.09688/pperp.Perp();
+        double ctauPV = distXY.value()*cosAlpha * myCand.mass()/pperp.Perp();
+        GlobalError v1e = (Vertex(myVertex)).error();
+        GlobalError v2e = thePrimaryV.error();
+        AlgebraicSymMatrix33 vXYe = v1e.matrix()+ v2e.matrix();
+        //double ctauErrPV = sqrt(vXYe.similarity(vpperp))*3.09688/(pperp.Perp2());
+        double ctauErrPV = sqrt(ROOT::Math::Similarity(vpperp,vXYe))*myCand.mass()/(pperp.Perp2());
 
-	  myCand.addUserFloat("ppdlPV",ctauPV);
-          myCand.addUserFloat("ppdlErrPV",ctauErrPV);
-	  myCand.addUserFloat("cosAlpha",cosAlpha);
+        myCand.addUserFloat("ppdlPV",ctauPV);
+        myCand.addUserFloat("ppdlErrPV",ctauErrPV);
+        myCand.addUserFloat("cosAlpha",cosAlpha);
 
-	  // lifetime using BS
-          pvtx.SetXYZ(theBeamSpotV.position().x(),theBeamSpotV.position().y(),0);
-	  vdiff = vtx - pvtx;
-	  cosAlpha = vdiff.Dot(pperp)/(vdiff.Perp()*pperp.Perp());
-	  distXY = vdistXY.distance(Vertex(myVertex), theBeamSpotV);
-	  //double ctauBS = distXY.value()*cosAlpha*3.09688/pperp.Perp();
-	  double ctauBS = distXY.value()*cosAlpha*myCand.mass()/pperp.Perp();
-	  GlobalError v1eB = (Vertex(myVertex)).error();
-	  GlobalError v2eB = theBeamSpotV.error();
-          AlgebraicSymMatrix33 vXYeB = v1eB.matrix()+ v2eB.matrix();
-	  //double ctauErrBS = sqrt(vXYeB.similarity(vpperp))*3.09688/(pperp.Perp2());
-	  double ctauErrBS = sqrt(ROOT::Math::Similarity(vpperp,vXYeB))*myCand.mass()/(pperp.Perp2());
+        // lifetime using BS
+        pvtx.SetXYZ(theBeamSpotV.position().x(),theBeamSpotV.position().y(),0);
+        vdiff = vtx - pvtx;
+        cosAlpha = vdiff.Dot(pperp)/(vdiff.Perp()*pperp.Perp());
+        distXY = vdistXY.distance(Vertex(myVertex), theBeamSpotV);
+        //double ctauBS = distXY.value()*cosAlpha*3.09688/pperp.Perp();
+        double ctauBS = distXY.value()*cosAlpha*myCand.mass()/pperp.Perp();
+        GlobalError v1eB = (Vertex(myVertex)).error();
+        GlobalError v2eB = theBeamSpotV.error();
+        AlgebraicSymMatrix33 vXYeB = v1eB.matrix()+ v2eB.matrix();
+        //double ctauErrBS = sqrt(vXYeB.similarity(vpperp))*3.09688/(pperp.Perp2());
+        double ctauErrBS = sqrt(ROOT::Math::Similarity(vpperp,vXYeB))*myCand.mass()/(pperp.Perp2());
 
-	  myCand.addUserFloat("ppdlBS",ctauBS);
-          myCand.addUserFloat("ppdlErrBS",ctauErrBS);
+        myCand.addUserFloat("ppdlBS",ctauBS);
+        myCand.addUserFloat("ppdlErrBS",ctauErrBS);
 
-	  if (addCommonVertex_) {
-	    myCand.addUserData("commonVertex",Vertex(myVertex));
-	  }
-	} else {
-	  myCand.addUserFloat("vNChi2",-1);
-	  myCand.addUserFloat("vProb", -1);
-	  myCand.addUserFloat("ppdlPV",-100);
-          myCand.addUserFloat("ppdlErrPV",-100);
-	  myCand.addUserFloat("cosAlpha",-100);
-	  myCand.addUserFloat("ppdlBS",-100);
-          myCand.addUserFloat("ppdlErrBS",-100);
-          myCand.addUserFloat("DCA", -1 );
-	  if (addCommonVertex_) {
-	    myCand.addUserData("commonVertex",Vertex());
-	  }
-	  if (addMuonlessPrimaryVertex_) {
-            myCand.addUserData("muonlessPV",Vertex());
-	  } else {
-	    myCand.addUserData("PVwithmuons",Vertex());
-	  }
-	}
+        if (addCommonVertex_) {
+          myCand.addUserData("commonVertex",Vertex(myVertex));
+        }
+      } else {
+        myCand.addUserFloat("vNChi2",-1);
+        myCand.addUserFloat("vProb", -1);
+        myCand.addUserFloat("ppdlPV",-100);
+        myCand.addUserFloat("ppdlErrPV",-100);
+        myCand.addUserFloat("cosAlpha",-100);
+        myCand.addUserFloat("ppdlBS",-100);
+        myCand.addUserFloat("ppdlErrBS",-100);
+        myCand.addUserFloat("DCA", -1 );
+        if (addCommonVertex_) {
+          myCand.addUserData("commonVertex",Vertex());
+        }
+        if (addMuonlessPrimaryVertex_) {
+          myCand.addUserData("muonlessPV",Vertex());
+        } else {
+          myCand.addUserData("PVwithmuons",Vertex());
+        }
       }
+    }
 
-      // ---- MC Truth, if enabled ----
-      if (addMCTruth_) {
-	reco::GenParticleRef genMu1 = it->genParticleRef();
-	reco::GenParticleRef genMu2 = it2->genParticleRef();
-	if (genMu1.isNonnull() && genMu2.isNonnull()) {
-	  if (genMu1->numberOfMothers()>0 && genMu2->numberOfMothers()>0){
-	    reco::GenParticleRef mom1 = genMu1->motherRef();
-	    reco::GenParticleRef mom2 = genMu2->motherRef();
-	    if (mom1.isNonnull() && (mom1 == mom2)) {
-	      myCand.setGenParticleRef(mom1); // set
-	      myCand.embedGenParticle();      // and embed
-	      std::pair<int, float> MCinfo = findJpsiMCInfo(mom1);
-	      myCand.addUserInt("momPDGId",MCinfo.first);
-	      myCand.addUserFloat("ppdlTrue",MCinfo.second);
-	    } else {
-	      myCand.addUserInt("momPDGId",0);
-	      myCand.addUserFloat("ppdlTrue",-99.);
-	    }
-	  } else {
-	    edm::Handle<reco::GenParticleCollection> theGenParticles;
-            edm::EDGetTokenT<reco::GenParticleCollection> genCands_ = consumes<reco::GenParticleCollection>((edm::InputTag)"genParticles");
-	    iEvent.getByToken(genCands_, theGenParticles);
-	    if (theGenParticles.isValid()){
-	      for(size_t iGenParticle=0; iGenParticle<theGenParticles->size();++iGenParticle) {
-		const Candidate & genCand = (*theGenParticles)[iGenParticle];
-		if (genCand.pdgId()==443 || genCand.pdgId()==100443 ||
-		    genCand.pdgId()==553 || genCand.pdgId()==100553 || genCand.pdgId()==200553) {
-		  reco::GenParticleRef mom1(theGenParticles,iGenParticle);
-		  myCand.setGenParticleRef(mom1);
-		  myCand.embedGenParticle();
-		  std::pair<int, float> MCinfo = findJpsiMCInfo(mom1);
-		  myCand.addUserInt("momPDGId",MCinfo.first);
-		  myCand.addUserFloat("ppdlTrue",MCinfo.second);
-		}
-	      }
-	    } else {
-	      myCand.addUserInt("momPDGId",0);
-	      myCand.addUserFloat("ppdlTrue",-99.);
-	    }
-	  }
-	} else {
-	  myCand.addUserInt("momPDGId",0);
-	  myCand.addUserFloat("ppdlTrue",-99.);
-	}
+
+
+    // ---- MC Truth, if enabled ----
+    if (addMCTruth_) {
+      reco::GenParticleRef genMu1 = it->genParticleRef();
+      reco::GenParticleRef genMu2 = it2->genParticleRef();
+      if (genMu1.isNonnull() && genMu2.isNonnull()) {
+        if (genMu1->numberOfMothers()>0 && genMu2->numberOfMothers()>0){
+          reco::GenParticleRef mom1 = genMu1->motherRef();
+          reco::GenParticleRef mom2 = genMu2->motherRef();
+          if (mom1.isNonnull() && (mom1 == mom2)) {
+            myCand.setGenParticleRef(mom1); // set
+            myCand.embedGenParticle();      // and embed
+            std::pair<int, float> MCinfo = findJpsiMCInfo(mom1);
+            myCand.addUserInt("momPDGId",MCinfo.first);
+            myCand.addUserFloat("ppdlTrue",MCinfo.second);
+          } else {
+            myCand.addUserInt("momPDGId",0);
+            myCand.addUserFloat("ppdlTrue",-99.);
+          }
+        } else {
+          edm::Handle<reco::GenParticleCollection> theGenParticles;
+          edm::EDGetTokenT<reco::GenParticleCollection> genCands_ = consumes<reco::GenParticleCollection>((edm::InputTag)"genParticles");
+          iEvent.getByToken(genCands_, theGenParticles);
+          if (theGenParticles.isValid()){
+            for(size_t iGenParticle=0; iGenParticle<theGenParticles->size();++iGenParticle) {
+              const Candidate & genCand = (*theGenParticles)[iGenParticle];
+              if (genCand.pdgId()==443 || genCand.pdgId()==100443 ||
+              genCand.pdgId()==553 || genCand.pdgId()==100553 || genCand.pdgId()==200553) {
+                reco::GenParticleRef mom1(theGenParticles,iGenParticle);
+                myCand.setGenParticleRef(mom1);
+                myCand.embedGenParticle();
+                std::pair<int, float> MCinfo = findJpsiMCInfo(mom1);
+                myCand.addUserInt("momPDGId",MCinfo.first);
+                myCand.addUserFloat("ppdlTrue",MCinfo.second);
+              }
+            }
+          } else {
+            myCand.addUserInt("momPDGId",0);
+            myCand.addUserFloat("ppdlTrue",-99.);
+          }
+        }
+      } else {
+        myCand.addUserInt("momPDGId",0);
+        myCand.addUserFloat("ppdlTrue",-99.);
       }
+    }
 
 
 

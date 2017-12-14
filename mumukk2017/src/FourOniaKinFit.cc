@@ -89,7 +89,7 @@ FourOniaKinFit::FourOniaKinFit(const edm::ParameterSet& iConfig) {
 
 // ------------ method called to produce the data  ------------
 void FourOniaKinFit::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
-
+  std::cout<<"FourOniaKinFit inside"<<std::endl;
   // Grab paramenters
   edm::Handle<pat::CompositeCandidateCollection> xCandHandle;
   iEvent.getByToken(x_Label, xCandHandle);

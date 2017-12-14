@@ -49,11 +49,13 @@ UInt_t DiMuonFilter::isTriggerMatched(const pat::CompositeCandidate *diMuon_cand
      const pat::TriggerObjectStandAloneCollection mu2HLTMatches = muon2->triggerObjectMatchesByFilter(HLTFilters_[iTr]);
      if (!mu1HLTMatches.empty() && !mu2HLTMatches.empty()) matched += (1<<iTr);
   }
+  std::cout << "Triggers matched : " << matched << std::endl;
   return matched;
 }
 
 // ------------ method called to produce the data  ------------
 void DiMuonFilter::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
+  std::cout<<"DiMuon Filter"<<std::endl;
   std::unique_ptr<pat::CompositeCandidateCollection> mumuOutput(new pat::CompositeCandidateCollection);
   edm::Handle<pat::CompositeCandidateCollection> onias_;
   iEvent.getByToken(theOnias_, onias_);

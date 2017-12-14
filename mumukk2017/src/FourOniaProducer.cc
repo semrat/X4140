@@ -17,6 +17,9 @@ triggerMatch_(ps.getParameter<bool>("triggerMatch"))
 
 
 void FourOniaProducer::produce(edm::Event& event, const edm::EventSetup& esetup){
+
+  std::cout<<"FourOniaProducer inside"<<std::endl;
+
   std::unique_ptr<pat::CompositeCandidateCollection> xCandColl(new pat::CompositeCandidateCollection);
 
   edm::Handle<pat::CompositeCandidateCollection> dimuonsPhi;
