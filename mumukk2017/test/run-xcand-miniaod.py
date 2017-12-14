@@ -128,12 +128,11 @@ process.xCandSequence = cms.Sequence(
                    process.DiMuonCounterJPsi *
                    process.xProducer *
                    process.xFitter
-
 				   )
 
 process.rootuple = cms.EDAnalyzer('x4MuRootupler',
                           #chi_cand = cms.InputTag("chiProducer"),
-			              x_cand = cms.InputTag("Onia2MuMuMuMu"),
+			              x_cand = cms.InputTag("xProducer"),
                           xrefit = cms.InputTag("xFitter","xCand"),
 			              # refit2S  = cms.InputTag("chiFitter2S","y2S"),
 			              # refit3S  = cms.InputTag("chiFitter3S","y3S"),
