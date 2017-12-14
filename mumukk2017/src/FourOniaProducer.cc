@@ -26,7 +26,7 @@ void FourOniaProducer::produce(edm::Event& event, const edm::EventSetup& esetup)
   event.getByToken(jpsi_dimuon_Label,dimuonsJPsi);
 
   std::cout << "JPsis size: " << dimuonsJPsi.product()->size() << std::endl;
-  std::cout << "JPsis size: " << dimuonsPhi.product()->size() << std::endl;
+  std::cout << "Phis size: " << dimuonsPhi.product()->size() << std::endl;
   // Note: since Dimuon cand are sorted by decreasing vertex probability then the first chi cand is the one associated with the "best" dimuon
   for (pat::CompositeCandidateCollection::const_iterator  phiCand = dimuonsPhi->begin(); phiCand!= dimuonsPhi->end(); ++phiCand){
 

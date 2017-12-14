@@ -91,8 +91,8 @@ process.DiMuonCounterPhi = cms.EDFilter('CandViewCountFilter',
 )
 
 process.xProducer = cms.EDProducer('FourOniaProducer',
-    phidimuons          = cms.InputTag("Onia2MuMuFiltered"),
-    jpsidimuons         = cms.InputTag("Onia2MuMuFiltered"),
+    phidimuons          = cms.InputTag("Onia2MuMuFilteredPhi"),
+    jpsidimuons         = cms.InputTag("Onia2MuMuFilteredJpsi"),
     pi0OnlineSwitch     = cms.bool(False),
     dzmax               = cms.double(0.5),
     triggerMatch        = cms.bool(False),
