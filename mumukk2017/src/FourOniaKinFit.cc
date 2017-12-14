@@ -110,8 +110,8 @@ void FourOniaKinFit::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) 
     reco::TrackRef theTracks[4]={
       ( dynamic_cast<const pat::Muon*>(xCand->daughter("phi")->daughter("muon1") ) )->innerTrack(),
       ( dynamic_cast<const pat::Muon*>(xCand->daughter("phi")->daughter("muon2") ) )->innerTrack(),
-      ( dynamic_cast<const pat::Muon*>(xCand->daughter("jpsi")->daughter("muon3") ) )->innerTrack(),
-      ( dynamic_cast<const pat::Muon*>(xCand->daughter("jpsi")->daughter("muon4") ) )->innerTrack()
+      ( dynamic_cast<const pat::Muon*>(xCand->daughter("jpsi")->daughter("muon1") ) )->innerTrack(),
+      ( dynamic_cast<const pat::Muon*>(xCand->daughter("jpsi")->daughter("muon2") ) )->innerTrack()
     };
 
 
