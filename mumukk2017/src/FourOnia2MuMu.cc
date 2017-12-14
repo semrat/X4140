@@ -399,7 +399,7 @@ FourOnia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   }
 
   std::sort(oniaOutput->begin(),oniaOutput->end(),vPComparator_);
-
+  std::cout << "MuMu candidates count : " << oniaOutput->size() << std::endl;
   iEvent.put(std::move(oniaOutput));
 
 }
