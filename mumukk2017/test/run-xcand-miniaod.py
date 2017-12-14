@@ -65,7 +65,7 @@ process.Onia2MuMuFilteredJpsi = cms.EDProducer('DiMuonFilter',
       OniaTag             = cms.InputTag("FourOnia2MuMuJPsi"),
       singlemuonSelection = cms.string(""),
       dimuonSelection     = cms.string("2.95 < mass && mass < 3.15 && pt > 10. && abs(y) < 2.5 && charge==0 && userFloat('vProb') > 0.01"),
-      do_trigger_match    = cms.bool(True),
+      do_trigger_match    = cms.bool(False),
       HLTFilters          = cms.vstring('hltJpsiTkTkVertexFilterPhiDoubleTrk1v2'),
 )
 
@@ -73,7 +73,7 @@ process.Onia2MuMuFilteredPhi = cms.EDProducer('DiMuonFilter',
       OniaTag             = cms.InputTag("FourOnia2MuMuPhi"),
       singlemuonSelection = cms.string(""),
       dimuonSelection     = cms.string("0.92 < mass && mass < 1.12 && pt > 10. && abs(y) < 2.5 && charge==0 && userFloat('vProb') > 0.01"),
-      do_trigger_match    = cms.bool(True),
+      do_trigger_match    = cms.bool(False),
       HLTFilters          = cms.vstring('hltJpsiTkTkVertexFilterPhiDoubleTrk1v2'),
 
 )
@@ -94,7 +94,7 @@ process.xProducer = cms.EDProducer('FourOniaProducer',
     phidimuons          = cms.InputTag("Onia2MuMuFilteredPhi"),
     jpsidimuons         = cms.InputTag("Onia2MuMuFilteredJpsi"),
     pi0OnlineSwitch     = cms.bool(False),
-    dzmax               = cms.double(0.5),
+    dzmax               = cms.double(20.0),
     triggerMatch        = cms.bool(False),
     deltaMass           = cms.vdouble(0.0,2.0)  # trigger match is performed in Onia2MuMuFiltered
 )
