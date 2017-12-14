@@ -1,7 +1,7 @@
 import sys
 import os
 
-jsonFile="'Cert_190456-208686_8TeV_22Jan2013ReReco_Collisions12_JSON_MuonPhys.txt'"
+jsonFile="Cert_294927-306462_13TeV_PromptReco_Collisions17_JSON_MuonPhys.txt"
 run = "F"
 
 from WMCore.Configuration import Configuration
