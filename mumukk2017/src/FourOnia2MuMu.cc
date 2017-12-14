@@ -121,13 +121,13 @@ FourOnia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
       myCand.addDaughter(*it2,"muon2");
 
       // ---- define and set candidate's 4momentum  ----
-      LorentzVector jpsi = it->p4() + it2->p4();
-      myCand.setP4(jpsi);
+      LorentzVector mumu = it->p4() + it2->p4();
+      myCand.setP4(mumu);
       myCand.setCharge(it->charge()+it2->charge());
 
       // ---- apply the dimuon cut ----
-      std::cout << "Dimuon mass : " << jpsi.M() << std::endl;
-      if(!dimuonSelection_(myCand)) continue;
+      std::cout << "Dimuon mass : " << mumu.M() << std::endl;
+      if(!dimuonSelection(mumu)) continue;
       std::cout << "Dimuon selection passed !" << std::endl;
       // ---- fit vertex using Tracker tracks (if they have tracks) ----
       if (it->track().isNonnull() && it2->track().isNonnull()) {
@@ -140,7 +140,7 @@ FourOnia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 	CachingVertex<5> VtxForInvMass = vtxFitter.vertex( t_tks );
 
-        Measurement1D MassWErr(jpsi.M(),-9999.);
+        Measurement1D MassWErr(mumu.M(),-9999.);
         if ( field->nominalValue() > 0 ) {
           MassWErr = massCalculator.invariantMass( VtxForInvMass, muMasses );
         } else {
@@ -162,7 +162,7 @@ FourOnia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
           VertexDistanceXY vdistXY;
 
 	  vtx.SetXYZ(myVertex.position().x(),myVertex.position().y(),0);
-	  TVector3 pperp(jpsi.px(), jpsi.py(), 0);
+	  TVector3 pperp(mumu.px(), mumu.py(), 0);
 	  AlgebraicVector3 vpperp(pperp.x(),pperp.y(),0);
 
 	  if (resolveAmbiguity_) {
@@ -425,6 +425,8 @@ FourOnia2MuMuPAT::isAMixedbHadron(int pdgID, int momPdgID) {
   return false;
 
 }
+
+// bool FourOnia2MuMuPAT::dimuonSelection() {}
 
 std::pair<int, float>
 FourOnia2MuMuPAT::findJpsiMCInfo(reco::GenParticleRef genJpsi) {
