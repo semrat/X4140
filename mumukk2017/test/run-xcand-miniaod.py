@@ -78,17 +78,17 @@ process.Onia2MuMuFilteredPhi = cms.EDProducer('DiMuonFilter',
 
 )
 
-# process.DiMuonCounterJPsi = cms.EDFilter('CandViewCountFilter',
-#     src       = cms.InputTag("Onia2MuMuFilteredJpsi"),
-#     minNumber = cms.uint32(1),
-#     filter    = cms.bool(True)
-# )
-#
-# process.DiMuonCounterPhi = cms.EDFilter('CandViewCountFilter',
-#     src       = cms.InputTag("Onia2MuMuFilteredPhi"),
-#     minNumber = cms.uint32(1),
-#     filter    = cms.bool(True)
-# )
+process.DiMuonCounterJPsi = cms.EDFilter('CandViewCountFilter',
+    src       = cms.InputTag("Onia2MuMuFilteredJpsi"),
+    minNumber = cms.uint32(1),
+    filter    = cms.bool(True)
+)
+
+process.DiMuonCounterPhi = cms.EDFilter('CandViewCountFilter',
+    src       = cms.InputTag("Onia2MuMuFilteredPhi"),
+    minNumber = cms.uint32(1),
+    filter    = cms.bool(True)
+)
 
 process.xProducer = cms.EDProducer('FourOniaProducer',
     phidimuons          = cms.InputTag("Onia2MuMuFiltered"),
@@ -121,8 +121,10 @@ process.xCandSequence = cms.Sequence(
                    process.slimmedMuonsWithTriggerSequence *
 				   process.oniaSelectedMuons *
                    process.FourOnia2MuMuPhi *
+                   process.Onia2MuMuFilteredPhi *
                    process.DiMuonCounterPhi *
 				   process.FourOnia2MuMuJPsi *
+                   process.Onia2MuMuFilteredJpsi *
                    process.DiMuonCounterJPsi *
                    process.xProducer *
                    process.xFitter
