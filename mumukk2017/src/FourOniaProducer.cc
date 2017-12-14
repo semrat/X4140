@@ -25,6 +25,8 @@ void FourOniaProducer::produce(edm::Event& event, const edm::EventSetup& esetup)
   edm::Handle<pat::CompositeCandidateCollection> dimuonsJPsi;
   event.getByToken(jpsi_dimuon_Label,dimuonsJPsi);
 
+  std::cout << "JPsis size: " << dimuonsJPsi.size() << std::endl;
+  std::cout << "JPsis size: " << dimuonsPhi.size() << std::endl;
   // Note: since Dimuon cand are sorted by decreasing vertex probability then the first chi cand is the one associated with the "best" dimuon
   for (pat::CompositeCandidateCollection::const_iterator  phiCand = dimuonsPhi->begin(); phiCand!= dimuonsPhi->end(); ++phiCand){
 
@@ -32,16 +34,16 @@ void FourOniaProducer::produce(edm::Event& event, const edm::EventSetup& esetup)
     if (triggerMatch_)
     if (!phiCand->userInt("isTriggerMatched"))
     continue;
-
+    std::cout << "Phi muons trigger matched" << std::endl;
     for (pat::CompositeCandidateCollection::const_iterator  jpsiCand = dimuonsJPsi->begin(); jpsiCand!= dimuonsJPsi->end(); ++jpsiCand){
 
       if (triggerMatch_)
       if (!jpsiCand->userInt("isTriggerMatched"))
       continue;
-
+      std::cout << "Jps muons trigger matched" << std::endl;
       if(isOverlappedMuons(&(*phiCand),&(*jpsiCand)))
       continue;
-
+      std::cout << "Not overlapping 4 muons" << std::endl;
       pat::CompositeCandidate xCand = makeCandidate(*phiCand, *jpsiCand);
 
       const reco::Vertex *ipv = phiCand->userData<reco::Vertex>("commonVertex");
@@ -52,11 +54,11 @@ void FourOniaProducer::produce(edm::Event& event, const edm::EventSetup& esetup)
         dz_phi_cut_fail++;
         continue;
       }
-
+      std::cout << "Phi dz cut passed" << std::endl;
       ipv = jpsiCand->userData<reco::Vertex>("commonVertex");
       float dzJpsi = fabs(Getdz(*jpsiCand,ipv->position()));              // onia2mumu stores vertex as userData
       xCand.addUserFloat("dzJpsi",dzJpsi);
-
+      std::cout << "Jps dz cut passed" << std::endl;
       if (!cutdz(dzJpsi)){
         dz_jps_cut_fail++;
         continue;
