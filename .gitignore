@@ -8,8 +8,6 @@
 
 *.root
 
-*.txt
-
 *.png
 
 *.pdf
@@ -18,4 +16,3 @@
 *.eps_tmp_44041
 
 *.pyc
-
