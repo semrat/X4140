@@ -64,6 +64,7 @@ void DiMuonFilter::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     const pat::CompositeCandidate *ionia = nullptr;
     for (size_t ii = 0, nn=onias_->size(); ii < nn; ii++ ) {
        ionia = &(onias_->at(ii));
+       std::cout<<"Valid Onias Filter"<<std::endl;
        if (ionia && DiMuonSelection_(*ionia) &&
            SingleMuonSelection_(*ionia->daughter("muon1")) &&
            SingleMuonSelection_(*ionia->daughter("muon2")) &&
