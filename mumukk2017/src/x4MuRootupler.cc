@@ -73,6 +73,8 @@ class x4MuRootupler:public edm::EDAnalyzer {
 	Double_t ctpv_error;
 	Double_t conv_vertex;
 	Double_t dz;
+  Double_t dz_jpsi;
+  Double_t dz_phi;
 
 	UInt_t photon_flags;
 	UInt_t numPrimaryVertices;
@@ -145,6 +147,9 @@ isMC_(iConfig.getParameter < bool > ("isMC"))
     x_tree->Branch("numPrimaryVertices", &numPrimaryVertices, "numPrimaryVertices/i");
 
     x_tree->Branch("dz",           &dz,           "dz/D");
+    x_tree->Branch("dzjpsi",           &dz_jpsi,           "dz_jpsi/D");
+    x_tree->Branch("dzphi",           &dz_phi,           "dz_phi/D");
+
 
     x_tree->Branch("xVertex",  "Point", &xVertex);
     x_tree->Branch("jpsVertex",  "Point", &jpsVertex);
@@ -316,8 +321,11 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
 
         xVertex  = x_.vertex();
         phiVertex = x_.daughter("phi")->vertex();
-        jpsVertex = x_.daughter("jps")->vertex();
-        dz = x_.userFloat("dz");
+        jpsVertex = x_.daughter("jpsi")->vertex();
+
+        dz = Getdz(x_,xVertex);
+        dz_jpsi = x_.userFloat("dzJpsi");
+        dz_phi = x_.userFloat("dzPhi");
 
         std::cout<<"Cycling on ups"<<std::endl;
         x_p4.SetPtEtaPhiM(x_.pt(), x_.eta(), x_.phi(), x_.mass());
@@ -335,6 +343,16 @@ void x4MuRootupler::fillDescriptions(edm::ConfigurationDescriptions & descriptio
 	edm::ParameterSetDescription desc;
 	desc.setUnknown();
 	descriptions.addDefault(desc);
+}
+
+float x4MuRootupler::Getdz(const pat::CompositeCandidate& c, const reco::Candidate::Point &p) {
+
+  const reco::Candidate::LorentzVector& mom = c.p4();
+  const reco::Candidate::Point& vtx = c.vertex();
+
+  double dz = (vtx.Z()-p.Z()) - ((vtx.X()-p.X())*mom.X()+(vtx.Y()-p.Y())*mom.Y())/mom.Rho() * mom.Z()/mom.Rho();
+  return (float) dz;
+
 }
 
 //define this as a plug-in
