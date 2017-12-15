@@ -72,7 +72,7 @@ class x4MuRootupler:public edm::EDAnalyzer {
 	Double_t ctpv;
 	Double_t ctpv_error;
 	Double_t conv_vertex;
-	Double_t dz;
+	// Double_t dz;
   Double_t dz_jpsi;
   Double_t dz_phi;
 
@@ -102,21 +102,6 @@ class x4MuRootupler:public edm::EDAnalyzer {
   UInt_t x_rank;
 
 };
-
-static const double pi0_mass =  0.134977;
-static const double y1SMass  =  3.0969;
-
-/*
-// 2011 par
-static const double Y_sig_par_A = 0.058;
-static const double Y_sig_par_B = 0.047;
-static const double Y_sig_par_C = 0.22;
-*/
-
-// 2012 par
-static const double Y_sig_par_A = 62.62;
-static const double Y_sig_par_B = 56.3;
-static const double Y_sig_par_C = -20.77;
 
 float x4MuRootupler::Getdz(const pat::CompositeCandidate& c, const reco::Candidate::Point &p) {
 
@@ -156,7 +141,7 @@ isMC_(iConfig.getParameter < bool > ("isMC"))
 
     x_tree->Branch("numPrimaryVertices", &numPrimaryVertices, "numPrimaryVertices/i");
 
-    x_tree->Branch("dz",           &dz,           "dz/D");
+    // x_tree->Branch("dz",           &dz,           "dz/D");
     x_tree->Branch("dzjpsi",           &dz_jpsi,           "dz_jpsi/D");
     x_tree->Branch("dzphi",           &dz_phi,           "dz_phi/D");
 
@@ -333,7 +318,7 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
         phiVertex = x_.daughter("phi")->vertex();
         jpsVertex = x_.daughter("jpsi")->vertex();
 
-        dz = fabs(Getdz(x_,xVertex));
+        // dz = fabs(Getdz(x_,xVertex));
         dz_jpsi = x_.userFloat("dzJpsi");
         dz_phi = x_.userFloat("dzPhi");
 
