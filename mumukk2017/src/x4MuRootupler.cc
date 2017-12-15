@@ -17,7 +17,7 @@
 #include "DataFormats/Candidate/interface/Candidate.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 #include <DataFormats/PatCandidates/interface/UserData.h>
-#include "DataFormats/GeometryVector/interface/Point.h"
+#include "DataFormats/GeometryVector/interface/GlobalPoint.h"
 
 #include "TLorentzVector.h"
 #include "DataFormats/Math/interface/Point3D.h"
