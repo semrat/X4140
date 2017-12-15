@@ -17,7 +17,7 @@
 #include "DataFormats/Candidate/interface/Candidate.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 #include <DataFormats/PatCandidates/interface/UserData.h>
-#include "DataFormats/GeometryVector/interface/GlobalPoint.h"
+#include "DataFormats/GeometryVector/interface/Point.h"
 
 #include "TLorentzVector.h"
 #include "DataFormats/Math/interface/Point3D.h"
@@ -29,6 +29,8 @@
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "DataFormats/Common/interface/TriggerResults.h"
 #include "FWCore/Common/interface/TriggerNames.h"
+
+typedef math::XYZPoint Point;
 
 class x4MuRootupler:public edm::EDAnalyzer {
       public:
@@ -87,9 +89,9 @@ class x4MuRootupler:public edm::EDAnalyzer {
 	TLorentzVector gen_photon_p4;
 	TLorentzVector gen_muonP_p4;
 	TLorentzVector gen_muonM_p4;
-  GlobalPoint xVertex;
-  GlobalPoint jpsVertex;
-  GlobalPoint phiVertex;
+  Point xVertex;
+  Point jpsVertex;
+  Point phiVertex;
 
   edm::EDGetTokenT<reco::GenParticleCollection> genCands_;
 
@@ -144,9 +146,9 @@ isMC_(iConfig.getParameter < bool > ("isMC"))
 
     x_tree->Branch("dz",           &dz,           "dz/D");
 
-    x_tree->Branch("xVertex",  "GlobalPoint", &xVertex);
-    x_tree->Branch("jpsVertex",  "GlobalPoint", &jpsVertex);
-    x_tree->Branch("phiVertex",  "GlobalPoint", &phiVertex);
+    x_tree->Branch("xVertex",  "Point", &xVertex);
+    x_tree->Branch("jpsVertex",  "Point", &jpsVertex);
+    x_tree->Branch("phiVertex",  "Point", &phiVertex);
 
     //
     // x_tree->Branch("rf1S_chi_p4", "TLorentzVector", &rf1S_chi_p4);
@@ -312,9 +314,9 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
       for (unsigned int i=0; i< xcand_hand->size(); i++) {
         pat::CompositeCandidate x_ = xcand_hand->at(i);
 
-        xVertex  = dynamic_cast<GlobalPoint>(x_.vertex());
-        phiVertex = dynamic_cast<GlobalPoint>(x_.daughter("phi")->vertex());
-        jpsVertex = dynamic_cast<GlobalPoint>(x_.daughter("jps")->vertex());
+        xVertex  = x_.vertex();
+        phiVertex = x_.daughter("phi")->vertex();
+        jpsVertex = x_.daughter("jps")->vertex();
         dz = x_.userFloat("dz");
 
         std::cout<<"Cycling on ups"<<std::endl;
