@@ -20,6 +20,7 @@
 #include "DataFormats/GeometryVector/interface/GlobalPoint.h"
 
 #include "TLorentzVector.h"
+#include "DataFormats/Math/interface/Point3D.h"
 #include "TVector3.h"
 #include "TTree.h"
 #include <vector>
@@ -52,14 +53,16 @@ class x4MuRootupler:public edm::EDAnalyzer {
         UInt_t    lumiblock;
 
 	TLorentzVector x_p4;
-	TLorentzVector dimuon_p4;
-	TLorentzVector muonP_p4;
-	TLorentzVector muonM_p4;
-	TLorentzVector photon_p4;
+	TLorentzVector jpsi_p4;
+	TLorentzVector muonP_jpsi_p4;
+	TLorentzVector muonM_jpsi_p4;
+  TLorentzVector phi_p4;
+  TLorentzVector muonP_phi_p4;
+  TLorentzVector muonM_phi_p4;
 
-	TLorentzVector rf1S_chi_p4;
+
 	Double_t invm1S;
-        Double_t probFit1S;
+  Double_t probFit1S;
 	Double_t y1S_nsigma;
 
 	Double_t ele_lowerPt_pt;
@@ -80,16 +83,19 @@ class x4MuRootupler:public edm::EDAnalyzer {
 	Int_t yns_pdgId;
 	TLorentzVector gen_chi_p4;
 	TLorentzVector gen_yns_p4;
-        TLorentzVector gen_dimuon_p4;
+  TLorentzVector gen_dimuon_p4;
 	TLorentzVector gen_photon_p4;
 	TLorentzVector gen_muonP_p4;
 	TLorentzVector gen_muonM_p4;
+  GlobalPoint xVertex;
+  GlobalPoint jpsVertex;
+  GlobalPoint phiVertex;
 
-        edm::EDGetTokenT<reco::GenParticleCollection> genCands_;
+  edm::EDGetTokenT<reco::GenParticleCollection> genCands_;
 
-        TTree *upsilon_tree;
-        TLorentzVector mumu_p4, muP_p4, muM_p4;
-        UInt_t mumu_rank;
+  TTree *upsilon_tree;
+  TLorentzVector mumu_p4, muP_p4, muM_p4;
+  UInt_t x_rank;
 
 };
 
@@ -124,12 +130,24 @@ isMC_(iConfig.getParameter < bool > ("isMC"))
     x_tree->Branch("lumiblock",&lumiblock,"lumiblock/i");
 
     x_tree->Branch("x_p4",    "TLorentzVector", &x_p4);
-    x_tree->Branch("trigger",            &trigger,            "trigger/i");
+    x_tree->Branch("trigger", &trigger,            "trigger/i");
 
-    // x_tree->Branch("dimuon_p4", "TLorentzVector", &dimuon_p4);
-    // x_tree->Branch("muonP_p4",  "TLorentzVector", &muonP_p4);
-    // x_tree->Branch("muonM_p4",  "TLorentzVector", &muonM_p4);
-    // x_tree->Branch("photon_p4", "TLorentzVector", &photon_p4);
+    x_tree->Branch("jpsi_p4", "TLorentzVector", &jpsi_p4);
+    x_tree->Branch("muonP_jpsi_p4",  "TLorentzVector", &muonP_jpsi_p4);
+    x_tree->Branch("muonM_jpsi_p4",  "TLorentzVector", &muonM_jpsi_p4);
+
+    x_tree->Branch("phi_p4", "TLorentzVector", &phi_p4);
+    x_tree->Branch("muonP_phi_p4",  "TLorentzVector", &muonP_phi_p4);
+    x_tree->Branch("muonM_phi_p4",  "TLorentzVector", &muonM_phi_p4);
+
+    x_tree->Branch("numPrimaryVertices", &numPrimaryVertices, "numPrimaryVertices/i");
+
+    x_tree->Branch("dz",           &dz,           "dz/D");
+
+    x_tree->Branch("xVertex",  "GlobalPoint", &xVertex);
+    x_tree->Branch("jpsVertex",  "GlobalPoint", &jpsVertex);
+    x_tree->Branch("phiVertex",  "GlobalPoint", &phiVertex);
+
     //
     // x_tree->Branch("rf1S_chi_p4", "TLorentzVector", &rf1S_chi_p4);
     // x_tree->Branch("invm1S",      &invm1S,          "invm1S/D");
@@ -146,7 +164,7 @@ isMC_(iConfig.getParameter < bool > ("isMC"))
     //
     // x_tree->Branch("photon_flags", &photon_flags, "photon_flags/i");
     //
-    // x_tree->Branch("numPrimaryVertices", &numPrimaryVertices, "numPrimaryVertices/i");
+    //
     // x_tree->Branch("trigger",            &trigger,            "trigger/i");
     // x_tree->Branch("rf1S_rank",          &rf1S_rank,          "rf1S_rank/i");
     //
@@ -168,7 +186,7 @@ isMC_(iConfig.getParameter < bool > ("isMC"))
     // upsilon_tree->Branch("muM_p4",   "TLorentzVector", &muM_p4);
     // upsilon_tree->Branch("trigger",  &trigger,         "trigger/i");
     // upsilon_tree->Branch("numPrimaryVertices", &numPrimaryVertices, "numPrimaryVertices/i");
-    // upsilon_tree->Branch("mumu_rank",&mumu_rank,       "mumu_rank/i");
+    // upsilon_tree->Branch("x_rank",&x_rank,       "x_rank/i");
 }
 
 //Check recursively if any ancestor of particle is the given one
@@ -287,17 +305,23 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
     rf1S_rank = 0;
     photon_flags = 0; //else std::cout << "no valid chi handle" << std::endl;
 
-    mumu_rank = 0;
+    x_rank = 0;
     if (!xcand_hand.isValid()) std::cout << "Invalid" << std::endl;
     if (xcand_hand->empty()) std::cout << "Empty" << std::endl;
     if (xcand_hand.isValid() && !xcand_hand->empty()) {
       for (unsigned int i=0; i< xcand_hand->size(); i++) {
         pat::CompositeCandidate x_ = xcand_hand->at(i);
+
+        xVertex  = x_.vertex();
+        phiVertex = x_.daughter("phi")->vertex();
+        jpsVertex = x_.daughter("jps")->vertex();
+        dz = x_.userFloat("dz");
+
         std::cout<<"Cycling on ups"<<std::endl;
         x_p4.SetPtEtaPhiM(x_.pt(), x_.eta(), x_.phi(), x_.mass());
 
         x_tree->Fill();
-
+        x_rank++;
       }
     }
 }
