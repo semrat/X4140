@@ -61,14 +61,16 @@ void DiMuonFilter::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   edm::Handle<pat::CompositeCandidateCollection> onias_;
   iEvent.getByToken(theOnias_, onias_);
   if (onias_.isValid() && !onias_->empty()) {
+    std::cout<<"Valid Onias in the Filter"<<std::endl;
+
     const pat::CompositeCandidate *ionia = nullptr;
     for (size_t ii = 0, nn=onias_->size(); ii < nn; ii++ ) {
        ionia = &(onias_->at(ii));
-       std::cout<<"Valid Onias Filter"<<std::endl;
+
        if (ionia && DiMuonSelection_(*ionia) &&
            SingleMuonSelection_(*ionia->daughter("muon1")) &&
            SingleMuonSelection_(*ionia->daughter("muon2")) &&
-           ( !do_trigger_match_ || isTriggerMatched(ionia))
+           ( !do_trigger_match_ || !isTriggerMatched(ionia))
           ) mumuOutput->push_back(*ionia);
     }
   }
