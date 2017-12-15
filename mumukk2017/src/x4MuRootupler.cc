@@ -103,16 +103,6 @@ class x4MuRootupler:public edm::EDAnalyzer {
 
 };
 
-float x4MuRootupler::Getdz(const pat::CompositeCandidate& c, const reco::Candidate::Point &p) {
-
-  const reco::Candidate::LorentzVector& mom = c.p4();
-  const reco::Candidate::Point& vtx = c.vertex();
-
-  double dz = (vtx.Z()-p.Z()) - ((vtx.X()-p.X())*mom.X()+(vtx.Y()-p.Y())*mom.Y())/mom.Rho() * mom.Z()/mom.Rho();
-  return (float) dz;
-
-}
-
 x4MuRootupler::x4MuRootupler(const edm::ParameterSet & iConfig):
 // chi_(consumes<pat::CompositeCandidateCollection>(iConfig.getParameter < edm::InputTag > ("chi_cand"))),
 xcand_(consumes<pat::CompositeCandidateCollection>(iConfig.getParameter < edm::InputTag > ("x_cand"))),
