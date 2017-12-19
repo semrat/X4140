@@ -34,6 +34,12 @@ void FourOniaProducer::produce(edm::Event& event, const edm::EventSetup& esetup)
   Vertex thePrimaryV;
   Vertex theBeamSpotV;
 
+  vector<double> muMasses;
+  muMasses.push_back( 0.1056583715 );
+  muMasses.push_back( 0.1056583715 );
+  muMasses.push_back( 0.1056583715 );
+  muMasses.push_back( 0.1056583715 );
+
   //std::cout<<"FourOniaProducer inside"<<std::endl;
 
   std::unique_ptr<pat::CompositeCandidateCollection> xCandColl(new pat::CompositeCandidateCollection);
