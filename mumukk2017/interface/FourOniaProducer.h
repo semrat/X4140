@@ -33,6 +33,7 @@
 
 #include "TrackingTools/TransientTrack/interface/TransientTrackBuilder.h"
 #include "TrackingTools/Records/interface/TransientTrackRecord.h"
+#include "TrackingTools/IPTools/interface/IPTools.h"
 #include "RecoVertex/KalmanVertexFit/interface/KalmanVertexFitter.h"
 #include "RecoVertex/VertexTools/interface/VertexDistanceXY.h"
 #include "TMath.h"
