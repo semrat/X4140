@@ -71,7 +71,7 @@ FourOnia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   muMasses.push_back( 0.1056583715 );
 
   std::unique_ptr<pat::CompositeCandidateCollection> oniaOutput(new pat::CompositeCandidateCollection);
-  std::cout<<"Four muonia producer"<<std::endl;
+  //std::cout<<"Four muonia producer"<<std::endl;
   Vertex thePrimaryV;
   Vertex theBeamSpotV;
 
@@ -105,14 +105,14 @@ FourOnia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   for(View<pat::Muon>::const_iterator it = muons->begin(), itend = muons->end(); it != itend; ++it){
     // both must pass low quality
     if(!lowerPuritySelection_(*it)) continue;
-    std::cout << "First muon quality flag" << std::endl;
+    //std::cout << "First muon quality flag" << std::endl;
     for(View<pat::Muon>::const_iterator it2 = it+1; it2 != itend;++it2){
       // both must pass low quality
       if(!lowerPuritySelection_(*it2)) continue;
-      std::cout << "Second muon quality flag" << std::endl;
+      //std::cout << "Second muon quality flag" << std::endl;
       // one must pass tight quality
       if (!(higherPuritySelection_(*it) || higherPuritySelection_(*it2))) continue;
-      std::cout << "High quality flags" << std::endl;
+      //std::cout << "High quality flags" << std::endl;
       pat::CompositeCandidate myCand;
       vector<TransientVertex> pvs;
 
@@ -126,12 +126,12 @@ FourOnia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
       myCand.setCharge(it->charge()+it2->charge());
 
       // ---- apply the dimuon cut ----
-      std::cout << "Dimuon mass : " << mumu.M() << " - " << myCand.mass() << std::endl;
+      //std::cout << "Dimuon mass : " << mumu.M() << " - " << myCand.mass() << std::endl;
       if(!dimuonSelection_(myCand)) continue;
-      std::cout << "Dimuon selection passed !" << std::endl;
+      //std::cout << "Dimuon selection passed !" << std::endl;
       // ---- fit vertex using Tracker tracks (if they have tracks) ----
       if (it->track().isNonnull() && it2->track().isNonnull()) {
-        std::cout << "Tracker tracks: they exist !" << std::endl;
+        //std::cout << "Tracker tracks: they exist !" << std::endl;
 	//build the dimuon secondary vertex
 	vector<TransientTrack> t_tks;
 	t_tks.push_back(theTTBuilder->build(*it->track()));  // pass the reco::Track, not  the reco::TrackRef (which can be transient)
@@ -158,8 +158,8 @@ FourOnia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  myCand.addUserFloat("vProb",vProb);
 
 	  TVector3 vtx;
-          TVector3 pvtx;
-          VertexDistanceXY vdistXY;
+    TVector3 pvtx;
+    VertexDistanceXY vdistXY;
 
 	  vtx.SetXYZ(myVertex.position().x(),myVertex.position().y(),0);
 	  TVector3 pperp(mumu.px(), mumu.py(), 0);
@@ -288,11 +288,11 @@ FourOnia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 	  if (addMuonlessPrimaryVertex_)
 	    myCand.addUserData("muonlessPV",Vertex(thePrimaryV));
-	  else
-	    myCand.addUserData("PVwithmuons",thePrimaryV);
+
+	  myCand.addUserData("PVwithmuons",Vertex(theOriginalPV));
 
 	  // lifetime using PV
-          pvtx.SetXYZ(thePrimaryV.position().x(),thePrimaryV.position().y(),0);
+    pvtx.SetXYZ(thePrimaryV.position().x(),thePrimaryV.position().y(),0);
 	  TVector3 vdiff = vtx - pvtx;
 	  double cosAlpha = vdiff.Dot(pperp)/(vdiff.Perp()*pperp.Perp());
 	  Measurement1D distXY = vdistXY.distance(Vertex(myVertex), thePrimaryV);
@@ -300,16 +300,16 @@ FourOnia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  double ctauPV = distXY.value()*cosAlpha * myCand.mass()/pperp.Perp();
 	  GlobalError v1e = (Vertex(myVertex)).error();
 	  GlobalError v2e = thePrimaryV.error();
-          AlgebraicSymMatrix33 vXYe = v1e.matrix()+ v2e.matrix();
+    AlgebraicSymMatrix33 vXYe = v1e.matrix()+ v2e.matrix();
 	  //double ctauErrPV = sqrt(vXYe.similarity(vpperp))*3.09688/(pperp.Perp2());
 	  double ctauErrPV = sqrt(ROOT::Math::Similarity(vpperp,vXYe))*myCand.mass()/(pperp.Perp2());
 
 	  myCand.addUserFloat("ppdlPV",ctauPV);
-          myCand.addUserFloat("ppdlErrPV",ctauErrPV);
+    myCand.addUserFloat("ppdlErrPV",ctauErrPV);
 	  myCand.addUserFloat("cosAlpha",cosAlpha);
 
 	  // lifetime using BS
-          pvtx.SetXYZ(theBeamSpotV.position().x(),theBeamSpotV.position().y(),0);
+    pvtx.SetXYZ(theBeamSpotV.position().x(),theBeamSpotV.position().y(),0);
 	  vdiff = vtx - pvtx;
 	  cosAlpha = vdiff.Dot(pperp)/(vdiff.Perp()*pperp.Perp());
 	  distXY = vdistXY.distance(Vertex(myVertex), theBeamSpotV);
@@ -317,12 +317,12 @@ FourOnia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  double ctauBS = distXY.value()*cosAlpha*myCand.mass()/pperp.Perp();
 	  GlobalError v1eB = (Vertex(myVertex)).error();
 	  GlobalError v2eB = theBeamSpotV.error();
-          AlgebraicSymMatrix33 vXYeB = v1eB.matrix()+ v2eB.matrix();
+    AlgebraicSymMatrix33 vXYeB = v1eB.matrix()+ v2eB.matrix();
 	  //double ctauErrBS = sqrt(vXYeB.similarity(vpperp))*3.09688/(pperp.Perp2());
 	  double ctauErrBS = sqrt(ROOT::Math::Similarity(vpperp,vXYeB))*myCand.mass()/(pperp.Perp2());
 
 	  myCand.addUserFloat("ppdlBS",ctauBS);
-          myCand.addUserFloat("ppdlErrBS",ctauErrBS);
+    myCand.addUserFloat("ppdlErrBS",ctauErrBS);
 
 	  if (addCommonVertex_) {
 	    myCand.addUserData("commonVertex",Vertex(myVertex));
@@ -331,11 +331,11 @@ FourOnia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  myCand.addUserFloat("vNChi2",-1);
 	  myCand.addUserFloat("vProb", -1);
 	  myCand.addUserFloat("ppdlPV",-100);
-          myCand.addUserFloat("ppdlErrPV",-100);
+    myCand.addUserFloat("ppdlErrPV",-100);
 	  myCand.addUserFloat("cosAlpha",-100);
 	  myCand.addUserFloat("ppdlBS",-100);
-          myCand.addUserFloat("ppdlErrBS",-100);
-          myCand.addUserFloat("DCA", -1 );
+    myCand.addUserFloat("ppdlErrBS",-100);
+    myCand.addUserFloat("DCA", -1 );
 	  if (addCommonVertex_) {
 	    myCand.addUserData("commonVertex",Vertex());
 	  }
@@ -402,7 +402,7 @@ FourOnia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   }
 
   std::sort(oniaOutput->begin(),oniaOutput->end(),vPComparator_);
-  std::cout << "MuMu candidates count : " << oniaOutput->size() << std::endl;
+  //std::cout << "MuMu candidates count : " << oniaOutput->size() << std::endl;
   iEvent.put(std::move(oniaOutput));
 
 }

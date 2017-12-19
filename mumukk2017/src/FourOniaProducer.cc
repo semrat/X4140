@@ -1,4 +1,4 @@
-//std::cout#include "../interface/FourOniaProducer.h"
+#include "../interface/FourOniaProducer.h"
 
 FourOniaProducer::FourOniaProducer(const edm::ParameterSet& ps):
 phi_dimuon_Label(consumes<pat::CompositeCandidateCollection>(ps.getParameter< edm::InputTag>("phidimuons"))),
@@ -6,7 +6,6 @@ jpsi_dimuon_Label(consumes<pat::CompositeCandidateCollection>(ps.getParameter< e
 thebeamspot_(consumes<reco::BeamSpot>(iConfig.getParameter<edm::InputTag>("beamSpotTag"))),
 thePVs_(consumes<reco::VertexCollection>(iConfig.getParameter<edm::InputTag>("primaryVertexTag"))),
 quadmuonSelection_(iConfig.existsAs<std::string>("quadmuonSelection") ? iConfig.getParameter<std::string>("quadmuonSelection") : ""),
-deltaMass_(ps.getParameter<std::vector<double> >("deltaMass")),
 dzMax_(ps.getParameter<double>("dzmax")),
 addCommonVertex_(iConfig.getParameter<bool>("addCommonVertex")),
 addMuonlessPrimaryVertex_(iConfig.getParameter<bool>("addMuonlessPrimaryVertex")),
@@ -415,14 +414,6 @@ const pat::CompositeCandidate FourOniaProducer::makeCandidate(const pat::Composi
     return xCand;
   }
 
-  // check if the mass difference is in desired range
-  bool FourOniaProducer::cutDeltaMass(const pat::CompositeCandidate& xCand,
-    const pat::CompositeCandidate& dimuonCand){
-      float deltam = xCand.p4().M() - dimuonCand.p4().M();
-      float m1     = deltaMass_[0];
-      float m2     = deltaMass_[1];
-      return (deltam > m1 && deltam < m2);
-    }
 
     //define this as a plug-in
     DEFINE_FWK_MODULE(FourOniaProducer);

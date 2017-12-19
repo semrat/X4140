@@ -93,18 +93,17 @@ process.DiMuonCounterPhi = cms.EDFilter('CandViewCountFilter',
 process.xProducer = cms.EDProducer('FourOniaProducer',
     phidimuons          = cms.InputTag("Onia2MuMuFilteredPhi"),
     jpsidimuons         = cms.InputTag("Onia2MuMuFilteredJpsi"),
-    pi0OnlineSwitch     = cms.bool(False),
     dzmax               = cms.double(20.0),
-    triggerMatch        = cms.bool(False),
+    triggerMatch        = cms.bool(True),
     deltaMass           = cms.vdouble(0.0,2.0)  # trigger match is performed in Onia2MuMuFiltered
 )
 
-process.xFitter = cms.EDProducer('FourOniaKinFit',
-                          x_cand = cms.InputTag("xProducer"),
-                          x_mass = cms.double(5.36679), # GeV   1S = 9.46030   2S = 10.02326    3S = 10.35520  J/psi=3.0969
-                          product_name = cms.string("xCand"),
-                          pdgID = cms.int32(531)
-                         )
+# process.xFitter = cms.EDProducer('FourOniaKinFit',
+#                           x_cand = cms.InputTag("xProducer"),
+#                           x_mass = cms.double(5.36679), # GeV   1S = 9.46030   2S = 10.02326    3S = 10.35520  J/psi=3.0969
+#                           product_name = cms.string("xCand"),
+#                           pdgID = cms.int32(531)
+#                          )
 
 
 process.triggerSelection = cms.EDFilter("TriggerResultsFilter",
@@ -127,13 +126,13 @@ process.xCandSequence = cms.Sequence(
                    process.Onia2MuMuFilteredJpsi *
                    process.DiMuonCounterJPsi *
                    process.xProducer *
-                   process.xFitter
+                   #process.xFitter
 				   )
 
 process.rootuple = cms.EDAnalyzer('x4MuRootupler',
                           #chi_cand = cms.InputTag("chiProducer"),
 			              x_cand = cms.InputTag("xProducer"),
-                          xrefit = cms.InputTag("xFitter","xCand"),
+                          #xrefit = cms.InputTag("xFitter","xCand"),
 			              # refit2S  = cms.InputTag("chiFitter2S","y2S"),
 			              # refit3S  = cms.InputTag("chiFitter3S","y3S"),
                           primaryVertices = cms.InputTag("offlineSlimmedPrimaryVertices"),

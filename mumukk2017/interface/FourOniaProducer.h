@@ -24,6 +24,18 @@
 #include <TLorentzVector.h>
 #include <vector>
 
+#include "TrackingTools/TransientTrack/interface/TransientTrackBuilder.h"
+#include "TrackingTools/Records/interface/TransientTrackRecord.h"
+#include "RecoVertex/KalmanVertexFit/interface/KalmanVertexFitter.h"
+#include "RecoVertex/VertexTools/interface/VertexDistanceXY.h"
+#include "TMath.h"
+#include "Math/VectorUtil.h"
+#include "TVector3.h"
+
+#include "MagneticField/Engine/interface/MagneticField.h"
+#include "MagneticField/Records/interface/IdealMagneticFieldRecord.h"
+
+
 class FourOniaProducer : public edm::EDProducer {
 
  public:
@@ -34,8 +46,18 @@ class FourOniaProducer : public edm::EDProducer {
   void produce(edm::Event& event, const edm::EventSetup& esetup) override;
   void endJob() override;
 
+
+
   edm::EDGetTokenT<pat::CompositeCandidateCollection> phi_dimuon_Label;
   edm::EDGetTokenT<pat::CompositeCandidateCollection> jpsi_dimuon_Label;
+  edm::EDGetTokenT<reco::BeamSpot> thebeamspot_;
+  edm::EDGetTokenT<reco::VertexCollection> thePVs_;
+  edm::EDGetTokenT<reco::TrackCollection> revtxtrks_;
+  edm::EDGetTokenT<reco::BeamSpot> revtxbs_;
+  StringCutObjectSelector<reco::Candidate, true> quadmuonSelection_;
+  bool addCommonVertex_, addMuonlessPrimaryVertex_;
+  bool resolveAmbiguity_;
+  bool addMCTruth_;
 
   const pat::CompositeCandidate makeCandidate(const pat::CompositeCandidate&,
 						 const pat::CompositeCandidate&);
@@ -48,14 +70,9 @@ class FourOniaProducer : public edm::EDProducer {
 
   bool isOverlappedMuons(const pat::CompositeCandidate *phi,const pat::CompositeCandidate *jpsi);
 
-  bool pi0OnlineSwitch_;
-
   // delta mass range
   std::vector<double> deltaMass_;
   double dzMax_;
-
-  // use only trigger-matched J/Psi or Upsilon
-  bool triggerMatch_;
 
   int candidates;
   int delta_mass_fail;

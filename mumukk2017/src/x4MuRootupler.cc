@@ -298,8 +298,7 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
     photon_flags = 0; //else std::cout << "no valid chi handle" << std::endl;
 
     x_rank = 0;
-    if (!xcand_hand.isValid()) std::cout << "Invalid" << std::endl;
-    if (xcand_hand->empty()) std::cout << "Empty" << std::endl;
+
     if (xcand_hand.isValid() && !xcand_hand->empty()) {
       for (unsigned int i=0; i< xcand_hand->size(); i++) {
         pat::CompositeCandidate x_ = xcand_hand->at(i);
@@ -312,7 +311,6 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
         dz_jpsi = x_.userFloat("dzJpsi");
         dz_phi = x_.userFloat("dzPhi");
 
-        std::cout<<"Cycling on ups"<<std::endl;
         x_p4.SetPtEtaPhiM(x_.pt(), x_.eta(), x_.phi(), x_.mass());
 
         x_tree->Fill();

@@ -89,7 +89,7 @@ FourOniaKinFit::FourOniaKinFit(const edm::ParameterSet& iConfig) {
 
 // ------------ method called to produce the data  ------------
 void FourOniaKinFit::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
-  std::cout<<"FourOniaKinFit inside"<<std::endl;
+  //std::cout<<"FourOniaKinFit inside"<<std::endl;
   // Grab paramenters
   edm::Handle<pat::CompositeCandidateCollection> xCandHandle;
   iEvent.getByToken(x_Label, xCandHandle);
@@ -135,6 +135,8 @@ void FourOniaKinFit::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) 
     allXDaughters.push_back(pFactory.particle (JPsiMuMuTT[1], muonMass, float(0), float(0), muonSigma));
 
     KinematicConstrainedVertexFitter constVertexFitter;
+
+
 
     MultiTrackKinematicConstraint *xcand_mtc = new  TwoTrackMassKinematicConstraint(x_mass_);
     RefCountedKinematicTree XTree = constVertexFitter.fit(allXDaughters,xcand_mtc);
