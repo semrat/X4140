@@ -16,10 +16,17 @@
 #include "FWCore/Framework/interface/MakerMacros.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
+#include <DataFormats/HepMCCandidate/interface/GenParticle.h>
+#include <DataFormats/TrackReco/interface/TrackFwd.h>
+#include <DataFormats/TrackReco/interface/Track.h>
 #include "DataFormats/Math/interface/LorentzVector.h"
 #include "DataFormats/PatCandidates/interface/CompositeCandidate.h"
 #include "DataFormats/PatCandidates/interface/UserData.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
+#include <DataFormats/VertexReco/interface/VertexFwd.h>
+#include <DataFormats/Common/interface/View.h>
+#include <DataFormats/MuonReco/interface/MuonFwd.h>
+#include <DataFormats/MuonReco/interface/Muon.h>
 #include "DataFormats/PatCandidates/interface/Muon.h"
 #include <TLorentzVector.h>
 #include <vector>
@@ -35,6 +42,9 @@
 #include "MagneticField/Engine/interface/MagneticField.h"
 #include "MagneticField/Records/interface/IdealMagneticFieldRecord.h"
 
+#include <CommonTools/UtilAlgos/interface/StringCutObjectSelector.h>
+
+#include "FourOniaVtxReProducer.h"
 
 class FourOniaProducer : public edm::EDProducer {
 
