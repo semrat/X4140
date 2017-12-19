@@ -101,6 +101,8 @@ void FourOniaProducer::produce(edm::Event& event, const edm::EventSetup& esetup)
       if ((dynamic_cast<const pat::Muon*>((*phiCand).daughter("muon1") )->track()).isNonnull())
       if ((dynamic_cast<const pat::Muon*>((*phiCand).daughter("muon2") )->track()).isNonnull()){
 
+      vector<TransientVertex> pvs;
+
       vector<TransientTrack> t_tks;
       t_tks.push_back(theTTBuilder->build(dynamic_cast<const pat::Muon*>((*jpsiCand).daughter("muon1") )->track()));  // pass the reco::Track, not  the reco::TrackRef (which can be transient)
       t_tks.push_back(theTTBuilder->build(dynamic_cast<const pat::Muon*>((*jpsiCand).daughter("muon2") )->track()));  // pass the reco::Track, not  the reco::TrackRef (which can be transient)
