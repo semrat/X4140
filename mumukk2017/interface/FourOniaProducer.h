@@ -38,6 +38,8 @@
 
 #include "RecoVertex/KalmanVertexFit/interface/KalmanVertexFitter.h"
 #include "RecoVertex/VertexTools/interface/VertexDistanceXY.h"
+#include "RecoVertex/VertexTools/interface/InvariantMassFromVertex.h"
+
 #include "TMath.h"
 #include "Math/VectorUtil.h"
 #include "TVector3.h"
