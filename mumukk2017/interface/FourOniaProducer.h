@@ -52,12 +52,13 @@ class FourOniaProducer : public edm::EDProducer {
   edm::EDGetTokenT<pat::CompositeCandidateCollection> jpsi_dimuon_Label;
   edm::EDGetTokenT<reco::BeamSpot> thebeamspot_;
   edm::EDGetTokenT<reco::VertexCollection> thePVs_;
-  edm::EDGetTokenT<reco::TrackCollection> revtxtrks_;
-  edm::EDGetTokenT<reco::BeamSpot> revtxbs_;
   StringCutObjectSelector<reco::Candidate, true> quadmuonSelection_;
+
+  double dzMax_;
   bool addCommonVertex_, addMuonlessPrimaryVertex_;
   bool resolveAmbiguity_;
   bool addMCTruth_;
+
 
   const pat::CompositeCandidate makeCandidate(const pat::CompositeCandidate&,
 						 const pat::CompositeCandidate&);
@@ -70,9 +71,8 @@ class FourOniaProducer : public edm::EDProducer {
 
   bool isOverlappedMuons(const pat::CompositeCandidate *phi,const pat::CompositeCandidate *jpsi);
 
-  // delta mass range
-  std::vector<double> deltaMass_;
-  double dzMax_;
+  edm::EDGetTokenT<reco::TrackCollection> revtxtrks_;
+  edm::EDGetTokenT<reco::BeamSpot> revtxbs_;
 
   int candidates;
   int delta_mass_fail;

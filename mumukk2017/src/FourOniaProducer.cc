@@ -26,17 +26,17 @@
 #include "TrackingTools/IPTools/interface/IPTools.h"
 #include "TrackingTools/PatternTools/interface/ClosestApproachInRPhi.h"
 
-FourOniaProducer::FourOniaProducer(const edm::ParameterSet& ps):
-phi_dimuon_Label(consumes<pat::CompositeCandidateCollection>(ps.getParameter< edm::InputTag>("phidimuons"))),
-jpsi_dimuon_Label(consumes<pat::CompositeCandidateCollection>(ps.getParameter< edm::InputTag>("jpsidimuons"))),
+FourOniaProducer::FourOniaProducer(const edm::ParameterSet& iConfig):
+phi_dimuon_Label(consumes<pat::CompositeCandidateCollection>(iConfig.getParameter< edm::InputTag>("phidimuons"))),
+jpsi_dimuon_Label(consumes<pat::CompositeCandidateCollection>(iConfig.getParameter< edm::InputTag>("jpsidimuons"))),
 thebeamspot_(consumes<reco::BeamSpot>(iConfig.getParameter<edm::InputTag>("beamSpotTag"))),
 thePVs_(consumes<reco::VertexCollection>(iConfig.getParameter<edm::InputTag>("primaryVertexTag"))),
 quadmuonSelection_(iConfig.existsAs<std::string>("quadmuonSelection") ? iConfig.getParameter<std::string>("quadmuonSelection") : ""),
-dzMax_(ps.getParameter<double>("dzmax")),
+dzMax_(iConfig.getParameter<double>("dzmax")),
 addCommonVertex_(iConfig.getParameter<bool>("addCommonVertex")),
 addMuonlessPrimaryVertex_(iConfig.getParameter<bool>("addMuonlessPrimaryVertex")),
 resolveAmbiguity_(iConfig.getParameter<bool>("resolvePileUpAmbiguity")),
-triggerMatch_(ps.getParameter<bool>("triggerMatch"))
+triggerMatch_(iConfig.getParameter<bool>("triggerMatch"))
 {
   revtxtrks_ = consumes<reco::TrackCollection>((edm::InputTag)"generalTracks"); //if that is not true, we will raise an exception
   revtxbs_ = consumes<reco::BeamSpot>((edm::InputTag)"offlineBeamSpot");
