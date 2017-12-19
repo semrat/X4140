@@ -108,6 +108,8 @@ void FourOniaProducer::produce(edm::Event& event, const edm::EventSetup& esetup)
       t_tks.push_back(theTTBuilder->build(dynamic_cast<const pat::Muon*>((*phiCand).daughter("muon2") )->track()));  // pass the reco::Track, not  the reco::TrackRef (which can be transient)
       TransientVertex myVertex = vtxFitter.vertex(t_tks);
 
+      CachingVertex<5> VtxForInvMass = vtxFitter.vertex( t_tks );
+
       Measurement1D MassWErr(mumu.M(),-9999.);
       if ( field->nominalValue() > 0 ) {
         MassWErr = massCalculator.invariantMass( VtxForInvMass, muMasses );
@@ -365,6 +367,9 @@ void FourOniaProducer::produce(edm::Event& event, const edm::EventSetup& esetup)
     candidates++;
   }
 }
+
+std::sort(xCandColl->begin(),xCandColl->end(),vPComparator_);
+
 event.put(std::move(xCandColl));
 }
 

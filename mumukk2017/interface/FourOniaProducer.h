@@ -49,6 +49,13 @@
 
 #include "FourOniaVtxReProducer.h"
 
+template<typename T>
+struct GreaterByVProb {
+  bool operator()( const T & t1, const T & t2 ) const {
+    return t1.userFloat("vProb") > t2.userFloat("vProb");
+  }
+};
+
 class FourOniaProducer : public edm::EDProducer {
 
  public:
@@ -92,6 +99,11 @@ class FourOniaProducer : public edm::EDProducer {
   int delta_mass_fail;
   int dz_phi_cut_fail;
   int dz_jps_cut_fail;
+
+  GreaterByVProb<pat::CompositeCandidate> vPComparator_;
+
+  InvariantMassFromVertex massCalculator;
+
 };
 
 #endif // __FourOniaProducer_h_
