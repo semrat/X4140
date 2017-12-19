@@ -27,6 +27,10 @@ triggerMatch_(iConfig.getParameter<bool>("triggerMatch"))
 
 void FourOniaProducer::produce(edm::Event& event, const edm::EventSetup& esetup){
 
+  using namespace edm;
+  using namespace std;
+  using namespace reco;
+
   Vertex thePrimaryV;
   Vertex theBeamSpotV;
 
