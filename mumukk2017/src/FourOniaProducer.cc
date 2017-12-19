@@ -55,7 +55,7 @@ void FourOniaProducer::produce(edm::Event& event, const edm::EventSetup& esetup)
   event.getByToken(jpsi_dimuon_Label,dimuonsJPsi);
 
   Handle<BeamSpot> theBeamSpot;
-  iEvent.getByToken(thebeamspot_,theBeamSpot);
+  event.getByToken(thebeamspot_,theBeamSpot);
   BeamSpot bs = *theBeamSpot;
   theBeamSpotV = Vertex(bs.position(), bs.covariance3D());
 
@@ -65,7 +65,7 @@ void FourOniaProducer::produce(edm::Event& event, const edm::EventSetup& esetup)
   TrackCollection muonLess;
 
   Handle<VertexCollection> priVtxs;
-  iEvent.getByToken(thePVs_, priVtxs);
+  event.getByToken(thePVs_, priVtxs);
   if ( priVtxs->begin() != priVtxs->end() ) {
     thePrimaryV = Vertex(*(priVtxs->begin()));
   }
@@ -166,13 +166,13 @@ void FourOniaProducer::produce(edm::Event& event, const edm::EventSetup& esetup)
           muonLess.reserve(thePrimaryV.tracksSize());
           if( addMuonlessPrimaryVertex_  && thePrimaryV.tracksSize()>2) {
             // Primary vertex matched to the dimuon, now refit it removing the two muons
-            FourOniaVtxReProducer revertex(priVtxs, iEvent);
+            FourOniaVtxReProducer revertex(priVtxs, event);
             edm::Handle<reco::TrackCollection> pvtracks;
-            iEvent.getByToken(revtxtrks_,   pvtracks);
+            event.getByToken(revtxtrks_,   pvtracks);
             if( !pvtracks.isValid()) { std::cout << "pvtracks NOT valid " << std::endl; }
             else {
               edm::Handle<reco::BeamSpot> pvbeamspot;
-              iEvent.getByToken(revtxbs_, pvbeamspot);
+              event.getByToken(revtxbs_, pvbeamspot);
               if (pvbeamspot.id() != theBeamSpot.id()) edm::LogWarning("Inconsistency") << "The BeamSpot used for PV reco is not the same used in this analyzer.";
               // I need to go back to the reco::Muon object, as the TrackRef in the pat::Muon can be an embedded ref.
               const reco::Muon *rmu1 = dynamic_cast<const reco::Muon *>(dynamic_cast<const pat::Muon*>((*jpsiCand).daughter("muon1") )->originalObject());
