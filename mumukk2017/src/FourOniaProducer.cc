@@ -1,5 +1,31 @@
 #include "../interface/FourOniaProducer.h"
 
+//Headers for the data items
+#include <DataFormats/TrackReco/interface/TrackFwd.h>
+#include <DataFormats/TrackReco/interface/Track.h>
+#include <DataFormats/MuonReco/interface/MuonFwd.h>
+#include <DataFormats/MuonReco/interface/Muon.h>
+#include <DataFormats/Common/interface/View.h>
+#include <DataFormats/HepMCCandidate/interface/GenParticle.h>
+#include <DataFormats/PatCandidates/interface/Muon.h>
+#include <DataFormats/VertexReco/interface/VertexFwd.h>
+
+//Headers for services and tools
+#include "TrackingTools/TransientTrack/interface/TransientTrackBuilder.h"
+#include "TrackingTools/Records/interface/TransientTrackRecord.h"
+#include "RecoVertex/KalmanVertexFit/interface/KalmanVertexFitter.h"
+#include "RecoVertex/VertexTools/interface/VertexDistanceXY.h"
+#include "TMath.h"
+#include "Math/VectorUtil.h"
+#include "TVector3.h"
+#include "../interface/FourOniaVtxReProducer.h"
+
+#include "MagneticField/Engine/interface/MagneticField.h"
+#include "MagneticField/Records/interface/IdealMagneticFieldRecord.h"
+#include "TrackingTools/PatternTools/interface/TwoTrackMinimumDistance.h"
+#include "TrackingTools/IPTools/interface/IPTools.h"
+#include "TrackingTools/PatternTools/interface/ClosestApproachInRPhi.h"
+
 FourOniaProducer::FourOniaProducer(const edm::ParameterSet& ps):
 phi_dimuon_Label(consumes<pat::CompositeCandidateCollection>(ps.getParameter< edm::InputTag>("phidimuons"))),
 jpsi_dimuon_Label(consumes<pat::CompositeCandidateCollection>(ps.getParameter< edm::InputTag>("jpsidimuons"))),

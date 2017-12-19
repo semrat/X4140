@@ -91,11 +91,15 @@ process.DiMuonCounterPhi = cms.EDFilter('CandViewCountFilter',
 )
 
 process.xProducer = cms.EDProducer('FourOniaProducer',
-    phidimuons          = cms.InputTag("Onia2MuMuFilteredPhi"),
-    jpsidimuons         = cms.InputTag("Onia2MuMuFilteredJpsi"),
-    dzmax               = cms.double(20.0),
-    triggerMatch        = cms.bool(True),
-    deltaMass           = cms.vdouble(0.0,2.0)  # trigger match is performed in Onia2MuMuFiltered
+    phidimuons                  = cms.InputTag("Onia2MuMuFilteredPhi"),
+    jpsidimuons                 = cms.InputTag("Onia2MuMuFilteredJpsi"),
+    dzmax                       = cms.double(20.0),
+    triggerMatch                = cms.bool(True),
+    addCommonVertex             = cms.bool(True),
+    addMuonlessPrimaryVertex    = cms.bool(True),
+    resolvePileUpAmbiguity      = cms.bool(True),
+    quadmuonSelection           = cms.string("4.0 < mass && mass < 6.0"),
+    deltaMass                   = cms.vdouble(0.0,2.0)  # trigger match is performed in Onia2MuMuFiltered
 )
 
 # process.xFitter = cms.EDProducer('FourOniaKinFit',
