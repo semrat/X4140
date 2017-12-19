@@ -112,7 +112,7 @@ void FourOniaProducer::produce(edm::Event& event, const edm::EventSetup& esetup)
 
       CachingVertex<5> VtxForInvMass = vtxFitter.vertex( t_tks );
 
-      Measurement1D MassWErr(xCand.M(),-9999.);
+      Measurement1D MassWErr(xCand.mass(),-9999.);
       if ( field->nominalValue() > 0 ) {
         MassWErr = massCalculator.invariantMass( VtxForInvMass, muMasses );
       } else {
