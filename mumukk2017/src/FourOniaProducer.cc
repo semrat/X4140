@@ -1,15 +1,4 @@
 #include "../interface/FourOniaProducer.h"
-
-//Headers for the data items
-
-
-
-#include <DataFormats/HepMCCandidate/interface/GenParticle.h>
-#include <DataFormats/PatCandidates/interface/Muon.h>
-
-
-//Headers for services and tools
-
 #include "../interface/FourOniaVtxReProducer.h"
 
 
@@ -23,6 +12,7 @@ dzMax_(iConfig.getParameter<double>("dzmax")),
 addCommonVertex_(iConfig.getParameter<bool>("addCommonVertex")),
 addMuonlessPrimaryVertex_(iConfig.getParameter<bool>("addMuonlessPrimaryVertex")),
 resolveAmbiguity_(iConfig.getParameter<bool>("resolvePileUpAmbiguity")),
+addMCTruth_(iConfig.getParameter<bool>("addMCTruth")),
 triggerMatch_(iConfig.getParameter<bool>("triggerMatch"))
 {
   revtxtrks_ = consumes<reco::TrackCollection>((edm::InputTag)"generalTracks"); //if that is not true, we will raise an exception

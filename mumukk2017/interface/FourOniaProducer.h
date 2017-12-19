@@ -68,6 +68,7 @@ class FourOniaProducer : public edm::EDProducer {
   bool addCommonVertex_, addMuonlessPrimaryVertex_;
   bool resolveAmbiguity_;
   bool addMCTruth_;
+  bool triggerMatch_;
 
 
   const pat::CompositeCandidate makeCandidate(const pat::CompositeCandidate&,
