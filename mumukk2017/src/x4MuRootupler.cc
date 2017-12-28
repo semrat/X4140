@@ -50,9 +50,11 @@ class x4MuRootupler:public edm::EDAnalyzer {
 
 	bool isMC_;
 
-	UInt_t    run;
-        ULong64_t event;
-        UInt_t    lumiblock;
+	UInt_t run;
+  ULong64_t event;
+  UInt_t lumiblock;
+  UInt_t numPrimaryVertices;
+  UInt_t countTksOfPV;
 
 	TLorentzVector x_p4;
 	TLorentzVector jpsi_p4;
@@ -62,38 +64,16 @@ class x4MuRootupler:public edm::EDAnalyzer {
   TLorentzVector muonP_phi_p4;
   TLorentzVector muonM_phi_p4;
 
-
-	Double_t invm1S;
-  Double_t probFit1S;
-	Double_t y1S_nsigma;
-
-	Double_t ele_lowerPt_pt;
-	Double_t ele_higherPt_pt;
-	Double_t ctpv;
-	Double_t ctpv_error;
-	Double_t conv_vertex;
-	// Double_t dz;
-  Double_t dz_jpsi;
-  Double_t dz_phi;
-
-	UInt_t photon_flags;
-	UInt_t numPrimaryVertices;
-	UInt_t trigger;
-	UInt_t rf1S_rank;
+  Double_t cosAlpha, ppdlErrPV, ppdlPV, ppdlBS, ppdlErrBS;
+  Double_t ctauErrBS, ctauBS, vChi2, vProb, sumPTPV;
+  Double_t vertexWeight, dz, dz_jpsi, dz_phi;
 
 	TTree *x_tree;
 
-	Int_t chi_pdgId;
-	Int_t yns_pdgId;
-	TLorentzVector gen_chi_p4;
-	TLorentzVector gen_yns_p4;
-  TLorentzVector gen_dimuon_p4;
-	TLorentzVector gen_photon_p4;
-	TLorentzVector gen_muonP_p4;
-	TLorentzVector gen_muonM_p4;
   Point xVertex;
   Point jpsVertex;
   Point phiVertex;
+  Point commonVertex;
 
   edm::EDGetTokenT<reco::GenParticleCollection> genCands_;
 
@@ -114,12 +94,12 @@ isMC_(iConfig.getParameter < bool > ("isMC"))
     edm::Service < TFileService > fs;
     x_tree = fs->make < TTree > ("chiTree", "Tree of chic");
 
-    x_tree->Branch("run",      &run,      "run/i");
-    x_tree->Branch("event",    &event,    "event/l");
+    x_tree->Branch("run", &run, "run/i");
+    x_tree->Branch("event", &event, "event/l");
     x_tree->Branch("lumiblock",&lumiblock,"lumiblock/i");
 
-    x_tree->Branch("x_p4",    "TLorentzVector", &x_p4);
-    x_tree->Branch("trigger", &trigger,            "trigger/i");
+    x_tree->Branch("x_p4", "TLorentzVector", &x_p4);
+    x_tree->Branch("trigger", &trigger, "trigger/i");
 
     x_tree->Branch("jpsi_p4", "TLorentzVector", &jpsi_p4);
     x_tree->Branch("muonP_jpsi_p4",  "TLorentzVector", &muonP_jpsi_p4);
@@ -131,54 +111,34 @@ isMC_(iConfig.getParameter < bool > ("isMC"))
 
     x_tree->Branch("numPrimaryVertices", &numPrimaryVertices, "numPrimaryVertices/i");
 
-    // x_tree->Branch("dz",           &dz,           "dz/D");
-    x_tree->Branch("dzjpsi",           &dz_jpsi,           "dz_jpsi/D");
-    x_tree->Branch("dzphi",           &dz_phi,           "dz_phi/D");
-
+    x_tree->Branch("dz", &dz, "dz/D");
+    x_tree->Branch("dzjpsi", &dz_jpsi, "dz_jpsi/D");
+    x_tree->Branch("dzphi", &dz_phi, "dz_phi/D");
 
     x_tree->Branch("xVertex",  "Point", &xVertex);
+    x_tree->Branch("muLessVertex",  "Point", &muLessVertex);
     x_tree->Branch("jpsVertex",  "Point", &jpsVertex);
     x_tree->Branch("phiVertex",  "Point", &phiVertex);
+    x_tree->Branch("commonVertex",  "Point", &commonVertex);
 
-    //
-    // x_tree->Branch("rf1S_chi_p4", "TLorentzVector", &rf1S_chi_p4);
-    // x_tree->Branch("invm1S",      &invm1S,          "invm1S/D");
-    // x_tree->Branch("probFit1S",   &probFit1S,       "probFit1S/D");
-    // x_tree->Branch("y1S_nsigma",  &y1S_nsigma,      "y1S_nsigma/D");
-    //
-    // x_tree->Branch("ele_lowerPt_pt",  &ele_lowerPt_pt,  "ele_lowerPt_pt/D");
-    // x_tree->Branch("ele_higherPt_pt", &ele_higherPt_pt, "ele_higherPt_pt/D");
-    //
-    // x_tree->Branch("ctpv",         &ctpv,         "ctpv/D");
-    // x_tree->Branch("ctpv_error",   &ctpv_error,   "ctpv_error/D");
-    // x_tree->Branch("conv_vertex",  &conv_vertex,  "conv_vertex/D");
-    // x_tree->Branch("dz",           &dz,           "dz/D");
-    //
-    // x_tree->Branch("photon_flags", &photon_flags, "photon_flags/i");
-    //
-    //
-    // x_tree->Branch("trigger",            &trigger,            "trigger/i");
-    // x_tree->Branch("rf1S_rank",          &rf1S_rank,          "rf1S_rank/i");
-    //
-    // if (isMC_) {
-    //    x_tree->Branch("chi_pdgId",     &chi_pdgId,        "chi_pdgId/I");
-    //    x_tree->Branch("yns_pdgId",     &yns_pdgId,        "yns_pdgId/I");
-    //    x_tree->Branch("gen_chi_p4",    "TLorentzVector",  &gen_chi_p4);
-    //    x_tree->Branch("gen_yns_p4",    "TLorentzVector",  &gen_yns_p4);
-    //    x_tree->Branch("gen_dimuon_p4", "TLorentzVector",  &gen_dimuon_p4);
-    //    x_tree->Branch("gen_photon_p4", "TLorentzVector",  &gen_photon_p4);
-    //    x_tree->Branch("gen_muonP_p4",  "TLorentzVector",  &gen_muonP_p4);
-    //    x_tree->Branch("gen_muonM_p4",  "TLorentzVector",  &gen_muonM_p4);
-    // }
-    // genCands_ = consumes<reco::GenParticleCollection>((edm::InputTag)"prunedGenParticles");
-    //
-    // upsilon_tree = fs->make<TTree>("psiTree","Tree of Jpsi");
-    // upsilon_tree->Branch("mumu_p4",  "TLorentzVector", &mumu_p4);
-    // upsilon_tree->Branch("muP_p4",   "TLorentzVector", &muP_p4);
-    // upsilon_tree->Branch("muM_p4",   "TLorentzVector", &muM_p4);
-    // upsilon_tree->Branch("trigger",  &trigger,         "trigger/i");
-    // upsilon_tree->Branch("numPrimaryVertices", &numPrimaryVertices, "numPrimaryVertices/i");
-    // upsilon_tree->Branch("x_rank",&x_rank,       "x_rank/i");
+    x_tree->Branch("countTksOfPV", &countTksOfPV, "countTksOfPV/i");
+    x_tree->Branch("vertexWeight", &vertexWeight, "vertexWeight/D");
+    x_tree->Branch("sumPTPV", &sumPTPV, "sumPTPV/D");
+
+    x_tree->Branch("vProb", &vProb, "vProb/D");
+    x_tree->Branch("vNChi2", &vChi2, "vChi2/D");
+
+    x_tree->Branch("ctauBS", &ctauBS, "ctauBS/D");
+    x_tree->Branch("ctauErrBS", &ctauErrBS, "ctauErrBS/D");
+
+    x_tree->Branch("ppdlBS", &ppdlBS, "ppdlBS/D");
+    x_tree->Branch("ppdlErrBS", &ppdlErrBS, "ppdlErrBS/D");
+
+    x_tree->Branch("ppdlPV", &ppdlPV, "ppdlPV/D");
+    x_tree->Branch("ppdlErrPV", &ppdlErrPV, "ppdlErrPV/D");
+
+    x_tree->Branch("cosAlpha", &cosAlpha, "cosAlpha/D");
+
 }
 
 //Check recursively if any ancestor of particle is the given one
@@ -294,8 +254,6 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
     } else std::cout << "*** NO triggerResults found " << iEvent.id().run() << "," << iEvent.id().event() << std::endl;
 
     bool bestCandidateOnly_ = false;
-    rf1S_rank = 0;
-    photon_flags = 0; //else std::cout << "no valid chi handle" << std::endl;
 
     x_rank = 0;
 
@@ -307,7 +265,32 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
         phiVertex = x_.daughter("phi")->vertex();
         jpsVertex = x_.daughter("jpsi")->vertex();
 
-        // dz = fabs(Getdz(x_,xVertex));
+        xCand.addUserInt("countTksOfPV", countTksOfPV);
+        xCand.addUserFloat("vertexWeight", (float) vertexWeight);
+        xCand.addUserFloat("sumPTPV", (float) sumPTPV);
+
+        if (addMuonlessPrimaryVertex_)
+        {
+          xCand.addUserData("muonlessPV",Vertex(thePrimaryV));
+          xCand.addUserFloat("ppdlPVMuLess",ctauPV);
+          xCand.addUserFloat("ppdlErrPVMuLess",ctauErrPV);
+          xCand.addUserFloat("cosAlphaMuLess",cosAlpha);
+        }
+        xCand.addUserFloat("MassErr",MassWErr.error());
+
+        xCand.addUserFloat("vNChi2",vChi2/vNDF);
+        xCand.addUserFloat("vProb",vProb);
+
+        xCand.addUserFloat("ppdlBS",ctauBS);
+        xCand.addUserFloat("ppdlErrBS",ctauErrBS);
+
+        xCand.addUserData("PVwithmuons",Vertex(theOriginalPV));
+
+        xCand.addUserFloat("ppdlPV",ctauPV);
+        xCand.addUserFloat("ppdlErrPV",ctauErrPV);
+        xCand.addUserFloat("cosAlpha",cosAlpha);
+
+        dz = x_.userFloat("dzFourMuons");
         dz_jpsi = x_.userFloat("dzJpsi");
         dz_phi = x_.userFloat("dzPhi");
 

@@ -9,7 +9,6 @@ thebeamspot_(consumes<reco::BeamSpot>(iConfig.getParameter<edm::InputTag>("beamS
 thePVs_(consumes<reco::VertexCollection>(iConfig.getParameter<edm::InputTag>("primaryVertexTag"))),
 quadmuonSelection_(iConfig.existsAs<std::string>("quadmuonSelection") ? iConfig.getParameter<std::string>("quadmuonSelection") : ""),
 dzMax_(iConfig.getParameter<double>("dzmax")),
-addCommonVertex_(iConfig.getParameter<bool>("addCommonVertex")),
 addMuonlessPrimaryVertex_(iConfig.getParameter<bool>("addMuonlessPrimaryVertex")),
 resolveAmbiguity_(iConfig.getParameter<bool>("resolvePileUpAmbiguity")),
 addMCTruth_(iConfig.getParameter<bool>("addMCTruth")),
@@ -320,9 +319,8 @@ void FourOniaProducer::produce(edm::Event& event, const edm::EventSetup& esetup)
           xCand.addUserFloat("ppdlBS",ctauBS);
           xCand.addUserFloat("ppdlErrBS",ctauErrBS);
 
-          if (addCommonVertex_) {
-            xCand.addUserData("commonVertex",Vertex(myVertex));
-          }
+          xCand.addUserData("commonVertex",Vertex(myVertex));
+
         } else {
           xCand.addUserFloat("vNChi2",-1);
           xCand.addUserFloat("vProb", -1);
@@ -331,7 +329,7 @@ void FourOniaProducer::produce(edm::Event& event, const edm::EventSetup& esetup)
           xCand.addUserFloat("cosAlpha",-100);
           xCand.addUserFloat("ppdlBS",-100);
           xCand.addUserFloat("ppdlErrBS",-100);
-          if (addCommonVertex_)
+
           xCand.addUserData("commonVertex",Vertex());
           if (addMuonlessPrimaryVertex_)
           xCand.addUserData("muonlessPV",Vertex());
@@ -359,11 +357,9 @@ void FourOniaProducer::produce(edm::Event& event, const edm::EventSetup& esetup)
       continue;
     }
 
-    if (addCommonVertex_)
-    {
-      float dz = fabs(Getdz(*phiCand,ipv->position()));
-      xCand.addUserFloat("dzFourMuons",dz);
-    }
+    float dz = fabs(Getdz(*phiCand,ipv->position()));
+    xCand.addUserFloat("dzFourMuons",dz);
+
 
     xCandColl->push_back(xCand);
     candidates++;

@@ -3,7 +3,7 @@ from ROOT import TFile,TH1,TH1F,TCanvas,TNtuple,TTreeReader,TTreeReaderValue
 from ROOT import RooFit
 from ROOT.RooFit import Layout
 from ROOT import RooStats
-from ROOT import RooAbsData
+from ROOT import RooAbsData,RooBernstein
 RooAbsData.setDefaultStorageType ( RooAbsData.Tree )
 from array import array
 import sys
@@ -29,7 +29,7 @@ xTuple = (inputfile.Get("outuple"))
 # In[5]:
 
 
-massmin = 5.2
+massmin = 1.2
 massmax = 5.55
 
 
@@ -99,6 +99,7 @@ c.SaveAs("testmass.png")
 
 # In[13]:
 
+phimean = 1.019
 
 sigma = RooRealVar("sigma","width of gaussian",0.0013)
 gamma = RooRealVar("gamma","gamma of bw",0.004253,0.001,0.01)
@@ -106,42 +107,51 @@ mean = RooRealVar("mean","mean of gaussian",phimean,phimean-0.005,phimean+0.005)
 
 nSig = RooRealVar("nSig","nSig",1E6,0.,5.0E6)
 nBkg = RooRealVar("nBkg","nBkg",5E5,0.,5.0E6)
-cheb = RooChebychev("cheb","Background",masskk,aset)
+#cheb = RooChebychev("cheb","Background",masskk,aset)
 #gauss = RooGaussian("gauss","gaussian PDF ",mass,mean,sigma)
 signal = RooVoigtian("signal","signal",masskk,mean,gamma,sigma)
 
-B_c     = RooRealVar ( "B_c"    , "B_c "    , 0.3  , -20   , 100   )
-B_b     = RooRealVar ( "B_b"    , "B_b "    , 0.3  , -20   , 100   )
+B_1     = RooRealVar ( "B_1"    , "B_1 "    , 0.3  , -20   , 100   )
+B_2     = RooRealVar ( "B_2"    , "B_2"    , 0.3  , -20   , 100   )
+B_3     = RooRealVar ( "B_3"    , "B_3"    , 0.3  , -20   , 100   )
+B_4     = RooRealVar ( "B_4"    , "B_4"    , 0.3  , -20   , 100   )
 
-bkg    = RooBernstein("pdfB" , "pdfB"    , masskk   , RooArgList(B_c, B_b))
+bkg    = RooBernstein("pdfB" , "pdfB"    , masskk   , RooArgList(B_1, B_2,B_3,B_4))
 
 tot = RooAddPdf("tot","g+cheb",RooArgList(signal,bkg),RooArgList(nSig,nBkg))
 
+mean.setVal(phimean)
+gamma.setConstant(ROOT.kTRUE)
+mean.setConstant(ROOT.kTRUE)
 
-rfit = tot.fitTo(b0dataNonPrompt,Range(massmin,massmax))
+rfit = tot.fitTo(b0dataNonPrompt,Range(massmin,massmax),RooFit.NumCPU(8))
+mean.setConstant(ROOT.kFALSE)
+rfit = tot.fitTo(b0dataNonPrompt,Range(massmin,massmax),RooFit.NumCPU(8))
+gamma.setConstant(ROOT.kFALSE)
+rfit = tot.fitTo(b0dataNonPrompt,Range(phimean-0.025,phimean+0.025),RooFit.NumCPU(8))
 
-massFrame = mass.frame(Range(massmin,massmax))
+masskkFrame = masskk.frame(Range(phimean-0.025,phimean+0.025))
 b0dataNonPrompt.plotOn(massFrame,RooLinkedList())
-tot.plotOn(massFrame)
+tot.plotOn(masskkFrame)
 
 massFrame.Draw()
 c.SaveAs("testmassFit.png")
 
 cD=TCanvas("cD","cD",750,600)
 cD.cd()
-splot   = RooStats.SPlot ( "sPlot","sPlot", xdataPrompt, tot, RooArgList(nSig,nBkg))
+splot   = RooStats.SPlot ( "sPlot","sPlot", b0dataNonPrompt, tot, RooArgList(nSig,nBkg))
 
 
 # In[18]:
 
 
-dstree  = xdataPrompt.store().tree()
+dstree  = b0dataNonPrompt.store().tree()
 
 
 # In[19]:
 
 
-shist   = TH1F('shist','shist', 100, 1.00, 1.05)
+shist   = TH1F('shist','shist', 500, 1.00, 1.05)
 
 
 # In[20]:

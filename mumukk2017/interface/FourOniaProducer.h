@@ -77,7 +77,7 @@ class FourOniaProducer : public edm::EDProducer {
   StringCutObjectSelector<reco::Candidate, true> quadmuonSelection_;
 
   double dzMax_;
-  bool addCommonVertex_, addMuonlessPrimaryVertex_;
+  bool addMuonlessPrimaryVertex_;
   bool resolveAmbiguity_;
   bool addMCTruth_;
   bool triggerMatch_;

@@ -91,10 +91,12 @@ cheb = RooChebychev("cheb","Background",masskk,aset)
 #gauss = RooGaussian("gauss","gaussian PDF ",mass,mean,sigma)
 signal = RooVoigtian("signal","signal",masskk,mean,gamma,sigma)
 
-B_c     = RooRealVar ( "B_c"    , "B_c "    , 0.3  , -20   , 100   )
-B_b     = RooRealVar ( "B_b"    , "B_b "    , 0.3  , -20   , 100   )
+B_1     = RooRealVar ( "B_1"    , "B_1 "    , 0.3  , -20   , 100   )
+B_2     = RooRealVar ( "B_2"    , "B_2"    , 0.3  , -20   , 100   )
+B_3     = RooRealVar ( "B_3"    , "B_3"    , 0.3  , -20   , 100   )
+B_4     = RooRealVar ( "B_4"    , "B_4"    , 0.3  , -20   , 100   )
 
-bkg    = RooBernstein("pdfB" , "pdfB"    , masskk   , RooArgList(B_c, B_b))
+bkg    = RooBernstein("pdfB" , "pdfB"    , masskk   , RooArgList(B_1, B_2, B_3, B_4))
 
 tot = RooAddPdf("tot","g+cheb",RooArgList(signal,bkg),RooArgList(nSig,nBkg))
 
@@ -107,9 +109,10 @@ mean.setConstant(True)
 gamma.setConstant(True)
 rPhifit = tot.fitTo(xdataPrompt,Range(phimin,phimax),RooFit.NumCPU(4))
 
-mean.setConstant(False)
-rPhifit = tot.fitTo(xdataPrompt,Range(phimin,phimax),RooFit.NumCPU(4))
 
+#rPhifit = tot.fitTo(xdataPrompt,Range(phimin,phimax),RooFit.NumCPU(4))
+
+mean.setConstant(False)
 gamma.setConstant(False)
 rPhifit = tot.fitTo(xdataPrompt,Range(phimin,phimax),RooFit.NumCPU(4))
 
@@ -140,7 +143,7 @@ dstree  = xdataPrompt.store().tree()
 # In[19]:
 
 
-shist   = TH1F('shist','shist', 100, 4.0, 5.0)
+shist   = TH1F('shist','shist', 500, 4.0, 5.0)
 
 
 # In[20]:
