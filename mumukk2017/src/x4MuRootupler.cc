@@ -175,57 +175,57 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
   edm::Handle<reco::GenParticleCollection> pruned;
   // iEvent.getByToken(genCands_,pruned);
 
-  if (false && isMC_) {
-   gen_chi_p4.SetPtEtaPhiM(0, 0, 0, 0);
-   gen_yns_p4.SetPtEtaPhiM(0, 0, 0, 0);
-   gen_dimuon_p4.SetPtEtaPhiM(0, 0, 0, 0);
-   chi_pdgId = 0;
-   for (size_t i=0; i<pruned->size(); i++) {
-      int p_id = abs((*pruned)[i].pdgId());
-      int p_status = (*pruned)[i].status();
-      yns_pdgId = 0;
-      int foundit = 0;
-      if ( ( p_id == 20443 || p_id == 445 || p_id == 10441) && p_status == 2)  yns_pdgId = 443;
-      if (yns_pdgId > 0) {
-         chi_pdgId = p_id;
-         foundit++;
-         const reco::Candidate * pwave = &(*pruned)[i];
-         gen_chi_p4.SetPtEtaPhiM(pwave->pt(),pwave->eta(),pwave->phi(),pwave->mass());
-         for (size_t j=0; j<pwave->numberOfDaughters(); j++) {
-            const reco::Candidate *dau = pwave->daughter(j);
-            if (dau->pdgId() == yns_pdgId && dau->status() == 2) {
-               gen_yns_p4.SetPtEtaPhiM(dau->pt(),dau->eta(),dau->phi(),dau->mass());
-               uint nmuons = 0;
-               for (size_t k=0; k<dau->numberOfDaughters(); k++) {
-                  const reco::Candidate *gdau = dau->daughter(k);
-                  if (gdau->pdgId() == 13 && gdau->status()==1) {
-                     nmuons++;
-                     gen_muonM_p4.SetPtEtaPhiM(gdau->pt(),gdau->eta(),gdau->phi(),gdau->mass());
-                  } else {
-                     if (gdau->pdgId() == -13 && gdau->status()==1) {
-                        nmuons++;
-                        gen_muonP_p4.SetPtEtaPhiM(gdau->pt(),gdau->eta(),gdau->phi(),gdau->mass());
-                     }
-                  }
-               }
-               if (nmuons == 2 ) {
-                  foundit += 3;                                  // found complete dimuon decay
-                  gen_dimuon_p4 = gen_muonM_p4 + gen_muonP_p4;   // will account fsr
-               }
-            } else {
-               if (dau->pdgId() == 22 && dau->status() ==1) {
-                  foundit++;
-                  gen_photon_p4.SetPtEtaPhiM(dau->pt(),dau->eta(),dau->phi(),dau->mass());
-               }  else std::cout << "Rootupler: unexpected pdg_id " << dau->pdgId() << " (" << run << "," << event << ")" << std::endl;
-            }
-            if (foundit == 5 ) break;                             // decay found !
-         }
-      }
-      if (chi_pdgId && yns_pdgId && foundit==5) break;        // just one decay of this kind is expected
-      else chi_pdgId = 0;
-   }
-   if (!chi_pdgId)  std::cout << "Rootupler does not found the given decay " << run << "," << event << std::endl;
-  }
+  // if (false && isMC_) {
+  //  gen_chi_p4.SetPtEtaPhiM(0, 0, 0, 0);
+  //  gen_yns_p4.SetPtEtaPhiM(0, 0, 0, 0);
+  //  gen_dimuon_p4.SetPtEtaPhiM(0, 0, 0, 0);
+  //  chi_pdgId = 0;
+  //  for (size_t i=0; i<pruned->size(); i++) {
+  //     int p_id = abs((*pruned)[i].pdgId());
+  //     int p_status = (*pruned)[i].status();
+  //     yns_pdgId = 0;
+  //     int foundit = 0;
+  //     if ( ( p_id == 20443 || p_id == 445 || p_id == 10441) && p_status == 2)  yns_pdgId = 443;
+  //     if (yns_pdgId > 0) {
+  //        chi_pdgId = p_id;
+  //        foundit++;
+  //        const reco::Candidate * pwave = &(*pruned)[i];
+  //        gen_chi_p4.SetPtEtaPhiM(pwave->pt(),pwave->eta(),pwave->phi(),pwave->mass());
+  //        for (size_t j=0; j<pwave->numberOfDaughters(); j++) {
+  //           const reco::Candidate *dau = pwave->daughter(j);
+  //           if (dau->pdgId() == yns_pdgId && dau->status() == 2) {
+  //              gen_yns_p4.SetPtEtaPhiM(dau->pt(),dau->eta(),dau->phi(),dau->mass());
+  //              uint nmuons = 0;
+  //              for (size_t k=0; k<dau->numberOfDaughters(); k++) {
+  //                 const reco::Candidate *gdau = dau->daughter(k);
+  //                 if (gdau->pdgId() == 13 && gdau->status()==1) {
+  //                    nmuons++;
+  //                    gen_muonM_p4.SetPtEtaPhiM(gdau->pt(),gdau->eta(),gdau->phi(),gdau->mass());
+  //                 } else {
+  //                    if (gdau->pdgId() == -13 && gdau->status()==1) {
+  //                       nmuons++;
+  //                       gen_muonP_p4.SetPtEtaPhiM(gdau->pt(),gdau->eta(),gdau->phi(),gdau->mass());
+  //                    }
+  //                 }
+  //              }
+  //              if (nmuons == 2 ) {
+  //                 foundit += 3;                                  // found complete dimuon decay
+  //                 gen_dimuon_p4 = gen_muonM_p4 + gen_muonP_p4;   // will account fsr
+  //              }
+  //           } else {
+  //              if (dau->pdgId() == 22 && dau->status() ==1) {
+  //                 foundit++;
+  //                 gen_photon_p4.SetPtEtaPhiM(dau->pt(),dau->eta(),dau->phi(),dau->mass());
+  //              }  else std::cout << "Rootupler: unexpected pdg_id " << dau->pdgId() << " (" << run << "," << event << ")" << std::endl;
+  //           }
+  //           if (foundit == 5 ) break;                             // decay found !
+  //        }
+  //     }
+  //     if (chi_pdgId && yns_pdgId && foundit==5) break;        // just one decay of this kind is expected
+  //     else chi_pdgId = 0;
+  //  }
+  //  if (!chi_pdgId)  std::cout << "Rootupler does not found the given decay " << run << "," << event << std::endl;
+  // }
 
    //grab Trigger informations
    // save it in variable trigger, trigger is an int between 0 and 15, in binary it is:
@@ -264,6 +264,47 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
         xVertex  = x_.vertex();
         phiVertex = x_.daughter("phi")->vertex();
         jpsVertex = x_.daughter("jpsi")->vertex();
+
+        x_tree->Branch("x_p4", "TLorentzVector", &x_p4);
+        x_tree->Branch("trigger", &trigger, "trigger/i");
+
+        x_tree->Branch("jpsi_p4", "TLorentzVector", &jpsi_p4);
+        x_tree->Branch("muonP_jpsi_p4",  "TLorentzVector", &muonP_jpsi_p4);
+        x_tree->Branch("muonM_jpsi_p4",  "TLorentzVector", &muonM_jpsi_p4);
+
+        x_tree->Branch("phi_p4", "TLorentzVector", &phi_p4);
+        x_tree->Branch("muonP_phi_p4",  "TLorentzVector", &muonP_phi_p4);
+        x_tree->Branch("muonM_phi_p4",  "TLorentzVector", &muonM_phi_p4);
+
+        x_tree->Branch("numPrimaryVertices", &numPrimaryVertices, "numPrimaryVertices/i");
+
+        x_tree->Branch("dz", &dz, "dz/D");
+        x_tree->Branch("dzjpsi", &dz_jpsi, "dz_jpsi/D");
+        x_tree->Branch("dzphi", &dz_phi, "dz_phi/D");
+
+        x_tree->Branch("xVertex",  "Point", &xVertex);
+        x_tree->Branch("muLessVertex",  "Point", &muLessVertex);
+        x_tree->Branch("jpsVertex",  "Point", &jpsVertex);
+        x_tree->Branch("phiVertex",  "Point", &phiVertex);
+        x_tree->Branch("commonVertex",  "Point", &commonVertex);
+
+        x_tree->Branch("countTksOfPV", &countTksOfPV, "countTksOfPV/i");
+        x_tree->Branch("vertexWeight", &vertexWeight, "vertexWeight/D");
+        x_tree->Branch("sumPTPV", &sumPTPV, "sumPTPV/D");
+
+        x_tree->Branch("vProb", &vProb, "vProb/D");
+        x_tree->Branch("vNChi2", &vChi2, "vChi2/D");
+
+        x_tree->Branch("ctauBS", &ctauBS, "ctauBS/D");
+        x_tree->Branch("ctauErrBS", &ctauErrBS, "ctauErrBS/D");
+
+        x_tree->Branch("ppdlBS", &ppdlBS, "ppdlBS/D");
+        x_tree->Branch("ppdlErrBS", &ppdlErrBS, "ppdlErrBS/D");
+
+        x_tree->Branch("ppdlPV", &ppdlPV, "ppdlPV/D");
+        x_tree->Branch("ppdlErrPV", &ppdlErrPV, "ppdlErrPV/D");
+
+        x_tree->Branch("cosAlpha", &cosAlpha, "cosAlpha/D");
 
         xCand.addUserInt("countTksOfPV", countTksOfPV);
         xCand.addUserFloat("vertexWeight", (float) vertexWeight);
