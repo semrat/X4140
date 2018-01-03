@@ -16,7 +16,7 @@
 #include "DataFormats/PatCandidates/interface/PackedGenParticle.h"
 #include "DataFormats/Candidate/interface/Candidate.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
-#include <DataFormats/PatCandidates/interface/UserData.h>
+#include "DataFormats/PatCandidates/interface/UserData.h"
 #include "DataFormats/GeometryVector/interface/GlobalPoint.h"
 
 #include "TLorentzVector.h"
@@ -66,7 +66,7 @@ class x4MuRootupler:public edm::EDAnalyzer {
   TLorentzVector muonM_phi_p4;
 
   Double_t cosAlpha, ctauErrPV, ctauPV, ctauPVMuLess, ctauErrPVMuLess;
-  Double_t ctauErrBS, ctauBS, vChi2, vProb, sumPTPV;
+  Double_t ctauErrBS, ctauBS, vNChi2, vProb, sumPTPV;
   Double_t vertexWeight, dz, dz_jpsi, dz_phi;
 
 	TTree *x_tree;
@@ -128,7 +128,7 @@ isMC_(iConfig.getParameter < bool > ("isMC"))
     x_tree->Branch("sumPTPV", &sumPTPV, "sumPTPV/D");
 
     x_tree->Branch("vProb", &vProb, "vProb/D");
-    x_tree->Branch("vNChi2", &vChi2, "vChi2/D");
+    x_tree->Branch("vNChi2", &vNChi2, "vNChi2/D");
 
     x_tree->Branch("ctauBS", &ctauBS, "ctauBS/D");
     x_tree->Branch("ctauErrBS", &ctauErrBS, "ctauErrBS/D");
@@ -263,7 +263,7 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
         xVertex  = x_.vertex();
         phiVertex = x_.daughter("phi")->vertex();
         jpsVertex = x_.daughter("jpsi")->vertex();
-        muLessVertex = x_.userData("muonlessPV");
+        muLessVertex = *(x_.userData("muonlessPV"));
         commonVertex = x_.userData("commonVertex");
 
         countTksOfPV = x_.userInt("countTksOfPV");
@@ -288,16 +288,14 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
         xCand.addUserFloat("vertexWeight", (float) vertexWeight);
         xCand.addUserFloat("sumPTPV", (float) sumPTPV);
 
-        if (addMuonlessPrimaryVertex_)
-        {
           xCand.addUserData("muonlessPV",Vertex(thePrimaryV));
           xCand.addUserFloat("ppdlPVMuLess",ctauPV);
           xCand.addUserFloat("ppdlErrPVMuLess",ctauErrPV);
           xCand.addUserFloat("cosAlphaMuLess",cosAlpha);
-        }
+
         xCand.addUserFloat("MassErr",MassWErr.error());
 
-        xCand.addUserFloat("vNChi2",vChi2/vNDF);
+        xCand.addUserFloat("vNChi2",vNChi2/vNDF);
         xCand.addUserFloat("vProb",vProb);
 
         xCand.addUserFloat("ppdlBS",ctauBS);
