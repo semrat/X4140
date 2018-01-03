@@ -266,8 +266,8 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
 
         // getdata = "muonlessPV";
         std::string getdata = "muonlessPV";
-        muLessVertex = (x_.userData(getdata));
-        commonVertex = x_.userData("commonVertex");
+        muLessVertex = (x_.userData<Point>(getdata));
+        commonVertex = x_.userData<Point>("commonVertex");
 
         countTksOfPV = x_.userInt("countTksOfPV");
         vertexWeight = x_.userFloat("vertexWeight");
