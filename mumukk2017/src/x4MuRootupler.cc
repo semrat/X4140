@@ -53,6 +53,7 @@ class x4MuRootupler:public edm::EDAnalyzer {
 	UInt_t run;
   ULong64_t event;
   UInt_t lumiblock;
+  UInt_t trigger;
   UInt_t numPrimaryVertices;
   UInt_t countTksOfPV;
 
@@ -64,7 +65,7 @@ class x4MuRootupler:public edm::EDAnalyzer {
   TLorentzVector muonP_phi_p4;
   TLorentzVector muonM_phi_p4;
 
-  Double_t cosAlpha, ppdlErrPV, ppdlPV, ppdlBS, ppdlErrBS;
+  Double_t cosAlpha, ctauErrPV, ctauPV, ctauBS, ctauErrBS, ctauPVMuLess, ctauErrPVMuLess;
   Double_t ctauErrBS, ctauBS, vChi2, vProb, sumPTPV;
   Double_t vertexWeight, dz, dz_jpsi, dz_phi;
 
@@ -74,6 +75,7 @@ class x4MuRootupler:public edm::EDAnalyzer {
   Point jpsVertex;
   Point phiVertex;
   Point commonVertex;
+  Point muLessVertex;
 
   edm::EDGetTokenT<reco::GenParticleCollection> genCands_;
 
@@ -130,9 +132,6 @@ isMC_(iConfig.getParameter < bool > ("isMC"))
 
     x_tree->Branch("ctauBS", &ctauBS, "ctauBS/D");
     x_tree->Branch("ctauErrBS", &ctauErrBS, "ctauErrBS/D");
-
-    x_tree->Branch("ppdlBS", &ppdlBS, "ppdlBS/D");
-    x_tree->Branch("ppdlErrBS", &ppdlErrBS, "ppdlErrBS/D");
 
     x_tree->Branch("ppdlPV", &ppdlPV, "ppdlPV/D");
     x_tree->Branch("ppdlErrPV", &ppdlErrPV, "ppdlErrPV/D");
@@ -264,42 +263,24 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
         xVertex  = x_.vertex();
         phiVertex = x_.daughter("phi")->vertex();
         jpsVertex = x_.daughter("jpsi")->vertex();
+        muLessVertex = x_.userData("muonlessPV");
+        commonVertex = x_.userData("commonVertex");
 
-        x_tree->Branch("x_p4", "TLorentzVector", &x_p4);
-        x_tree->Branch("trigger", &trigger, "trigger/i");
+        countTksOfPV = x_.userInt("countTksOfPV");
+        vertexWeight = x_.userFloat("vertexWeight");
+        sumPTPV       = x_.userFloat("sumPTPV");
 
-        x_tree->Branch("jpsi_p4", "TLorentzVector", &jpsi_p4);
-        x_tree->Branch("muonP_jpsi_p4",  "TLorentzVector", &muonP_jpsi_p4);
-        x_tree->Branch("muonM_jpsi_p4",  "TLorentzVector", &muonM_jpsi_p4);
+        vProb           = x_.userFloat("vProb");
+        vNChi2          = x_.userFloat("vNChi2");
 
-        x_tree->Branch("phi_p4", "TLorentzVector", &phi_p4);
-        x_tree->Branch("muonP_phi_p4",  "TLorentzVector", &muonP_phi_p4);
-        x_tree->Branch("muonM_phi_p4",  "TLorentzVector", &muonM_phi_p4);
+        ctauBS          = x_.userFloat("ctauBS");
+        ctauErrBS       = x_.userFloat("ctauErrBS");
 
-        x_tree->Branch("numPrimaryVertices", &numPrimaryVertices, "numPrimaryVertices/i");
+        ctauPV          = x_.userFloat("ctauPV");
+        ctauErrPV       = x_.userFloat("ctauErrPV");
 
-        x_tree->Branch("dz", &dz, "dz/D");
-        x_tree->Branch("dzjpsi", &dz_jpsi, "dz_jpsi/D");
-        x_tree->Branch("dzphi", &dz_phi, "dz_phi/D");
-
-        x_tree->Branch("xVertex",  "Point", &xVertex);
-        x_tree->Branch("muLessVertex",  "Point", &muLessVertex);
-        x_tree->Branch("jpsVertex",  "Point", &jpsVertex);
-        x_tree->Branch("phiVertex",  "Point", &phiVertex);
-        x_tree->Branch("commonVertex",  "Point", &commonVertex);
-
-        x_tree->Branch("countTksOfPV", &countTksOfPV, "countTksOfPV/i");
-        x_tree->Branch("vertexWeight", &vertexWeight, "vertexWeight/D");
-        x_tree->Branch("sumPTPV", &sumPTPV, "sumPTPV/D");
-
-        x_tree->Branch("vProb", &vProb, "vProb/D");
-        x_tree->Branch("vNChi2", &vChi2, "vChi2/D");
-
-        x_tree->Branch("ctauBS", &ctauBS, "ctauBS/D");
-        x_tree->Branch("ctauErrBS", &ctauErrBS, "ctauErrBS/D");
-
-        x_tree->Branch("ppdlBS", &ppdlBS, "ppdlBS/D");
-        x_tree->Branch("ppdlErrBS", &ppdlErrBS, "ppdlErrBS/D");
+        ctauPVMuLess    = x_.userFloat("ctauPVMuLess");
+        ctauErrPVMuLess = x_.userFloat("ctauErrPVMuLess");
 
         x_tree->Branch("ppdlPV", &ppdlPV, "ppdlPV/D");
         x_tree->Branch("ppdlErrPV", &ppdlErrPV, "ppdlErrPV/D");
@@ -335,7 +316,16 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
         dz_jpsi = x_.userFloat("dzJpsi");
         dz_phi = x_.userFloat("dzPhi");
 
+
         x_p4.SetPtEtaPhiM(x_.pt(), x_.eta(), x_.phi(), x_.mass());
+
+        jpsi_p4.SetPtEtaPhiM(x_.pt(), x_.eta(), x_.phi(), x_.mass());
+        muonP_jpsi_p4.SetPtEtaPhiM(x_.pt(), x_.eta(), x_.phi(), x_.mass());
+        muonM_jpsi_p4.SetPtEtaPhiM(x_.pt(), x_.eta(), x_.phi(), x_.mass());
+
+        phi_p4.SetPtEtaPhiM(x_.pt(), x_.eta(), x_.phi(), x_.mass());
+        muonP_phi_p4.SetPtEtaPhiM(x_.pt(), x_.eta(), x_.phi(), x_.mass());
+        muonM_phi_p4.SetPtEtaPhiM(x_.pt(), x_.eta(), x_.phi(), x_.mass());
 
         x_tree->Fill();
         x_rank++;

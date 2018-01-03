@@ -280,8 +280,8 @@ void FourOniaProducer::produce(edm::Event& event, const edm::EventSetup& esetup)
           //double ctauErrPV = sqrt(vXYe.similarity(vpperp))*3.09688/(pperp.Perp2());
           double ctauErrPV = sqrt(ROOT::Math::Similarity(vpperp,vXYe))*xCand.mass()/(pperp.Perp2());
 
-          xCand.addUserFloat("ppdlPV",ctauPV);
-          xCand.addUserFloat("ppdlErrPV",ctauErrPV);
+          xCand.addUserFloat("ctauPV",ctauPV);
+          xCand.addUserFloat("ctauErrPV",ctauErrPV);
           xCand.addUserFloat("cosAlpha",cosAlpha);
 
           if (addMuonlessPrimaryVertex_){
@@ -297,10 +297,16 @@ void FourOniaProducer::produce(edm::Event& event, const edm::EventSetup& esetup)
             //double ctauErrPV = sqrt(vXYe.similarity(vpperp))*3.09688/(pperp.Perp2());
             double ctauErrPV = sqrt(ROOT::Math::Similarity(vpperp,vXYe))*xCand.mass()/(pperp.Perp2());
 
-            xCand.addUserFloat("ppdlPVMuLess",ctauPV);
-            xCand.addUserFloat("ppdlErrPVMuLess",ctauErrPV);
+            xCand.addUserFloat("ctauPVMuLess",ctauPV);
+            xCand.addUserFloat("ctauErrPVMuLess",ctauErrPV);
             xCand.addUserFloat("cosAlphaMuLess",cosAlpha);
 
+          }
+          else
+          {
+            xCand.addUserFloat("ctauPVMuLess",-100.0);
+            xCand.addUserFloat("ctauErrPVMuLess",ctauErrPV);
+            xCand.addUserFloat("cosAlphaMuLess",cosAlpha);
           }
 
           // lifetime using BS
@@ -316,23 +322,27 @@ void FourOniaProducer::produce(edm::Event& event, const edm::EventSetup& esetup)
           //double ctauErrBS = sqrt(vXYeB.similarity(vpperp))*3.09688/(pperp.Perp2());
           double ctauErrBS = sqrt(ROOT::Math::Similarity(vpperp,vXYeB))*xCand.mass()/(pperp.Perp2());
 
-          xCand.addUserFloat("ppdlBS",ctauBS);
-          xCand.addUserFloat("ppdlErrBS",ctauErrBS);
-
+          xCand.addUserFloat("ctauBS",ctauBS);
+          xCand.addUserFloat("ctauErrBS",ctauErrBS);
           xCand.addUserData("commonVertex",Vertex(myVertex));
 
         } else {
           xCand.addUserFloat("vNChi2",-1);
           xCand.addUserFloat("vProb", -1);
-          xCand.addUserFloat("ppdlPV",-100);
-          xCand.addUserFloat("ppdlErrPV",-100);
+          xCand.addUserFloat("ctauPV",-100);
+          xCand.addUserFloat("ctauErrPV",-100);
           xCand.addUserFloat("cosAlpha",-100);
-          xCand.addUserFloat("ppdlBS",-100);
-          xCand.addUserFloat("ppdlErrBS",-100);
+          xCand.addUserFloat("ctauBS",-100);
+          xCand.addUserFloat("ctauErrBS",-100);
 
           xCand.addUserData("commonVertex",Vertex());
           if (addMuonlessPrimaryVertex_)
-          xCand.addUserData("muonlessPV",Vertex());
+          {
+            xCand.addUserData("muonlessPV",Vertex());
+            xCand.addUserFloat("ctauPVMuLess",-100);
+            xCand.addUserFloat("ctauErrPVMuLess",-100);
+            xCand.addUserFloat("cosAlphaMuLess",-100);
+          }
           xCand.addUserData("PVwithmuons",Vertex());
         }
 
