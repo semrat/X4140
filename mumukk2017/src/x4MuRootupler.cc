@@ -133,8 +133,8 @@ isMC_(iConfig.getParameter < bool > ("isMC"))
     x_tree->Branch("ctauBS", &ctauBS, "ctauBS/D");
     x_tree->Branch("ctauErrBS", &ctauErrBS, "ctauErrBS/D");
 
-    x_tree->Branch("ppdlPV", &ppdlPV, "ppdlPV/D");
-    x_tree->Branch("ppdlErrPV", &ppdlErrPV, "ppdlErrPV/D");
+    x_tree->Branch("ctauPV", &ctauPV, "ctauPV/D");
+    x_tree->Branch("ctauErrPV", &ctauErrPV, "ctauErrPV/D");
 
     x_tree->Branch("cosAlpha", &cosAlpha, "cosAlpha/D");
 
@@ -281,9 +281,6 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
 
         ctauPVMuLess    = x_.userFloat("ctauPVMuLess");
         ctauErrPVMuLess = x_.userFloat("ctauErrPVMuLess");
-
-        x_tree->Branch("ppdlPV", &ppdlPV, "ppdlPV/D");
-        x_tree->Branch("ppdlErrPV", &ppdlErrPV, "ppdlErrPV/D");
 
         x_tree->Branch("cosAlpha", &cosAlpha, "cosAlpha/D");
 
