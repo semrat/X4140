@@ -283,30 +283,30 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
         ctauPVMuLess    = x_.userFloat("ctauPVMuLess");
         ctauErrPVMuLess = x_.userFloat("ctauErrPVMuLess");
 
-        x_tree->Branch("cosAlpha", &cosAlpha, "cosAlpha/D");
-
-        xCand.addUserInt("countTksOfPV", countTksOfPV);
-        xCand.addUserFloat("vertexWeight", (float) vertexWeight);
-        xCand.addUserFloat("sumPTPV", (float) sumPTPV);
-
-          xCand.addUserData("muonlessPV",Vertex(thePrimaryV));
-          xCand.addUserFloat("ppdlPVMuLess",ctauPV);
-          xCand.addUserFloat("ppdlErrPVMuLess",ctauErrPV);
-          xCand.addUserFloat("cosAlphaMuLess",cosAlpha);
-
-        xCand.addUserFloat("MassErr",MassWErr.error());
-
-        xCand.addUserFloat("vNChi2",vNChi2/vNDF);
-        xCand.addUserFloat("vProb",vProb);
-
-        xCand.addUserFloat("ppdlBS",ctauBS);
-        xCand.addUserFloat("ppdlErrBS",ctauErrBS);
-
-        xCand.addUserData("PVwithmuons",Vertex(theOriginalPV));
-
-        xCand.addUserFloat("ppdlPV",ctauPV);
-        xCand.addUserFloat("ppdlErrPV",ctauErrPV);
-        xCand.addUserFloat("cosAlpha",cosAlpha);
+        // x_tree->Branch("cosAlpha", &cosAlpha, "cosAlpha/D");
+        //
+        // xCand.addUserInt("countTksOfPV", countTksOfPV);
+        // xCand.addUserFloat("vertexWeight", (float) vertexWeight);
+        // xCand.addUserFloat("sumPTPV", (float) sumPTPV);
+        //
+        //   xCand.addUserData("muonlessPV",Vertex(thePrimaryV));
+        //   xCand.addUserFloat("ppdlPVMuLess",ctauPV);
+        //   xCand.addUserFloat("ppdlErrPVMuLess",ctauErrPV);
+        //   xCand.addUserFloat("cosAlphaMuLess",cosAlpha);
+        //
+        // xCand.addUserFloat("MassErr",MassWErr.error());
+        //
+        // xCand.addUserFloat("vNChi2",vNChi2/vNDF);
+        // xCand.addUserFloat("vProb",vProb);
+        //
+        // xCand.addUserFloat("ppdlBS",ctauBS);
+        // xCand.addUserFloat("ppdlErrBS",ctauErrBS);
+        //
+        // xCand.addUserData("PVwithmuons",Vertex(theOriginalPV));
+        //
+        // xCand.addUserFloat("ppdlPV",ctauPV);
+        // xCand.addUserFloat("ppdlErrPV",ctauErrPV);
+        // xCand.addUserFloat("cosAlpha",cosAlpha);
 
         dz = x_.userFloat("dzFourMuons");
         dz_jpsi = x_.userFloat("dzJpsi");
