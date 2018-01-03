@@ -65,7 +65,7 @@ class x4MuRootupler:public edm::EDAnalyzer {
   TLorentzVector muonP_phi_p4;
   TLorentzVector muonM_phi_p4;
 
-  Double_t cosAlpha, ctauErrPV, ctauPV, ctauBS, ctauErrBS, ctauPVMuLess, ctauErrPVMuLess;
+  Double_t cosAlpha, ctauErrPV, ctauPV, ctauPVMuLess, ctauErrPVMuLess;
   Double_t ctauErrBS, ctauBS, vChi2, vProb, sumPTPV;
   Double_t vertexWeight, dz, dz_jpsi, dz_phi;
 
