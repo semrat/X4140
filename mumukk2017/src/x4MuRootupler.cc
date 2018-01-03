@@ -315,13 +315,13 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
 
         x_p4.SetPtEtaPhiM(x_.pt(), x_.eta(), x_.phi(), x_.mass());
 
-        jpsi_p4.SetPtEtaPhiM(x_.pt(), x_.eta(), x_.phi(), x_.mass());
-        muonP_jpsi_p4.SetPtEtaPhiM(x_.pt(), x_.eta(), x_.phi(), x_.mass());
-        muonM_jpsi_p4.SetPtEtaPhiM(x_.pt(), x_.eta(), x_.phi(), x_.mass());
-
-        phi_p4.SetPtEtaPhiM(x_.pt(), x_.eta(), x_.phi(), x_.mass());
-        muonP_phi_p4.SetPtEtaPhiM(x_.pt(), x_.eta(), x_.phi(), x_.mass());
-        muonM_phi_p4.SetPtEtaPhiM(x_.pt(), x_.eta(), x_.phi(), x_.mass());
+        // jpsi_p4.SetPtEtaPhiM(x_.pt(), x_.eta(), x_.phi(), x_.mass());
+        // muonP_jpsi_p4.SetPtEtaPhiM(x_.pt(), x_.eta(), x_.phi(), x_.mass());
+        // muonM_jpsi_p4.SetPtEtaPhiM(x_.pt(), x_.eta(), x_.phi(), x_.mass());
+        //
+        // phi_p4.SetPtEtaPhiM(x_.pt(), x_.eta(), x_.phi(), x_.mass());
+        // muonP_phi_p4.SetPtEtaPhiM(x_.pt(), x_.eta(), x_.phi(), x_.mass());
+        // muonM_phi_p4.SetPtEtaPhiM(x_.pt(), x_.eta(), x_.phi(), x_.mass());
 
         x_tree->Fill();
         x_rank++;
