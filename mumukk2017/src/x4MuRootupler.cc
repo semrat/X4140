@@ -65,9 +65,10 @@ class x4MuRootupler:public edm::EDAnalyzer {
   TLorentzVector muonP_phi_p4;
   TLorentzVector muonM_phi_p4;
 
-  Double_t cosAlpha, ctauErrPV, ctauPV, ctauPVMuLess, ctauErrPVMuLess;
+  Double_t cosAlpha, cosAlphaMuLess, ctauErrPV, ctauPV, ctauPVMuLess, ctauErrPVMuLess;
   Double_t ctauErrBS, ctauBS, vNChi2, vProb, sumPTPV;
   Double_t vertexWeight, dz, dz_jpsi, dz_phi;
+  Double_t MassErr;
 
 	TTree *x_tree;
 
@@ -75,6 +76,7 @@ class x4MuRootupler:public edm::EDAnalyzer {
   Point jpsVertex;
   Point phiVertex;
   Point commonVertex;
+  Point PVwithmuons;
   Point muLessVertex;
 
   edm::EDGetTokenT<reco::GenParticleCollection> genCands_;
@@ -119,6 +121,7 @@ isMC_(iConfig.getParameter < bool > ("isMC"))
 
     x_tree->Branch("xVertex",  "Point", &xVertex);
     x_tree->Branch("muLessVertex",  "Point", &muLessVertex);
+    x_tree->Branch("PVwithmuons",  "Point", &PVwithmuons);
     x_tree->Branch("jpsVertex",  "Point", &jpsVertex);
     x_tree->Branch("phiVertex",  "Point", &phiVertex);
     x_tree->Branch("commonVertex",  "Point", &commonVertex);
@@ -136,7 +139,11 @@ isMC_(iConfig.getParameter < bool > ("isMC"))
     x_tree->Branch("ctauPV", &ctauPV, "ctauPV/D");
     x_tree->Branch("ctauErrPV", &ctauErrPV, "ctauErrPV/D");
 
+    x_tree->Branch("ctauPVMuLess", &ctauPVMuLess, "ctauPVMuLess/D");
+    x_tree->Branch("ctauErrPVMuLess", &ctauErrPVMuLess, "ctauErrPVMuLess/D");
+
     x_tree->Branch("cosAlpha", &cosAlpha, "cosAlpha/D");
+    x_tree->Branch("cosAlphaMuLess", &cosAlphaMuLess, "cosAlphaMuLess/D");
 
 }
 
@@ -264,6 +271,7 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
         phiVertex = x_.daughter("phi")->vertex();
         jpsVertex = x_.daughter("jpsi")->vertex();
 
+        PVwithmuons = *(x_.userData<Point>("PVwithmuons"));
         muLessVertex = *(x_.userData<Point>("muonlessPV"));
         commonVertex = *(x_.userData<Point>("commonVertex"));
 
@@ -283,30 +291,10 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
         ctauPVMuLess    = x_.userFloat("ctauPVMuLess");
         ctauErrPVMuLess = x_.userFloat("ctauErrPVMuLess");
 
-        // x_tree->Branch("cosAlpha", &cosAlpha, "cosAlpha/D");
-        //
-        // xCand.addUserInt("countTksOfPV", countTksOfPV);
-        // xCand.addUserFloat("vertexWeight", (float) vertexWeight);
-        // xCand.addUserFloat("sumPTPV", (float) sumPTPV);
-        //
-        //   xCand.addUserData("muonlessPV",Vertex(thePrimaryV));
-        //   xCand.addUserFloat("ppdlPVMuLess",ctauPV);
-        //   xCand.addUserFloat("ppdlErrPVMuLess",ctauErrPV);
-        //   xCand.addUserFloat("cosAlphaMuLess",cosAlpha);
-        //
-        // xCand.addUserFloat("MassErr",MassWErr.error());
-        //
-        // xCand.addUserFloat("vNChi2",vNChi2/vNDF);
-        // xCand.addUserFloat("vProb",vProb);
-        //
-        // xCand.addUserFloat("ppdlBS",ctauBS);
-        // xCand.addUserFloat("ppdlErrBS",ctauErrBS);
-        //
-        // xCand.addUserData("PVwithmuons",Vertex(theOriginalPV));
-        //
-        // xCand.addUserFloat("ppdlPV",ctauPV);
-        // xCand.addUserFloat("ppdlErrPV",ctauErrPV);
-        // xCand.addUserFloat("cosAlpha",cosAlpha);
+        cosAlpha = x_.userFloat("cosAlpha");
+        cosAlphaMuLess = x_.userFloat("cosAlphaMuLess");
+
+        MassErr = x_.userFloat("MassErr");
 
         dz = x_.userFloat("dzFourMuons");
         dz_jpsi = x_.userFloat("dzJpsi");
@@ -315,7 +303,7 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
 
         x_p4.SetPtEtaPhiM(x_.pt(), x_.eta(), x_.phi(), x_.mass());
 
-        // jpsi_p4.SetPtEtaPhiM(x_.pt(), x_.eta(), x_.phi(), x_.mass());
+        jpsi_p4.SetPtEtaPhiM(x_.daughter("jpsi")->pt(), x_.daughter("jpsi")->eta(), x_.daughter("jpsi")->phi(), x_.daughter("jpsi")->mass());
         // muonP_jpsi_p4.SetPtEtaPhiM(x_.pt(), x_.eta(), x_.phi(), x_.mass());
         // muonM_jpsi_p4.SetPtEtaPhiM(x_.pt(), x_.eta(), x_.phi(), x_.mass());
         //
