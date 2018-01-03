@@ -45,7 +45,7 @@ class x4MuRootupler:public edm::EDAnalyzer {
 	std::string file_name;
         edm::EDGetTokenT<pat::CompositeCandidateCollection> xcand_;
         edm::EDGetTokenT<pat::CompositeCandidateCollection> refit1_;
-        edm::EDGetTokenT<PointCollection>            primaryVertices_;
+        edm::EDGetTokenT<reco::VertexCollection>            primaryVertices_;
         edm::EDGetTokenT<edm::TriggerResults>               triggerResults_;
 
 	bool isMC_;
@@ -89,7 +89,7 @@ x4MuRootupler::x4MuRootupler(const edm::ParameterSet & iConfig):
 // chi_(consumes<pat::CompositeCandidateCollection>(iConfig.getParameter < edm::InputTag > ("chi_cand"))),
 xcand_(consumes<pat::CompositeCandidateCollection>(iConfig.getParameter < edm::InputTag > ("x_cand"))),
 // refit1_(consumes<pat::CompositeCandidateCollection>(iConfig.getParameter < edm::InputTag > ("refit1S"))),
-primaryVertices_(consumes<PointCollection>(iConfig.getParameter < edm::InputTag > ("primaryVertices"))),
+primaryVertices_(consumes<reco::VertexCollection>(iConfig.getParameter < edm::InputTag > ("primaryVertices"))),
 triggerResults_(consumes<edm::TriggerResults>(iConfig.getParameter < edm::InputTag > ("TriggerResults"))),
 isMC_(iConfig.getParameter < bool > ("isMC"))
 {
@@ -157,7 +157,7 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
   // edm::Handle < pat::CompositeCandidateCollection >refit1S_handle;
   // iEvent.getByToken(refit1_, refit1S_handle);
 
-  edm::Handle < PointCollection  >primaryVertices_handle;
+  edm::Handle < reco::VertexCollection  >primaryVertices_handle;
   iEvent.getByToken(primaryVertices_, primaryVertices_handle);
 
   edm::Handle < edm::TriggerResults > triggerResults_handle;
