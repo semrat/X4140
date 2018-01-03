@@ -45,7 +45,7 @@ class x4MuRootupler:public edm::EDAnalyzer {
 	std::string file_name;
         edm::EDGetTokenT<pat::CompositeCandidateCollection> xcand_;
         edm::EDGetTokenT<pat::CompositeCandidateCollection> refit1_;
-        edm::EDGetTokenT<reco::VertexCollection>            primaryVertices_;
+        edm::EDGetTokenT<PointCollection>            primaryVertices_;
         edm::EDGetTokenT<edm::TriggerResults>               triggerResults_;
 
 	bool isMC_;
@@ -71,11 +71,11 @@ class x4MuRootupler:public edm::EDAnalyzer {
 
 	TTree *x_tree;
 
-  reco::Vertex xVertex;
-  reco::Vertex jpsVertex;
-  reco::Vertex phiVertex;
-  reco::Vertex commonVertex;
-  reco::Vertex muLessVertex;
+  Point xVertex;
+  Point jpsVertex;
+  Point phiVertex;
+  Point commonVertex;
+  Point muLessVertex;
 
   edm::EDGetTokenT<reco::GenParticleCollection> genCands_;
 
@@ -89,7 +89,7 @@ x4MuRootupler::x4MuRootupler(const edm::ParameterSet & iConfig):
 // chi_(consumes<pat::CompositeCandidateCollection>(iConfig.getParameter < edm::InputTag > ("chi_cand"))),
 xcand_(consumes<pat::CompositeCandidateCollection>(iConfig.getParameter < edm::InputTag > ("x_cand"))),
 // refit1_(consumes<pat::CompositeCandidateCollection>(iConfig.getParameter < edm::InputTag > ("refit1S"))),
-primaryVertices_(consumes<reco::VertexCollection>(iConfig.getParameter < edm::InputTag > ("primaryVertices"))),
+primaryVertices_(consumes<PointCollection>(iConfig.getParameter < edm::InputTag > ("primaryVertices"))),
 triggerResults_(consumes<edm::TriggerResults>(iConfig.getParameter < edm::InputTag > ("TriggerResults"))),
 isMC_(iConfig.getParameter < bool > ("isMC"))
 {
@@ -117,11 +117,11 @@ isMC_(iConfig.getParameter < bool > ("isMC"))
     x_tree->Branch("dzjpsi", &dz_jpsi, "dz_jpsi/D");
     x_tree->Branch("dzphi", &dz_phi, "dz_phi/D");
 
-    x_tree->Branch("xVertex",  "reco::Vertex", &xVertex);
-    x_tree->Branch("muLessVertex",  "reco::Vertex", &muLessVertex);
-    x_tree->Branch("jpsVertex",  "reco::Vertex", &jpsVertex);
-    x_tree->Branch("phiVertex",  "reco::Vertex", &phiVertex);
-    x_tree->Branch("commonVertex",  "reco::Vertex", &commonVertex);
+    x_tree->Branch("xVertex",  "Point", &xVertex);
+    x_tree->Branch("muLessVertex",  "Point", &muLessVertex);
+    x_tree->Branch("jpsVertex",  "Point", &jpsVertex);
+    x_tree->Branch("phiVertex",  "Point", &phiVertex);
+    x_tree->Branch("commonVertex",  "Point", &commonVertex);
 
     x_tree->Branch("countTksOfPV", &countTksOfPV, "countTksOfPV/i");
     x_tree->Branch("vertexWeight", &vertexWeight, "vertexWeight/D");
@@ -157,7 +157,7 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
   // edm::Handle < pat::CompositeCandidateCollection >refit1S_handle;
   // iEvent.getByToken(refit1_, refit1S_handle);
 
-  edm::Handle < reco::VertexCollection  >primaryVertices_handle;
+  edm::Handle < PointCollection  >primaryVertices_handle;
   iEvent.getByToken(primaryVertices_, primaryVertices_handle);
 
   edm::Handle < edm::TriggerResults > triggerResults_handle;
@@ -264,8 +264,8 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
         phiVertex = x_.daughter("phi")->vertex();
         jpsVertex = x_.daughter("jpsi")->vertex();
 
-        muLessVertex = x_.userData<reco::Vertex>("muonlessPV");
-        commonVertex = x_.userData<reco::Vertex>("commonVertex");
+        muLessVertex = x_.userData<Point>("muonlessPV");
+        commonVertex = x_.userData<Point>("commonVertex");
 
         countTksOfPV = x_.userInt("countTksOfPV");
         vertexWeight = x_.userFloat("vertexWeight");
