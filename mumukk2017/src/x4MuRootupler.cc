@@ -71,11 +71,11 @@ class x4MuRootupler:public edm::EDAnalyzer {
 
 	TTree *x_tree;
 
-  Point xVertex;
-  Point jpsVertex;
-  Point phiVertex;
-  Point commonVertex;
-  Point muLessVertex;
+  reco::Vertex xVertex;
+  reco::Vertex jpsVertex;
+  reco::Vertex phiVertex;
+  reco::Vertex commonVertex;
+  reco::Vertex muLessVertex;
 
   edm::EDGetTokenT<reco::GenParticleCollection> genCands_;
 
@@ -117,11 +117,11 @@ isMC_(iConfig.getParameter < bool > ("isMC"))
     x_tree->Branch("dzjpsi", &dz_jpsi, "dz_jpsi/D");
     x_tree->Branch("dzphi", &dz_phi, "dz_phi/D");
 
-    x_tree->Branch("xVertex",  "Point", &xVertex);
-    x_tree->Branch("muLessVertex",  "Point", &muLessVertex);
-    x_tree->Branch("jpsVertex",  "Point", &jpsVertex);
-    x_tree->Branch("phiVertex",  "Point", &phiVertex);
-    x_tree->Branch("commonVertex",  "Point", &commonVertex);
+    x_tree->Branch("xVertex",  "reco::Vertex", &xVertex);
+    x_tree->Branch("muLessVertex",  "reco::Vertex", &muLessVertex);
+    x_tree->Branch("jpsVertex",  "reco::Vertex", &jpsVertex);
+    x_tree->Branch("phiVertex",  "reco::Vertex", &phiVertex);
+    x_tree->Branch("commonVertex",  "reco::Vertex", &commonVertex);
 
     x_tree->Branch("countTksOfPV", &countTksOfPV, "countTksOfPV/i");
     x_tree->Branch("vertexWeight", &vertexWeight, "vertexWeight/D");
@@ -264,10 +264,8 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
         phiVertex = x_.daughter("phi")->vertex();
         jpsVertex = x_.daughter("jpsi")->vertex();
 
-        // getdata = "muonlessPV";
-        std::string getdata = "muonlessPV";
-        muLessVertex = (x_.userData<Point>(getdata));
-        commonVertex = x_.userData<Point>("commonVertex");
+        muLessVertex = x_.userData<reco::Vertex>("muonlessPV");
+        commonVertex = x_.userData<reco::Vertex>("commonVertex");
 
         countTksOfPV = x_.userInt("countTksOfPV");
         vertexWeight = x_.userFloat("vertexWeight");
