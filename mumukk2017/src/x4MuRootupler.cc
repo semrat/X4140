@@ -255,7 +255,7 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
     bool bestCandidateOnly_ = false;
 
     x_rank = 0;
-
+    // std::string getdata = "";
     if (xcand_hand.isValid() && !xcand_hand->empty()) {
       for (unsigned int i=0; i< xcand_hand->size(); i++) {
         pat::CompositeCandidate x_ = xcand_hand->at(i);
@@ -263,7 +263,9 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
         xVertex  = x_.vertex();
         phiVertex = x_.daughter("phi")->vertex();
         jpsVertex = x_.daughter("jpsi")->vertex();
-        muLessVertex = *(x_.userData("muonlessPV"));
+
+        // getdata = "muonlessPV";
+        muLessVertex = (x_.userData(std::string("muonlessPV")));
         commonVertex = x_.userData("commonVertex");
 
         countTksOfPV = x_.userInt("countTksOfPV");
