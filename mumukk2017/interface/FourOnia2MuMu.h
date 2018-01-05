@@ -45,7 +45,7 @@ class FourOnia2MuMuPAT : public edm::EDProducer {
   void endJob() override ;
   bool isAbHadron(int pdgID);
   bool isAMixedbHadron(int pdgID, int momPdgID);
-  UInt_t isTriggerMatched(const pat::CompositeCandidate *diMuon_cand);
+  UInt_t isTriggerMatched(pat::CompositeCandidate *diMuon_cand);
   std::pair<int, float> findJpsiMCInfo(reco::GenParticleRef genJpsi);
 
   // ----------member data ---------------------------
