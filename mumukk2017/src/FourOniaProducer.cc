@@ -11,7 +11,7 @@ quadmuonSelection_(iConfig.existsAs<std::string>("quadmuonSelection") ? iConfig.
 dzMax_(iConfig.getParameter<double>("dzmax")),
 addMuonlessPrimaryVertex_(iConfig.getParameter<bool>("addMuonlessPrimaryVertex")),
 resolveAmbiguity_(iConfig.getParameter<bool>("resolvePileUpAmbiguity")),
-addMCTruth_(iConfig.getParameter<bool>("addMCTruth")),
+// addMCTruth_(iConfig.getParameter<bool>("addMCTruth")),
 triggerMatch_(iConfig.getParameter<bool>("triggerMatch"))
 {
   revtxtrks_ = consumes<reco::TrackCollection>((edm::InputTag)"generalTracks"); //if that is not true, we will raise an exception
