@@ -78,14 +78,13 @@ void FourOniaProducer::produce(edm::Event& event, const edm::EventSetup& esetup)
   for (pat::CompositeCandidateCollection::const_iterator  phiCand = dimuonsPhi->begin(); phiCand!= dimuonsPhi->end(); ++phiCand){
 
     // use only trigger-matched Jpsi or Upsilon if so requested
-    if (triggerMatch_)
-    if (!phiCand->userInt("isTriggerMatched"))
+
+    if ( ( trigger_match ) && ( !phiCand->userInt("isTriggerMatched") ) )
     continue;
     //std::cout << "Phi muons trigger matched" << std::endl;
     for (pat::CompositeCandidateCollection::const_iterator  jpsiCand = dimuonsJPsi->begin(); jpsiCand!= dimuonsJPsi->end(); ++jpsiCand){
 
-      if (triggerMatch_)
-      if (!jpsiCand->userInt("isTriggerMatched"))
+      if (( trigger_match ) && (  !jpsiCand->userInt("isTriggerMatched") ) )
       continue;
       //std::cout << "Jps muons trigger matched" << std::endl;
       if(isOverlappedMuons(&(*phiCand),&(*jpsiCand)))

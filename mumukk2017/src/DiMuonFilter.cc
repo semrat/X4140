@@ -70,8 +70,11 @@ void DiMuonFilter::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
        if (ionia && DiMuonSelection_(*ionia) &&
            SingleMuonSelection_(*ionia->daughter("muon1")) &&
            SingleMuonSelection_(*ionia->daughter("muon2")) &&
-           ( !do_trigger_match_ || !isTriggerMatched(ionia))
-          ) mumuOutput->push_back(*ionia);
+           ( !do_trigger_match_ || !isTriggerMatched(ionia)))
+           {
+             ionia->addUserInt("isTriggerMatched",isTriggerMatched(ionia));
+             mumuOutput->push_back(*ionia);
+           }
     }
   }
   iEvent.put(std::move(mumuOutput));
