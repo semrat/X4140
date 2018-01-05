@@ -63,6 +63,7 @@ class FourOnia2MuMuPAT : public edm::EDProducer {
   bool resolveAmbiguity_;
   bool addMCTruth_;
   GreaterByVProb<pat::CompositeCandidate> vPComparator_;
+  std::vector<std::string> HLTFilters_;
 
   InvariantMassFromVertex massCalculator;
 
