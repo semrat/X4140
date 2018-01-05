@@ -57,7 +57,24 @@ FourOnia2MuMuPAT::~FourOnia2MuMuPAT()
 // member functions
 //
 
+UInt_t FourOnia2MuMuPAT::isTriggerMatched(pat::CompositeCandidate *diMuon_cand) {
+  const pat::Muon* muon1 = dynamic_cast<const pat::Muon*>(diMuon_cand->daughter("muon1"));
+  const pat::Muon* muon2 = dynamic_cast<const pat::Muon*>(diMuon_cand->daughter("muon2"));
+  UInt_t matched = 0;  // if no list is given, is not matched
+
+// if matched a given trigger, set the bit, in the same order as listed
+  for (unsigned int iTr = 0; iTr<HLTFilters_.size(); iTr++ ) {
+     std::cout << HLTFilters_[iTr] << std::endl;
+     const pat::TriggerObjectStandAloneCollection mu1HLTMatches = muon1->triggerObjectMatchesByFilter(HLTFilters_[iTr]);
+     const pat::TriggerObjectStandAloneCollection mu2HLTMatches = muon2->triggerObjectMatchesByFilter(HLTFilters_[iTr]);
+     if (!mu1HLTMatches.empty() && !mu2HLTMatches.empty()) matched += (1<<iTr);
+  }
+  std::cout << "Triggers matched : " << matched << std::endl;
+  return matched;
+}
+
 // ------------ method called to produce the data  ------------
+
 void
 FourOnia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
@@ -113,21 +130,21 @@ FourOnia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
       // one must pass tight quality
       if (!(higherPuritySelection_(*it) || higherPuritySelection_(*it2))) continue;
       //std::cout << "High quality flags" << std::endl;
-      pat::CompositeCandidate myCand;
+      pat::CompositeCandidate mumucand;
       vector<TransientVertex> pvs;
 
       // ---- no explicit order defined ----
-      myCand.addDaughter(*it, "muon1");
-      myCand.addDaughter(*it2,"muon2");
+      mumucand.addDaughter(*it, "muon1");
+      mumucand.addDaughter(*it2,"muon2");
 
       // ---- define and set candidate's 4momentum  ----
       LorentzVector mumu = it->p4() + it2->p4();
-      myCand.setP4(mumu);
-      myCand.setCharge(it->charge()+it2->charge());
+      mumucand.setP4(mumu);
+      mumucand.setCharge(it->charge()+it2->charge());
 
       // ---- apply the dimuon cut ----
-      //std::cout << "Dimuon mass : " << mumu.M() << " - " << myCand.mass() << std::endl;
-      if(!dimuonSelection_(myCand)) continue;
+      //std::cout << "Dimuon mass : " << mumu.M() << " - " << mumucand.mass() << std::endl;
+      if(!dimuonSelection_(mumucand)) continue;
       //std::cout << "Dimuon selection passed !" << std::endl;
       // ---- fit vertex using Tracker tracks (if they have tracks) ----
       if (it->track().isNonnull() && it2->track().isNonnull()) {
@@ -147,15 +164,15 @@ FourOnia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
           myVertex = TransientVertex();                      // with no arguments it is invalid
         }
 
-	myCand.addUserFloat("MassErr",MassWErr.error());
+	mumucand.addUserFloat("MassErr",MassWErr.error());
 
 	if (myVertex.isValid()) {
 	  float vChi2 = myVertex.totalChiSquared();
 	  float vNDF  = myVertex.degreesOfFreedom();
 	  float vProb(TMath::Prob(vChi2,(int)vNDF));
 
-	  myCand.addUserFloat("vNChi2",vChi2/vNDF);
-	  myCand.addUserFloat("vProb",vProb);
+	  mumucand.addUserFloat("vNChi2",vChi2/vNDF);
+	  mumucand.addUserFloat("vProb",vProb);
 
 	  TVector3 vtx;
     TVector3 pvtx;
@@ -171,7 +188,7 @@ FourOnia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    TwoTrackMinimumDistance ttmd;
 	    bool status = ttmd.calculate( GlobalTrajectoryParameters(
                                                                      GlobalPoint(myVertex.position().x(), myVertex.position().y(), myVertex.position().z()),
-                                                                     GlobalVector(myCand.px(),myCand.py(),myCand.pz()),TrackCharge(0),&(*magneticField)),
+                                                                     GlobalVector(mumucand.px(),mumucand.py(),mumucand.pz()),TrackCharge(0),&(*magneticField)),
 					  GlobalTrajectoryParameters(
 								     GlobalPoint(bs.position().x(), bs.position().y(), bs.position().z()),
 								     GlobalVector(bs.dxdz(), bs.dydz(), 1.),TrackCharge(0),&(*magneticField)));
@@ -270,9 +287,9 @@ FourOnia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    }
  	  } catch (std::exception & err) {std::cout << " muon Selection%G�%@failed " << std::endl; return ; }
 
-	  myCand.addUserInt("countTksOfPV", countTksOfPV);
-	  myCand.addUserFloat("vertexWeight", (float) vertexWeight);
-	  myCand.addUserFloat("sumPTPV", (float) sumPTPV);
+	  mumucand.addUserInt("countTksOfPV", countTksOfPV);
+	  mumucand.addUserFloat("vertexWeight", (float) vertexWeight);
+	  mumucand.addUserFloat("sumPTPV", (float) sumPTPV);
 
 	  ///DCA
 	  TrajectoryStateClosestToPoint mu1TS = t_tks[0].impactPointTSCP();
@@ -283,13 +300,13 @@ FourOnia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    cApp.calculate(mu1TS.theState(), mu2TS.theState());
 	    if (cApp.status() ) dca = cApp.distance();
 	  }
-	  myCand.addUserFloat("DCA", dca );
+	  mumucand.addUserFloat("DCA", dca );
 	  ///end DCA
 
 	  if (addMuonlessPrimaryVertex_)
-	    myCand.addUserData("muonlessPV",Vertex(thePrimaryV));
+	    mumucand.addUserData("muonlessPV",Vertex(thePrimaryV));
 
-	  myCand.addUserData("PVwithmuons",Vertex(theOriginalPV));
+	  mumucand.addUserData("PVwithmuons",Vertex(theOriginalPV));
 
 	  // lifetime using PV
     pvtx.SetXYZ(thePrimaryV.position().x(),thePrimaryV.position().y(),0);
@@ -297,16 +314,16 @@ FourOnia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  double cosAlpha = vdiff.Dot(pperp)/(vdiff.Perp()*pperp.Perp());
 	  Measurement1D distXY = vdistXY.distance(Vertex(myVertex), thePrimaryV);
 	  //double ctauPV = distXY.value()*cosAlpha*3.09688/pperp.Perp();
-	  double ctauPV = distXY.value()*cosAlpha * myCand.mass()/pperp.Perp();
+	  double ctauPV = distXY.value()*cosAlpha * mumucand.mass()/pperp.Perp();
 	  GlobalError v1e = (Vertex(myVertex)).error();
 	  GlobalError v2e = thePrimaryV.error();
     AlgebraicSymMatrix33 vXYe = v1e.matrix()+ v2e.matrix();
 	  //double ctauErrPV = sqrt(vXYe.similarity(vpperp))*3.09688/(pperp.Perp2());
-	  double ctauErrPV = sqrt(ROOT::Math::Similarity(vpperp,vXYe))*myCand.mass()/(pperp.Perp2());
+	  double ctauErrPV = sqrt(ROOT::Math::Similarity(vpperp,vXYe))*mumucand.mass()/(pperp.Perp2());
 
-	  myCand.addUserFloat("ppdlPV",ctauPV);
-    myCand.addUserFloat("ppdlErrPV",ctauErrPV);
-	  myCand.addUserFloat("cosAlpha",cosAlpha);
+	  mumucand.addUserFloat("ppdlPV",ctauPV);
+    mumucand.addUserFloat("ppdlErrPV",ctauErrPV);
+	  mumucand.addUserFloat("cosAlpha",cosAlpha);
 
 	  // lifetime using BS
     pvtx.SetXYZ(theBeamSpotV.position().x(),theBeamSpotV.position().y(),0);
@@ -314,35 +331,35 @@ FourOnia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  cosAlpha = vdiff.Dot(pperp)/(vdiff.Perp()*pperp.Perp());
 	  distXY = vdistXY.distance(Vertex(myVertex), theBeamSpotV);
 	  //double ctauBS = distXY.value()*cosAlpha*3.09688/pperp.Perp();
-	  double ctauBS = distXY.value()*cosAlpha*myCand.mass()/pperp.Perp();
+	  double ctauBS = distXY.value()*cosAlpha*mumucand.mass()/pperp.Perp();
 	  GlobalError v1eB = (Vertex(myVertex)).error();
 	  GlobalError v2eB = theBeamSpotV.error();
     AlgebraicSymMatrix33 vXYeB = v1eB.matrix()+ v2eB.matrix();
 	  //double ctauErrBS = sqrt(vXYeB.similarity(vpperp))*3.09688/(pperp.Perp2());
-	  double ctauErrBS = sqrt(ROOT::Math::Similarity(vpperp,vXYeB))*myCand.mass()/(pperp.Perp2());
+	  double ctauErrBS = sqrt(ROOT::Math::Similarity(vpperp,vXYeB))*mumucand.mass()/(pperp.Perp2());
 
-	  myCand.addUserFloat("ppdlBS",ctauBS);
-    myCand.addUserFloat("ppdlErrBS",ctauErrBS);
+	  mumucand.addUserFloat("ppdlBS",ctauBS);
+    mumucand.addUserFloat("ppdlErrBS",ctauErrBS);
 
 	  if (addCommonVertex_) {
-	    myCand.addUserData("commonVertex",Vertex(myVertex));
+	    mumucand.addUserData("commonVertex",Vertex(myVertex));
 	  }
 	} else {
-	  myCand.addUserFloat("vNChi2",-1);
-	  myCand.addUserFloat("vProb", -1);
-	  myCand.addUserFloat("ppdlPV",-100);
-    myCand.addUserFloat("ppdlErrPV",-100);
-	  myCand.addUserFloat("cosAlpha",-100);
-	  myCand.addUserFloat("ppdlBS",-100);
-    myCand.addUserFloat("ppdlErrBS",-100);
-    myCand.addUserFloat("DCA", -1 );
+	  mumucand.addUserFloat("vNChi2",-1);
+	  mumucand.addUserFloat("vProb", -1);
+	  mumucand.addUserFloat("ppdlPV",-100);
+    mumucand.addUserFloat("ppdlErrPV",-100);
+	  mumucand.addUserFloat("cosAlpha",-100);
+	  mumucand.addUserFloat("ppdlBS",-100);
+    mumucand.addUserFloat("ppdlErrBS",-100);
+    mumucand.addUserFloat("DCA", -1 );
 	  if (addCommonVertex_) {
-	    myCand.addUserData("commonVertex",Vertex());
+	    mumucand.addUserData("commonVertex",Vertex());
 	  }
 	  if (addMuonlessPrimaryVertex_) {
-            myCand.addUserData("muonlessPV",Vertex());
+            mumucand.addUserData("muonlessPV",Vertex());
 	  } else {
-	    myCand.addUserData("PVwithmuons",Vertex());
+	    mumucand.addUserData("PVwithmuons",Vertex());
 	  }
 	}
       }
@@ -356,14 +373,14 @@ FourOnia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    reco::GenParticleRef mom1 = genMu1->motherRef();
 	    reco::GenParticleRef mom2 = genMu2->motherRef();
 	    if (mom1.isNonnull() && (mom1 == mom2)) {
-	      myCand.setGenParticleRef(mom1); // set
-	      myCand.embedGenParticle();      // and embed
+	      mumucand.setGenParticleRef(mom1); // set
+	      mumucand.embedGenParticle();      // and embed
 	      std::pair<int, float> MCinfo = findJpsiMCInfo(mom1);
-	      myCand.addUserInt("momPDGId",MCinfo.first);
-	      myCand.addUserFloat("ppdlTrue",MCinfo.second);
+	      mumucand.addUserInt("momPDGId",MCinfo.first);
+	      mumucand.addUserFloat("ppdlTrue",MCinfo.second);
 	    } else {
-	      myCand.addUserInt("momPDGId",0);
-	      myCand.addUserFloat("ppdlTrue",-99.);
+	      mumucand.addUserInt("momPDGId",0);
+	      mumucand.addUserFloat("ppdlTrue",-99.);
 	    }
 	  } else {
 	    edm::Handle<reco::GenParticleCollection> theGenParticles;
@@ -375,21 +392,21 @@ FourOnia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 		if (genCand.pdgId()==443 || genCand.pdgId()==100443 ||
 		    genCand.pdgId()==553 || genCand.pdgId()==100553 || genCand.pdgId()==200553) {
 		  reco::GenParticleRef mom1(theGenParticles,iGenParticle);
-		  myCand.setGenParticleRef(mom1);
-		  myCand.embedGenParticle();
+		  mumucand.setGenParticleRef(mom1);
+		  mumucand.embedGenParticle();
 		  std::pair<int, float> MCinfo = findJpsiMCInfo(mom1);
-		  myCand.addUserInt("momPDGId",MCinfo.first);
-		  myCand.addUserFloat("ppdlTrue",MCinfo.second);
+		  mumucand.addUserInt("momPDGId",MCinfo.first);
+		  mumucand.addUserFloat("ppdlTrue",MCinfo.second);
 		}
 	      }
 	    } else {
-	      myCand.addUserInt("momPDGId",0);
-	      myCand.addUserFloat("ppdlTrue",-99.);
+	      mumucand.addUserInt("momPDGId",0);
+	      mumucand.addUserFloat("ppdlTrue",-99.);
 	    }
 	  }
 	} else {
-	  myCand.addUserInt("momPDGId",0);
-	  myCand.addUserFloat("ppdlTrue",-99.);
+	  mumucand.addUserInt("momPDGId",0);
+	  mumucand.addUserFloat("ppdlTrue",-99.);
 	}
       }
 
@@ -397,7 +414,9 @@ FourOnia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 
       // ---- Push back output ----
-      oniaOutput->push_back(myCand);
+      mumucand.addUserInt("isTriggerMatched",isTriggerMatched(&mumucand));
+
+      oniaOutput->push_back(mumucand);
     }
   }
 
