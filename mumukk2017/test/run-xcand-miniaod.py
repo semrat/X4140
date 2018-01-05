@@ -93,6 +93,7 @@ process.DiMuonCounterPhi = cms.EDFilter('CandViewCountFilter',
 process.xProducer = cms.EDProducer('FourOniaProducer',
     phidimuons                  = cms.InputTag("Onia2MuMuFilteredPhi"),
     jpsidimuons                 = cms.InputTag("Onia2MuMuFilteredJpsi"),
+    beamSpotTag                 = cms.InputTag('offlineBeamSpot'),
     dzmax                       = cms.double(20.0),
     triggerMatch                = cms.bool(True),
     addCommonVertex             = cms.bool(True),
@@ -125,10 +126,10 @@ process.xCandSequence = cms.Sequence(
 				   process.oniaSelectedMuons *
                    process.FourOnia2MuMuPhi *
                    process.Onia2MuMuFilteredPhi *
-                   process.DiMuonCounterPhi *
+                   #process.DiMuonCounterPhi *
 				   process.FourOnia2MuMuJPsi *
                    process.Onia2MuMuFilteredJpsi *
-                   process.DiMuonCounterJPsi *
+                   #process.DiMuonCounterJPsi *
                    process.xProducer
                    #process.xFitter
 				   )
