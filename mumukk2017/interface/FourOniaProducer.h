@@ -94,6 +94,8 @@ class FourOniaProducer : public edm::EDProducer {
 
   bool isOverlappedMuons(const pat::CompositeCandidate *phi,const pat::CompositeCandidate *jpsi);
 
+  UInt_t isTriggerMatched(const pat::CompositeCandidate *diMuon_cand);
+
   edm::EDGetTokenT<reco::TrackCollection> revtxtrks_;
   edm::EDGetTokenT<reco::BeamSpot> revtxbs_;
 
