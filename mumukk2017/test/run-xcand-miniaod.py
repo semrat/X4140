@@ -68,7 +68,7 @@ process.Onia2MuMuFilteredJpsi = cms.EDProducer('DiMuonFilter',
       singlemuonSelection = cms.string(""),
       dimuonSelection     = cms.string("2.95 < mass && mass < 3.15"),
       do_trigger_match    = cms.bool(True),
-      HLTFilters          = cms.vstring('hltDiMuonGlbOrTrk0zFiltered0p2v2'),
+      HLTFilters          = cms.vstring('hltDiMuonGlbOrTrk0zFiltered0p2v2')
 )
 
 process.Onia2MuMuFilteredPhi = cms.EDProducer('DiMuonFilter',
@@ -76,7 +76,7 @@ process.Onia2MuMuFilteredPhi = cms.EDProducer('DiMuonFilter',
       singlemuonSelection = cms.string(""),
       dimuonSelection     = cms.string("0.92 < mass && mass < 1.12"),
       do_trigger_match    = cms.bool(True),
-      HLTFilters          = cms.vstring('hltDiMuonGlbOrTrk0zFiltered0p2v2'),
+      HLTFilters          = cms.vstring('hltDiMuonGlbOrTrk0zFiltered0p2v2')
 
 )
 
