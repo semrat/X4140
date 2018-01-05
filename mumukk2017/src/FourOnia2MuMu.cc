@@ -36,7 +36,8 @@ FourOnia2MuMuPAT::FourOnia2MuMuPAT(const edm::ParameterSet& iConfig):
   addCommonVertex_(iConfig.getParameter<bool>("addCommonVertex")),
   addMuonlessPrimaryVertex_(iConfig.getParameter<bool>("addMuonlessPrimaryVertex")),
   resolveAmbiguity_(iConfig.getParameter<bool>("resolvePileUpAmbiguity")),
-  addMCTruth_(iConfig.getParameter<bool>("addMCTruth"))
+  addMCTruth_(iConfig.getParameter<bool>("addMCTruth")),
+  HLTFilters_(iConfig.getParameter<std::vector<std::string>>("HLTFilters"))
 {
     revtxtrks_ = consumes<reco::TrackCollection>((edm::InputTag)"generalTracks"); //if that is not true, we will raise an exception
     revtxbs_ = consumes<reco::BeamSpot>((edm::InputTag)"offlineBeamSpot");
