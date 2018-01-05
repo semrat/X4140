@@ -63,7 +63,7 @@ void DiMuonFilter::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   if (onias_.isValid() && !onias_->empty()) {
     std::cout<<"Valid Onias in the Filter"<<std::endl;
 
-    const pat::CompositeCandidate *ionia = nullptr;
+    pat::CompositeCandidate *ionia = nullptr;
     for (size_t ii = 0, nn=onias_->size(); ii < nn; ii++ ) {
        ionia = &(onias_->at(ii));
 
