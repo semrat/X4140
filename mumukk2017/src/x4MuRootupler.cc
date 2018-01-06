@@ -273,30 +273,30 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
         xVertex  = x_.vertex();
         phiVertex = x_.daughter("phi")->vertex();
         jpsVertex = x_.daughter("jpsi")->vertex();
-
+        std::cout<<"debug :" << debug <<std::endl; debug++;
         PVwithmuons = *(x_.userData<Point>("PVwithmuons"));
         muLessVertex = *(x_.userData<Point>("muonlessPV"));
         commonVertex = *(x_.userData<Point>("commonVertex"));
-
+        std::cout<<"debug :" << debug <<std::endl; debug++;
         countTksOfPV = x_.userInt("countTksOfPV");
         vertexWeight = x_.userFloat("vertexWeight");
         sumPTPV       = x_.userFloat("sumPTPV");
-
+        std::cout<<"debug :" << debug <<std::endl; debug++;
         vProb           = x_.userFloat("vProb");
         vNChi2          = x_.userFloat("vNChi2");
-
+        std::cout<<"debug :" << debug <<std::endl; debug++;
         ctauBS          = x_.userFloat("ctauBS");
         ctauErrBS       = x_.userFloat("ctauErrBS");
-
+        std::cout<<"debug :" << debug <<std::endl; debug++;
         ctauPV          = x_.userFloat("ctauPV");
         ctauErrPV       = x_.userFloat("ctauErrPV");
-
+        std::cout<<"debug :" << debug <<std::endl; debug++;
         ctauPVMuLess    = x_.userFloat("ctauPVMuLess");
         ctauErrPVMuLess = x_.userFloat("ctauErrPVMuLess");
-
+        std::cout<<"debug :" << debug <<std::endl; debug++;
         cosAlpha = x_.userFloat("cosAlpha");
         cosAlphaMuLess = x_.userFloat("cosAlphaMuLess");
-
+        std::cout<<"debug :" << debug <<std::endl; debug++;
         MassErr = x_.userFloat("MassErr");
         std::cout<<"debug :" << debug <<std::endl; debug++;
         dz = x_.userFloat("dzFourMuons");
