@@ -274,7 +274,7 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
         phiVertex = x_.daughter("phi")->vertex();
         jpsVertex = x_.daughter("jpsi")->vertex();
         std::cout<<"debug :" << debug <<std::endl; debug++;
-        PVwithmuons = (x_.userData<reco::Vertex>("PVwithmuons")).point();
+        PVwithmuons = (x_.userData<reco::Vertex>("PVwithmuons"))->point();
         muLessVertex = (x_.userData<reco::Vertex>("muonlessPV"));
         commonVertex = (x_.userData<reco::Vertex>("commonVertex"));
         std::cout<<"debug :" << debug <<std::endl; debug++;
