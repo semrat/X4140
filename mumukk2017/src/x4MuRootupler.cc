@@ -95,8 +95,7 @@ primaryVertices_(consumes<reco::VertexCollection>(iConfig.getParameter < edm::In
 triggerResults_(consumes<edm::TriggerResults>(iConfig.getParameter < edm::InputTag > ("TriggerResults"))),
 isMC_(iConfig.getParameter < bool > ("isMC"))
 {
-    int debug = 0;
-    std::cout<<"debug :" << debug <<std::endl; debug++;
+    
     edm::Service < TFileService > fs;
     x_tree = fs->make < TTree > ("chiTree", "Tree of chic");
 
@@ -146,7 +145,7 @@ isMC_(iConfig.getParameter < bool > ("isMC"))
 
     x_tree->Branch("cosAlpha", &cosAlpha, "cosAlpha/D");
     x_tree->Branch("cosAlphaMuLess", &cosAlphaMuLess, "cosAlphaMuLess/D");
-    std::cout<<"debug :" << debug <<std::endl; debug++;
+
 }
 
 //Check recursively if any ancestor of particle is the given one
@@ -160,7 +159,7 @@ bool x4MuRootupler::isAncestor(const reco::Candidate* ancestor, const reco::Cand
 void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & iSetup) {
 
   int debug = 0;
-  std::cout<<"debug :" << debug <<std::endl; debug++;
+
   edm::Handle < pat::CompositeCandidateCollection >xcand_hand;
   iEvent.getByToken(xcand_, xcand_hand);
 
@@ -241,7 +240,7 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
    // (pass 11)(pass 8)(pass 7)(pass 5)
    // es. 11 = pass 5, 7 and 11
    // es. 4 = pass only 8
-   std::cout<<"debug :" << debug <<std::endl; debug++;
+
    trigger = 0;
    if (triggerResults_handle.isValid()) {
       const edm::TriggerNames & TheTriggerNames = iEvent.triggerNames(*triggerResults_handle);
@@ -263,42 +262,42 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
     } else std::cout << "*** NO triggerResults found " << iEvent.id().run() << "," << iEvent.id().event() << std::endl;
 
     bool bestCandidateOnly_ = false;
-    std::cout<<"debug :" << debug <<std::endl; debug++;
+
     x_rank = 0;
     // std::string getdata = "";
     if (xcand_hand.isValid() && !xcand_hand->empty()) {
       for (unsigned int i=0; i< xcand_hand->size(); i++) {
         pat::CompositeCandidate x_ = xcand_hand->at(i);
-        std::cout<<"debug :" << debug <<std::endl; debug++;
+
         xVertex  = x_.vertex();
         phiVertex = x_.daughter("phi")->vertex();
         jpsVertex = x_.daughter("jpsi")->vertex();
-        std::cout<<"debug :" << debug <<std::endl; debug++;
+
         // PVwithmuons = (x_.userData<reco::Vertex>("PVwithmuons"))->Point();
         // muLessVertex = (x_.userData<reco::Vertex>("muonlessPV"));
         // commonVertex = (x_.userData<reco::Vertex>("commonVertex"));
-        std::cout<<"debug :" << debug <<std::endl; debug++;
+
         countTksOfPV = x_.userInt("countTksOfPV");
         vertexWeight = x_.userFloat("vertexWeight");
         sumPTPV       = x_.userFloat("sumPTPV");
-        std::cout<<"debug :" << debug <<std::endl; debug++;
+
         vProb           = x_.userFloat("vProb");
         vNChi2          = x_.userFloat("vNChi2");
-        std::cout<<"debug :" << debug <<std::endl; debug++;
+
         ctauBS          = x_.userFloat("ctauBS");
         ctauErrBS       = x_.userFloat("ctauErrBS");
-        std::cout<<"debug :" << debug <<std::endl; debug++;
+
         ctauPV          = x_.userFloat("ctauPV");
         ctauErrPV       = x_.userFloat("ctauErrPV");
-        std::cout<<"debug :" << debug <<std::endl; debug++;
+
         ctauPVMuLess    = x_.userFloat("ctauPVMuLess");
         ctauErrPVMuLess = x_.userFloat("ctauErrPVMuLess");
-        std::cout<<"debug :" << debug <<std::endl; debug++;
+
         cosAlpha = x_.userFloat("cosAlpha");
         cosAlphaMuLess = x_.userFloat("cosAlphaMuLess");
-        std::cout<<"debug :" << debug <<std::endl; debug++;
+
         MassErr = x_.userFloat("MassErr");
-        std::cout<<"debug :" << debug <<std::endl; debug++;
+
         dz = x_.userFloat("dzFourMuons");
         dz_jpsi = x_.userFloat("dzJpsi");
         dz_phi = x_.userFloat("dzPhi");
@@ -313,9 +312,9 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
         phi_p4.SetPtEtaPhiM(x_.daughter("phi")->pt(), x_.daughter("phi")->eta(), x_.daughter("phi")->phi(), x_.daughter("phi")->mass());
         muonTwo_phi_p4.SetPtEtaPhiM(x_.daughter("phi")->daughter("muon2")->pt(), x_.eta(), x_.daughter("phi")->daughter("muon2")->phi(), x_.daughter("phi")->daughter("muon2")->mass());
         muonOne_phi_p4.SetPtEtaPhiM(x_.daughter("phi")->daughter("muon1")->pt(), x_.daughter("phi")->daughter("muon1")->eta(), x_.daughter("phi")->daughter("muon1")->phi(), x_.daughter("phi")->daughter("muon1")->mass());
-        std::cout<<"debug :" << debug <<std::endl; debug++;
+
         x_tree->Fill();
-        std::cout<<"debug :" << debug <<std::endl; debug++;
+
         x_rank++;
       }
     }
