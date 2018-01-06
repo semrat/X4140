@@ -76,7 +76,7 @@ class x4MuRootupler:public edm::EDAnalyzer {
   Point jpsVertex;
   Point phiVertex;
   reco::Vertex commonVertex;
-  reco::Vertex PVwithmuons;
+  Point PVwithmuons;
   reco::Vertex muLessVertex;
 
   edm::EDGetTokenT<reco::GenParticleCollection> genCands_;
@@ -123,7 +123,7 @@ isMC_(iConfig.getParameter < bool > ("isMC"))
 
     x_tree->Branch("xVertex",  "Point", &xVertex);
     x_tree->Branch("muLessVertex",  "reco::Vertex", &muLessVertex);
-    x_tree->Branch("PVwithmuons",  "reco::Vertex", &PVwithmuons);
+    x_tree->Branch("PVwithmuons",  "Point", &PVwithmuons);
     x_tree->Branch("jpsVertex",  "Point", &jpsVertex);
     x_tree->Branch("phiVertex",  "Point", &phiVertex);
     x_tree->Branch("commonVertex",  "reco::Vertex", &commonVertex);
@@ -274,7 +274,7 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
         phiVertex = x_.daughter("phi")->vertex();
         jpsVertex = x_.daughter("jpsi")->vertex();
         std::cout<<"debug :" << debug <<std::endl; debug++;
-        PVwithmuons = const_cast<reco::Vertex>(x_.userData<reco::Vertex>("PVwithmuons"));
+        PVwithmuons = (x_.userData<reco::Vertex>("PVwithmuons")).point();
         muLessVertex = (x_.userData<reco::Vertex>("muonlessPV"));
         commonVertex = (x_.userData<reco::Vertex>("commonVertex"));
         std::cout<<"debug :" << debug <<std::endl; debug++;
