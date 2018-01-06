@@ -75,9 +75,9 @@ class x4MuRootupler:public edm::EDAnalyzer {
   Point xVertex;
   Point jpsVertex;
   Point phiVertex;
-  reco::Vertex commonVertex;
-  reco::Vertex PVwithmuons;
-  reco::Vertex muLessVertex;
+  const reco::Vertex commonVertex;
+  const reco::Vertex PVwithmuons;
+  const reco::Vertex muLessVertex;
 
   edm::EDGetTokenT<reco::GenParticleCollection> genCands_;
 
