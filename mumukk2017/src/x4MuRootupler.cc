@@ -76,7 +76,7 @@ class x4MuRootupler:public edm::EDAnalyzer {
   Point jpsVertex;
   Point phiVertex;
   const reco::Vertex commonVertex;
-  const reco::Vertex PVwithmuons;
+  reco::Vertex PVwithmuons;
   const reco::Vertex muLessVertex;
 
   edm::EDGetTokenT<reco::GenParticleCollection> genCands_;
@@ -274,7 +274,7 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
         phiVertex = x_.daughter("phi")->vertex();
         jpsVertex = x_.daughter("jpsi")->vertex();
         std::cout<<"debug :" << debug <<std::endl; debug++;
-        PVwithmuons = *(x_.userData<reco::Vertex>("PVwithmuons"));
+        PVwithmuons = (x_.userData<reco::Vertex>("PVwithmuons")).get();
         muLessVertex = *(x_.userData<reco::Vertex>("muonlessPV"));
         commonVertex = *(x_.userData<reco::Vertex>("commonVertex"));
         std::cout<<"debug :" << debug <<std::endl; debug++;
