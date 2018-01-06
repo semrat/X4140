@@ -75,9 +75,9 @@ class x4MuRootupler:public edm::EDAnalyzer {
   Point xVertex;
   Point jpsVertex;
   Point phiVertex;
-  Point* commonVertex;
-  Point* PVwithmuons;
-  Point* muLessVertex;
+  reco::Vertex *commonVertex;
+  reco::Vertex *PVwithmuons;
+  reco::Vertex *muLessVertex;
 
   edm::EDGetTokenT<reco::GenParticleCollection> genCands_;
 
@@ -122,11 +122,11 @@ isMC_(iConfig.getParameter < bool > ("isMC"))
     x_tree->Branch("dzphi", &dz_phi, "dz_phi/D");
 
     x_tree->Branch("xVertex",  "Point", &xVertex);
-    x_tree->Branch("muLessVertex",  "Point", &muLessVertex);
-    x_tree->Branch("PVwithmuons",  "Point", &PVwithmuons);
+    x_tree->Branch("muLessVertex",  "reco::Vertex", &muLessVertex);
+    x_tree->Branch("PVwithmuons",  "reco::Vertex", &PVwithmuons);
     x_tree->Branch("jpsVertex",  "Point", &jpsVertex);
     x_tree->Branch("phiVertex",  "Point", &phiVertex);
-    x_tree->Branch("commonVertex",  "Point", &commonVertex);
+    x_tree->Branch("commonVertex",  "reco::Vertex", &commonVertex);
 
     x_tree->Branch("countTksOfPV", &countTksOfPV, "countTksOfPV/i");
     x_tree->Branch("vertexWeight", &vertexWeight, "vertexWeight/D");
@@ -274,9 +274,9 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
         phiVertex = x_.daughter("phi")->vertex();
         jpsVertex = x_.daughter("jpsi")->vertex();
         std::cout<<"debug :" << debug <<std::endl; debug++;
-        PVwithmuons = &(x_.userData<Point>("PVwithmuons"));
-        muLessVertex = &(x_.userData<Point>("muonlessPV"));
-        commonVertex = &(x_.userData<Point>("commonVertex"));
+        PVwithmuons = (x_.userData<Point>("PVwithmuons"));
+        muLessVertex = (x_.userData<Point>("muonlessPV"));
+        commonVertex = (x_.userData<Point>("commonVertex"));
         std::cout<<"debug :" << debug <<std::endl; debug++;
         countTksOfPV = x_.userInt("countTksOfPV");
         vertexWeight = x_.userFloat("vertexWeight");
