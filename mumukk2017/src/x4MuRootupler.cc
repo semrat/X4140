@@ -95,6 +95,7 @@ primaryVertices_(consumes<reco::VertexCollection>(iConfig.getParameter < edm::In
 triggerResults_(consumes<edm::TriggerResults>(iConfig.getParameter < edm::InputTag > ("TriggerResults"))),
 isMC_(iConfig.getParameter < bool > ("isMC"))
 {
+    int debug = 0;
     std::cout<<"debug :" << debug <<std::endl; debug++;
     edm::Service < TFileService > fs;
     x_tree = fs->make < TTree > ("chiTree", "Tree of chic");
