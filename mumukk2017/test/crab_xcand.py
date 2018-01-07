@@ -22,7 +22,10 @@ runNumber = [
 #'274094-274240',
 '305388-307000',
 '305388-306000',
-'306000-306500',
+'305388-305700',
+'305700-306000',
+'306000-306200',
+'306200-306500',
 #'273158',
 ]
 
@@ -39,7 +42,6 @@ timestamp = datetime.datetime.now().strftime("_%Y%m%d_%H%M%S")
 dataset = filter(None, datasetName.split('/'))
 
 config.section_('General')
-config.JobType.allowUndistributedCMSSW = True
 config.General.transferOutputs  = True
 config.General.workArea         = jobdir
 #config.General.requestName     = 'JetHT_Run2015D_PromptReco_v4_RECO'+timestamp
@@ -52,6 +54,7 @@ config.JobType.psetName         = '/lustre/home/adrianodif/CMSSW_9_2_2/src/mmkk/
 config.JobType.pluginName       = 'Analysis'
 config.JobType.maxMemoryMB      = 2500
 config.JobType.maxJobRuntimeMin = 2750
+config.JobType.allowUndistributedCMSSW = True
 #config.JobType.inputFiles      = ['Run_time.txt']
 #config.JobType.outputFiles     = ['EventList.txt','EventListClean.txt']
 
