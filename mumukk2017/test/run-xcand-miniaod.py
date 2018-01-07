@@ -102,7 +102,7 @@ process.xProducer = cms.EDProducer('FourOniaProducer',
     addCommonVertex             = cms.bool(True),
     addMuonlessPrimaryVertex    = cms.bool(True),
     resolvePileUpAmbiguity      = cms.bool(True),
-    quadmuonSelection           = cms.string("4.0 < mass && mass < 6.0 && charge==0 && userFloat('vProb') > 0.0"),
+    quadmuonSelection           = cms.string("4.0 < mass && mass < 6.0 && charge==0"),
     deltaMass                   = cms.vdouble(0.0,2.0)  # trigger match is performed in Onia2MuMuFiltered
 )
 
