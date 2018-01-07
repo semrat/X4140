@@ -148,7 +148,7 @@ FourOnia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
       if(!dimuonSelection_(mumucand)) continue;
       //std::cout << "Dimuon selection passed !" << std::endl;
       // ---- fit vertex using Tracker tracks (if they have tracks) ----
-      std::cout<< "charge quadmuon = " << mumucand.charge() << std:endl;
+      std::cout<< "charge quadmuon = " << mumucand.charge() << std::endl;
       if (it->track().isNonnull() && it2->track().isNonnull()) {
         //std::cout << "Tracker tracks: they exist !" << std::endl;
 	//build the dimuon secondary vertex
