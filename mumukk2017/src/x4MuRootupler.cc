@@ -59,11 +59,11 @@ class x4MuRootupler:public edm::EDAnalyzer {
 
 	TLorentzVector x_p4;
 	TLorentzVector jpsi_p4;
-	TLorentzVector muonTwo_jpsi_p4;
-	TLorentzVector muonOne_jpsi_p4;
+	TLorentzVector muonM_jpsi_p4;
+	TLorentzVector muonP_jpsi_p4;
   TLorentzVector phi_p4;
-  TLorentzVector muonTwo_phi_p4;
-  TLorentzVector muonOne_phi_p4;
+  TLorentzVector muonM_phi_p4;
+  TLorentzVector muonP_phi_p4;
 
   Double_t cosAlpha, cosAlphaMuLess, ctauErrPV, ctauPV, ctauPVMuLess, ctauErrPVMuLess;
   Double_t ctauErrBS, ctauBS, vNChi2, vProb, sumPTPV;
@@ -95,7 +95,7 @@ primaryVertices_(consumes<reco::VertexCollection>(iConfig.getParameter < edm::In
 triggerResults_(consumes<edm::TriggerResults>(iConfig.getParameter < edm::InputTag > ("TriggerResults"))),
 isMC_(iConfig.getParameter < bool > ("isMC"))
 {
-    
+
     edm::Service < TFileService > fs;
     x_tree = fs->make < TTree > ("chiTree", "Tree of chic");
 
@@ -107,12 +107,12 @@ isMC_(iConfig.getParameter < bool > ("isMC"))
     x_tree->Branch("trigger", &trigger, "trigger/i");
 
     x_tree->Branch("jpsi_p4", "TLorentzVector", &jpsi_p4);
-    x_tree->Branch("muonTwo_jpsi_p4",  "TLorentzVector", &muonTwo_jpsi_p4);
-    x_tree->Branch("muonOne_jpsi_p4",  "TLorentzVector", &muonOne_jpsi_p4);
+    x_tree->Branch("muonM_jpsi_p4",  "TLorentzVector", &muonM_jpsi_p4);
+    x_tree->Branch("muonP_jpsi_p4",  "TLorentzVector", &muonP_jpsi_p4);
 
     x_tree->Branch("phi_p4", "TLorentzVector", &phi_p4);
-    x_tree->Branch("muonTwo_phi_p4",  "TLorentzVector", &muonTwo_phi_p4);
-    x_tree->Branch("muonOne_phi_p4",  "TLorentzVector", &muonOne_phi_p4);
+    x_tree->Branch("muonM_phi_p4",  "TLorentzVector", &muonM_phi_p4);
+    x_tree->Branch("muonP_phi_p4",  "TLorentzVector", &muonP_phi_p4);
 
     x_tree->Branch("numPrimaryVertices", &numPrimaryVertices, "numPrimaryVertices/i");
 
@@ -208,17 +208,17 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
   //                 const reco::Candidate *gdau = dau->daughter(k);
   //                 if (gdau->pdgId() == 13 && gdau->status()==1) {
   //                    nmuons++;
-  //                    gen_muonOne_p4.SetPtEtaPhiM(gdau->pt(),gdau->eta(),gdau->phi(),gdau->mass());
+  //                    gen_muonP_p4.SetPtEtaPhiM(gdau->pt(),gdau->eta(),gdau->phi(),gdau->mass());
   //                 } else {
   //                    if (gdau->pdgId() == -13 && gdau->status()==1) {
   //                       nmuons++;
-  //                       gen_muonTwo_p4.SetPtEtaPhiM(gdau->pt(),gdau->eta(),gdau->phi(),gdau->mass());
+  //                       gen_muonM_p4.SetPtEtaPhiM(gdau->pt(),gdau->eta(),gdau->phi(),gdau->mass());
   //                    }
   //                 }
   //              }
   //              if (nmuons == 2 ) {
   //                 foundit += 3;                                  // found complete dimuon decay
-  //                 gen_dimuon_p4 = gen_muonOne_p4 + gen_muonTwo_p4;   // will account fsr
+  //                 gen_dimuon_p4 = gen_muonP_p4 + gen_muonM_p4;   // will account fsr
   //              }
   //           } else {
   //              if (dau->pdgId() == 22 && dau->status() ==1) {
@@ -306,12 +306,27 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
         x_p4.SetPtEtaPhiM(x_.pt(), x_.eta(), x_.phi(), x_.mass());
 
         jpsi_p4.SetPtEtaPhiM(x_.daughter("jpsi")->pt(), x_.daughter("jpsi")->eta(), x_.daughter("jpsi")->phi(), x_.daughter("jpsi")->mass());
-        muonTwo_jpsi_p4.SetPtEtaPhiM(x_.daughter("jpsi")->daughter("muon2")->pt(), x_.eta(), x_.daughter("jpsi")->daughter("muon2")->phi(), x_.daughter("jpsi")->daughter("muon2")->mass());
-        muonOne_jpsi_p4.SetPtEtaPhiM(x_.daughter("jpsi")->daughter("muon1")->pt(), x_.daughter("jpsi")->daughter("muon1")->eta(), x_.daughter("jpsi")->daughter("muon1")->phi(), x_.daughter("jpsi")->daughter("muon1")->mass());
+        if ((x_.daughter("jpsi")->daughter("muon1")->charge()) > 0 )
+        {
+          muonM_jpsi_p4.SetPtEtaPhiM(x_.daughter("jpsi")->daughter("muon2")->pt(), x_.eta(), x_.daughter("jpsi")->daughter("muon2")->phi(), x_.daughter("jpsi")->daughter("muon2")->mass());
+          muonP_jpsi_p4.SetPtEtaPhiM(x_.daughter("jpsi")->daughter("muon1")->pt(), x_.daughter("jpsi")->daughter("muon1")->eta(), x_.daughter("jpsi")->daughter("muon1")->phi(), x_.daughter("jpsi")->daughter("muon1")->mass());
+        } else
+        {
+          muonP_jpsi_p4.SetPtEtaPhiM(x_.daughter("jpsi")->daughter("muon2")->pt(), x_.eta(), x_.daughter("jpsi")->daughter("muon2")->phi(), x_.daughter("jpsi")->daughter("muon2")->mass());
+          muonM_jpsi_p4.SetPtEtaPhiM(x_.daughter("jpsi")->daughter("muon1")->pt(), x_.daughter("jpsi")->daughter("muon1")->eta(), x_.daughter("jpsi")->daughter("muon1")->phi(), x_.daughter("jpsi")->daughter("muon1")->mass());
+        }
 
         phi_p4.SetPtEtaPhiM(x_.daughter("phi")->pt(), x_.daughter("phi")->eta(), x_.daughter("phi")->phi(), x_.daughter("phi")->mass());
-        muonTwo_phi_p4.SetPtEtaPhiM(x_.daughter("phi")->daughter("muon2")->pt(), x_.eta(), x_.daughter("phi")->daughter("muon2")->phi(), x_.daughter("phi")->daughter("muon2")->mass());
-        muonOne_phi_p4.SetPtEtaPhiM(x_.daughter("phi")->daughter("muon1")->pt(), x_.daughter("phi")->daughter("muon1")->eta(), x_.daughter("phi")->daughter("muon1")->phi(), x_.daughter("phi")->daughter("muon1")->mass());
+        if((x_.daughter("phi")->daughter("muon1")->charge()) > 0 )
+        {
+          muonM_phi_p4.SetPtEtaPhiM(x_.daughter("phi")->daughter("muon2")->pt(), x_.eta(), x_.daughter("phi")->daughter("muon2")->phi(), x_.daughter("phi")->daughter("muon2")->mass());
+          muonP_phi_p4.SetPtEtaPhiM(x_.daughter("phi")->daughter("muon1")->pt(), x_.daughter("phi")->daughter("muon1")->eta(), x_.daughter("phi")->daughter("muon1")->phi(), x_.daughter("phi")->daughter("muon1")->mass());
+        }
+        else
+        {
+          muonP_phi_p4.SetPtEtaPhiM(x_.daughter("phi")->daughter("muon2")->pt(), x_.eta(), x_.daughter("phi")->daughter("muon2")->phi(), x_.daughter("phi")->daughter("muon2")->mass());
+          muonM_phi_p4.SetPtEtaPhiM(x_.daughter("phi")->daughter("muon1")->pt(), x_.daughter("phi")->daughter("muon1")->eta(), x_.daughter("phi")->daughter("muon1")->phi(), x_.daughter("phi")->daughter("muon1")->mass());
+        }
 
         x_tree->Fill();
 
