@@ -46,7 +46,7 @@ process.FourOnia2MuMuPhi = cms.EDProducer('FourOnia2MuMuPAT',
         addMuonlessPrimaryVertex    = cms.bool(False),
         addMCTruth                  = cms.bool(False),
         resolvePileUpAmbiguity      = cms.bool(True),
-        HLTFilters                  = cms.vstring('hltDiMuonGlbOrTrk0zFiltered0p2v2')
+        HLTFilters                  = cms.vstring('hltDiMuonGlbOrTrk0zFiltered0p2v2','hltMumuFilterDoubleMu2Jpsi')
 )
 
 process.FourOnia2MuMuJPsi = cms.EDProducer('FourOnia2MuMuPAT',
@@ -60,7 +60,7 @@ process.FourOnia2MuMuJPsi = cms.EDProducer('FourOnia2MuMuPAT',
         addMuonlessPrimaryVertex    = cms.bool(False),
         addMCTruth                  = cms.bool(False),
         resolvePileUpAmbiguity      = cms.bool(True),
-        HLTFilters                  = cms.vstring('hltDiMuonGlbOrTrk0zFiltered0p2v2')
+        HLTFilters                  = cms.vstring('hltDiMuonGlbOrTrk0zFiltered0p2v2','hltMumuFilterDoubleMu2Jpsi')
 )
 
 process.Onia2MuMuFilteredJpsi = cms.EDProducer('DiMuonFilter',
@@ -68,7 +68,7 @@ process.Onia2MuMuFilteredJpsi = cms.EDProducer('DiMuonFilter',
       singlemuonSelection = cms.string(""),
       dimuonSelection     = cms.string("2.95 < mass && mass < 3.15"),
       do_trigger_match    = cms.bool(True),
-      HLTFilters          = cms.vstring('hltDiMuonGlbOrTrk0zFiltered0p2v2')
+      HLTFilters                  = cms.vstring('hltDiMuonGlbOrTrk0zFiltered0p2v2','hltMumuFilterDoubleMu2Jpsi')
 )
 
 process.Onia2MuMuFilteredPhi = cms.EDProducer('DiMuonFilter',
@@ -76,7 +76,7 @@ process.Onia2MuMuFilteredPhi = cms.EDProducer('DiMuonFilter',
       singlemuonSelection = cms.string(""),
       dimuonSelection     = cms.string("0.92 < mass && mass < 1.12"),
       do_trigger_match    = cms.bool(True),
-      HLTFilters          = cms.vstring('hltDiMuonGlbOrTrk0zFiltered0p2v2')
+      HLTFilters                  = cms.vstring('hltDiMuonGlbOrTrk0zFiltered0p2v2','hltMumuFilterDoubleMu2Jpsi')
 
 )
 
@@ -115,7 +115,7 @@ process.xProducer = cms.EDProducer('FourOniaProducer',
 
 
 process.triggerSelection = cms.EDFilter("TriggerResultsFilter",
-                                        triggerConditions = cms.vstring('HLT_DoubleMu2_Jpsi_DoubleTrk1_Phi_v*',
+                                        triggerConditions = cms.vstring(
                                                                         'HLT_DoubleMu2_Jpsi_DoubleTkMu0_Phi_v*'
                                                                        ),
                                         hltResults = cms.InputTag( "TriggerResults", "", "HLT" ),
