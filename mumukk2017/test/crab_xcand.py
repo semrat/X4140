@@ -20,7 +20,9 @@ datasetnames = {
 
 runNumber = [
 #'274094-274240',
-'306100-307000',
+'305388-307000',
+'305388-306000',
+'306000-306500',
 #'273158',
 ]
 
@@ -37,6 +39,7 @@ timestamp = datetime.datetime.now().strftime("_%Y%m%d_%H%M%S")
 dataset = filter(None, datasetName.split('/'))
 
 config.section_('General')
+config.JobType.allowUndistributedCMSSW = True
 config.General.transferOutputs  = True
 config.General.workArea         = jobdir
 #config.General.requestName     = 'JetHT_Run2015D_PromptReco_v4_RECO'+timestamp
