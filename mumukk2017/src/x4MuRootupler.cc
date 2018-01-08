@@ -83,7 +83,7 @@ class x4MuRootupler:public edm::EDAnalyzer {
 
   TTree *upsilon_tree;
   TLorentzVector mumu_p4, muP_p4, muM_p4;
-  UInt_t x_rank;
+  UInt_t x_rank,filter;
 
 };
 
