@@ -105,7 +105,7 @@ isMC_(iConfig.getParameter < bool > ("isMC"))
 
     x_tree->Branch("x_p4", "TLorentzVector", &x_p4);
     x_tree->Branch("trigger", &trigger, "trigger/i");
-    x_tree->Branch("filter", &filter, "filter/i");
+    // x_tree->Branch("filter", &filter, "filter/i");
 
     x_tree->Branch("jpsi_p4", "TLorentzVector", &jpsi_p4);
     x_tree->Branch("muonM_jpsi_p4",  "TLorentzVector", &muonM_jpsi_p4);
