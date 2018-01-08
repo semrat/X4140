@@ -35,24 +35,33 @@ process.oniaSelectedMuons = cms.EDFilter('PATMuonSelector',
    filter = cms.bool(True)
 )
 
-process.FourOnia2MuMuJPsi = cms.EDProducer('FourOnia2MuMuPAT',
-        muons                       = cms.InputTag('oniaSelectedMuons'),
-        primaryVertexTag            = cms.InputTag('offlineSlimmedPrimaryVertices'),
-        beamSpotTag                 = cms.InputTag('offlineBeamSpot'),
-        higherPuritySelection       = cms.string(""),
-        lowerPuritySelection        = cms.string(""),
-        dimuonSelection             = cms.string("2.9 < mass && mass < 3.3 && charge==0 "),
-        addCommonVertex             = cms.bool(True),
-        addMuonlessPrimaryVertex    = cms.bool(False),
-        addMCTruth                  = cms.bool(False),
-        resolvePileUpAmbiguity      = cms.bool(True),
-        HLTFilters                  = cms.vstring('hltDiMuonGlbOrTrk0zFiltered0p2v2','hltMumuFilterDoubleMu2Jpsi')
-)
+# process.FourOnia2MuMuJPsi = cms.EDProducer('FourOnia2MuMuPAT',
+#         muons                       = cms.InputTag('oniaSelectedMuons'),
+#         primaryVertexTag            = cms.InputTag('offlineSlimmedPrimaryVertices'),
+#         beamSpotTag                 = cms.InputTag('offlineBeamSpot'),
+#         higherPuritySelection       = cms.string(""),
+#         lowerPuritySelection        = cms.string(""),
+#         dimuonSelection             = cms.string("2.9 < mass && mass < 3.3 && charge==0 "),
+#         addCommonVertex             = cms.bool(True),
+#         addMuonlessPrimaryVertex    = cms.bool(False),
+#         addMCTruth                  = cms.bool(False),
+#         resolvePileUpAmbiguity      = cms.bool(True),
+#         HLTFilters                  = cms.vstring('hltDiMuonGlbOrTrk0zFiltered0p2v2','hltMumuFilterDoubleMu2Jpsi')
+# )
+
+process.load("HeavyFlavorAnalysis.Onia2MuMu.onia2MuMuPAT_cfi")
+process.onia2MuMuPAT.muons=cms.InputTag('oniaSelectedMuons')
+process.onia2MuMuPAT.primaryVertexTag=cms.InputTag('offlineSlimmedPrimaryVertices')
+process.onia2MuMuPAT.beamSpotTag=cms.InputTag('offlineBeamSpot')
+process.onia2MuMuPAT.higherPuritySelection=cms.string("")
+process.onia2MuMuPAT.lowerPuritySelection=cms.string("")
+process.onia2MuMuPAT.dimuonSelection=cms.string("2.9 < mass && mass < 3.15")
+process.onia2MuMuPAT.addMCTruth = cms.bool(False)
 
 process.Onia2MuMuFilteredJpsi = cms.EDProducer('DiMuonFilter',
-      OniaTag             = cms.InputTag("FourOnia2MuMuJPsi"),
+      OniaTag             = cms.InputTag("onia2MuMuPAT"),
       singlemuonSelection = cms.string(""),
-      dimuonSelection     = cms.string("2.95 < mass && mass < 3.15 && userFloat('vProb') > 0.0 "),
+      dimuonSelection     = cms.string("2.95 < mass && mass < 3.15 && userFloat('vProb') > 0.0 && charge == 0"),
       do_trigger_match    = cms.bool(False),
       HLTFilters          = cms.vstring('hltDiMuonGlbOrTrk0zFiltered0p2v2','hltMumuFilterDoubleMu2Jpsi')
 )
