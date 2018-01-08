@@ -99,7 +99,7 @@ process.jCandSequence = cms.Sequence(
                    process.triggerSelection *
                    process.slimmedMuonsWithTriggerSequence *
 				   process.oniaSelectedMuons *
-				   process.FourOnia2MuMuJPsi *
+				   process.onia2MuMuPAT *
                    process.Onia2MuMuFilteredJpsi
 				   )
 
