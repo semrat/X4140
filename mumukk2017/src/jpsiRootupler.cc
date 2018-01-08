@@ -231,7 +231,7 @@ void jpsiRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
         // muLessVertex = (jpsi.userData<reco::Vertex>("muonlessPV"));
         // commonVertex = (jpsi.userData<reco::Vertex>("commonVertex"));
 
-        filter = jpsi.userInt("isTriggerMatched");
+        // filter = jpsi.userInt("isTriggerMatched");
         countTksOfPV = jpsi.userInt("countTksOfPV");
         vertexWeight = jpsi.userFloat("vertexWeight");
         sumPTPV       = jpsi.userFloat("sumPTPV");
