@@ -200,9 +200,10 @@ void jpsiRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
    if (triggerResults_handle.isValid()) {
       const edm::TriggerNames & TheTriggerNames = iEvent.triggerNames(*triggerResults_handle);
       unsigned int NTRIGGERS = 7;
-      std::string TriggersToTest[NTRIGGERS] = {
+      std::string TriggersToTest[NTRIGGERS] = {"HLT_Dimuon0_Jpsi","HLT_Dimuon0_Jpsi_NoVertexing",
+      "HLT_Dimuon25_Jpsi_v12","HLT_Dimuon20_Jpsi_Barrel_Seagulls",
 	      "HLT_DoubleMu2_Jpsi_DoubleTrk1_Phi","HLT_DoubleMu2_Jpsi_DoubleTkMu0_Phi"};
-
+        //hltDisplacedmumuFilterDimuon0Jpsi
       for (unsigned int i = 0; i < NTRIGGERS; i++) {
          for (int version = 1; version < 19; version++) {
             std::stringstream ss;
@@ -230,6 +231,7 @@ void jpsiRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
         // muLessVertex = (jpsi.userData<reco::Vertex>("muonlessPV"));
         // commonVertex = (jpsi.userData<reco::Vertex>("commonVertex"));
 
+        filter = jpsi.userInt("isTriggerMatched");
         countTksOfPV = jpsi.userInt("countTksOfPV");
         vertexWeight = jpsi.userFloat("vertexWeight");
         sumPTPV       = jpsi.userFloat("sumPTPV");
@@ -241,7 +243,7 @@ void jpsiRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
 
         MassErr = jpsi.userFloat("MassErr");
 
-
+        MassErr = jpsi.userFloat("MassErr");
 
         p4.SetPtEtaPhiM(jpsi.pt(), jpsi.eta(), jpsi.phi(), jpsi.mass());
 
