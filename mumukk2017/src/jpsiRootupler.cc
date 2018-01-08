@@ -238,20 +238,21 @@ void jpsiRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
         vNChi2          = jpsi.userFloat("vNChi2");
 
         cosAlpha = jpsi.userFloat("cosAlpha");
+
         MassErr = jpsi.userFloat("MassErr");
 
 
 
         p4.SetPtEtaPhiM(jpsi.pt(), jpsi.eta(), jpsi.phi(), jpsi.mass());
 
-        if ((jpsi.daughter("jpsi")->daughter("muon1")->charge()) > 0 )
+        if ((jpsi.daughter("muon1")->charge()) > 0 )
         {
-          muM_p4.SetPtEtaPhiM(jpsi.daughter("jpsi")->daughter("muon2")->pt(), jpsi.eta(), jpsi.daughter("jpsi")->daughter("muon2")->phi(), jpsi.daughter("jpsi")->daughter("muon2")->mass());
-          muP_p4.SetPtEtaPhiM(jpsi.daughter("jpsi")->daughter("muon1")->pt(), jpsi.daughter("jpsi")->daughter("muon1")->eta(), jpsi.daughter("jpsi")->daughter("muon1")->phi(), jpsi.daughter("jpsi")->daughter("muon1")->mass());
+          muM_p4.SetPtEtaPhiM(jpsi.daughter("muon2")->pt(), jpsi.eta(), jpsi.daughter("muon2")->phi(), jpsi.daughter("muon2")->mass());
+          muP_p4.SetPtEtaPhiM(jpsi.daughter("muon1")->pt(), jpsi.daughter("muon1")->eta(), jpsi.daughter("muon1")->phi(), jpsi.daughter("muon1")->mass());
         } else
         {
-          muP_p4.SetPtEtaPhiM(jpsi.daughter("jpsi")->daughter("muon2")->pt(), jpsi.eta(), jpsi.daughter("jpsi")->daughter("muon2")->phi(), jpsi.daughter("jpsi")->daughter("muon2")->mass());
-          muM_p4.SetPtEtaPhiM(jpsi.daughter("jpsi")->daughter("muon1")->pt(), jpsi.daughter("jpsi")->daughter("muon1")->eta(), jpsi.daughter("jpsi")->daughter("muon1")->phi(), jpsi.daughter("jpsi")->daughter("muon1")->mass());
+          muP_p4.SetPtEtaPhiM(jpsi.daughter("muon2")->pt(), jpsi.eta(), jpsi.daughter("muon2")->phi(), jpsi.daughter("muon2")->mass());
+          muM_p4.SetPtEtaPhiM(jpsi.daughter("muon1")->pt(), jpsi.daughter("muon1")->eta(), jpsi.daughter("muon1")->phi(), jpsi.daughter("muon1")->mass());
         }
 
         j_tree->Fill();
