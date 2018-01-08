@@ -86,15 +86,12 @@ process.triggerSelection = cms.EDFilter("TriggerResultsFilter",
                                         throw = cms.bool(False)
                                         )
 
-process.xCandSequence = cms.Sequence(
+process.jCandSequence = cms.Sequence(
                    process.triggerSelection *
                    process.slimmedMuonsWithTriggerSequence *
 				   process.oniaSelectedMuons *
 				   process.FourOnia2MuMuJPsi *
                    process.Onia2MuMuFilteredJpsi *
-                   #process.DiMuonCounterJPsi *
-                   process.jProducer
-                   #process.xFitter
 				   )
 
 process.rootuple = cms.EDAnalyzer('jpsiRootupler',
@@ -103,4 +100,4 @@ process.rootuple = cms.EDAnalyzer('jpsiRootupler',
                           TriggerResults  = cms.InputTag("TriggerResults", "", "HLT"),
                           isMC = cms.bool(False)
                          )
-process.p = cms.Path(process.xCandSequence * process.rootuple)
+process.p = cms.Path(process.jCandSequence * process.rootuple)

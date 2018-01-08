@@ -238,8 +238,6 @@ void jpsiRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
         vNChi2          = jpsi.userFloat("vNChi2");
 
         cosAlpha = jpsi.userFloat("cosAlpha");
-        cosAlphaMuLess = jpsi.userFloat("cosAlphaMuLess");
-
         MassErr = jpsi.userFloat("MassErr");
 
 
