@@ -83,7 +83,7 @@ class jpsiRootupler:public edm::EDAnalyzer {
 
 jpsiRootupler::jpsiRootupler(const edm::ParameterSet & iConfig):
 // chi_(consumes<pat::CompositeCandidateCollection>(iConfig.getParameter < edm::InputTag > ("chi_cand"))),
-jcand_(consumes<pat::CompositeCandidateCollection>(iConfig.getParameter < edm::InputTag > ("x_cand"))),
+jcand_(consumes<pat::CompositeCandidateCollection>(iConfig.getParameter < edm::InputTag > ("j_cand"))),
 primaryVertices_(consumes<reco::VertexCollection>(iConfig.getParameter < edm::InputTag > ("primaryVertices"))),
 triggerResults_(consumes<edm::TriggerResults>(iConfig.getParameter < edm::InputTag > ("TriggerResults"))),
 isMC_(iConfig.getParameter < bool > ("isMC"))

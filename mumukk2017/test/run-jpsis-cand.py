@@ -35,20 +35,6 @@ process.oniaSelectedMuons = cms.EDFilter('PATMuonSelector',
    filter = cms.bool(True)
 )
 
-process.FourOnia2MuMuPhi = cms.EDProducer('FourOnia2MuMuPAT',
-        muons                       = cms.InputTag('oniaSelectedMuons'),
-        primaryVertexTag            = cms.InputTag('offlineSlimmedPrimaryVertices'),
-        beamSpotTag                 = cms.InputTag('offlineBeamSpot'),
-        higherPuritySelection       = cms.string(""),
-        lowerPuritySelection        = cms.string(""),
-        dimuonSelection             = cms.string("0.9 < mass && mass < 1.2 && charge==0 "),
-        addCommonVertex             = cms.bool(True),
-        addMuonlessPrimaryVertex    = cms.bool(False),
-        addMCTruth                  = cms.bool(False),
-        resolvePileUpAmbiguity      = cms.bool(True),
-        HLTFilters                  = cms.vstring('hltDiMuonGlbOrTrk0zFiltered0p2v2','hltMumuFilterDoubleMu2Jpsi')
-)
-
 process.FourOnia2MuMuJPsi = cms.EDProducer('FourOnia2MuMuPAT',
         muons                       = cms.InputTag('oniaSelectedMuons'),
         primaryVertexTag            = cms.InputTag('offlineSlimmedPrimaryVertices'),
@@ -71,15 +57,6 @@ process.Onia2MuMuFilteredJpsi = cms.EDProducer('DiMuonFilter',
       HLTFilters          = cms.vstring('hltDiMuonGlbOrTrk0zFiltered0p2v2','hltMumuFilterDoubleMu2Jpsi')
 )
 
-process.Onia2MuMuFilteredPhi = cms.EDProducer('DiMuonFilter',
-      OniaTag             = cms.InputTag("FourOnia2MuMuPhi"),
-      singlemuonSelection = cms.string(""),
-      dimuonSelection     = cms.string("0.92 < mass && mass < 1.12  && userFloat('vProb') > 0.0 "),
-      do_trigger_match    = cms.bool(False),
-      HLTFilters          = cms.vstring('hltDiMuonGlbOrTrk0zFiltered0p2v2','hltMumuFilterDoubleMu2Jpsi')
-
-)
-
 process.DiMuonCounterJPsi = cms.EDFilter('CandViewCountFilter',
     src       = cms.InputTag("Onia2MuMuFilteredJpsi"),
     minNumber = cms.uint32(1),
@@ -92,22 +69,8 @@ process.DiMuonCounterPhi = cms.EDFilter('CandViewCountFilter',
     filter    = cms.bool(True)
 )
 
-process.xProducer = cms.EDProducer('FourOniaProducer',
-    phidimuons                  = cms.InputTag("Onia2MuMuFilteredPhi"),
-    jpsidimuons                 = cms.InputTag("Onia2MuMuFilteredJpsi"),
-    primaryVertexTag            = cms.InputTag('offlineSlimmedPrimaryVertices'),
-    beamSpotTag                 = cms.InputTag('offlineBeamSpot'),
-    dzmax                       = cms.double(20.0),
-    triggerMatch                = cms.bool(False),
-    addCommonVertex             = cms.bool(True),
-    addMuonlessPrimaryVertex    = cms.bool(True),
-    resolvePileUpAmbiguity      = cms.bool(True),
-    quadmuonSelection           = cms.string("4.0 < mass && mass < 6.0 && charge==0"),
-    deltaMass                   = cms.vdouble(0.0,2.0)  # trigger match is performed in Onia2MuMuFiltered
-)
-
 # process.xFitter = cms.EDProducer('FourOniaKinFit',
-#                           x_cand = cms.InputTag("xProducer"),
+#                           x_cand = cms.InputTag("jProducer"),
 #                           x_mass = cms.double(5.36679), # GeV   1S = 9.46030   2S = 10.02326    3S = 10.35520  J/psi=3.0969
 #                           product_name = cms.string("xCand"),
 #                           pdgID = cms.int32(531)
@@ -127,22 +90,15 @@ process.xCandSequence = cms.Sequence(
                    process.triggerSelection *
                    process.slimmedMuonsWithTriggerSequence *
 				   process.oniaSelectedMuons *
-                   process.FourOnia2MuMuPhi *
-                   process.Onia2MuMuFilteredPhi *
-                   #process.DiMuonCounterPhi *
 				   process.FourOnia2MuMuJPsi *
                    process.Onia2MuMuFilteredJpsi *
                    #process.DiMuonCounterJPsi *
-                   process.xProducer
+                   process.jProducer
                    #process.xFitter
 				   )
 
-process.rootuple = cms.EDAnalyzer('x4MuRootupler',
-                          #chi_cand = cms.InputTag("chiProducer"),
-			              x_cand = cms.InputTag("xProducer"),
-                          #xrefit = cms.InputTag("xFitter","xCand"),
-			              # refit2S  = cms.InputTag("chiFitter2S","y2S"),
-			              # refit3S  = cms.InputTag("chiFitter3S","y3S"),
+process.rootuple = cms.EDAnalyzer('jpsiRootupler',
+			              j_cand = cms.InputTag("Onia2MuMuFilteredJpsi"),
                           primaryVertices = cms.InputTag("offlineSlimmedPrimaryVertices"),
                           TriggerResults  = cms.InputTag("TriggerResults", "", "HLT"),
                           isMC = cms.bool(False)
