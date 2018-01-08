@@ -91,7 +91,7 @@ process.jCandSequence = cms.Sequence(
                    process.slimmedMuonsWithTriggerSequence *
 				   process.oniaSelectedMuons *
 				   process.FourOnia2MuMuJPsi *
-                   process.Onia2MuMuFilteredJpsi *
+                   process.Onia2MuMuFilteredJpsi
 				   )
 
 process.rootuple = cms.EDAnalyzer('jpsiRootupler',
