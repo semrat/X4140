@@ -88,7 +88,10 @@ process.DiMuonCounterPhi = cms.EDFilter('CandViewCountFilter',
 
 process.triggerSelection = cms.EDFilter("TriggerResultsFilter",
                                         triggerConditions = cms.vstring(
-                                                                        'HLT_DoubleMu2_Jpsi_DoubleTkMu0_Phi_v*'
+                                                                        'HLT_DoubleMu2_Jpsi_DoubleTkMu0_Phi_v*',
+                                                                        "HLT_Dimuon0_Jpsi_v*","HLT_Dimuon0_Jpsi_NoVertexing_v*",
+                                                                  "HLT_Dimuon25_Jpsi_v*","HLT_Dimuon20_Jpsi_Barrel_Seagulls_v*",
+                                                            	      "HLT_DoubleMu2_Jpsi_DoubleTrk1_Phi_v*","HLT_DoubleMu2_Jpsi_DoubleTkMu0_Phi_v*"
                                                                        ),
                                         hltResults = cms.InputTag( "TriggerResults", "", "HLT" ),
                                         l1tResults = cms.InputTag( "" ),

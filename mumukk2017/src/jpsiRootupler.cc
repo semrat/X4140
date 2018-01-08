@@ -201,7 +201,7 @@ void jpsiRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
       const edm::TriggerNames & TheTriggerNames = iEvent.triggerNames(*triggerResults_handle);
       unsigned int NTRIGGERS = 7;
       std::string TriggersToTest[NTRIGGERS] = {"HLT_Dimuon0_Jpsi","HLT_Dimuon0_Jpsi_NoVertexing",
-      "HLT_Dimuon25_Jpsi_v12","HLT_Dimuon20_Jpsi_Barrel_Seagulls",
+      "HLT_Dimuon25_Jpsi","HLT_Dimuon20_Jpsi_Barrel_Seagulls",
 	      "HLT_DoubleMu2_Jpsi_DoubleTrk1_Phi","HLT_DoubleMu2_Jpsi_DoubleTkMu0_Phi"};
         //hltDisplacedmumuFilterDimuon0Jpsi
       for (unsigned int i = 0; i < NTRIGGERS; i++) {
