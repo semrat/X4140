@@ -91,7 +91,7 @@ class x4MuRootupler:public edm::EDAnalyzer {
 
   TLorentzVector p_muonM_p4, p_muonP_p4, p_p4;
 
-  Double_t jM;
+  Double_t pM;
   Double_t p_cosAlpha, p_vNChi2, p_vProb, p_dz;
   Double_t p_ctauErrPV, p_ctauPV, p_ctauErrBS, p_ctauBS;
 
@@ -131,7 +131,7 @@ isMC_(iConfig.getParameter < bool > ("isMC"))
     x_tree->Branch("lumiblock",&lumiblock,"lumiblock/i");
 
     x_tree->Branch("x_p4", "TLorentzVector", &x_p4);
-    x_tree->Branch("x_M",  &x_M, "x_M/D");
+    x_tree->Branch("xM",  &xM, "xM/D");
     x_tree->Branch("trigger", &trigger, "trigger/i");
     // x_tree->Branch("filter", &filter, "filter/i");
 
@@ -186,7 +186,7 @@ isMC_(iConfig.getParameter < bool > ("isMC"))
     j_tree->Branch("lumiblock",&lumiblock,"lumiblock/i");
 
     j_tree->Branch("j_p4", "TLorentzVector", &x_p4);
-    j_tree->Branch("j_M",  &j_M, "j_M/D");
+    j_tree->Branch("jM",  &jM, "jM/D");
     j_tree->Branch("trigger", &trigger, "trigger/i");
     j_tree->Branch("jVertex",  "Point", &xVertex);
 
@@ -211,7 +211,7 @@ isMC_(iConfig.getParameter < bool > ("isMC"))
     p_tree->Branch("lumiblock",&lumiblock,"lumiblock/i");
 
     p_tree->Branch("p_p4", "TLorentzVector", &x_p4);
-    p_tree->Branch("p_M",  &p_M, "p_M/D");
+    p_tree->Branch("pM",  &pM, "pM/D");
     p_tree->Branch("trigger", &trigger, "trigger/i");
     p_tree->Branch("jVertex",  "Point", &xVertex);
 
@@ -306,7 +306,7 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
         pat::CompositeCandidate j_ = dimuonsPhi->at(i);
 
         j_p4.SetPtEtaPhiM(j_.pt(), j_.eta(), j_.phi(), j_.mass());
-        j_M = j_p4.M();
+        jM = j_p4.M();
         jVertex = j_.vertex();
 
         if ((j_.daughter("muon1")->charge()) > 0 )
@@ -346,7 +346,7 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
         pat::CompositeCandidate j_ = dimuonsPhi->at(i);
 
         j_p4.SetPtEtaPhiM(j_.pt(), j_.eta(), j_.phi(), j_.mass());
-        j_M = j_p4.M();
+        jM = j_p4.M();
         jVertex = j_.vertex();
 
         if ((j_.daughter("muon1")->charge()) > 0 )
@@ -384,8 +384,8 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
         pat::CompositeCandidate p_ = dimuonsPhi->at(i);
 
         p_p4.SetPtEtaPhiM(p_.pt(), p_.eta(), p_.phi(), p_.mass());
-        p_M = p_p4.M();
-        jVertex = p_.vertex();
+        pM = p_p4.M();
+        pVertex = p_.vertex();
 
         if ((p_.daughter("muon1")->charge()) > 0 )
         {
@@ -455,7 +455,7 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
 
         x_p4.SetPtEtaPhiM(x_.pt(), x_.eta(), x_.phi(), x_.mass());
 
-        x_M = x_p4.M();
+        xM = x_p4.M();
 
         jpsi_p4.SetPtEtaPhiM(x_.daughter("jpsi")->pt(), x_.daughter("jpsi")->eta(), x_.daughter("jpsi")->phi(), x_.daughter("jpsi")->mass());
         if ((x_.daughter("jpsi")->daughter("muon1")->charge()) > 0 )
