@@ -42,9 +42,10 @@ class x4MuRootupler:public edm::EDAnalyzer {
       private:
 	void analyze(const edm::Event &, const edm::EventSetup &) override;
 
-	std::string file_name;
+	      std::string file_name;
         edm::EDGetTokenT<pat::CompositeCandidateCollection> xcand_;
-        edm::EDGetTokenT<pat::CompositeCandidateCollection> refit1_;
+        edm::EDGetTokenT<pat::CompositeCandidateCollection> phi_dimuon_Label;
+        edm::EDGetTokenT<pat::CompositeCandidateCollection> jpsi_dimuon_Label;
         edm::EDGetTokenT<reco::VertexCollection>            primaryVertices_;
         edm::EDGetTokenT<edm::TriggerResults>               triggerResults_;
 
@@ -57,6 +58,7 @@ class x4MuRootupler:public edm::EDAnalyzer {
   UInt_t numPrimaryVertices;
   UInt_t countTksOfPV;
 
+  //x tree variables
 	TLorentzVector x_p4;
 	TLorentzVector jpsi_p4;
 	TLorentzVector muonM_jpsi_p4;
@@ -65,16 +67,37 @@ class x4MuRootupler:public edm::EDAnalyzer {
   TLorentzVector muonM_phi_p4;
   TLorentzVector muonP_phi_p4;
 
+  Double_t xM;
   Double_t cosAlpha, cosAlphaMuLess, ctauErrPV, ctauPV, ctauPVMuLess, ctauErrPVMuLess;
   Double_t ctauErrBS, ctauBS, vNChi2, vProb, sumPTPV;
   Double_t vertexWeight, dz, dz_jpsi, dz_phi;
   Double_t MassErr;
 
-	TTree *x_tree;
+  UInt_t jpsi_i,phi_i;
 
-  Point xVertex;
-  Point jpsVertex;
-  Point phiVertex;
+	TTree *x_tree;
+  TTree *j_tree;
+  TTree *p_tree;
+
+  //jpsi tree variables
+
+  TLorentzVector j_muonM_p4, j_muonP_p4, j_p4;
+
+  Double_t jM;
+  Double_t j_cosAlpha, j_vNChi2, j_vProb, j_dz;
+  Double_t j_ctauErrPV, j_ctauPV, j_ctauErrBS, j_ctauBS;
+
+  //phi tree variables
+
+  TLorentzVector p_muonM_p4, p_muonP_p4, p_p4;
+
+  Double_t jM;
+  Double_t p_cosAlpha, p_vNChi2, p_vProb, p_dz;
+  Double_t p_ctauErrPV, p_ctauPV, p_ctauErrBS, p_ctauBS;
+
+  Point jVertex, pVertex;
+  Point xVertex, jpsVertex, phiVertex;
+
   reco::Vertex commonVertex;
   Point PVwithmuons;
   reco::Vertex muLessVertex;
@@ -83,13 +106,15 @@ class x4MuRootupler:public edm::EDAnalyzer {
 
   TTree *upsilon_tree;
   TLorentzVector mumu_p4, muP_p4, muM_p4;
-  UInt_t x_rank,filter;
+  UInt_t x_rank,filter,j_rank,p_rank;
 
 };
 
 x4MuRootupler::x4MuRootupler(const edm::ParameterSet & iConfig):
 // chi_(consumes<pat::CompositeCandidateCollection>(iConfig.getParameter < edm::InputTag > ("chi_cand"))),
 xcand_(consumes<pat::CompositeCandidateCollection>(iConfig.getParameter < edm::InputTag > ("x_cand"))),
+phi_dimuon_Label(consumes<pat::CompositeCandidateCollection>(iConfig.getParameter< edm::InputTag>("phidimuons"))),
+jpsi_dimuon_Label(consumes<pat::CompositeCandidateCollection>(iConfig.getParameter< edm::InputTag>("jpsidimuons"))),
 // refit1_(consumes<pat::CompositeCandidateCollection>(iConfig.getParameter < edm::InputTag > ("refit1S"))),
 primaryVertices_(consumes<reco::VertexCollection>(iConfig.getParameter < edm::InputTag > ("primaryVertices"))),
 triggerResults_(consumes<edm::TriggerResults>(iConfig.getParameter < edm::InputTag > ("TriggerResults"))),
@@ -97,15 +122,21 @@ isMC_(iConfig.getParameter < bool > ("isMC"))
 {
 
     edm::Service < TFileService > fs;
-    x_tree = fs->make < TTree > ("chiTree", "Tree of chic");
+    x_tree = fs->make < TTree > ("xTree", "Tree of xs");
+    j_tree = fs->make < TTree > ("jTree", "Tree of jpsis");
+    p_tree = fs->make < TTree > ("pTree", "Tree of phis");
 
     x_tree->Branch("run", &run, "run/i");
     x_tree->Branch("event", &event, "event/l");
     x_tree->Branch("lumiblock",&lumiblock,"lumiblock/i");
 
     x_tree->Branch("x_p4", "TLorentzVector", &x_p4);
+    x_tree->Branch("x_M",  &x_M, "x_M/D");
     x_tree->Branch("trigger", &trigger, "trigger/i");
     // x_tree->Branch("filter", &filter, "filter/i");
+
+    x_tree->Branch("jpsi_i",&jpsi_i, "jpsi_i/i");
+    x_tree->Branch("phi_i", &phi_i, "phi_i/i");
 
     x_tree->Branch("jpsi_p4", "TLorentzVector", &jpsi_p4);
     x_tree->Branch("muonM_jpsi_p4",  "TLorentzVector", &muonM_jpsi_p4);
@@ -147,6 +178,59 @@ isMC_(iConfig.getParameter < bool > ("isMC"))
     x_tree->Branch("cosAlpha", &cosAlpha, "cosAlpha/D");
     x_tree->Branch("cosAlphaMuLess", &cosAlphaMuLess, "cosAlphaMuLess/D");
 
+    x_tree->Branch("x_rank", &x_rank, "x_rank/I");
+
+    //jpsi tree
+    j_tree->Branch("run", &run, "run/i");
+    j_tree->Branch("event", &event, "event/l");
+    j_tree->Branch("lumiblock",&lumiblock,"lumiblock/i");
+
+    j_tree->Branch("j_p4", "TLorentzVector", &x_p4);
+    j_tree->Branch("j_M",  &j_M, "j_M/D");
+    j_tree->Branch("trigger", &trigger, "trigger/i");
+    j_tree->Branch("jVertex",  "Point", &xVertex);
+
+    j_tree->Branch("j_muonM_p4",  "TLorentzVector", &j_muonM_p4);
+    j_tree->Branch("j_muonP_p4",  "TLorentzVector", &j_muonP_p4);
+
+    j_tree->Branch("j_vProb", &j_vProb, "j_vProb/D");
+    // j_tree->Branch("j_dz", &j_dz, "j_dz/D");
+    j_tree->Branch("j_vNChi2", &j_vNChi2, "j_vNChi2/D");
+    j_tree->Branch("j_cosAlpha", &j_cosAlpha, "j_cosAlpha/D");
+
+    j_tree->Branch("j_ctauPV", &j_ctauPV, "j_ctauPV/D");
+    j_tree->Branch("j_ctauErrPV", &j_ctauErrPV, "j_ctauErrPV/D");
+    j_tree->Branch("j_ctauBS", &j_ctauBS, "j_ctauBS/D");
+    j_tree->Branch("j_ctauErrBS", &j_ctauErrBS, "j_ctauErrBS/D");
+
+    j_tree->Branch("j_rank", &j_rank, "j_rank/I");
+
+    //phi tree
+    p_tree->Branch("run", &run, "run/i");
+    p_tree->Branch("event", &event, "event/l");
+    p_tree->Branch("lumiblock",&lumiblock,"lumiblock/i");
+
+    p_tree->Branch("p_p4", "TLorentzVector", &x_p4);
+    p_tree->Branch("p_M",  &p_M, "p_M/D");
+    p_tree->Branch("trigger", &trigger, "trigger/i");
+    p_tree->Branch("jVertex",  "Point", &xVertex);
+
+    p_tree->Branch("p_muonM_p4",  "TLorentzVector", &p_muonM_p4);
+    p_tree->Branch("p_muonP_p4",  "TLorentzVector", &p_muonP_p4);
+
+    p_tree->Branch("p_vProb", &p_vProb, "p_vProb/D");
+    // p_tree->Branch("p_dz", &p_dz, "p_dz/D");
+    p_tree->Branch("p_vNChi2", &p_vNChi2, "p_vNChi2/D");
+    p_tree->Branch("p_cosAlpha", &p_cosAlpha, "p_cosAlpha/D");
+
+    p_tree->Branch("p_ctauPV", &p_ctauPV, "p_ctauPV/D");
+    p_tree->Branch("p_ctauErrPV", &p_ctauErrPV, "p_ctauErrPV/D");
+    p_tree->Branch("p_ctauBS", &p_ctauBS, "p_ctauBS/D");
+    p_tree->Branch("p_ctauErrBS", &p_ctauErrBS, "p_ctauErrBS/D");
+
+    p_tree->Branch("p_rank", &p_rank, "p_rank/I");
+
+
 }
 
 //Check recursively if any ancestor of particle is the given one
@@ -164,8 +248,11 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
   edm::Handle < pat::CompositeCandidateCollection >xcand_hand;
   iEvent.getByToken(xcand_, xcand_hand);
 
-  // edm::Handle < pat::CompositeCandidateCollection >refit1S_handle;
-  // iEvent.getByToken(refit1_, refit1S_handle);
+  edm::Handle<pat::CompositeCandidateCollection> dimuonsPhi;
+  event.getByToken(phi_dimuon_Label,dimuonsPhi);
+
+  edm::Handle<pat::CompositeCandidateCollection> dimuonsJPsi;
+  event.getByToken(jpsi_dimuon_Label,dimuonsJPsi);
 
   edm::Handle < reco::VertexCollection  >primaryVertices_handle;
   iEvent.getByToken(primaryVertices_, primaryVertices_handle);
@@ -182,59 +269,7 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
   pat::CompositeCandidate refit1S;
 
   edm::Handle<reco::GenParticleCollection> pruned;
-  // iEvent.getByToken(genCands_,pruned);
 
-  // if (false && isMC_) {
-  //  gen_chi_p4.SetPtEtaPhiM(0, 0, 0, 0);
-  //  gen_yns_p4.SetPtEtaPhiM(0, 0, 0, 0);
-  //  gen_dimuon_p4.SetPtEtaPhiM(0, 0, 0, 0);
-  //  chi_pdgId = 0;
-  //  for (size_t i=0; i<pruned->size(); i++) {
-  //     int p_id = abs((*pruned)[i].pdgId());
-  //     int p_status = (*pruned)[i].status();
-  //     yns_pdgId = 0;
-  //     int foundit = 0;
-  //     if ( ( p_id == 20443 || p_id == 445 || p_id == 10441) && p_status == 2)  yns_pdgId = 443;
-  //     if (yns_pdgId > 0) {
-  //        chi_pdgId = p_id;
-  //        foundit++;
-  //        const reco::Candidate * pwave = &(*pruned)[i];
-  //        gen_chi_p4.SetPtEtaPhiM(pwave->pt(),pwave->eta(),pwave->phi(),pwave->mass());
-  //        for (size_t j=0; j<pwave->numberOfDaughters(); j++) {
-  //           const reco::Candidate *dau = pwave->daughter(j);
-  //           if (dau->pdgId() == yns_pdgId && dau->status() == 2) {
-  //              gen_yns_p4.SetPtEtaPhiM(dau->pt(),dau->eta(),dau->phi(),dau->mass());
-  //              uint nmuons = 0;
-  //              for (size_t k=0; k<dau->numberOfDaughters(); k++) {
-  //                 const reco::Candidate *gdau = dau->daughter(k);
-  //                 if (gdau->pdgId() == 13 && gdau->status()==1) {
-  //                    nmuons++;
-  //                    gen_muonP_p4.SetPtEtaPhiM(gdau->pt(),gdau->eta(),gdau->phi(),gdau->mass());
-  //                 } else {
-  //                    if (gdau->pdgId() == -13 && gdau->status()==1) {
-  //                       nmuons++;
-  //                       gen_muonM_p4.SetPtEtaPhiM(gdau->pt(),gdau->eta(),gdau->phi(),gdau->mass());
-  //                    }
-  //                 }
-  //              }
-  //              if (nmuons == 2 ) {
-  //                 foundit += 3;                                  // found complete dimuon decay
-  //                 gen_dimuon_p4 = gen_muonP_p4 + gen_muonM_p4;   // will account fsr
-  //              }
-  //           } else {
-  //              if (dau->pdgId() == 22 && dau->status() ==1) {
-  //                 foundit++;
-  //                 gen_photon_p4.SetPtEtaPhiM(dau->pt(),dau->eta(),dau->phi(),dau->mass());
-  //              }  else std::cout << "Rootupler: unexpected pdg_id " << dau->pdgId() << " (" << run << "," << event << ")" << std::endl;
-  //           }
-  //           if (foundit == 5 ) break;                             // decay found !
-  //        }
-  //     }
-  //     if (chi_pdgId && yns_pdgId && foundit==5) break;        // just one decay of this kind is expected
-  //     else chi_pdgId = 0;
-  //  }
-  //  if (!chi_pdgId)  std::cout << "Rootupler does not found the given decay " << run << "," << event << std::endl;
-  // }
 
    //grab Trigger informations
    // save it in variable trigger, trigger is an int between 0 and 15, in binary it is:
@@ -262,7 +297,121 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
       }
     } else std::cout << "*** NO triggerResults found " << iEvent.id().run() << "," << iEvent.id().event() << std::endl;
 
-    bool bestCandidateOnly_ = false;
+    // bool bestCandidateOnly_ = false;
+
+    if (dimuonsPhi.isValid() && !dimuonsPhi->empty())
+    {
+      for (unsigned int i=0; i< dimuonsPhi->size(); i++)
+      {
+        pat::CompositeCandidate j_ = dimuonsPhi->at(i);
+
+        j_p4.SetPtEtaPhiM(j_.pt(), j_.eta(), j_.phi(), j_.mass());
+        j_M = j_p4.M();
+        jVertex = j_.vertex();
+
+        if ((j_.daughter("muon1")->charge()) > 0 )
+        {
+          j_muonM_p4.SetPtEtaPhiM(j_.daughter("muon2")->pt(), j_.eta(), j_.daughter("muon2")->phi(), j_.daughter("muon2")->mass());
+          j_muonP_p4.SetPtEtaPhiM(j_.daughter("muon1")->pt(), j_.daughter("muon1")->eta(), j_.daughter("muon1")->phi(), j_.daughter("muon1")->mass());
+        } else
+        {
+          j_muonP_p4.SetPtEtaPhiM(j_.daughter("muon2")->pt(), j_.eta(), j_.daughter("muon2")->phi(), j_.daughter("muon2")->mass());
+          j_muonM_p4.SetPtEtaPhiM(j_.daughter("muon1")->pt(), j_.daughter("muon1")->eta(), j_.daughter("muon1")->phi(), j_.daughter("muon1")->mass());
+        }
+
+        j_vProb           = j_.userFloat("vProb");
+        j_vNChi2          = j_.userFloat("vNChi2");
+
+        j_ctauBS          = j_.userFloat("ppdlBS");
+        j_ctauErrBS       = j_.userFloat("ppdlErrBS");
+
+        j_ctauPV          = j_.userFloat("ppdlPV");
+        j_ctauErrPV       = j_.userFloat("ppdlErrPV");
+
+        j_cosAlpha = j_.userFloat("cosAlpha");
+
+        j_tree->Fill();
+
+      }
+    }
+
+
+
+    if (dimuonsJPsi.isValid() && !dimuonsJPsi->empty())
+    {
+      j_rank = dimuonsJPsi->size();
+
+      for (unsigned int i=0; i< dimuonsPhi->size(); i++)
+      {
+        pat::CompositeCandidate j_ = dimuonsPhi->at(i);
+
+        j_p4.SetPtEtaPhiM(j_.pt(), j_.eta(), j_.phi(), j_.mass());
+        j_M = j_p4.M();
+        jVertex = j_.vertex();
+
+        if ((j_.daughter("muon1")->charge()) > 0 )
+        {
+          j_muonM_p4.SetPtEtaPhiM(j_.daughter("muon2")->pt(), j_.eta(), j_.daughter("muon2")->phi(), j_.daughter("muon2")->mass());
+          j_muonP_p4.SetPtEtaPhiM(j_.daughter("muon1")->pt(), j_.daughter("muon1")->eta(), j_.daughter("muon1")->phi(), j_.daughter("muon1")->mass());
+        } else
+        {
+          j_muonP_p4.SetPtEtaPhiM(j_.daughter("muon2")->pt(), j_.eta(), j_.daughter("muon2")->phi(), j_.daughter("muon2")->mass());
+          j_muonM_p4.SetPtEtaPhiM(j_.daughter("muon1")->pt(), j_.daughter("muon1")->eta(), j_.daughter("muon1")->phi(), j_.daughter("muon1")->mass());
+        }
+
+        j_vProb           = j_.userFloat("vProb");
+        j_vNChi2          = j_.userFloat("vNChi2");
+
+        j_ctauBS          = j_.userFloat("ppdlBS");
+        j_ctauErrBS       = j_.userFloat("ppdlErrBS");
+
+        j_ctauPV          = j_.userFloat("ppdlPV");
+        j_ctauErrPV       = j_.userFloat("ppdlErrPV");
+
+        j_cosAlpha = j_.userFloat("cosAlpha");
+
+        j_tree->Fill();
+
+      }
+    }
+
+    if (dimuonsPhi.isValid() && !dimuonsPhi->empty())
+    {
+      p_rank = dimuonsPhi->size();
+
+      for (unsigned int i=0; i< dimuonsPhi->size(); i++)
+      {
+        pat::CompositeCandidate p_ = dimuonsPhi->at(i);
+
+        p_p4.SetPtEtaPhiM(p_.pt(), p_.eta(), p_.phi(), p_.mass());
+        p_M = p_p4.M();
+        jVertex = p_.vertex();
+
+        if ((p_.daughter("muon1")->charge()) > 0 )
+        {
+          p_muonM_p4.SetPtEtaPhiM(p_.daughter("muon2")->pt(), p_.eta(), p_.daughter("muon2")->phi(), p_.daughter("muon2")->mass());
+          p_muonP_p4.SetPtEtaPhiM(p_.daughter("muon1")->pt(), p_.daughter("muon1")->eta(), p_.daughter("muon1")->phi(), p_.daughter("muon1")->mass());
+        } else
+        {
+          p_muonP_p4.SetPtEtaPhiM(p_.daughter("muon2")->pt(), p_.eta(), p_.daughter("muon2")->phi(), p_.daughter("muon2")->mass());
+          p_muonM_p4.SetPtEtaPhiM(p_.daughter("muon1")->pt(), p_.daughter("muon1")->eta(), p_.daughter("muon1")->phi(), p_.daughter("muon1")->mass());
+        }
+
+        p_vProb           = p_.userFloat("vProb");
+        p_vNChi2          = p_.userFloat("vNChi2");
+
+        p_ctauBS          = p_.userFloat("ppdlBS");
+        p_ctauErrBS       = p_.userFloat("ppdlErrBS");
+
+        p_ctauPV          = p_.userFloat("ppdlPV");
+        p_ctauErrPV       = p_.userFloat("ppdlErrPV");
+
+        p_cosAlpha = p_.userFloat("cosAlpha");
+
+        p_tree->Fill();
+
+      }
+    }
 
     x_rank = 0;
     // std::string getdata = "";
@@ -305,6 +454,8 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
 
 
         x_p4.SetPtEtaPhiM(x_.pt(), x_.eta(), x_.phi(), x_.mass());
+
+        x_M = x_p4.M();
 
         jpsi_p4.SetPtEtaPhiM(x_.daughter("jpsi")->pt(), x_.daughter("jpsi")->eta(), x_.daughter("jpsi")->phi(), x_.daughter("jpsi")->mass());
         if ((x_.daughter("jpsi")->daughter("muon1")->charge()) > 0 )

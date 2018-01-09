@@ -22,15 +22,22 @@ process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(False))
 
 process.load("mmkk.mmkk.slimmedMuonsTriggerMatcher2017_cfi")
 
+process.triggerSelection = cms.EDFilter("TriggerResultsFilter",
+                                        triggerConditions = cms.vstring(
+                                                                        'HLT_DoubleMu2_Jpsi_DoubleTkMu0_Phi_v*',
+                                                                        # 'HLT_Mu20_TkMu0_Phi_v*',
+                                                                        # 'HLT_Dimuon14_Phi_Barrel_Seagulls_v*',
+                                                                        # 'HLT_Mu25_TkMu0_Phi_v*',
+                                                                        # 'HLT_Mu20_TkMu0_Phi_v*',
+                                                                       ),
+                                        hltResults = cms.InputTag( "TriggerResults", "", "HLT" ),
+                                        l1tResults = cms.InputTag( "" ),
+                                        throw = cms.bool(False)
+                                        )
+
 process.oniaSelectedMuons = cms.EDFilter('PATMuonSelector',
    src = cms.InputTag('slimmedMuonsWithTrigger'),
-   cut = cms.string('muonID(\"TMOneStationTight\")'
-                    ' && abs(innerTrack.dxy) < 0.3'
-                    ' && abs(innerTrack.dz)  < 20.'
-                    ' && innerTrack.hitPattern.trackerLayersWithMeasurement > 5'
-                    ' && innerTrack.hitPattern.pixelLayersWithMeasurement > 0'
-                    ' && innerTrack.quality(\"highPurity\")'
-                    ' && (abs(eta) <= 2.5 && pt > 0.2)'
+   cut = cms.string(' && (abs(eta) <= 3 )'
    ),
    filter = cms.bool(True)
 )
@@ -41,7 +48,7 @@ process.FourOnia2MuMuPhi = cms.EDProducer('FourOnia2MuMuPAT',
         beamSpotTag                 = cms.InputTag('offlineBeamSpot'),
         higherPuritySelection       = cms.string(""),
         lowerPuritySelection        = cms.string(""),
-        dimuonSelection             = cms.string("0.9 < mass && mass < 1.2 && charge==0 "),
+        dimuonSelection             = cms.string("0.65 < mass && mass < 1.2 && charge==0 "),
         addCommonVertex             = cms.bool(True),
         addMuonlessPrimaryVertex    = cms.bool(False),
         addMCTruth                  = cms.bool(False),
@@ -113,15 +120,6 @@ process.xProducer = cms.EDProducer('FourOniaProducer',
 #                           pdgID = cms.int32(531)
 #                          )
 
-
-process.triggerSelection = cms.EDFilter("TriggerResultsFilter",
-                                        triggerConditions = cms.vstring(
-                                                                        'HLT_DoubleMu2_Jpsi_DoubleTkMu0_Phi_v*'
-                                                                       ),
-                                        hltResults = cms.InputTag( "TriggerResults", "", "HLT" ),
-                                        l1tResults = cms.InputTag( "" ),
-                                        throw = cms.bool(False)
-                                        )
 
 process.xCandSequence = cms.Sequence(
                    process.triggerSelection *

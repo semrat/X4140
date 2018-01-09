@@ -394,13 +394,13 @@ float FourOniaProducer::Getdz(const pat::CompositeCandidate& c, const reco::Cand
 
 void FourOniaProducer::endJob(){
   std::cout << "###########################" << std::endl;
-  std::cout << "Chi Candidate producer report:" << std::endl;
+  std::cout << "X Candidate producer report:" << std::endl;
   std::cout << "###########################" << std::endl;
   // std::cout << "Delta mass fail: " << delta_mass_fail << std::endl;
   std::cout << "Dz phi fail:      " << dz_phi_cut_fail << std::endl;
   std::cout << "Dz jps fail:      " << dz_jps_cut_fail << std::endl;
   std::cout << "###########################" << std::endl;
-  std::cout << "Found " << candidates << " Chi candidates." << std::endl;
+  std::cout << "Found " << candidates << " X candidates." << std::endl;
   std::cout << "###########################" << std::endl;
 }
 //
