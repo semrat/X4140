@@ -52,6 +52,7 @@ class x4MuRootupler:public edm::EDAnalyzer {
         edm::EDGetTokenT<pat::CompositeCandidateCollection> jpsi_dimuon_Label;
         edm::EDGetTokenT<reco::VertexCollection>            primaryVertices_;
         edm::EDGetTokenT<edm::TriggerResults>               triggerResults_;
+        std::vector<std::string>                            HLTs_;
 
 	bool isMC_;
 
@@ -124,7 +125,8 @@ jpsi_dimuon_Label(consumes<pat::CompositeCandidateCollection>(iConfig.getParamet
 // refit1_(consumes<pat::CompositeCandidateCollection>(iConfig.getParameter < edm::InputTag > ("refit1S"))),
 primaryVertices_(consumes<reco::VertexCollection>(iConfig.getParameter < edm::InputTag > ("primaryVertices"))),
 triggerResults_(consumes<edm::TriggerResults>(iConfig.getParameter < edm::InputTag > ("TriggerResults"))),
-isMC_(iConfig.getParameter < bool > ("isMC"))
+isMC_(iConfig.getParameter < bool > ("isMC")),
+HLTs_(iConfig.getParameter<std::vector<std::string>>("HLTs"))
 {
 
     edm::Service < TFileService > fs;
@@ -288,16 +290,15 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
    // es. 4 = pass only 8
 
    trigger = 0;
+
    if (triggerResults_handle.isValid()) {
       const edm::TriggerNames & TheTriggerNames = iEvent.triggerNames(*triggerResults_handle);
-      unsigned int NTRIGGERS = 7;
-      std::string TriggersToTest[NTRIGGERS] = {
-	      "HLT_DoubleMu2_Jpsi_DoubleTrk1_Phi","HLT_DoubleMu2_Jpsi_DoubleTkMu0_Phi"};
+      unsigned int NTRIGGERS = HLTs_.size();
 
       for (unsigned int i = 0; i < NTRIGGERS; i++) {
          for (int version = 1; version < 19; version++) {
             std::stringstream ss;
-            ss << TriggersToTest[i] << "_v" << version;
+            ss << HLTs_[i] << "_v" << version;
             unsigned int bit = TheTriggerNames.triggerIndex(edm::InputTag(ss.str()).label());
             if (bit < triggerResults_handle->size() && triggerResults_handle->accept(bit) && !triggerResults_handle->error(bit)) {
                trigger += (1<<i);
