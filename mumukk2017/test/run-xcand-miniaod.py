@@ -37,7 +37,7 @@ process.triggerSelection = cms.EDFilter("TriggerResultsFilter",
 
 process.oniaSelectedMuons = cms.EDFilter('PATMuonSelector',
    src = cms.InputTag('slimmedMuonsWithTrigger'),
-   cut = cms.string(' && (abs(eta) <= 3 )'
+   cut = cms.string(' ( abs(eta) <= 3 )'
    ),
    filter = cms.bool(True)
 )
