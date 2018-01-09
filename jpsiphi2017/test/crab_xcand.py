@@ -52,7 +52,7 @@ config.General.requestName      = dataset[0]+'_'+dataset[1]+'_'+dataset[2]+'_'+r
 config.General.transferLogs     = False
 
 config.section_('JobType')
-config.JobType.psetName         = '/lustre/home/adrianodif/CMSSW_9_2_2/src/mmkk/mmkk/test/run-xcand-miniaod.py'
+config.JobType.psetName         = '/lustre/home/adrianodif/CMSSW_9_2_2/src/mmkk/mmkk/test/run-4mu-miniaod.py'
 config.JobType.pluginName       = 'Analysis'
 config.JobType.maxMemoryMB      = 2500
 config.JobType.maxJobRuntimeMin = 2750
