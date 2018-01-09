@@ -314,9 +314,9 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
     {
       j_rank = dimuonsJPsi->size();
 
-      for (unsigned int i=0; i< dimuonsPhi->size(); i++)
+      for (unsigned int i=0; i< dimuonsJPsi->size(); i++)
       {
-        pat::CompositeCandidate j_ = dimuonsPhi->at(i);
+        pat::CompositeCandidate j_ = dimuonsJPsi->at(i);
 
         j_p4.SetPtEtaPhiM(j_.pt(), j_.eta(), j_.phi(), j_.mass());
         jM = j_p4.M();
