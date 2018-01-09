@@ -255,10 +255,10 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
   iEvent.getByToken(xcand_, xcand_hand);
 
   edm::Handle<pat::CompositeCandidateCollection> dimuonsPhi;
-  event.getByToken(phi_dimuon_Label,dimuonsPhi);
+  iEvent.getByToken(phi_dimuon_Label,dimuonsPhi);
 
   edm::Handle<pat::CompositeCandidateCollection> dimuonsJPsi;
-  event.getByToken(jpsi_dimuon_Label,dimuonsJPsi);
+  iEvent.getByToken(jpsi_dimuon_Label,dimuonsJPsi);
 
   edm::Handle < reco::VertexCollection  >primaryVertices_handle;
   iEvent.getByToken(primaryVertices_, primaryVertices_handle);
