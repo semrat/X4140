@@ -47,9 +47,8 @@ class diMuonRootupler:public edm::EDAnalyzer {
         edm::EDGetTokenT<pat::CompositeCandidateCollection> refit1_;
         edm::EDGetTokenT<reco::VertexCollection>            primaryVertices_;
         edm::EDGetTokenT<edm::TriggerResults>               triggerResults_;
-
         std::vector<std::string>                            HLTs_;
-	bool isMC_;
+	      bool isMC_;
 
 	UInt_t run;
   ULong64_t event;
@@ -87,8 +86,8 @@ diMuonRootupler::diMuonRootupler(const edm::ParameterSet & iConfig):
 jcand_(consumes<pat::CompositeCandidateCollection>(iConfig.getParameter < edm::InputTag > ("dimuon_cand"))),
 primaryVertices_(consumes<reco::VertexCollection>(iConfig.getParameter < edm::InputTag > ("primaryVertices"))),
 triggerResults_(consumes<edm::TriggerResults>(iConfig.getParameter < edm::InputTag > ("TriggerResults"))),
-isMC_(iConfig.getParameter < bool > ("isMC")),
-HLTs_(iConfig.getParameter<std::vector<std::string>>("HLTs"))
+HLTs_(iConfig.getParameter<std::vector<std::string>>("HLTs")),
+isMC_(iConfig.getParameter < bool > ("isMC"))
 {
 
     edm::Service < TFileService > fs;
