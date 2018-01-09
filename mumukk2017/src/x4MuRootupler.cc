@@ -305,44 +305,6 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
 
     // bool bestCandidateOnly_ = false;
 
-    if (dimuonsPhi.isValid() && !dimuonsPhi->empty())
-    {
-      for (unsigned int i=0; i< dimuonsPhi->size(); i++)
-      {
-        pat::CompositeCandidate j_ = dimuonsPhi->at(i);
-
-        j_p4.SetPtEtaPhiM(j_.pt(), j_.eta(), j_.phi(), j_.mass());
-        jM = j_p4.M();
-        jVertex = j_.vertex();
-
-        if ((j_.daughter("muon1")->charge()) > 0 )
-        {
-          j_muonM_p4.SetPtEtaPhiM(j_.daughter("muon2")->pt(), j_.eta(), j_.daughter("muon2")->phi(), j_.daughter("muon2")->mass());
-          j_muonP_p4.SetPtEtaPhiM(j_.daughter("muon1")->pt(), j_.daughter("muon1")->eta(), j_.daughter("muon1")->phi(), j_.daughter("muon1")->mass());
-        } else
-        {
-          j_muonP_p4.SetPtEtaPhiM(j_.daughter("muon2")->pt(), j_.eta(), j_.daughter("muon2")->phi(), j_.daughter("muon2")->mass());
-          j_muonM_p4.SetPtEtaPhiM(j_.daughter("muon1")->pt(), j_.daughter("muon1")->eta(), j_.daughter("muon1")->phi(), j_.daughter("muon1")->mass());
-        }
-
-        j_vProb           = j_.userFloat("vProb");
-        j_vNChi2          = j_.userFloat("vNChi2");
-
-        j_ctauBS          = j_.userFloat("ppdlBS");
-        j_ctauErrBS       = j_.userFloat("ppdlErrBS");
-
-        j_ctauPV          = j_.userFloat("ppdlPV");
-        j_ctauErrPV       = j_.userFloat("ppdlErrPV");
-
-        j_cosAlpha = j_.userFloat("cosAlpha");
-
-        j_tree->Fill();
-
-      }
-    }
-
-
-
     if (dimuonsJPsi.isValid() && !dimuonsJPsi->empty())
     {
       j_rank = dimuonsJPsi->size();
@@ -359,10 +321,18 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
         {
           j_muonM_p4.SetPtEtaPhiM(j_.daughter("muon2")->pt(), j_.eta(), j_.daughter("muon2")->phi(), j_.daughter("muon2")->mass());
           j_muonP_p4.SetPtEtaPhiM(j_.daughter("muon1")->pt(), j_.daughter("muon1")->eta(), j_.daughter("muon1")->phi(), j_.daughter("muon1")->mass());
+
+          j_muonP_type = j_.daughter("muon1")->type();
+          j_muonM_type = j_.daughter("muon2")->type();
+
         } else
         {
           j_muonP_p4.SetPtEtaPhiM(j_.daughter("muon2")->pt(), j_.eta(), j_.daughter("muon2")->phi(), j_.daughter("muon2")->mass());
           j_muonM_p4.SetPtEtaPhiM(j_.daughter("muon1")->pt(), j_.daughter("muon1")->eta(), j_.daughter("muon1")->phi(), j_.daughter("muon1")->mass());
+
+          j_muonP_type = j_.daughter("muon2")->type();
+          j_muonM_type = j_.daughter("muon1")->type();
+
         }
 
         j_vProb           = j_.userFloat("vProb");
@@ -395,12 +365,20 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
 
         if ((p_.daughter("muon1")->charge()) > 0 )
         {
-          p_muonM_p4.SetPtEtaPhiM(p_.daughter("muon2")->pt(), p_.eta(), p_.daughter("muon2")->phi(), p_.daughter("muon2")->mass());
           p_muonP_p4.SetPtEtaPhiM(p_.daughter("muon1")->pt(), p_.daughter("muon1")->eta(), p_.daughter("muon1")->phi(), p_.daughter("muon1")->mass());
+          p_muonM_p4.SetPtEtaPhiM(p_.daughter("muon2")->pt(), p_.daughter("muon2")->eta(), p_.daughter("muon2")->phi(), p_.daughter("muon2")->mass());
+
+          p_muonP_type = p_.daughter("muon1")->type();
+          p_muonM_type = p_.daughter("muon2")->type();
+
         } else
         {
-          p_muonP_p4.SetPtEtaPhiM(p_.daughter("muon2")->pt(), p_.eta(), p_.daughter("muon2")->phi(), p_.daughter("muon2")->mass());
+          p_muonP_p4.SetPtEtaPhiM(p_.daughter("muon2")->pt(), p_.daughter("muon2")->eta(), p_.daughter("muon2")->phi(), p_.daughter("muon2")->mass());
           p_muonM_p4.SetPtEtaPhiM(p_.daughter("muon1")->pt(), p_.daughter("muon1")->eta(), p_.daughter("muon1")->phi(), p_.daughter("muon1")->mass());
+
+          p_muonP_type = p_.daughter("muon2")->type();
+          p_muonM_type = p_.daughter("muon1")->type();
+
         }
 
         p_vProb           = p_.userFloat("vProb");
@@ -466,23 +444,23 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
         jpsi_p4.SetPtEtaPhiM(x_.daughter("jpsi")->pt(), x_.daughter("jpsi")->eta(), x_.daughter("jpsi")->phi(), x_.daughter("jpsi")->mass());
         if ((x_.daughter("jpsi")->daughter("muon1")->charge()) > 0 )
         {
-          muonM_jpsi_p4.SetPtEtaPhiM(x_.daughter("jpsi")->daughter("muon2")->pt(), x_.eta(), x_.daughter("jpsi")->daughter("muon2")->phi(), x_.daughter("jpsi")->daughter("muon2")->mass());
+          muonM_jpsi_p4.SetPtEtaPhiM(x_.daughter("jpsi")->daughter("muon2")->pt(), x_.daughter("jpsi")->daughter("muon2")->eta(), x_.daughter("jpsi")->daughter("muon2")->phi(), x_.daughter("jpsi")->daughter("muon2")->mass());
           muonP_jpsi_p4.SetPtEtaPhiM(x_.daughter("jpsi")->daughter("muon1")->pt(), x_.daughter("jpsi")->daughter("muon1")->eta(), x_.daughter("jpsi")->daughter("muon1")->phi(), x_.daughter("jpsi")->daughter("muon1")->mass());
         } else
         {
-          muonP_jpsi_p4.SetPtEtaPhiM(x_.daughter("jpsi")->daughter("muon2")->pt(), x_.eta(), x_.daughter("jpsi")->daughter("muon2")->phi(), x_.daughter("jpsi")->daughter("muon2")->mass());
+          muonP_jpsi_p4.SetPtEtaPhiM(x_.daughter("jpsi")->daughter("muon2")->pt(), x_.daughter("jpsi")->daughter("muon2")->eta(), x_.daughter("jpsi")->daughter("muon2")->phi(), x_.daughter("jpsi")->daughter("muon2")->mass());
           muonM_jpsi_p4.SetPtEtaPhiM(x_.daughter("jpsi")->daughter("muon1")->pt(), x_.daughter("jpsi")->daughter("muon1")->eta(), x_.daughter("jpsi")->daughter("muon1")->phi(), x_.daughter("jpsi")->daughter("muon1")->mass());
         }
 
         phi_p4.SetPtEtaPhiM(x_.daughter("phi")->pt(), x_.daughter("phi")->eta(), x_.daughter("phi")->phi(), x_.daughter("phi")->mass());
         if((x_.daughter("phi")->daughter("muon1")->charge()) > 0 )
         {
-          muonM_phi_p4.SetPtEtaPhiM(x_.daughter("phi")->daughter("muon2")->pt(), x_.eta(), x_.daughter("phi")->daughter("muon2")->phi(), x_.daughter("phi")->daughter("muon2")->mass());
+          muonM_phi_p4.SetPtEtaPhiM(x_.daughter("phi")->daughter("muon2")->pt(), x_.daughter("phi")->daughter("muon2")->eta(), x_.daughter("phi")->daughter("muon2")->phi(), x_.daughter("phi")->daughter("muon2")->mass());
           muonP_phi_p4.SetPtEtaPhiM(x_.daughter("phi")->daughter("muon1")->pt(), x_.daughter("phi")->daughter("muon1")->eta(), x_.daughter("phi")->daughter("muon1")->phi(), x_.daughter("phi")->daughter("muon1")->mass());
         }
         else
         {
-          muonP_phi_p4.SetPtEtaPhiM(x_.daughter("phi")->daughter("muon2")->pt(), x_.eta(), x_.daughter("phi")->daughter("muon2")->phi(), x_.daughter("phi")->daughter("muon2")->mass());
+          muonP_phi_p4.SetPtEtaPhiM(x_.daughter("phi")->daughter("muon2")->pt(), x_.daughter("phi")->daughter("muon2")->eta(), x_.daughter("phi")->daughter("muon2")->phi(), x_.daughter("phi")->daughter("muon2")->mass());
           muonM_phi_p4.SetPtEtaPhiM(x_.daughter("phi")->daughter("muon1")->pt(), x_.daughter("phi")->daughter("muon1")->eta(), x_.daughter("phi")->daughter("muon1")->phi(), x_.daughter("phi")->daughter("muon1")->mass());
         }
 
