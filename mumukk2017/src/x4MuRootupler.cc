@@ -322,16 +322,16 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
           j_muonM_p4.SetPtEtaPhiM(j_.daughter("muon2")->pt(), j_.eta(), j_.daughter("muon2")->phi(), j_.daughter("muon2")->mass());
           j_muonP_p4.SetPtEtaPhiM(j_.daughter("muon1")->pt(), j_.daughter("muon1")->eta(), j_.daughter("muon1")->phi(), j_.daughter("muon1")->mass());
 
-          j_muonP_type = (dynamic_cast<const pat::Muon*>(j_.daughter("muon1"))->type();
-          j_muonM_type = (dynamic_cast<const pat::Muon*>(j_.daughter("muon2"))->type();
+          j_muonP_type = dynamic_cast<const pat::Muon*>(j_.daughter("muon1"))->type();
+          j_muonM_type = dynamic_cast<const pat::Muon*>(j_.daughter("muon2"))->type();
 
         } else
         {
           j_muonP_p4.SetPtEtaPhiM(j_.daughter("muon2")->pt(), j_.eta(), j_.daughter("muon2")->phi(), j_.daughter("muon2")->mass());
           j_muonM_p4.SetPtEtaPhiM(j_.daughter("muon1")->pt(), j_.daughter("muon1")->eta(), j_.daughter("muon1")->phi(), j_.daughter("muon1")->mass());
 
-          j_muonP_type = (dynamic_cast<const pat::Muon*>(j_.daughter("muon2"))->type();
-          j_muonM_type = (dynamic_cast<const pat::Muon*>(j_.daughter("muon1"))->type();
+          j_muonP_type = dynamic_cast<const pat::Muon*>(j_.daughter("muon2"))->type();
+          j_muonM_type = dynamic_cast<const pat::Muon*>(j_.daughter("muon1"))->type();
 
         }
 
@@ -368,16 +368,16 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
           p_muonP_p4.SetPtEtaPhiM(p_.daughter("muon1")->pt(), p_.daughter("muon1")->eta(), p_.daughter("muon1")->phi(), p_.daughter("muon1")->mass());
           p_muonM_p4.SetPtEtaPhiM(p_.daughter("muon2")->pt(), p_.daughter("muon2")->eta(), p_.daughter("muon2")->phi(), p_.daughter("muon2")->mass());
 
-          p_muonP_type = (dynamic_cast<const pat::Muon*>(p_.daughter("muon1"))->type();
-          p_muonM_type = (dynamic_cast<const pat::Muon*>(p_.daughter("muon2"))->type();
+          p_muonP_type = dynamic_cast<const pat::Muon*>(p_.daughter("muon1"))->type();
+          p_muonM_type = dynamic_cast<const pat::Muon*>(p_.daughter("muon2"))->type();
 
         } else
         {
           p_muonP_p4.SetPtEtaPhiM(p_.daughter("muon2")->pt(), p_.daughter("muon2")->eta(), p_.daughter("muon2")->phi(), p_.daughter("muon2")->mass());
           p_muonM_p4.SetPtEtaPhiM(p_.daughter("muon1")->pt(), p_.daughter("muon1")->eta(), p_.daughter("muon1")->phi(), p_.daughter("muon1")->mass());
 
-          p_muonP_type = (dynamic_cast<const pat::Muon*>(p_.daughter("muon2"))->type();
-          p_muonM_type = (dynamic_cast<const pat::Muon*>(p_.daughter("muon1"))->type();
+          p_muonP_type = dynamic_cast<const pat::Muon*>(p_.daughter("muon2"))->type();
+          p_muonM_type = dynamic_cast<const pat::Muon*>(p_.daughter("muon1"))->type();
 
         }
 
