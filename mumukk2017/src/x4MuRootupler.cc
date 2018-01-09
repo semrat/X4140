@@ -30,6 +30,10 @@
 #include "DataFormats/Common/interface/TriggerResults.h"
 #include "FWCore/Common/interface/TriggerNames.h"
 
+#include <DataFormats/MuonReco/interface/MuonFwd.h>
+#include <DataFormats/MuonReco/interface/Muon.h>
+#include "DataFormats/PatCandidates/interface/Muon.h"
+
 typedef math::XYZPoint Point;
 
 class x4MuRootupler:public edm::EDAnalyzer {
