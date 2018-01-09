@@ -35,6 +35,30 @@ process.triggerSelection = cms.EDFilter("TriggerResultsFilter",
                                         throw = cms.bool(False)
                                         )
 
+#make patTracks
+from PhysicsTools.PatAlgos.tools.trackTools import makeTrackCandidates
+makeTrackCandidates(process,
+                       label        = 'KaonPCands',                  # output collection
+                       tracks       = cms.InputTag('generalTracks'), # input track collection
+                       particleType = 'k+',                           # particle type (for assigning a mass)
+                       preselection = 'pt > 0.5',                    # preselection cut on candidates
+                       selection    = 'pt > 0.5',                    # selection on PAT Layer 1 objects
+                       isolation    = {},                            # isolations to use (set to {} for None)
+                       isoDeposits  = [],
+                       mcAs         = None                           # replicate MC match as the one used for Muons
+   )
+
+makeTrackCandidates(process,
+                       label        = 'KaonMCands',                  # output collection
+                       tracks       = cms.InputTag('generalTracks'), # input track collection
+                       particleType = 'k-',                           # particle type (for assigning a mass)
+                       preselection = 'pt > 0.5',                    # preselection cut on candidates
+                       selection    = 'pt > 0.5',                    # selection on PAT Layer 1 objects
+                       isolation    = {},                            # isolations to use (set to {} for None)
+                       isoDeposits  = [],
+                       mcAs         = None                           # replicate MC match as the one used for Muons
+   )
+
 process.oniaSelectedMuons = cms.EDFilter('PATMuonSelector',
    src = cms.InputTag('slimmedMuonsWithTrigger'),
    cut = cms.string(' ( abs(eta) <= 3 )'
