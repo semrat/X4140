@@ -72,13 +72,14 @@ class x4MuRootupler:public edm::EDAnalyzer {
   TLorentzVector muonM_phi_p4;
   TLorentzVector muonP_phi_p4;
 
-  Double_t xM;
+  Double_t xM,jpsi_M,phi_M;
   Double_t cosAlpha, cosAlphaMuLess, ctauErrPV, ctauPV, ctauPVMuLess, ctauErrPVMuLess;
   Double_t ctauErrBS, ctauBS, vNChi2, vProb, sumPTPV;
   Double_t vertexWeight, dz, dz_jpsi, dz_phi;
   Double_t MassErr;
 
   UInt_t jpsi_i,phi_i;
+  UInt_t x_rank, jpsi_muonM_type, jpsi_muonP_type, phi_muonP_type, phi_muonM_type;
 
 	TTree *x_tree;
   TTree *j_tree;
@@ -113,7 +114,7 @@ class x4MuRootupler:public edm::EDAnalyzer {
 
   TTree *upsilon_tree;
   TLorentzVector mumu_p4, muP_p4, muM_p4;
-  UInt_t x_rank,filter;
+
 
 };
 
@@ -147,12 +148,18 @@ isMC_(iConfig.getParameter < bool > ("isMC"))
     x_tree->Branch("phi_i", &phi_i, "phi_i/i");
 
     x_tree->Branch("jpsi_p4", "TLorentzVector", &jpsi_p4);
+    x_tree->Branch("jpsi_M", &jpsi_M, "jpsi_M/D");
     x_tree->Branch("muonM_jpsi_p4",  "TLorentzVector", &muonM_jpsi_p4);
     x_tree->Branch("muonP_jpsi_p4",  "TLorentzVector", &muonP_jpsi_p4);
+    x_tree->Branch("jpsi_muonM_type", &jpsi_muonM_type, "jpsi_muonM_type/I");
+    x_tree->Branch("jpsi_muonP_type", &jpsi_muonP_type, "jpsi_muonP_type/I");
 
     x_tree->Branch("phi_p4", "TLorentzVector", &phi_p4);
+    x_tree->Branch("phi_M", &phi_M, "phi_M/D");
     x_tree->Branch("muonM_phi_p4",  "TLorentzVector", &muonM_phi_p4);
     x_tree->Branch("muonP_phi_p4",  "TLorentzVector", &muonP_phi_p4);
+    x_tree->Branch("phi_muonM_type", &phi_muonM_type, "phi_muonM_type/I");
+    x_tree->Branch("phi_muonP_type", &phi_muonP_type, "phi_muonP_type/I");
 
     x_tree->Branch("numPrimaryVertices", &numPrimaryVertices, "numPrimaryVertices/i");
 
@@ -200,7 +207,7 @@ isMC_(iConfig.getParameter < bool > ("isMC"))
 
     j_tree->Branch("j_muonM_p4",  "TLorentzVector", &j_muonM_p4);
     j_tree->Branch("j_muonP_p4",  "TLorentzVector", &j_muonP_p4);
-    j_tree->Branch("j_muonM_type", &j_muonM_type, "j_rank/I");
+    j_tree->Branch("j_muonM_type", &j_muonM_type, "j_muonM_type/I");
     j_tree->Branch("j_muonP_type", &j_muonP_type, "j_muonP_type/I");
 
     j_tree->Branch("j_vProb", &j_vProb, "j_vProb/D");
@@ -227,7 +234,7 @@ isMC_(iConfig.getParameter < bool > ("isMC"))
 
     p_tree->Branch("p_muonM_p4",  "TLorentzVector", &p_muonM_p4);
     p_tree->Branch("p_muonP_p4",  "TLorentzVector", &p_muonP_p4);
-    p_tree->Branch("p_muonM_type", &p_muonM_type, "p_rank/I");
+    p_tree->Branch("p_muonM_type", &p_muonM_type, "p_muonM_type/I");
     p_tree->Branch("p_muonP_type", &p_muonP_type, "p_muonP_type/I");
 
     p_tree->Branch("p_vProb", &p_vProb, "p_vProb/D");
@@ -449,12 +456,20 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
         jpsi_p4.SetPtEtaPhiM(x_.daughter("jpsi")->pt(), x_.daughter("jpsi")->eta(), x_.daughter("jpsi")->phi(), x_.daughter("jpsi")->mass());
         if ((x_.daughter("jpsi")->daughter("muon1")->charge()) > 0 )
         {
-          muonM_jpsi_p4.SetPtEtaPhiM(x_.daughter("jpsi")->daughter("muon2")->pt(), x_.daughter("jpsi")->daughter("muon2")->eta(), x_.daughter("jpsi")->daughter("muon2")->phi(), x_.daughter("jpsi")->daughter("muon2")->mass());
           muonP_jpsi_p4.SetPtEtaPhiM(x_.daughter("jpsi")->daughter("muon1")->pt(), x_.daughter("jpsi")->daughter("muon1")->eta(), x_.daughter("jpsi")->daughter("muon1")->phi(), x_.daughter("jpsi")->daughter("muon1")->mass());
+          muonM_jpsi_p4.SetPtEtaPhiM(x_.daughter("jpsi")->daughter("muon2")->pt(), x_.daughter("jpsi")->daughter("muon2")->eta(), x_.daughter("jpsi")->daughter("muon2")->phi(), x_.daughter("jpsi")->daughter("muon2")->mass());
+
+          jpsi_muonP_type = dynamic_cast<const pat::Muon*>(x_.daughter("jpsi")->daughter("muon1"))->type();
+          jpsi_muonM_type = dynamic_cast<const pat::Muon*>(x_.daughter("jpsi")->daughter("muon2"))->type();
+
         } else
         {
           muonP_jpsi_p4.SetPtEtaPhiM(x_.daughter("jpsi")->daughter("muon2")->pt(), x_.daughter("jpsi")->daughter("muon2")->eta(), x_.daughter("jpsi")->daughter("muon2")->phi(), x_.daughter("jpsi")->daughter("muon2")->mass());
           muonM_jpsi_p4.SetPtEtaPhiM(x_.daughter("jpsi")->daughter("muon1")->pt(), x_.daughter("jpsi")->daughter("muon1")->eta(), x_.daughter("jpsi")->daughter("muon1")->phi(), x_.daughter("jpsi")->daughter("muon1")->mass());
+
+          jpsi_muonP_type = dynamic_cast<const pat::Muon*>(x_.daughter("jpsi")->daughter("muon2"))->type();
+          jpsi_muonM_type = dynamic_cast<const pat::Muon*>(x_.daughter("jpsi")->daughter("muon1"))->type();
+
         }
 
         phi_p4.SetPtEtaPhiM(x_.daughter("phi")->pt(), x_.daughter("phi")->eta(), x_.daughter("phi")->phi(), x_.daughter("phi")->mass());
@@ -462,12 +477,23 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
         {
           muonM_phi_p4.SetPtEtaPhiM(x_.daughter("phi")->daughter("muon2")->pt(), x_.daughter("phi")->daughter("muon2")->eta(), x_.daughter("phi")->daughter("muon2")->phi(), x_.daughter("phi")->daughter("muon2")->mass());
           muonP_phi_p4.SetPtEtaPhiM(x_.daughter("phi")->daughter("muon1")->pt(), x_.daughter("phi")->daughter("muon1")->eta(), x_.daughter("phi")->daughter("muon1")->phi(), x_.daughter("phi")->daughter("muon1")->mass());
+
+          phi_muonP_type = dynamic_cast<const pat::Muon*>(x_.daughter("phi")->daughter("muon1"))->type();
+          phi_muonM_type = dynamic_cast<const pat::Muon*>(x_.daughter("phi")->daughter("muon2"))->type();
+
         }
         else
         {
           muonP_phi_p4.SetPtEtaPhiM(x_.daughter("phi")->daughter("muon2")->pt(), x_.daughter("phi")->daughter("muon2")->eta(), x_.daughter("phi")->daughter("muon2")->phi(), x_.daughter("phi")->daughter("muon2")->mass());
           muonM_phi_p4.SetPtEtaPhiM(x_.daughter("phi")->daughter("muon1")->pt(), x_.daughter("phi")->daughter("muon1")->eta(), x_.daughter("phi")->daughter("muon1")->phi(), x_.daughter("phi")->daughter("muon1")->mass());
+
+          phi_muonP_type = dynamic_cast<const pat::Muon*>(x_.daughter("phi")->daughter("muon2"))->type();
+          phi_muonM_type = dynamic_cast<const pat::Muon*>(x_.daughter("phi")->daughter("muon1"))->type();
+
         }
+
+        phi_M = phi_p4.M();
+        jpsi_M = jpsi_p4.M();
 
         x_tree->Fill();
 
