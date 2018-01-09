@@ -136,6 +136,8 @@ process.xCandSequence = cms.Sequence(
 				   )
 
 process.rootuple = cms.EDAnalyzer('x4MuRootupler',
+                          phidimuons = cms.InputTag("Onia2MuMuFilteredPhi"),
+                          jpsidimuons = cms.InputTag("Onia2MuMuFilteredJpsi"),
                           #chi_cand = cms.InputTag("chiProducer"),
 			              x_cand = cms.InputTag("xProducer"),
                           #xrefit = cms.InputTag("xFitter","xCand"),
