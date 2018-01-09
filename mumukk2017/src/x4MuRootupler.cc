@@ -125,8 +125,8 @@ jpsi_dimuon_Label(consumes<pat::CompositeCandidateCollection>(iConfig.getParamet
 // refit1_(consumes<pat::CompositeCandidateCollection>(iConfig.getParameter < edm::InputTag > ("refit1S"))),
 primaryVertices_(consumes<reco::VertexCollection>(iConfig.getParameter < edm::InputTag > ("primaryVertices"))),
 triggerResults_(consumes<edm::TriggerResults>(iConfig.getParameter < edm::InputTag > ("TriggerResults"))),
-isMC_(iConfig.getParameter < bool > ("isMC")),
-HLTs_(iConfig.getParameter<std::vector<std::string>>("HLTs"))
+HLTs_(iConfig.getParameter<std::vector<std::string>>("HLTs")),
+isMC_(iConfig.getParameter < bool > ("isMC"))
 {
 
     edm::Service < TFileService > fs;
