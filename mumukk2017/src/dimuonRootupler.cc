@@ -87,7 +87,7 @@ diMuonRootupler::diMuonRootupler(const edm::ParameterSet & iConfig):
 jcand_(consumes<pat::CompositeCandidateCollection>(iConfig.getParameter < edm::InputTag > ("dimuon_cand"))),
 primaryVertices_(consumes<reco::VertexCollection>(iConfig.getParameter < edm::InputTag > ("primaryVertices"))),
 triggerResults_(consumes<edm::TriggerResults>(iConfig.getParameter < edm::InputTag > ("TriggerResults"))),
-isMC_(iConfig.getParameter < bool > ("isMC"))
+isMC_(iConfig.getParameter < bool > ("isMC")),
 HLTs_(iConfig.getParameter<std::vector<std::string>>("HLTs"))
 {
 
@@ -201,12 +201,12 @@ void diMuonRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup &
    trigger = 0;
    if (triggerResults_handle.isValid()) {
       const edm::TriggerNames & TheTriggerNames = iEvent.triggerNames(*triggerResults_handle);
-      unsigned int NTRIGGERS = HLTs.size();
+      unsigned int NTRIGGERS = HLTs_.size();
 
       for (unsigned int i = 0; i < NTRIGGERS; i++) {
          for (int version = 1; version < 19; version++) {
             std::stringstream ss;
-            ss << HLTs[i] << "_v" << version;
+            ss << HLTs_[i] << "_v" << version;
             unsigned int bit = TheTriggerNames.triggerIndex(edm::InputTag(ss.str()).label());
             if (bit < triggerResults_handle->size() && triggerResults_handle->accept(bit) && !triggerResults_handle->error(bit)) {
                trigger += (1<<i);
