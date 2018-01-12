@@ -25,10 +25,10 @@ process.load("mmkk.mmkk.slimmedMuonsTriggerMatcher2017_cfi")
 process.triggerSelection = cms.EDFilter("TriggerResultsFilter",
                                         triggerConditions = cms.vstring(
                                                                         'HLT_DoubleMu2_Jpsi_DoubleTkMu0_Phi_v*',
-                                                                        # 'HLT_Mu20_TkMu0_Phi_v*',
-                                                                        # 'HLT_Dimuon14_Phi_Barrel_Seagulls_v*',
-                                                                        # 'HLT_Mu25_TkMu0_Phi_v*',
-                                                                        # 'HLT_Mu20_TkMu0_Phi_v*',
+                                                                        'HLT_Mu20_TkMu0_Phi_v*',
+                                                                        'HLT_Dimuon14_Phi_Barrel_Seagulls_v*',
+                                                                        'HLT_Mu25_TkMu0_Phi_v*',
+                                                                        'HLT Path HLT_Dimuon24_Phi_noCorrL1_v*'
                                                                        ),
                                         hltResults = cms.InputTag( "TriggerResults", "", "HLT" ),
                                         l1tResults = cms.InputTag( "" ),
@@ -37,8 +37,7 @@ process.triggerSelection = cms.EDFilter("TriggerResultsFilter",
 
 process.oniaSelectedMuons = cms.EDFilter('PATMuonSelector',
    src = cms.InputTag('slimmedMuonsWithTrigger'),
-   cut = cms.string(' ( abs(eta) <= 3 )'
-   ),
+   cut = cms.string(''),
    filter = cms.bool(True)
 )
 
@@ -138,7 +137,11 @@ process.xCandSequence = cms.Sequence(
 process.rootuple = cms.EDAnalyzer('x4MuRootupler',
                           phidimuons = cms.InputTag("Onia2MuMuFilteredPhi"),
                           jpsidimuons = cms.InputTag("Onia2MuMuFilteredJpsi"),
-                          HLTs = cms.vstring('HLT_DoubleMu2_Jpsi_DoubleTkMu0_Phi'),
+                          HLTs = cms.vstring('HLT_DoubleMu2_Jpsi_DoubleTkMu0_Phi',
+                          'HLT_Mu20_TkMu0_Phi',
+                          'HLT_Dimuon14_Phi_Barrel_Seagulls',
+                          'HLT_Mu25_TkMu0_Phi',
+                          'HLT Path HLT_Dimuon24_Phi_noCorrL1'),
                           #chi_cand = cms.InputTag("chiProducer"),
 			              x_cand = cms.InputTag("xProducer"),
                           #xrefit = cms.InputTag("xFitter","xCand"),
