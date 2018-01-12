@@ -28,7 +28,7 @@ process.triggerSelection = cms.EDFilter("TriggerResultsFilter",
                                                                         'HLT_Mu20_TkMu0_Phi_v*',
                                                                         'HLT_Dimuon14_Phi_Barrel_Seagulls_v*',
                                                                         'HLT_Mu25_TkMu0_Phi_v*',
-                                                                        'HLT Path HLT_Dimuon24_Phi_noCorrL1_v*'
+                                                                        'HLT Path HLT_Dimuon24_Phi_noCorrL1_v*',
                                                                        ),
                                         hltResults = cms.InputTag( "TriggerResults", "", "HLT" ),
                                         l1tResults = cms.InputTag( "" ),
