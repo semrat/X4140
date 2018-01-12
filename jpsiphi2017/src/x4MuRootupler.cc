@@ -317,6 +317,8 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
 
     // bool bestCandidateOnly_ = false;
 
+    std::cout << "JPsi " <<std::endl;
+
     if (dimuonsJPsi.isValid() && !dimuonsJPsi->empty())
     {
       j_rank = dimuonsJPsi->size();
@@ -363,6 +365,8 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
       }
     }
 
+    std::cout << "Phi " <<std::endl;
+
     if (dimuonsPhi.isValid() && !dimuonsPhi->empty())
     {
       p_rank = dimuonsPhi->size();
@@ -408,6 +412,8 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
 
       }
     }
+
+    std::cout << "X " <<std::endl;
 
     x_rank = 0;
     // std::string getdata = "";
