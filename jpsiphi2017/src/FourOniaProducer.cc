@@ -96,10 +96,10 @@ void FourOniaProducer::produce(edm::Event& event, const edm::EventSetup& esetup)
 
       std::cout<< "charge quadmuon = " << xCand.charge() << std::endl;
 
-      if ((dynamic_cast<const pat::Muon*>((*jpsiCand).daughter("muon1") )->track()).isNonnull())
-      if ((dynamic_cast<const pat::Muon*>((*jpsiCand).daughter("muon2") )->track()).isNonnull())
-      if ((dynamic_cast<const pat::Muon*>((*phiCand).daughter("muon1") )->track()).isNonnull())
-      if ((dynamic_cast<const pat::Muon*>((*phiCand).daughter("muon2") )->track()).isNonnull()){
+      if (((dynamic_cast<const pat::Muon*>((*jpsiCand).daughter("muon1") )->track()).isNonnull())
+      && ((dynamic_cast<const pat::Muon*>((*jpsiCand).daughter("muon2") )->track()).isNonnull())
+      && ((dynamic_cast<const pat::Muon*>((*phiCand).daughter("muon1") )->track()).isNonnull())
+      && ((dynamic_cast<const pat::Muon*>((*phiCand).daughter("muon2") )->track()).isNonnull())){
 
         vector<TransientVertex> pvs;
 
