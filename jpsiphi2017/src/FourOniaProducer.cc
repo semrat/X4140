@@ -333,6 +333,9 @@ void FourOniaProducer::produce(edm::Event& event, const edm::EventSetup& esetup)
             xCand.addUserFloat("cosAlpha",-100);
             xCand.addUserFloat("ctauBS",-100);
             xCand.addUserFloat("ctauErrBS",-100);
+            xCand.addUserInt("countTksOfPV", -1);
+            xCand.addUserFloat("vertexWeight", -100.);
+            xCand.addUserFloat("sumPTPV", -100.);
 
             xCand.addUserData("commonVertex",Vertex());
             if (addMuonlessPrimaryVertex_)
@@ -345,7 +348,8 @@ void FourOniaProducer::produce(edm::Event& event, const edm::EventSetup& esetup)
             xCand.addUserData("PVwithmuons",Vertex());
           }
 
-        } else
+        }
+        else
         continue;
 
 
