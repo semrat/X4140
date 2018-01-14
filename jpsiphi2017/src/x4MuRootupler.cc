@@ -317,14 +317,16 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
 
     // bool bestCandidateOnly_ = false;
 
-    std::cout << "JPsi " <<std::endl;
+    std::cout << "JPsi " << dimuonsJPsi->size() << std::endl;
 
-    if (dimuonsJPsi.isValid() && !dimuonsJPsi->empty())
+    if (dimuonsJPsi->isValid() && !dimuonsJPsi->empty())
     {
       j_rank = dimuonsJPsi->size();
 
       for (unsigned int i=0; i< dimuonsJPsi->size(); i++)
       {
+        std::cout << i << std::endl;
+
         pat::CompositeCandidate j_ = dimuonsJPsi->at(i);
 
         j_p4.SetPtEtaPhiM(j_.pt(), j_.eta(), j_.phi(), j_.mass());
@@ -365,14 +367,17 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
       }
     }
 
-    std::cout << "Phi " <<std::endl;
+    std::cout << "Phi " <<  dimuonsPhi->size() << std::endl;
 
-    if (dimuonsPhi.isValid() && !dimuonsPhi->empty())
+    if (dimuonsPhi->isValid() && !dimuonsPhi->empty())
     {
       p_rank = dimuonsPhi->size();
 
       for (unsigned int i=0; i< dimuonsPhi->size(); i++)
       {
+
+        std::cout << i << std::endl;
+
         pat::CompositeCandidate p_ = dimuonsPhi->at(i);
 
         p_p4.SetPtEtaPhiM(p_.pt(), p_.eta(), p_.phi(), p_.mass());
@@ -413,12 +418,15 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
       }
     }
 
-    std::cout << "X " <<std::endl;
+    std::cout << "X " <<  xcand_hand->size() << std::endl;
 
     x_rank = 0;
     // std::string getdata = "";
-    if (xcand_hand.isValid() && !xcand_hand->empty()) {
+    if (xcand_hand->isValid() && !xcand_hand->empty()) {
       for (unsigned int i=0; i< xcand_hand->size(); i++) {
+
+        std::cout << i << std::endl;
+
         pat::CompositeCandidate x_ = xcand_hand->at(i);
 
         xVertex  = x_.vertex();
