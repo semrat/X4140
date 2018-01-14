@@ -402,8 +402,8 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
 
         }
 
-        p_vProb           = p_.userFloat("vProb");
         p_vNChi2          = p_.userFloat("vNChi2");
+        p_vProb           = p_.userFloat("vProb");
 
         p_ctauBS          = p_.userFloat("ppdlBS");
         p_ctauErrBS       = p_.userFloat("ppdlErrBS");
