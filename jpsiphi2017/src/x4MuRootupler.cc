@@ -319,7 +319,7 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
 
     std::cout << "JPsi " << dimuonsJPsi->size() << std::endl;
 
-    if (dimuonsJPsi->isValid() && !dimuonsJPsi->empty())
+    if (dimuonsJPsi.isValid() && !dimuonsJPsi->empty())
     {
       j_rank = dimuonsJPsi->size();
 
@@ -369,7 +369,7 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
 
     std::cout << "Phi " <<  dimuonsPhi->size() << std::endl;
 
-    if (dimuonsPhi->isValid() && !dimuonsPhi->empty())
+    if (dimuonsPhi.isValid() && !dimuonsPhi->empty())
     {
       p_rank = dimuonsPhi->size();
 
@@ -422,7 +422,7 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
 
     x_rank = 0;
     // std::string getdata = "";
-    if (xcand_hand->isValid() && !xcand_hand->empty()) {
+    if (xcand_hand.isValid() && !xcand_hand->empty()) {
       for (unsigned int i=0; i< xcand_hand->size(); i++) {
 
         std::cout << i << std::endl;
