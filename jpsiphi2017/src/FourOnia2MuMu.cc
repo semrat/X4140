@@ -73,9 +73,31 @@ UInt_t FourOnia2MuMuPAT::isTriggerMatched(pat::CompositeCandidate *diMuon_cand) 
   const pat::TriggerObjectStandAloneCollection muon1Collection = muon1->triggerObjectMatches();
   const pat::TriggerObjectStandAloneCollection muon2Collection = muon2->triggerObjectMatches();
 
+  std::cout << "Muon1 collection : " << muon1Collection.collection() << st::endl;
   for ( size_t i = 0; i < muon1Collection.size(); ++i )
+  {
+
+    std::cout << "Filters" << std::endl;
     for ( size_t j = 0; j < muon1->triggerObjectMatch(i)->filterLabels().size(); ++j )
       std::cout << (muon1->triggerObjectMatch(i)->filterLabels())[j] << std::endl;
+    std::cout << "Paths" << std::endl;
+    for ( size_t j = 0; j < muon1->triggerObjectMatch(i)->pathNames().size(); ++j )
+      std::cout << (muon1->triggerObjectMatch(i)->pathNames())[j] << std::endl;
+  }
+
+  std::cout << "Muon2 collection : " << muon2Collection.collection() << st::endl;
+  for ( size_t i = 0; i < muon2Collection.size(); ++i )
+  {
+
+    std::cout << "Filters" << std::endl;
+    for ( size_t j = 0; j < muon2->triggerObjectMatch(i)->filterLabels().size(); ++j )
+      std::cout << (muon2->triggerObjectMatch(i)->filterLabels())[j] << std::endl;
+    std::cout << "Paths" << std::endl;
+    for ( size_t j = 0; j < muon2->triggerObjectMatch(i)->pathNames().size(); ++j )
+      std::cout << (muon2->triggerObjectMatch(i)->pathNames())[j] << std::endl;
+  }
+
+
 
   std::cout << "Triggers matched : " << matched << std::endl;
   std::cout << "Sizes : " << muon1Collection.size() << " - " << muon2Collection.size() << std::endl;
