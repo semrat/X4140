@@ -52,7 +52,16 @@ process.FourOnia2MuMuPhi = cms.EDProducer('FourOnia2MuMuPAT',
         addMuonlessPrimaryVertex    = cms.bool(False),
         addMCTruth                  = cms.bool(False),
         resolvePileUpAmbiguity      = cms.bool(True),
-        HLTFilters                  = cms.vstring('hltDiMuonGlbOrTrk0zFiltered0p2v2','hltMumuFilterDoubleMu2Jpsi','hltDimuon14PhiBarrelnoCowL3Filtered')
+        HLTFilters                  = cms.vstring('hltDimuon14PhiBarrelnoCowL3Filtered',
+                                        'hltDiMuonGlbOrTrk0zFiltered0p2v2',
+                                        'hltMumuFilterDoubleMu2Jpsi',
+                                        'hltDisplacedmumuFilterDimuon14PhiBarrelnoCow',
+                                        'hltDisplacedmumuVtxProducerDimuon14PhiBarrelnoCow',
+                                        'hltL1fForIterL3L1fL1sL1DoubleMu0er1p5SQOSdRMax1p4L1Filtered0',
+                                        'hltL1fL1sL1DoubleMu0er1p5SQOSdRMax1p4L1Filtered0',
+                                        'hltL1sDoubleMu0er1p5SQOSdRMax1p4',
+                                        'hltL2fL1sL1DoubleMu0er1p5SQOSdRMax1p4L1f0L2PreFiltered0',
+                                        'hltDimuon14PhiBarrelnoCowL3Filtered')
 )
 
 process.FourOnia2MuMuJPsi = cms.EDProducer('FourOnia2MuMuPAT',
