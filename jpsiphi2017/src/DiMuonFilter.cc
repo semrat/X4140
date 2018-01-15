@@ -55,8 +55,8 @@ UInt_t DiMuonFilter::isTriggerMatched(const pat::CompositeCandidate *diMuon_cand
   const pat::TriggerObjectStandAloneCollection muon1Collection = muon1->triggerObjectMatches();
 
   for ( size_t i = 0; i < muon1Collection.size(); ++i )
-    for ( size_t j = 0; j < muon1->triggerObjectMatch(i)->pathNames_.size(); ++j )
-      std::cout << muon1->triggerObjectMatch(i)->pathNames_[j] << std::endl;
+    for ( size_t j = 0; j < muon1->triggerObjectMatch(i)->filterLabels().size(); ++j )
+      std::cout << (muon1->triggerObjectMatch(i)->filterLabels())[j] << std::endl;
 
   std::cout << "Triggers matched : " << matched << std::endl;
   return matched;
