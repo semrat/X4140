@@ -73,7 +73,7 @@ UInt_t FourOnia2MuMuPAT::isTriggerMatched(pat::CompositeCandidate *diMuon_cand) 
   const pat::TriggerObjectStandAloneCollection muon1Collection = muon1->triggerObjectMatches();
   const pat::TriggerObjectStandAloneCollection muon2Collection = muon2->triggerObjectMatches();
 
-  std::cout << "Muon1 collection : " << muon1Collection.collection() << st::endl;
+  std::cout << "Muon1 collection : " << muon1Collection.collection() << std::endl;
   for ( size_t i = 0; i < muon1Collection.size(); ++i )
   {
 
@@ -85,7 +85,7 @@ UInt_t FourOnia2MuMuPAT::isTriggerMatched(pat::CompositeCandidate *diMuon_cand) 
       std::cout << (muon1->triggerObjectMatch(i)->pathNames())[j] << std::endl;
   }
 
-  std::cout << "Muon2 collection : " << muon2Collection.collection() << st::endl;
+  std::cout << "Muon2 collection : " << muon2Collection.collection() << std::endl;
   for ( size_t i = 0; i < muon2Collection.size(); ++i )
   {
 
