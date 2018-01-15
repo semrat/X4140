@@ -89,8 +89,8 @@ UInt_t FourOnia2MuMuPAT::isTriggerMatched(pat::CompositeCandidate *diMuon_cand) 
       std::cout << "Conditions" << std::endl;
     for ( size_t j = 0; j < muon1->triggerObjectMatch(i)->conditionNames().size(); ++j )
       std::cout << (muon1->triggerObjectMatch(i)->conditionNames())[j] << std::endl;
-    for ( size_t j = 0; j < muon1->triggerObjectMatch(i)->conditionNames().size(); ++j )
-      std::cout << (muon1->triggerObjectMatch(i)->pathL3FilterAccepted_)[j] << std::endl;
+
+    std::cout << (muon1->triggerObjectMatch(i)->hasL3Filter())<< std::endl;
 
   }
 
