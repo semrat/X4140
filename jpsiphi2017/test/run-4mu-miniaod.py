@@ -24,11 +24,11 @@ process.load("mmkk.mmkk.slimmedMuonsTriggerMatcher2017_cfi")
 
 process.triggerSelection = cms.EDFilter("TriggerResultsFilter",
                                         triggerConditions = cms.vstring(
-                                                                        'HLT_DoubleMu2_Jpsi_DoubleTkMu0_Phi_v*',
-                                                                        'HLT_Mu20_TkMu0_Phi_v*',
+                                                                        #'HLT_DoubleMu2_Jpsi_DoubleTkMu0_Phi_v*',
+                                                                        #'HLT_Mu20_TkMu0_Phi_v*',
                                                                         'HLT_Dimuon14_Phi_Barrel_Seagulls_v*',
-                                                                        'HLT_Mu25_TkMu0_Phi_v*',
-                                                                        'HLT_Dimuon24_Phi_noCorrL1_v*',
+                                                                        #'HLT_Mu25_TkMu0_Phi_v*',
+                                                                        #'HLT_Dimuon24_Phi_noCorrL1_v*',
                                                                        ),
                                         hltResults = cms.InputTag( "TriggerResults", "", "HLT" ),
                                         l1tResults = cms.InputTag( "" ),
@@ -52,7 +52,7 @@ process.FourOnia2MuMuPhi = cms.EDProducer('FourOnia2MuMuPAT',
         addMuonlessPrimaryVertex    = cms.bool(False),
         addMCTruth                  = cms.bool(False),
         resolvePileUpAmbiguity      = cms.bool(True),
-        HLTFilters                  = cms.vstring('hltDiMuonGlbOrTrk0zFiltered0p2v2','hltMumuFilterDoubleMu2Jpsi')
+        HLTFilters                  = cms.vstring('hltDiMuonGlbOrTrk0zFiltered0p2v2','hltMumuFilterDoubleMu2Jpsi','hltDimuon14PhiBarrelnoCowL3Filtered')
 )
 
 process.FourOnia2MuMuJPsi = cms.EDProducer('FourOnia2MuMuPAT',

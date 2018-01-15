@@ -303,7 +303,7 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
       unsigned int NTRIGGERS = HLTs_.size();
 
       for (unsigned int i = 0; i < NTRIGGERS; i++) {
-         for (int version = 1; version < 19; version++) {
+         for (int version = 1; version < 20; version++) {
             std::stringstream ss;
             ss << HLTs_[i] << "_v" << version;
             unsigned int bit = TheTriggerNames.triggerIndex(edm::InputTag(ss.str()).label());
