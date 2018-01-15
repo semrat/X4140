@@ -49,8 +49,15 @@ UInt_t DiMuonFilter::isTriggerMatched(const pat::CompositeCandidate *diMuon_cand
      const pat::TriggerObjectStandAloneCollection mu1HLTMatches = muon1->triggerObjectMatchesByFilter(HLTFilters_[iTr]);
      const pat::TriggerObjectStandAloneCollection mu2HLTMatches = muon2->triggerObjectMatchesByFilter(HLTFilters_[iTr]);
      if (!mu1HLTMatches.empty() && !mu2HLTMatches.empty()) matched += (1<<iTr);
-     // if (!mu1HLTMatches.empty() || !mu2HLTMatches.empty()) std::cout << " MMM " << std::endl;
+     if (!mu1HLTMatches.empty() || !mu2HLTMatches.empty()) std::cout << " MMM " << std::endl;
   }
+
+  const pat::TriggerObjectStandAloneCollection muon1Collection = muon1->triggerObjectMatches();
+
+  for ( size_t i = 0; i < muon1Collection.size(); ++i )
+    for ( size_t j = 0; j < muon1->triggerObjectMatches(i)->_pathNames.size(); ++j )
+      std::cout << muon1->triggerObjectMatches(i)->_pathNames[j] << std::endl;
+
   std::cout << "Triggers matched : " << matched << std::endl;
   return matched;
 }
