@@ -89,6 +89,8 @@ UInt_t FourOnia2MuMuPAT::isTriggerMatched(pat::CompositeCandidate *diMuon_cand) 
       std::cout << "Conditions" << std::endl;
     for ( size_t j = 0; j < muon1->triggerObjectMatch(i)->conditionNames().size(); ++j )
       std::cout << (muon1->triggerObjectMatch(i)->conditionNames())[j] << std::endl;
+    for ( size_t j = 0; j < muon1->triggerObjectMatch(i)->conditionNames().size(); ++j )
+      std::cout << (muon1->triggerObjectMatch(i)->pathL3FilterAccepted_)[j] << std::endl;
 
   }
 
@@ -156,6 +158,9 @@ FourOnia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder",theTTBuilder);
   KalmanVertexFitter vtxFitter(true);
   TrackCollection muonLess;
+
+  edm::RefVector< TriggerFilterCollection > TriggerFilterRefVector;
+
 
   // JPsi candidates only from muons
   for(View<pat::Muon>::const_iterator it = muons->begin(), itend = muons->end(); it != itend; ++it){
