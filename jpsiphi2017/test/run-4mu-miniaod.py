@@ -42,8 +42,8 @@ process.oniaSelectedMuons = cms.EDFilter('PATMuonSelector',
 )
 
 filters = cms.vstring(          #HLT_DoubleMu2_Jpsi_DoubleTkMu0_Phi
-                        1        'hltDiMuonGlbOrTrkFiltered0v2',
-                        2        'hltDiMuonGlbOrTrk0zFiltered0p2v2',
+                                'hltDiMuonGlbOrTrkFiltered0v2',
+                                'hltDiMuonGlbOrTrk0zFiltered0p2v2',
                                 'hltDoubleMu2JpsiL3Filtered',
                                 'hltMumuVtxProducerDoubleMu2Jpsi',
                                 'hltMumuFilterDoubleMu2Jpsi',
