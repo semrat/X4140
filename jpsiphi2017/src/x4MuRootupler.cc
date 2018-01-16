@@ -353,6 +353,12 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
           j_muonP_type = dynamic_cast<const pat::Muon*>(j_.daughter("muon1"))->type();
           j_muonM_type = dynamic_cast<const pat::Muon*>(j_.daughter("muon2"))->type();
 
+          j_muonP_isTracker = dynamic_cast<const pat::Muon*>(j_.daughter("muon1"))->isTrackerMuon();
+          j_muonM_isTracker = dynamic_cast<const pat::Muon*>(j_.daughter("muon2"))->isTrackerMuon();
+
+          j_muonP_isGlobal = dynamic_cast<const pat::Muon*>(j_.daughter("muon1"))->isGlobalMuon();
+          j_muonM_isGlobal = dynamic_cast<const pat::Muon*>(j_.daughter("muon2"))->isGlobalMuon();
+
         } else
         {
           j_muonP_p4.SetPtEtaPhiM(j_.daughter("muon2")->pt(), j_.eta(), j_.daughter("muon2")->phi(), j_.daughter("muon2")->mass());
@@ -360,6 +366,12 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
 
           j_muonP_type = dynamic_cast<const pat::Muon*>(j_.daughter("muon2"))->type();
           j_muonM_type = dynamic_cast<const pat::Muon*>(j_.daughter("muon1"))->type();
+
+          j_muonP_isTracker = dynamic_cast<const pat::Muon*>(j_.daughter("muon2"))->isTrackerMuon();
+          j_muonM_isTracker = dynamic_cast<const pat::Muon*>(j_.daughter("muon1"))->isTrackerMuon();
+
+          j_muonP_isGlobal = dynamic_cast<const pat::Muon*>(j_.daughter("muon2"))->isGlobalMuon();
+          j_muonM_isGlobal = dynamic_cast<const pat::Muon*>(j_.daughter("muon1"))->isGlobalMuon();
 
         }
 
@@ -406,6 +418,13 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
           p_muonP_type = dynamic_cast<const pat::Muon*>(p_.daughter("muon1"))->type();
           p_muonM_type = dynamic_cast<const pat::Muon*>(p_.daughter("muon2"))->type();
 
+          p_muonP_isTracker = dynamic_cast<const pat::Muon*>(p_.daughter("muon1"))->isTrackerMuon();
+          p_muonM_isTracker = dynamic_cast<const pat::Muon*>(p_.daughter("muon2"))->isTrackerMuon();
+
+          p_muonP_isGlobal = dynamic_cast<const pat::Muon*>(p_.daughter("muon1"))->isGlobalMuon();
+          p_muonM_isGlobal = dynamic_cast<const pat::Muon*>(p_.daughter("muon2"))->isGlobalMuon();
+
+
         } else
         {
           p_muonP_p4.SetPtEtaPhiM(p_.daughter("muon2")->pt(), p_.daughter("muon2")->eta(), p_.daughter("muon2")->phi(), p_.daughter("muon2")->mass());
@@ -413,6 +432,12 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
 
           p_muonP_type = dynamic_cast<const pat::Muon*>(p_.daughter("muon2"))->type();
           p_muonM_type = dynamic_cast<const pat::Muon*>(p_.daughter("muon1"))->type();
+
+          p_muonP_isTracker = dynamic_cast<const pat::Muon*>(p_.daughter("muon2"))->isTrackerMuon();
+          p_muonM_isTracker = dynamic_cast<const pat::Muon*>(p_.daughter("muon1"))->isTrackerMuon();
+
+          p_muonP_isGlobal = dynamic_cast<const pat::Muon*>(p_.daughter("muon2"))->isGlobalMuon();
+          p_muonM_isGlobal = dynamic_cast<const pat::Muon*>(p_.daughter("muon1"))->isGlobalMuon();
 
         }
 
