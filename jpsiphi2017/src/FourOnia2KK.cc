@@ -27,7 +27,6 @@
 #include "TrackingTools/PatternTools/interface/ClosestApproachInRPhi.h"
 
 FourOnia2KKPAT::FourOnia2KKPAT(const edm::ParameterSet& iConfig):
-muons_(consumes<edm::View<pat::Muon>>(iConfig.getParameter<edm::InputTag>("muons"))),
 km_tracks_(consumes<reco::TrackCollection>(iConfig.getParameter<edm::InputTag>("kmtracks"))),
 kp_tracks_(consumes<reco::TrackCollection>(iConfig.getParameter<edm::InputTag>("kptracks"))),
 thebeamspot_(consumes<reco::BeamSpot>(iConfig.getParameter<edm::InputTag>("beamSpotTag"))),
@@ -176,15 +175,14 @@ FourOnia2KKPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     std::cout << it->pt() << std::endl;
   }
   std::cout<<"P"<< std::endl;
-  for(reco::TrackCollection::const_iterator it = kaonPTracks->begin(), itend = kaonPTracks->end(); it != itend; ++it){
+  for(reco::TrackCollection::const_iterator it = kaonPTracks->begin(), itend = kaonPTracks->end(); it != itend; ++it)
   {
     std::cout << it->pt() << std::endl;
   }
 
       iEvent.put(std::move(phiOutput));
 
-    }
-
+}
 
     bool
     FourOnia2KKPAT::isAbHadron(int pdgID) {
