@@ -25,10 +25,10 @@ process.load("mmkk.mmkk.slimmedMuonsTriggerMatcher2017_cfi")
 process.triggerSelection = cms.EDFilter("TriggerResultsFilter",
                                         triggerConditions = cms.vstring(
                                                                         'HLT_DoubleMu2_Jpsi_DoubleTkMu0_Phi_v*',
-                                                                        #'HLT_Mu20_TkMu0_Phi_v*',
-                                                                        #'HLT_Dimuon14_Phi_Barrel_Seagulls_v*',
-                                                                        #'HLT_Mu25_TkMu0_Phi_v*',
-                                                                        #'HLT_Dimuon24_Phi_noCorrL1_v*',
+                                                                        'HLT_Mu20_TkMu0_Phi_v*',
+                                                                        'HLT_Dimuon14_Phi_Barrel_Seagulls_v*',
+                                                                        'HLT_Mu25_TkMu0_Phi_v*'
+                                                                        'HLT_Dimuon24_Phi_noCorrL1_v*'
                                                                        ),
                                         hltResults = cms.InputTag( "TriggerResults", "", "HLT" ),
                                         l1tResults = cms.InputTag( "" ),
@@ -42,19 +42,29 @@ process.oniaSelectedMuons = cms.EDFilter('PATMuonSelector',
 )
 
 filters = cms.vstring(          #HLT_DoubleMu2_Jpsi_DoubleTkMu0_Phi
-                                'hltDiMuonGlbOrTrkFiltered0v2',
-                                'hltDiMuonGlbOrTrk0zFiltered0p2v2',
+                        1        'hltDiMuonGlbOrTrkFiltered0v2',
+                        2        'hltDiMuonGlbOrTrk0zFiltered0p2v2',
                                 'hltDoubleMu2JpsiL3Filtered',
                                 'hltMumuVtxProducerDoubleMu2Jpsi',
                                 'hltMumuFilterDoubleMu2Jpsi',
                                 #HLT_Dimuon14_Phi_Barrel_Seagulls
                                 'hltDimuon14PhiBarrelnoCowL3Filtered',
                                 'hltDisplacedmumuVtxProducerDimuon14PhiBarrelnoCow',
-                                'hltDisplacedmumuFilterDimuon14PhiBarrelnoCow')
+                                'hltDisplacedmumuFilterDimuon14PhiBarrelnoCow',
+                                #HLT_Mu25_TkMu0_Phi
+                                'hltDimuon14PhiBarrelnoCowL3Filtered',
+                                'hltDisplacedmumuVtxProducerDimuon14PhiBarrelnoCow',
+                                'hltDisplacedmumuFilterDimuon14PhiBarrelnoCow',
+                                #HLT_Mu20_TkMu0_Phi
+                                'hltL3fL1sMu16orMu18erorMu20L1f0L2f0L3Filtered20',
+                                'hltDiMuonGlbFiltered20TrkFiltered0',
+                                'hltDiMuonGlb20Trk0DzFiltered0p2',
+
+)
 
 hltpaths = cms.vstring('HLT_DoubleMu2_Jpsi_DoubleTkMu0_Phi', 'HLT_Mu20_TkMu0_Phi',
                         'HLT_Dimuon14_Phi_Barrel_Seagulls','HLT_Mu25_TkMu0_Phi',
-                        'HLT Path HLT_Dimuon24_Phi_noCorrL1')
+                        'HLT_Dimuon24_Phi_noCorrL1')
 
 process.FourOnia2MuMuPhi = cms.EDProducer('FourOnia2MuMuPAT',
         muons                       = cms.InputTag('oniaSelectedMuons'),
