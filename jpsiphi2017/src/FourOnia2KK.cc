@@ -158,7 +158,7 @@ FourOnia2KKPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   }
 
   edm::Handle< View<pat::PackedCandidate> > thePATTrackHandle;
-  iEvent.getByToken(trakCollection_label,thePATTrackHandle);
+  iEvent.getByToken(trakCollection_,thePATTrackHandle);
 
   edm::ESHandle<TransientTrackBuilder> theTTBuilder;
   iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder",theTTBuilder);
