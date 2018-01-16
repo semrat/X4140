@@ -41,8 +41,8 @@ makeTrackCandidates(process,
                        label        = 'KaonPCands',                  # output collection
                        tracks       = cms.InputTag('generalTracks'), # input track collection
                        particleType = 'k+',                           # particle type (for assigning a mass)
-                       preselection = 'pt > 0.5',                    # preselection cut on candidates
-                       selection    = 'pt > 0.5',                    # selection on PAT Layer 1 objects
+                       preselection = 'pt > 0.1',                    # preselection cut on candidates
+                       selection    = 'pt > 0.1',                    # selection on PAT Layer 1 objects
                        isolation    = {},                            # isolations to use (set to {} for None)
                        isoDeposits  = [],
                        mcAs         = None                           # replicate MC match as the one used for Muons
@@ -52,8 +52,8 @@ makeTrackCandidates(process,
                        label        = 'KaonMCands',                  # output collection
                        tracks       = cms.InputTag('generalTracks'), # input track collection
                        particleType = 'k-',                           # particle type (for assigning a mass)
-                       preselection = 'pt > 0.5',                    # preselection cut on candidates
-                       selection    = 'pt > 0.5',                    # selection on PAT Layer 1 objects
+                       preselection = 'pt > 0.1',                    # preselection cut on candidates
+                       selection    = 'pt > 0.1',                    # selection on PAT Layer 1 objects
                        isolation    = {},                            # isolations to use (set to {} for None)
                        isoDeposits  = [],
                        mcAs         = None                           # replicate MC match as the one used for Muons
@@ -68,18 +68,25 @@ process.oniaSelectedMuons = cms.EDFilter('PATMuonSelector',
    filter = cms.bool(True)
 )
 
-process.FourOnia2MuMuPhi = cms.EDProducer('FourOnia2MuMuPAT',
-        muons                       = cms.InputTag('oniaSelectedMuons'),
-        primaryVertexTag            = cms.InputTag('offlineSlimmedPrimaryVertices'),
-        beamSpotTag                 = cms.InputTag('offlineBeamSpot'),
-        higherPuritySelection       = cms.string(""),
-        lowerPuritySelection        = cms.string(""),
-        dimuonSelection             = cms.string("0.6 < mass && mass < 1.2 && charge==0 "),
-        addCommonVertex             = cms.bool(True),
-        addMuonlessPrimaryVertex    = cms.bool(False),
-        addMCTruth                  = cms.bool(False),
-        resolvePileUpAmbiguity      = cms.bool(True),
-        HLTFilters                  = cms.vstring('hltDiMuonGlbOrTrk0zFiltered0p2v2','hltMumuFilterDoubleMu2Jpsi')
+filters = cms.vstring(          #HLT_DoubleMu2_Jpsi_DoubleTkMu0_Phi
+                                'hltDiMuonGlbOrTrkFiltered0v2',
+                                'hltDiMuonGlbOrTrk0zFiltered0p2v2',
+                                'hltDoubleMu2JpsiL3Filtered',
+                                'hltMumuVtxProducerDoubleMu2Jpsi',
+                                'hltMumuFilterDoubleMu2Jpsi',
+                                #HLT_Dimuon14_Phi_Barrel_Seagulls
+                                'hltDimuon14PhiBarrelnoCowL3Filtered',
+                                'hltDisplacedmumuVtxProducerDimuon14PhiBarrelnoCow',
+                                'hltDisplacedmumuFilterDimuon14PhiBarrelnoCow',
+                                #HLT_Mu25_TkMu0_Phi
+                                'hltDimuon14PhiBarrelnoCowL3Filtered',
+                                'hltDisplacedmumuVtxProducerDimuon14PhiBarrelnoCow',
+                                'hltDisplacedmumuFilterDimuon14PhiBarrelnoCow',
+                                #HLT_Mu20_TkMu0_Phi
+                                'hltL3fL1sMu16orMu18erorMu20L1f0L2f0L3Filtered20',
+                                'hltDiMuonGlbFiltered20TrkFiltered0',
+                                'hltDiMuonGlb20Trk0DzFiltered0p2',
+
 )
 
 process.FourOnia2MuMuJPsi = cms.EDProducer('FourOnia2MuMuPAT',
@@ -93,7 +100,7 @@ process.FourOnia2MuMuJPsi = cms.EDProducer('FourOnia2MuMuPAT',
         addMuonlessPrimaryVertex    = cms.bool(False),
         addMCTruth                  = cms.bool(False),
         resolvePileUpAmbiguity      = cms.bool(True),
-        HLTFilters                  = cms.vstring('hltDiMuonGlbOrTrk0zFiltered0p2v2','hltMumuFilterDoubleMu2Jpsi')
+        HLTFilters                  = filters
 )
 
 process.Onia2MuMuFilteredJpsi = cms.EDProducer('DiMuonFilter',
@@ -101,32 +108,12 @@ process.Onia2MuMuFilteredJpsi = cms.EDProducer('DiMuonFilter',
       singlemuonSelection = cms.string(""),
       dimuonSelection     = cms.string("2.9 < mass && mass < 3.3 && userFloat('vProb') > 0.0 "),
       do_trigger_match    = cms.bool(False),
-      HLTFilters          = cms.vstring('hltDiMuonGlbOrTrk0zFiltered0p2v2','hltMumuFilterDoubleMu2Jpsi')
+      HLTFilters          = filters
 )
 
-process.Onia2MuMuFilteredPhi = cms.EDProducer('DiMuonFilter',
-      OniaTag             = cms.InputTag("FourOnia2MuMuPhi"),
-      singlemuonSelection = cms.string(""),
-      dimuonSelection     = cms.string("0.6 < mass && mass < 1.2  && userFloat('vProb') > 0.0 "),
-      do_trigger_match    = cms.bool(False),
-      HLTFilters          = cms.vstring('hltDiMuonGlbOrTrk0zFiltered0p2v2','hltMumuFilterDoubleMu2Jpsi')
-
-)
-
-process.DiMuonCounterJPsi = cms.EDFilter('CandViewCountFilter',
-    src       = cms.InputTag("Onia2MuMuFilteredJpsi"),
-    minNumber = cms.uint32(1),
-    filter    = cms.bool(True)
-)
-
-process.DiMuonCounterPhi = cms.EDFilter('CandViewCountFilter',
-    src       = cms.InputTag("Onia2MuMuFilteredPhi"),
-    minNumber = cms.uint32(1),
-    filter    = cms.bool(True)
-)
-
-process.xProducer = cms.EDProducer('FourOniaProducer',
-    phidimuons                  = cms.InputTag("Onia2MuMuFilteredPhi"),
+process.xProducer = cms.EDProducer('DiMuonTracksProducer',
+    kptracks                    = cms.InputTag("KaonPCands"),
+    kmtracks                    = cms.InputTag("KaonMCands"),
     jpsidimuons                 = cms.InputTag("Onia2MuMuFilteredJpsi"),
     primaryVertexTag            = cms.InputTag('offlineSlimmedPrimaryVertices'),
     beamSpotTag                 = cms.InputTag('offlineBeamSpot'),

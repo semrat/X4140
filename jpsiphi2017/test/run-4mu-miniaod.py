@@ -27,7 +27,7 @@ process.triggerSelection = cms.EDFilter("TriggerResultsFilter",
                                                                         'HLT_DoubleMu2_Jpsi_DoubleTkMu0_Phi_v*',
                                                                         'HLT_Mu20_TkMu0_Phi_v*',
                                                                         'HLT_Dimuon14_Phi_Barrel_Seagulls_v*',
-                                                                        'HLT_Mu25_TkMu0_Phi_v*'
+                                                                        'HLT_Mu25_TkMu0_Phi_v*',
                                                                         'HLT_Dimuon24_Phi_noCorrL1_v*'
                                                                        ),
                                         hltResults = cms.InputTag( "TriggerResults", "", "HLT" ),
@@ -133,16 +133,8 @@ process.xProducer = cms.EDProducer('FourOniaProducer',
     addCommonVertex             = cms.bool(True),
     addMuonlessPrimaryVertex    = cms.bool(True),
     resolvePileUpAmbiguity      = cms.bool(True),
-    quadmuonSelection           = cms.string("4.0 < mass && mass < 6.0 && charge==0"),
-    deltaMass                   = cms.vdouble(0.0,2.0)  # trigger match is performed in Onia2MuMuFiltered
+    quadmuonSelection           = cms.string("4.0 < mass && mass < 6.0 && charge==0")
 )
-
-# process.xFitter = cms.EDProducer('FourOniaKinFit',
-#                           x_cand = cms.InputTag("xProducer"),
-#                           x_mass = cms.double(5.36679), # GeV   1S = 9.46030   2S = 10.02326    3S = 10.35520  J/psi=3.0969
-#                           product_name = cms.string("xCand"),
-#                           pdgID = cms.int32(531)
-#                          )
 
 
 process.xCandSequence = cms.Sequence(
@@ -151,23 +143,19 @@ process.xCandSequence = cms.Sequence(
 				   process.oniaSelectedMuons *
                    process.FourOnia2MuMuPhi *
                    process.Onia2MuMuFilteredPhi *
-                   #process.DiMuonCounterPhi *
+                   process.DiMuonCounterPhi *
 				   process.FourOnia2MuMuJPsi *
                    process.Onia2MuMuFilteredJpsi *
-                   #process.DiMuonCounterJPsi *
+                   process.DiMuonCounterJPsi *
                    process.xProducer
-                   #process.xFitter
 				   )
 
 process.rootuple = cms.EDAnalyzer('x4MuRootupler',
                           phidimuons = cms.InputTag("Onia2MuMuFilteredPhi"),
                           jpsidimuons = cms.InputTag("Onia2MuMuFilteredJpsi"),
                           HLTs = hltpaths,
-                          #chi_cand = cms.InputTag("chiProducer"),
 			              x_cand = cms.InputTag("xProducer"),
-                          #xrefit = cms.InputTag("xFitter","xCand"),
-			              # refit2S  = cms.InputTag("chiFitter2S","y2S"),
-			              # refit3S  = cms.InputTag("chiFitter3S","y3S"),
+
                           primaryVertices = cms.InputTag("offlineSlimmedPrimaryVertices"),
                           TriggerResults  = cms.InputTag("TriggerResults", "", "HLT"),
                           isMC = cms.bool(False)
