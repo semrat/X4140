@@ -364,6 +364,8 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
 
         j_cosAlpha = j_.userFloat("cosAlpha");
 
+        j_triggerMatch = j_.userInt("isTriggerMatched");
+
         j_tree->Fill();
 
       }
@@ -414,6 +416,8 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
         p_ctauErrPV       = p_.userFloat("ppdlErrPV");
 
         p_cosAlpha = p_.userFloat("cosAlpha");
+
+        p_triggerMatch = p_.userInt("isTriggerMatched");
 
         p_tree->Fill();
 
