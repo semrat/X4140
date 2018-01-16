@@ -148,16 +148,16 @@ process.xCandSequence = cms.Sequence(
                    #process.xFitter
 				   )
 
-process.rootuple = cms.EDAnalyzer('x4MuRootupler',
-                          phidimuons = cms.InputTag("Onia2MuMuFilteredPhi"),
-                          jpsidimuons = cms.InputTag("Onia2MuMuFilteredJpsi"),
-                          #chi_cand = cms.InputTag("chiProducer"),
-			              x_cand = cms.InputTag("xProducer"),
-                          #xrefit = cms.InputTag("xFitter","xCand"),
-			              # refit2S  = cms.InputTag("chiFitter2S","y2S"),
-			              # refit3S  = cms.InputTag("chiFitter3S","y3S"),
-                          primaryVertices = cms.InputTag("offlineSlimmedPrimaryVertices"),
-                          TriggerResults  = cms.InputTag("TriggerResults", "", "HLT"),
-                          isMC = cms.bool(False)
-                         )
-process.p = cms.Path(process.xCandSequence * process.rootuple)
+# process.rootuple = cms.EDAnalyzer('x4MuRootupler',
+#                           phidimuons = cms.InputTag("Onia2MuMuFilteredPhi"),
+#                           jpsidimuons = cms.InputTag("Onia2MuMuFilteredJpsi"),
+#                           #chi_cand = cms.InputTag("chiProducer"),
+# 			              x_cand = cms.InputTag("xProducer"),
+#                           #xrefit = cms.InputTag("xFitter","xCand"),
+# 			              # refit2S  = cms.InputTag("chiFitter2S","y2S"),
+# 			              # refit3S  = cms.InputTag("chiFitter3S","y3S"),
+#                           primaryVertices = cms.InputTag("offlineSlimmedPrimaryVertices"),
+#                           TriggerResults  = cms.InputTag("TriggerResults", "", "HLT"),
+#                           isMC = cms.bool(False)
+#                          )
+# process.p = cms.Path(process.xCandSequence * process.rootuple)
