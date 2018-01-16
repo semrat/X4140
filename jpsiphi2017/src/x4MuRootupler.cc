@@ -319,7 +319,7 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
 
     // bool bestCandidateOnly_ = false;
 
-    std::cout << "JPsi " << dimuonsJPsi->size() << std::endl;
+    // std::cout << "JPsi " << dimuonsJPsi->size() << std::endl;
 
     if (dimuonsJPsi.isValid() && !dimuonsJPsi->empty())
     {
@@ -327,7 +327,7 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
 
       for (unsigned int i=0; i< dimuonsJPsi->size(); i++)
       {
-        std::cout << i << std::endl;
+        // std::cout << i << std::endl;
 
         pat::CompositeCandidate j_ = dimuonsJPsi->at(i);
 
@@ -369,7 +369,7 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
       }
     }
 
-    std::cout << "Phi " <<  dimuonsPhi->size() << std::endl;
+    // std::cout << "Phi " <<  dimuonsPhi->size() << std::endl;
 
     if (dimuonsPhi.isValid() && !dimuonsPhi->empty())
     {
@@ -378,7 +378,7 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
       for (unsigned int i=0; i< dimuonsPhi->size(); i++)
       {
 
-        std::cout << i << std::endl;
+        // std::cout << i << std::endl;
 
         pat::CompositeCandidate p_ = dimuonsPhi->at(i);
 
@@ -420,14 +420,14 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
       }
     }
 
-    std::cout << "X " <<  xcand_hand->size() << std::endl;
+    // std::cout << "X " <<  xcand_hand->size() << std::endl;
 
     x_rank = 0;
     // std::string getdata = "";
     if (xcand_hand.isValid() && !xcand_hand->empty()) {
       for (unsigned int i=0; i< xcand_hand->size(); i++) {
 
-        std::cout << i << std::endl;
+        // std::cout << i << std::endl;
 
         pat::CompositeCandidate x_ = xcand_hand->at(i);
 
