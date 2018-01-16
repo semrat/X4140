@@ -1,4 +1,4 @@
-#include "../interface/FourOnia2MuMu.h"
+#include "../interface/FourOnia2KK.h"
 
 //Headers for the data items
 #include <DataFormats/TrackReco/interface/TrackFwd.h>
