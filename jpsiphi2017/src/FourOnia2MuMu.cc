@@ -77,16 +77,20 @@ UInt_t FourOnia2MuMuPAT::isTriggerMatched(pat::CompositeCandidate *diMuon_cand) 
   for ( size_t i = 0; i < muon1Collection.size(); ++i )
   {
     std::cout << "Muon1 collection : " << muon1->triggerObjectMatch(i)->collection() << std::endl;
+
     std::cout << "Filters" << std::endl;
     for ( size_t j = 0; j < muon1->triggerObjectMatch(i)->filterLabels().size(); ++j )
       std::cout << (muon1->triggerObjectMatch(i)->filterLabels())[j] << std::endl;
+
     std::cout << "Paths" << std::endl;
     for ( size_t j = 0; j < muon1->triggerObjectMatch(i)->pathNames().size(); ++j )
       std::cout << (muon1->triggerObjectMatch(i)->pathNames())[j] << std::endl;
-      std::cout << "Algos" << std::endl;
+
+    std::cout << "Algos" << std::endl;
     for ( size_t j = 0; j < muon1->triggerObjectMatch(i)->algorithmNames().size(); ++j )
       std::cout << (muon1->triggerObjectMatch(i)->algorithmNames())[j] << std::endl;
-      std::cout << "Conditions" << std::endl;
+
+    std::cout << "Conditions" << std::endl;
     for ( size_t j = 0; j < muon1->triggerObjectMatch(i)->conditionNames().size(); ++j )
       std::cout << (muon1->triggerObjectMatch(i)->conditionNames())[j] << std::endl;
 

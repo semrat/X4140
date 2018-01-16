@@ -92,7 +92,7 @@ class x4MuRootupler:public edm::EDAnalyzer {
   Double_t jM;
   Double_t j_cosAlpha, j_vNChi2, j_vProb, j_dz;
   Double_t j_ctauErrPV, j_ctauPV, j_ctauErrBS, j_ctauBS;
-  UInt_t j_rank, j_muonM_type, j_muonP_type;
+  UInt_t j_rank, j_muonM_type, j_muonP_type, j_triggerMatch;
 
   //phi tree variables
 
@@ -101,7 +101,7 @@ class x4MuRootupler:public edm::EDAnalyzer {
   Double_t pM;
   Double_t p_cosAlpha, p_vNChi2, p_vProb, p_dz;
   Double_t p_ctauErrPV, p_ctauPV, p_ctauErrBS, p_ctauBS;
-  UInt_t p_rank, p_muonM_type, p_muonP_type;
+  UInt_t p_rank, p_muonM_type, p_muonP_type, p_triggerMatch;
 
   Point jVertex, pVertex;
   Point xVertex, jpsVertex, phiVertex;
@@ -210,6 +210,7 @@ isMC_(iConfig.getParameter < bool > ("isMC"))
     j_tree->Branch("j_muonM_type", &j_muonM_type, "j_muonM_type/I");
     j_tree->Branch("j_muonP_type", &j_muonP_type, "j_muonP_type/I");
 
+    j_tree->Branch("j_vProb", &j_vProb, "j_vProb/D");
     j_tree->Branch("j_vProb", &j_vProb, "j_vProb/D");
     // j_tree->Branch("j_dz", &j_dz, "j_dz/D");
     j_tree->Branch("j_vNChi2", &j_vNChi2, "j_vNChi2/D");

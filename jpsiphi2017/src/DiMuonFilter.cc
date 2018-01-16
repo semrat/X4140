@@ -59,8 +59,8 @@ UInt_t DiMuonFilter::isTriggerMatched(const pat::CompositeCandidate *diMuon_cand
     for ( size_t j = 0; j < muon1->triggerObjectMatch(i)->filterLabels().size(); ++j )
       std::cout << (muon1->triggerObjectMatch(i)->filterLabels())[j] << std::endl;
 
-  std::cout << "Triggers matched : " << matched << std::endl;
-  std::cout << "Sizes : " << muon1Collection.size() << " - " << muon2Collection.size() << std::endl;
+  // std::cout << "Triggers matched : " << matched << std::endl;
+  // std::cout << "Sizes : " << muon1Collection.size() << " - " << muon2Collection.size() << std::endl;
   return matched;
 }
 
@@ -78,7 +78,7 @@ void DiMuonFilter::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
        if (ionia && DiMuonSelection_(*ionia) &&
            SingleMuonSelection_(*ionia->daughter("muon1")) &&
            SingleMuonSelection_(*ionia->daughter("muon2")) &&
-           ( !do_trigger_match_ || !isTriggerMatched(ionia))
+           ( !do_trigger_match_ || isTriggerMatched(ionia))
           ) mumuOutput->push_back(*ionia);
     }
   }
