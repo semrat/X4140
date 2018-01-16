@@ -102,7 +102,7 @@ class x4MuRootupler:public edm::EDAnalyzer {
   Double_t pM;
   Double_t p_cosAlpha, p_vNChi2, p_vProb, p_dz;
   Double_t p_ctauErrPV, p_ctauPV, p_ctauErrBS, p_ctauBS;
-  UInt_t p_rank, p_muonM_type, p_muonP_type, p_triggerMatch
+  UInt_t p_rank, p_muonM_type, p_muonP_type, p_triggerMatch;
   UInt_t p_muonM_isGlobal,p_muonM_isTracker, p_muonP_isGlobal,p_muonP_isTracker ;
 
   Point jVertex, pVertex;
