@@ -28,8 +28,8 @@
 
 FourOnia2KKPAT::FourOnia2KKPAT(const edm::ParameterSet& iConfig):
 muons_(consumes<edm::View<pat::Muon>>(iConfig.getParameter<edm::InputTag>("muons"))),
-km_tracks_(consumes<edm::View<reco::TrackCollection>>(iConfig.getParameter<edm::InputTag>("kmtracks"))),
-km_tracks_(consumes<edm::View<reco::TrackCollection>>(iConfig.getParameter<edm::InputTag>("kptracks"))),
+km_tracks_(consumes<reco::TrackCollection>(iConfig.getParameter<edm::InputTag>("kmtracks"))),
+kp_tracks_(consumes<reco::TrackCollection>(iConfig.getParameter<edm::InputTag>("kptracks"))),
 thebeamspot_(consumes<reco::BeamSpot>(iConfig.getParameter<edm::InputTag>("beamSpotTag"))),
 thePVs_(consumes<reco::VertexCollection>(iConfig.getParameter<edm::InputTag>("primaryVertexTag"))),
 higherPuritySelection_(iConfig.getParameter<std::string>("higherPuritySelection")),
@@ -157,10 +157,10 @@ FourOnia2KKPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     thePrimaryV = Vertex(bs.position(), bs.covariance3D());
   }
 
-  Handle< View<reco::TrackCollection> > kaonMTracks;
+  Handle< reco::TrackCollection > kaonMTracks;
   iEvent.getByToken(km_tracks_,kaonMTracks);
 
-  Handle< View<reco::TrackCollection> > kaonPTracks;
+  Handle< reco::TrackCollection > kaonPTracks;
   iEvent.getByToken(kp_tracks_,kaonPTracks);
 
   edm::ESHandle<TransientTrackBuilder> theTTBuilder;
@@ -171,12 +171,12 @@ FourOnia2KKPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   // JPsi candidates only from muons
 
   std::cout<<"M"<< std:endl;
-  for(View<reco::TrackCollection>::const_iterator it = kaonMTracks->begin(), itend = kaonMTracks->end(); it != itend; ++it)
+  for(reco::TrackCollection::const_iterator it = kaonMTracks->begin(), itend = kaonMTracks->end(); it != itend; ++it)
   {
     std::cout << it->pt() << std::endl;
   }
   std::cout<<"P"<< std:endl;
-  for(View<reco::TrackCollection>::const_iterator it = kaonPTracks->begin(), itend = kaonPTracks->end(); it != itend; ++it){
+  for(reco::TrackCollection::const_iterator it = kaonPTracks->begin(), itend = kaonPTracks->end(); it != itend; ++it){
   {
     std::cout << it->pt() << std::endl;
   }
