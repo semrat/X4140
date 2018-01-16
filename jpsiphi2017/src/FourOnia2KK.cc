@@ -27,8 +27,7 @@
 #include "TrackingTools/PatternTools/interface/ClosestApproachInRPhi.h"
 
 FourOnia2KKPAT::FourOnia2KKPAT(const edm::ParameterSet& iConfig):
-km_tracks_(consumes<reco::TrackCollection>(iConfig.getParameter<edm::InputTag>("kmtracks"))),
-kp_tracks_(consumes<reco::TrackCollection>(iConfig.getParameter<edm::InputTag>("kptracks"))),
+trakCollection_(consumes<edm::View<pat::PackedCandidate>>(iConfig.getParameter<edm::InputTag>("tracks"))),
 thebeamspot_(consumes<reco::BeamSpot>(iConfig.getParameter<edm::InputTag>("beamSpotTag"))),
 thePVs_(consumes<reco::VertexCollection>(iConfig.getParameter<edm::InputTag>("primaryVertexTag"))),
 higherPuritySelection_(iConfig.getParameter<std::string>("higherPuritySelection")),
@@ -156,11 +155,8 @@ FourOnia2KKPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     thePrimaryV = Vertex(bs.position(), bs.covariance3D());
   }
 
-  Handle< reco::TrackCollection > kaonMTracks;
-  iEvent.getByToken(km_tracks_,kaonMTracks);
-
-  Handle< reco::TrackCollection > kaonPTracks;
-  iEvent.getByToken(kp_tracks_,kaonPTracks);
+  edm::Handle< View<pat::PackedCandidate> > thePATTrackHandle;
+  iEvent.getByToken(trakCollection_label,thePATTrackHandle);
 
   edm::ESHandle<TransientTrackBuilder> theTTBuilder;
   iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder",theTTBuilder);
@@ -170,14 +166,9 @@ FourOnia2KKPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   // JPsi candidates only from muons
 
   std::cout<<"M"<< std::endl;
-  for(reco::TrackCollection::const_iterator it = kaonMTracks->begin(), itend = kaonMTracks->end(); it != itend; ++it)
+  for(View<pat::PackedCandidate>::const_iterator iTrack1 = thePATTrackHandle->begin();iTrack1 != thePATTrackHandle->end(); ++iTrack1 )
   {
-    std::cout << it->pt() << std::endl;
-  }
-  std::cout<<"P"<< std::endl;
-  for(reco::TrackCollection::const_iterator it = kaonPTracks->begin(), itend = kaonPTracks->end(); it != itend; ++it)
-  {
-    std::cout << it->pt() << std::endl;
+    std::cout << iTrack1->pt() << std::endl;
   }
 
       iEvent.put(std::move(phiOutput));

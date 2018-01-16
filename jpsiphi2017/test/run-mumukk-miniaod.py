@@ -36,30 +36,30 @@ process.triggerSelection = cms.EDFilter("TriggerResultsFilter",
                                         )
 
 #make patTracks
-from PhysicsTools.PatAlgos.tools.trackTools import makeTrackCandidates
-makeTrackCandidates(process,
-                       label        = 'KaonPCands',                  # output collection
-                       tracks       = cms.InputTag('generalTracks'), # input track collection
-                       particleType = 'k+',                           # particle type (for assigning a mass)
-                       preselection = 'pt > 0.1',                    # preselection cut on candidates
-                       selection    = 'pt > 0.1',                    # selection on PAT Layer 1 objects
-                       isolation    = {},                            # isolations to use (set to {} for None)
-                       isoDeposits  = [],
-                       mcAs         = None                           # replicate MC match as the one used for Muons
-   )
+# from PhysicsTools.PatAlgos.tools.trackTools import makeTrackCandidates
+# makeTrackCandidates(process,
+#                        label        = 'KaonPCands',                  # output collection
+#                        tracks       = cms.InputTag('generalTracks'), # input track collection
+#                        particleType = 'k+',                           # particle type (for assigning a mass)
+#                        preselection = 'pt > 0.1',                    # preselection cut on candidates
+#                        selection    = 'pt > 0.1',                    # selection on PAT Layer 1 objects
+#                        isolation    = {},                            # isolations to use (set to {} for None)
+#                        isoDeposits  = [],
+#                        mcAs         = None                           # replicate MC match as the one used for Muons
+#    )
+#
+# makeTrackCandidates(process,
+#                        label        = 'KaonMCands',                  # output collection
+#                        tracks       = cms.InputTag('generalTracks'), # input track collection
+#                        particleType = 'k-',                           # particle type (for assigning a mass)
+#                        preselection = 'pt > 0.1',                    # preselection cut on candidates
+#                        selection    = 'pt > 0.1',                    # selection on PAT Layer 1 objects
+#                        isolation    = {},                            # isolations to use (set to {} for None)
+#                        isoDeposits  = [],
+#                        mcAs         = None                           # replicate MC match as the one used for Muons
+#    )
 
-makeTrackCandidates(process,
-                       label        = 'KaonMCands',                  # output collection
-                       tracks       = cms.InputTag('generalTracks'), # input track collection
-                       particleType = 'k-',                           # particle type (for assigning a mass)
-                       preselection = 'pt > 0.1',                    # preselection cut on candidates
-                       selection    = 'pt > 0.1',                    # selection on PAT Layer 1 objects
-                       isolation    = {},                            # isolations to use (set to {} for None)
-                       isoDeposits  = [],
-                       mcAs         = None                           # replicate MC match as the one used for Muons
-   )
-
-process.patTrackCands.embedTrack = True
+# process.patTrackCands.embedTrack = True
 
 process.oniaSelectedMuons = cms.EDFilter('PATMuonSelector',
    src = cms.InputTag('slimmedMuonsWithTrigger'),
@@ -111,19 +111,18 @@ process.Onia2MuMuFilteredJpsi = cms.EDProducer('DiMuonFilter',
       HLTFilters          = filters
 )
 
-process.xProducer = cms.EDProducer('DiMuonTracksProducer',
-    kptracks                    = cms.InputTag("KaonPCands"),
-    kmtracks                    = cms.InputTag("KaonMCands"),
-    jpsidimuons                 = cms.InputTag("Onia2MuMuFilteredJpsi"),
+process.FourOnia2KKPhi = cms.EDProducer('FourOnia2KKPAT',
+    tracks                      = cms.InputTag('packedPFCandidates'),
     primaryVertexTag            = cms.InputTag('offlineSlimmedPrimaryVertices'),
     beamSpotTag                 = cms.InputTag('offlineBeamSpot'),
-    dzmax                       = cms.double(20.0),
-    triggerMatch                = cms.bool(False),
+    higherPuritySelection       = cms.string(""),
+    lowerPuritySelection        = cms.string(""),
+    dimuonSelection             = cms.string("0.5 < mass && mass < 1.5 && charge==0 "),
     addCommonVertex             = cms.bool(True),
-    addMuonlessPrimaryVertex    = cms.bool(True),
+    addMuonlessPrimaryVertex    = cms.bool(False),
+    addMCTruth                  = cms.bool(False),
     resolvePileUpAmbiguity      = cms.bool(True),
-    quadmuonSelection           = cms.string("4.0 < mass && mass < 6.0 && charge==0"),
-    deltaMass                   = cms.vdouble(0.0,2.0)  # trigger match is performed in Onia2MuMuFiltered
+    HLTFilters                  = filters
 )
 
 # process.xFitter = cms.EDProducer('FourOniaKinFit',
@@ -138,13 +137,10 @@ process.xCandSequence = cms.Sequence(
                    process.triggerSelection *
                    process.slimmedMuonsWithTriggerSequence *
 				   process.oniaSelectedMuons *
-                   process.FourOnia2MuMuPhi *
-                   process.Onia2MuMuFilteredPhi *
-                   #process.DiMuonCounterPhi *
 				   process.FourOnia2MuMuJPsi *
                    process.Onia2MuMuFilteredJpsi *
-                   #process.DiMuonCounterJPsi *
-                   process.xProducer
+                   process.DiMuonCounterJPsi *
+                   process.FourOnia2KKPhi
                    #process.xFitter
 				   )
 
@@ -160,4 +156,4 @@ process.xCandSequence = cms.Sequence(
 #                           TriggerResults  = cms.InputTag("TriggerResults", "", "HLT"),
 #                           isMC = cms.bool(False)
 #                          )
-# process.p = cms.Path(process.xCandSequence * process.rootuple)
+process.p = cms.Path(process.xCandSequence)# * process.rootuple)

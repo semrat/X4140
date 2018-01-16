@@ -51,8 +51,7 @@ class FourOnia2KKPAT : public edm::EDProducer {
   // ----------member data ---------------------------
  private:
 
-  edm::EDGetTokenT<reco::TrackCollection> km_tracks_;
-  edm::EDGetTokenT<reco::TrackCollection> kp_tracks_;
+  edm::EDGetTokenT<edm::View<pat::PackedCandidate>> trakCollection_;
   edm::EDGetTokenT<reco::BeamSpot> thebeamspot_;
   edm::EDGetTokenT<reco::VertexCollection> thePVs_;
   edm::EDGetTokenT<reco::TrackCollection> revtxtrks_;
