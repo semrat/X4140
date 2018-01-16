@@ -22,6 +22,8 @@
 
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
 
+#include "DataFormats/PatCandidates/interface/PackedCandidate.h"
+
 template<typename T>
 struct GreaterByVProb {
   bool operator()( const T & t1, const T & t2 ) const {
