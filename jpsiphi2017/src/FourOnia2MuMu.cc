@@ -112,7 +112,7 @@ UInt_t FourOnia2MuMuPAT::isTriggerMatched(pat::CompositeCandidate *diMuon_cand) 
   //
   //
   //
-  // std::cout << "Triggers matched : " << matched << std::endl;
+  std::cout << "Triggers matched : " << matched << std::endl;
   // std::cout << "Sizes : " << muon1Collection.size() << " - " << muon2Collection.size() << std::endl;
 
   return matched;
@@ -181,18 +181,6 @@ FourOnia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
       // ---- no explicit order defined ----
       mumucand.addDaughter(*it, "muon1");
       mumucand.addDaughter(*it2,"muon2");
-
-      for (unsigned int iTr = 0; iTr<HLTFilters_.size(); iTr++ ) {
-        // std::cout << HLTFilters_[iTr] << std::endl;
-        const pat::TriggerObjectStandAloneCollection mu1HLTMatches = it->triggerObjectMatchesByFilter(HLTFilters_[iTr]);
-        const pat::TriggerObjectStandAloneCollection mu2HLTMatches = it2->triggerObjectMatchesByFilter(HLTFilters_[iTr]);
-        if (!mu1HLTMatches.empty() || !mu2HLTMatches.empty())
-          std::cout<<"Matched at the end!"<< std::endl;
-      }
-
-
-
-
 
       // ---- define and set candidate's 4momentum  ----
       LorentzVector mumu = it->p4() + it2->p4();
