@@ -185,7 +185,7 @@ FourOnia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
       for (unsigned int iTr = 0; iTr<HLTFilters_.size(); iTr++ ) {
         // std::cout << HLTFilters_[iTr] << std::endl;
         const pat::TriggerObjectStandAloneCollection mu1HLTMatches = it->triggerObjectMatchesByFilter(HLTFilters_[iTr]);
-        const pat::TriggerObjectStandAloneCollection mu1HLTMatches = it2->triggerObjectMatchesByFilter(HLTFilters_[iTr]);
+        const pat::TriggerObjectStandAloneCollection mu2HLTMatches = it2->triggerObjectMatchesByFilter(HLTFilters_[iTr]);
         if (!mu1HLTMatches.empty() || !mu2HLTMatches.empty())
           std::cout<<"Matched at the end!"<< std::endl;
       }
