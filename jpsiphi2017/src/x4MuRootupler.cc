@@ -211,7 +211,7 @@ isMC_(iConfig.getParameter < bool > ("isMC"))
     j_tree->Branch("j_muonP_type", &j_muonP_type, "j_muonP_type/I");
 
     j_tree->Branch("j_vProb", &j_vProb, "j_vProb/D");
-    j_tree->Branch("j_vProb", &j_vProb, "j_vProb/D");
+    j_tree->Branch("j_triggerMatch", &j_triggerMatch, "j_triggerMatch/I");
     // j_tree->Branch("j_dz", &j_dz, "j_dz/D");
     j_tree->Branch("j_vNChi2", &j_vNChi2, "j_vNChi2/D");
     j_tree->Branch("j_cosAlpha", &j_cosAlpha, "j_cosAlpha/D");
@@ -239,6 +239,7 @@ isMC_(iConfig.getParameter < bool > ("isMC"))
     p_tree->Branch("p_muonP_type", &p_muonP_type, "p_muonP_type/I");
 
     p_tree->Branch("p_vProb", &p_vProb, "p_vProb/D");
+    p_tree->Branch("p_triggerMatch", &p_triggerMatch, "p_triggerMatch/I");
     // p_tree->Branch("p_dz", &p_dz, "p_dz/D");
     p_tree->Branch("p_vNChi2", &p_vNChi2, "p_vNChi2/D");
     p_tree->Branch("p_cosAlpha", &p_cosAlpha, "p_cosAlpha/D");

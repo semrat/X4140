@@ -61,8 +61,7 @@ process.FourOnia2MuMuPhi = cms.EDProducer('FourOnia2MuMuPAT',
                                         'hltL1fForIterL3L1fL1sL1DoubleMu0er1p5SQOSdRMax1p4L1Filtered0',
                                         'hltL1fL1sL1DoubleMu0er1p5SQOSdRMax1p4L1Filtered0',
                                         'hltL1sDoubleMu0er1p5SQOSdRMax1p4',
-                                        'hltL2fL1sL1DoubleMu0er1p5SQOSdRMax1p4L1f0L2PreFiltered0',
-                                        'hltDimuon14PhiBarrelnoCowL3Filtered')
+                                        'hltL2fL1sL1DoubleMu0er1p5SQOSdRMax1p4L1f0L2PreFiltered0')
 )
 
 process.FourOnia2MuMuJPsi = cms.EDProducer('FourOnia2MuMuPAT',
