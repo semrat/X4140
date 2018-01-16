@@ -170,12 +170,12 @@ FourOnia2KKPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   // JPsi candidates only from muons
 
-  std::cout<<"M"<< std:endl;
+  std::cout<<"M"<< std::endl;
   for(reco::TrackCollection::const_iterator it = kaonMTracks->begin(), itend = kaonMTracks->end(); it != itend; ++it)
   {
     std::cout << it->pt() << std::endl;
   }
-  std::cout<<"P"<< std:endl;
+  std::cout<<"P"<< std::endl;
   for(reco::TrackCollection::const_iterator it = kaonPTracks->begin(), itend = kaonPTracks->end(); it != itend; ++it){
   {
     std::cout << it->pt() << std::endl;
