@@ -92,7 +92,7 @@ class x4MuRootupler:public edm::EDAnalyzer {
   Double_t jM;
   Double_t j_cosAlpha, j_vNChi2, j_vProb, j_dz;
   Double_t j_ctauErrPV, j_ctauPV, j_ctauErrBS, j_ctauBS;
-  UInt_t j_rank, j_muonM_type, j_muonP_type, j_triggerMatch;
+  UInt_t j_rank, j_muonM_type, j_muonP_type, j_triggerMatch,j_muonM_isGlobal,j_muonM_isTracker;
 
   //phi tree variables
 
@@ -101,7 +101,7 @@ class x4MuRootupler:public edm::EDAnalyzer {
   Double_t pM;
   Double_t p_cosAlpha, p_vNChi2, p_vProb, p_dz;
   Double_t p_ctauErrPV, p_ctauPV, p_ctauErrBS, p_ctauBS;
-  UInt_t p_rank, p_muonM_type, p_muonP_type, p_triggerMatch;
+  UInt_t p_rank, p_muonM_type, p_muonP_type, p_triggerMatch,p_muonM_isGlobal,p_muonM_isTracker;
 
   Point jVertex, pVertex;
   Point xVertex, jpsVertex, phiVertex;
@@ -210,6 +210,11 @@ isMC_(iConfig.getParameter < bool > ("isMC"))
     j_tree->Branch("j_muonM_type", &j_muonM_type, "j_muonM_type/I");
     j_tree->Branch("j_muonP_type", &j_muonP_type, "j_muonP_type/I");
 
+    j_tree->Branch("j_muonM_isGlobal", &j_muonM_isGlobal, "j_muonM_isGlobal/I");
+    j_tree->Branch("j_muonP_isGlobal", &j_muonP_isGlobal, "j_muonP_isGlobal/I");
+    j_tree->Branch("j_muonM_isTracker", &j_muonM_isTracker, "j_muonM_isTracker/I");
+    j_tree->Branch("j_muonP_isTracker", &j_muonP_isTracker, "j_muonP_isTracker/I");
+
     j_tree->Branch("j_vProb", &j_vProb, "j_vProb/D");
     j_tree->Branch("j_triggerMatch", &j_triggerMatch, "j_triggerMatch/I");
     // j_tree->Branch("j_dz", &j_dz, "j_dz/D");
@@ -237,6 +242,11 @@ isMC_(iConfig.getParameter < bool > ("isMC"))
     p_tree->Branch("p_muonP_p4",  "TLorentzVector", &p_muonP_p4);
     p_tree->Branch("p_muonM_type", &p_muonM_type, "p_muonM_type/I");
     p_tree->Branch("p_muonP_type", &p_muonP_type, "p_muonP_type/I");
+    p_tree->Branch("p_muonM_isGlobal", &p_muonM_isGlobal, "p_muonM_isGlobal/I");
+    p_tree->Branch("p_muonP_isGlobal", &p_muonP_isGlobal, "p_muonP_isGlobal/I");
+    p_tree->Branch("p_muonM_isTracker", &p_muonM_isTracker, "p_muonM_isTracker/I");
+    p_tree->Branch("p_muonP_isTracker", &p_muonP_isTracker, "p_muonP_isTracker/I");
+
 
     p_tree->Branch("p_vProb", &p_vProb, "p_vProb/D");
     p_tree->Branch("p_triggerMatch", &p_triggerMatch, "p_triggerMatch/I");

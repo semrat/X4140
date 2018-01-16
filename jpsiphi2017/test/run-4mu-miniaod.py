@@ -24,11 +24,11 @@ process.load("mmkk.mmkk.slimmedMuonsTriggerMatcher2017_cfi")
 
 process.triggerSelection = cms.EDFilter("TriggerResultsFilter",
                                         triggerConditions = cms.vstring(
-                                                                        #'HLT_DoubleMu2_Jpsi_DoubleTkMu0_Phi_v*',
-                                                                        #'HLT_Mu20_TkMu0_Phi_v*',
+                                                                        'HLT_DoubleMu2_Jpsi_DoubleTkMu0_Phi_v*',
+                                                                        'HLT_Mu20_TkMu0_Phi_v*',
                                                                         'HLT_Dimuon14_Phi_Barrel_Seagulls_v*',
-                                                                        #'HLT_Mu25_TkMu0_Phi_v*',
-                                                                        #'HLT_Dimuon24_Phi_noCorrL1_v*',
+                                                                        'HLT_Mu25_TkMu0_Phi_v*',
+                                                                        'HLT_Dimuon24_Phi_noCorrL1_v*',
                                                                        ),
                                         hltResults = cms.InputTag( "TriggerResults", "", "HLT" ),
                                         l1tResults = cms.InputTag( "" ),
