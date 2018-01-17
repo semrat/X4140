@@ -176,7 +176,7 @@ FourOnia2KKPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   for(View<pat::PackedCandidate>::const_iterator kTrack1 = thePATTrackHandle->begin();kTrack1 != thePATTrackHandle->end(); ++kTrack1 )
   {
     if(kTrack1->charge()==0) continue;
-    if ((kTrack1->chi2() / kTrack1->bestTrack()->ndof() > TrMaxNormChi2)  ||  kTrack1->pt() < TrMinPt) continue;
+    if ((kTrack1->bestTrack()->chi2() / kTrack1->bestTrack()->ndof() > TrMaxNormChi2)  ||  kTrack1->pt() < TrMinPt) continue;
 
     for(View<pat::PackedCandidate>::const_iterator kTrack2 = kTrack1+1; kTrack2 != thePATTrackHandle->end(); ++kTrack2 )
     {
