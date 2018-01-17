@@ -163,7 +163,7 @@ FourOnia2KKPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     thePrimaryV = Vertex(bs.position(), bs.covariance3D());
   }
 
-  edm::Handle< View<pat::PackedCandidate> > thePATTrackHandle;
+  edm::Handle< View<pat::GenericParticle> > thePATTrackHandle;
   iEvent.getByToken(trakCollection_,thePATTrackHandle);
 
   edm::ESHandle<TransientTrackBuilder> theTTBuilder;
