@@ -174,6 +174,7 @@ FourOnia2KKPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   double TrMaxNormChi2 = 10.0;
   double TrMinPt = 0.0;
+  bool do_phimass_constrain = false;
   std::cout<<"M"<< std::endl;
   for(View<pat::PackedCandidate>::const_iterator kTrack1 = thePATTrackHandle->begin();kTrack1 != thePATTrackHandle->end(); ++kTrack1 )
   {
