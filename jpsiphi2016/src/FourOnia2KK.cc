@@ -134,12 +134,6 @@ FourOnia2KKPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   kMasses.push_back( 0.493677 );
   kMasses.push_back( 0.493677 );
 
-  const ParticleMass kaon_mass(0.493677);
-  float kaon_sigma = 1E-6;
-
-  const ParticleMass phi_mass(1.019461);
-  float phi_sigma = 1E-6;
-
   std::unique_ptr<pat::CompositeCandidateCollection> phiOutput(new pat::CompositeCandidateCollection);
   //std::cout<<"Four muonia producer"<<std::endl;
   Vertex thePrimaryV;
@@ -169,6 +163,7 @@ FourOnia2KKPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   edm::ESHandle<TransientTrackBuilder> theTTBuilder;
   iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder",theTTBuilder);
   KalmanVertexFitter vtxFitter(true);
+  TrackCollection kaonLess;
 
   // JPsi candidates only from muons
 
@@ -176,178 +171,105 @@ FourOnia2KKPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   for(View<pat::PackedCandidate>::const_iterator kTrack1 = thePATTrackHandle->begin();kTrack1 != thePATTrackHandle->end(); ++kTrack1 )
   {
     if(kTrack1->charge()==0) continue;
-    if ((kTrack1->track()->chi2() / kTrack1->track()->ndof() > TrMaxNormChi2)  ||  kTrack1->pt() < TrMinPt) continue;
-
     for(View<pat::PackedCandidate>::const_iterator kTrack2 = kTrack1+1; kTrack2 != thePATTrackHandle->end(); ++kTrack2 )
     {
       if(kTrack1==kTrack2) continue;
       if(kTrack2->charge()==0) continue;
 
-      if ((kTrack2->track()->chi2() / kTrack2->track()->ndof() > TrMaxNormChi2)  ||  kTrack2->pt() < TrMinPt) continue;
-
-      if (Track1->charge() * Track2->charge() > 0) //TODO CHECK IF phi->K0K0 ... ?
-
-      std::vector<reco::TransientTrack> phiTracks;
-      phiTracks.push_back((*theTTBuilder).build(Track1));
-      phiTracks.push_back((*theTTBuilder).build(Track2));
-
-      KinematicParticleFactoryFromTransientTrack pFactory;
-      std::vector<RefCountedKinematicParticle> PhiParticles;
-      PhiParticles.push_back(pFactory.particle(phiTracks[0],kaon_mass,float(0),float(0),kaon_sigma));
-      PhiParticles.push_back(pFactory.particle(phiTracks[1],kaon_mass,float(0),float(0),kaon_sigma));
-
-      KinematicParticleVertexFitter fitter;
-      RefCountedKinematicTree phiVertexFitTree;
-      phiVertexFitTree = fitter.fit(PhiParticles);
-
-      if (!phiVertexFitTree->isValid())
-      {
-        edm::ParameterSet pSet;
-        pSet.addParameter<double>("maxDistance", 3);
-        pSet.addParameter<int>("maxNbrOfIterations", 10000);
-        KinematicParticleVertexFitter fitter2(pSet);
-        photonVertexFitTree = fitter2.fit(PhiParticles);
-      }
-
-
-      if (phiVertexFitTree->isValid())
-      {
-        KinematicParticleFitter fitterPhi;
-        KinematicConstraint * phi_const = new MassKinematicConstraint(phi_mass,phi_sigma);
-
-        phiVertexFitTree->movePointerToTheTop();
-
-        if(do_phimass_constrain)
-        phiVertexFitTree = fitterPhi.fit(phi_const,phiVertexFitTree);
-
-        if (phiVertexFitTree->isValid())
-        {
-
-          phiVertexFitTree->movePointerToTheTop();
-          RefCountedKinematicParticle kkCandFitted = phiVertexFitTree->currentParticle();
-          RefCountedKinematicVertex kkDecayVertex = phiVertexFitTree->currentDecayVertex();
-
-          float kkM_fit  = kkCandFitted->currentState().mass();
-          float kkPx_fit = kkCandFitted->currentState().kinematicParameters().momentum().x();
-          float kkPy_fit = kkCandFitted->currentState().kinematicParameters().momentum().y();
-          float kkPz_fit = kkCandFitted->currentState().kinematicParameters().momentum().z();
-          float kkVtxX_fit = kkDecayVertex->position().x();
-          float kkVtxY_fit = kkDecayVertex->position().y();
-          float kkVtxZ_fit = kkDecayVertex->position().z();
-          float kkVtxP_fit = ChiSquaredProbability((double)(kkDecayVertex->chiSquared()),
-          (double)(kkDecayVertex->degreesOfFreedom()));
-
-          reco::CompositeCandidate recoKKCand(0, math::XYZTLorentzVector(kkPx_fit, kkPy_fit, kkPz_fit,
-            sqrt(kkM_fit*kkM_fit + kkPx_fit*kkPx_fit + kkPy_fit*kkPy_fit +
-            kkPz_fit*kkPz_fit)), math::XYZPoint(kkVtxX_fit,
-            kkVtxY_fit, kkVtxZ_fit), 50551);
-
-          pat::CompositeCandidate patKKCand(recoKKCand);
-
-          patKKCand.addUserFloat("vProb",kkVtxP_fit);
-
-          phiOutput->push_back(patKKCand);
-
-        }
-
-      }
-
-
-
     }
   }
 
-  iEvent.put(std::move(phiOutput));
+      iEvent.put(std::move(phiOutput));
 
 }
 
-      bool
-      FourOnia2KKPAT::isAbHadron(int pdgID) {
+    bool
+    FourOnia2KKPAT::isAbHadron(int pdgID) {
 
-        if (abs(pdgID) == 511 || abs(pdgID) == 521 || abs(pdgID) == 531 || abs(pdgID) == 5122) return true;
-        return false;
+      if (abs(pdgID) == 511 || abs(pdgID) == 521 || abs(pdgID) == 531 || abs(pdgID) == 5122) return true;
+      return false;
 
-      }
+    }
 
-      bool
-      FourOnia2KKPAT::isAMixedbHadron(int pdgID, int momPdgID) {
+    bool
+    FourOnia2KKPAT::isAMixedbHadron(int pdgID, int momPdgID) {
 
-        if ((abs(pdgID) == 511 && abs(momPdgID) == 511 && pdgID*momPdgID < 0) ||
-        (abs(pdgID) == 531 && abs(momPdgID) == 531 && pdgID*momPdgID < 0))
-        return true;
-        return false;
+      if ((abs(pdgID) == 511 && abs(momPdgID) == 511 && pdgID*momPdgID < 0) ||
+      (abs(pdgID) == 531 && abs(momPdgID) == 531 && pdgID*momPdgID < 0))
+      return true;
+      return false;
 
-      }
+    }
 
-      std::pair<int, float>
-      FourOnia2KKPAT::findJpsiMCInfo(reco::GenParticleRef genJpsi) {
+    std::pair<int, float>
+    FourOnia2KKPAT::findJpsiMCInfo(reco::GenParticleRef genJpsi) {
 
-        int momJpsiID = 0;
-        float trueLife = -99.;
+      int momJpsiID = 0;
+      float trueLife = -99.;
 
-        if (genJpsi->numberOfMothers()>0) {
+      if (genJpsi->numberOfMothers()>0) {
 
-          TVector3 trueVtx(0.0,0.0,0.0);
-          TVector3 trueP(0.0,0.0,0.0);
-          TVector3 trueVtxMom(0.0,0.0,0.0);
+        TVector3 trueVtx(0.0,0.0,0.0);
+        TVector3 trueP(0.0,0.0,0.0);
+        TVector3 trueVtxMom(0.0,0.0,0.0);
 
-          trueVtx.SetXYZ(genJpsi->vertex().x(),genJpsi->vertex().y(),genJpsi->vertex().z());
-          trueP.SetXYZ(genJpsi->momentum().x(),genJpsi->momentum().y(),genJpsi->momentum().z());
+        trueVtx.SetXYZ(genJpsi->vertex().x(),genJpsi->vertex().y(),genJpsi->vertex().z());
+        trueP.SetXYZ(genJpsi->momentum().x(),genJpsi->momentum().y(),genJpsi->momentum().z());
 
-          bool aBhadron = false;
-          reco::GenParticleRef Jpsimom = genJpsi->motherRef();       // find mothers
-          if (Jpsimom.isNull()) {
-            std::pair<int, float> result = std::make_pair(momJpsiID, trueLife);
-            return result;
-          } else {
-            reco::GenParticleRef Jpsigrandmom = Jpsimom->motherRef();
-            if (isAbHadron(Jpsimom->pdgId())) {
-              if (Jpsigrandmom.isNonnull() && isAMixedbHadron(Jpsimom->pdgId(),Jpsigrandmom->pdgId())) {
-                momJpsiID = Jpsigrandmom->pdgId();
-                trueVtxMom.SetXYZ(Jpsigrandmom->vertex().x(),Jpsigrandmom->vertex().y(),Jpsigrandmom->vertex().z());
-              } else {
-                momJpsiID = Jpsimom->pdgId();
-                trueVtxMom.SetXYZ(Jpsimom->vertex().x(),Jpsimom->vertex().y(),Jpsimom->vertex().z());
-              }
-              aBhadron = true;
+        bool aBhadron = false;
+        reco::GenParticleRef Jpsimom = genJpsi->motherRef();       // find mothers
+        if (Jpsimom.isNull()) {
+          std::pair<int, float> result = std::make_pair(momJpsiID, trueLife);
+          return result;
+        } else {
+          reco::GenParticleRef Jpsigrandmom = Jpsimom->motherRef();
+          if (isAbHadron(Jpsimom->pdgId())) {
+            if (Jpsigrandmom.isNonnull() && isAMixedbHadron(Jpsimom->pdgId(),Jpsigrandmom->pdgId())) {
+              momJpsiID = Jpsigrandmom->pdgId();
+              trueVtxMom.SetXYZ(Jpsigrandmom->vertex().x(),Jpsigrandmom->vertex().y(),Jpsigrandmom->vertex().z());
             } else {
-              if (Jpsigrandmom.isNonnull() && isAbHadron(Jpsigrandmom->pdgId())) {
-                reco::GenParticleRef JpsiGrandgrandmom = Jpsigrandmom->motherRef();
-                if (JpsiGrandgrandmom.isNonnull() && isAMixedbHadron(Jpsigrandmom->pdgId(),JpsiGrandgrandmom->pdgId())) {
-                  momJpsiID = JpsiGrandgrandmom->pdgId();
-                  trueVtxMom.SetXYZ(JpsiGrandgrandmom->vertex().x(),JpsiGrandgrandmom->vertex().y(),JpsiGrandgrandmom->vertex().z());
-                } else {
-                  momJpsiID = Jpsigrandmom->pdgId();
-                  trueVtxMom.SetXYZ(Jpsigrandmom->vertex().x(),Jpsigrandmom->vertex().y(),Jpsigrandmom->vertex().z());
-                }
-                aBhadron = true;
-              }
-            }
-            if (!aBhadron) {
               momJpsiID = Jpsimom->pdgId();
               trueVtxMom.SetXYZ(Jpsimom->vertex().x(),Jpsimom->vertex().y(),Jpsimom->vertex().z());
             }
+            aBhadron = true;
+          } else {
+            if (Jpsigrandmom.isNonnull() && isAbHadron(Jpsigrandmom->pdgId())) {
+              reco::GenParticleRef JpsiGrandgrandmom = Jpsigrandmom->motherRef();
+              if (JpsiGrandgrandmom.isNonnull() && isAMixedbHadron(Jpsigrandmom->pdgId(),JpsiGrandgrandmom->pdgId())) {
+                momJpsiID = JpsiGrandgrandmom->pdgId();
+                trueVtxMom.SetXYZ(JpsiGrandgrandmom->vertex().x(),JpsiGrandgrandmom->vertex().y(),JpsiGrandgrandmom->vertex().z());
+              } else {
+                momJpsiID = Jpsigrandmom->pdgId();
+                trueVtxMom.SetXYZ(Jpsigrandmom->vertex().x(),Jpsigrandmom->vertex().y(),Jpsigrandmom->vertex().z());
+              }
+              aBhadron = true;
+            }
           }
-
-          TVector3 vdiff = trueVtx - trueVtxMom;
-          //trueLife = vdiff.Perp()*3.09688/trueP.Perp();
-          trueLife = vdiff.Perp()*genJpsi->mass()/trueP.Perp();
+          if (!aBhadron) {
+            momJpsiID = Jpsimom->pdgId();
+            trueVtxMom.SetXYZ(Jpsimom->vertex().x(),Jpsimom->vertex().y(),Jpsimom->vertex().z());
+          }
         }
-        std::pair<int, float> result = std::make_pair(momJpsiID, trueLife);
-        return result;
 
+        TVector3 vdiff = trueVtx - trueVtxMom;
+        //trueLife = vdiff.Perp()*3.09688/trueP.Perp();
+        trueLife = vdiff.Perp()*genJpsi->mass()/trueP.Perp();
       }
+      std::pair<int, float> result = std::make_pair(momJpsiID, trueLife);
+      return result;
 
-      // ------------ method called once each job just before starting event loop  ------------
-      void
-      FourOnia2KKPAT::beginJob()
-      {
-      }
+    }
 
-      // ------------ method called once each job just after ending the event loop  ------------
-      void
-      FourOnia2KKPAT::endJob() {
-      }
+    // ------------ method called once each job just before starting event loop  ------------
+    void
+    FourOnia2KKPAT::beginJob()
+    {
+    }
 
-      //define this as a plug-in
-      DEFINE_FWK_MODULE(FourOnia2KKPAT);
+    // ------------ method called once each job just after ending the event loop  ------------
+    void
+    FourOnia2KKPAT::endJob() {
+    }
+
+    //define this as a plug-in
+    DEFINE_FWK_MODULE(FourOnia2KKPAT);
