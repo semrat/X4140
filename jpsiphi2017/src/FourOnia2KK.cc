@@ -184,6 +184,8 @@ FourOnia2KKPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     if ((kTrack1->bestTrack() ==  nullptr)) continue;
     if ((kTrack1->bestTrack()->chi2() / kTrack1->bestTrack()->ndof() > TrMaxNormChi2)  ||  kTrack1->pt() < TrMinPt) continue;
 
+    std::cout << kTrack1->bestTrack()->pt() << " - " << kTrack1->pt() << std::endl;
+
     for(View<pat::PackedCandidate>::const_iterator kTrack2 = kTrack1+1; kTrack2 != thePATTrackHandle->end(); ++kTrack2 )
     {
       if ((kTrack2->bestTrack() ==  nullptr)) continue;
