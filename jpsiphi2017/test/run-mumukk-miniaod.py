@@ -60,7 +60,9 @@ makeTrackCandidates(process,
                        mcAs         = None                           # replicate MC match as the one used for Muons
    )
 
-# process.patTrackCands.embedTrack = True
+l1cands = getattr(process, 'patkaonTracks')
+
+process.patkaonTracks.embedTrack = True
 
 process.oniaSelectedMuons = cms.EDFilter('PATMuonSelector',
    src = cms.InputTag('slimmedMuonsWithTrigger'),
