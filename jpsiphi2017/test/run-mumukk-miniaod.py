@@ -48,6 +48,7 @@ process.triggerSelection = cms.EDFilter("TriggerResultsFilter",
 #                        mcAs         = None                           # replicate MC match as the one used for Muons
 #    )
 #
+from PhysicsTools.PatAlgos.tools.trackTools import makeTrackCandidates
 makeTrackCandidates(process,
                        label        = 'kaonTracks',                  # output collection
                        tracks       = cms.InputTag('generalTracks'), # input track collection
