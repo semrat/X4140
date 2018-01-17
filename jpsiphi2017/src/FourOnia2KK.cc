@@ -175,14 +175,18 @@ FourOnia2KKPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   double TrMaxNormChi2 = 10.0;
   double TrMinPt = 0.0;
   bool do_phimass_constrain = false;
+
   std::cout<<"M"<< std::endl;
+
   for(View<pat::PackedCandidate>::const_iterator kTrack1 = thePATTrackHandle->begin();kTrack1 != thePATTrackHandle->end(); ++kTrack1 )
   {
     if(kTrack1->charge()==0) continue;
+    if ((kTrack1->bestTrack() ==  nullptr)) continue;
     if ((kTrack1->bestTrack()->chi2() / kTrack1->bestTrack()->ndof() > TrMaxNormChi2)  ||  kTrack1->pt() < TrMinPt) continue;
 
     for(View<pat::PackedCandidate>::const_iterator kTrack2 = kTrack1+1; kTrack2 != thePATTrackHandle->end(); ++kTrack2 )
     {
+      if ((kTrack2->bestTrack() ==  nullptr)) continue;
       if(kTrack1==kTrack2) continue;
       if(kTrack2->charge()==0) continue;
 
