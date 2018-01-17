@@ -191,8 +191,8 @@ FourOnia2KKPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
       if (kTrack1->charge() * kTrack2->charge() > 0) //TODO CHECK IF phi->K0K0 ... ?
 
       std::vector<reco::TransientTrack> phiTracks;
-      phiTracks.push_back((*theTTBuilder).build(kTrack1));
-      phiTracks.push_back((*theTTBuilder).build(kTrack2));
+      phiTracks.push_back((*theTTBuilder).build(kTrack1->bestTrack()));
+      phiTracks.push_back((*theTTBuilder).build(kTrack2->bestTrack()));
 
       KinematicParticleFactoryFromTransientTrack pFactory;
       std::vector<RefCountedKinematicParticle> PhiParticles;
