@@ -139,7 +139,7 @@ process.xCandSequence = cms.Sequence(
 				   process.oniaSelectedMuons *
 				   process.FourOnia2MuMuJPsi *
                    process.Onia2MuMuFilteredJpsi *
-                   process.DiMuonCounterJPsi *
+                   #process.DiMuonCounterJPsi *
                    process.FourOnia2KKPhi
                    #process.xFitter
 				   )
