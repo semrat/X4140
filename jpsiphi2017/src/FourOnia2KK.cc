@@ -138,24 +138,24 @@ FourOnia2KKPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   for(View<pat::GenericParticle>::const_iterator kTrack1 = thePATTrackHandle->begin();kTrack1 != thePATTrackHandle->end(); ++kTrack1 )
   {
     if(kTrack1->charge()==0) continue;
-    if ((kTrack1->track()() ==  nullptr)) continue;
-    if ((kTrack1->track()()->chi2() / kTrack1->track()()->ndof() > TrMaxNormChi2)  ||  kTrack1->pt() < TrMinPt) continue;
+    if ((kTrack1->track() ==  nullptr)) continue;
+    if ((kTrack1->track()->chi2() / kTrack1->track()->ndof() > TrMaxNormChi2)  ||  kTrack1->pt() < TrMinPt) continue;
 
-    std::cout << kTrack1->track()()->pt() << " - " << kTrack1->pt() << std::endl;
+    std::cout << kTrack1->track()->pt() << " - " << kTrack1->pt() << std::endl;
 
     for(View<pat::GenericParticle>::const_iterator kTrack2 = kTrack1+1; kTrack2 != thePATTrackHandle->end(); ++kTrack2 )
     {
-      if ((kTrack2->track()() ==  nullptr)) continue;
+      if ((kTrack2->track() ==  nullptr)) continue;
       if(kTrack1==kTrack2) continue;
       if(kTrack2->charge()==0) continue;
 
-      if ((kTrack2->track()()->chi2() / kTrack2->track()()->ndof() > TrMaxNormChi2)  ||  kTrack2->pt() < TrMinPt) continue;
+      if ((kTrack2->track()->chi2() / kTrack2->track()->ndof() > TrMaxNormChi2)  ||  kTrack2->pt() < TrMinPt) continue;
 
       if (kTrack1->charge() * kTrack2->charge() > 0) continue;//TODO CHECK IF phi->K0K0 ... ?
 
       std::vector<reco::TransientTrack> phiTracks;
-      phiTracks.push_back((*theTTBuilder).build(kTrack1->track()()));
-      phiTracks.push_back((*theTTBuilder).build(kTrack2->track()()));
+      phiTracks.push_back((*theTTBuilder).build(kTrack1->track()));
+      phiTracks.push_back((*theTTBuilder).build(kTrack2->track()));
 
       KinematicParticleFactoryFromTransientTrack pFactory;
       std::vector<RefCountedKinematicParticle> PhiParticles;
