@@ -172,6 +172,8 @@ FourOnia2KKPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   // JPsi candidates only from muons
 
+  double TrMaxNormChi2 = 10.0;
+  double TrMinPt = 0.0;
   std::cout<<"M"<< std::endl;
   for(View<pat::PackedCandidate>::const_iterator kTrack1 = thePATTrackHandle->begin();kTrack1 != thePATTrackHandle->end(); ++kTrack1 )
   {
@@ -185,11 +187,11 @@ FourOnia2KKPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
       if ((kTrack2->bestTrack()->chi2() / kTrack2->bestTrack()->ndof() > TrMaxNormChi2)  ||  kTrack2->pt() < TrMinPt) continue;
 
-      if (Track1->charge() * Track2->charge() > 0) //TODO CHECK IF phi->K0K0 ... ?
+      if (iTrack1->charge() * iTrack2->charge() > 0) //TODO CHECK IF phi->K0K0 ... ?
 
       std::vector<reco::TransientTrack> phiTracks;
-      phiTracks.push_back((*theTTBuilder).build(Track1));
-      phiTracks.push_back((*theTTBuilder).build(Track2));
+      phiTracks.push_back((*theTTBuilder).build(iTrack1));
+      phiTracks.push_back((*theTTBuilder).build(iTrack2));
 
       KinematicParticleFactoryFromTransientTrack pFactory;
       std::vector<RefCountedKinematicParticle> PhiParticles;
