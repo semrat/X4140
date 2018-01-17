@@ -48,16 +48,16 @@ process.triggerSelection = cms.EDFilter("TriggerResultsFilter",
 #                        mcAs         = None                           # replicate MC match as the one used for Muons
 #    )
 #
-# makeTrackCandidates(process,
-#                        label        = 'KaonMCands',                  # output collection
-#                        tracks       = cms.InputTag('generalTracks'), # input track collection
-#                        particleType = 'k-',                           # particle type (for assigning a mass)
-#                        preselection = 'pt > 0.1',                    # preselection cut on candidates
-#                        selection    = 'pt > 0.1',                    # selection on PAT Layer 1 objects
-#                        isolation    = {},                            # isolations to use (set to {} for None)
-#                        isoDeposits  = [],
-#                        mcAs         = None                           # replicate MC match as the one used for Muons
-#    )
+makeTrackCandidates(process,
+                       label        = 'kaonTracks',                  # output collection
+                       tracks       = cms.InputTag('generalTracks'), # input track collection
+                       particleType = 'K+',                           # particle type (for assigning a mass)
+                       preselection = 'pt > 0.2',                    # preselection cut on candidates
+                       selection    = 'pt > 0.4',                    # selection on PAT Layer 1 objects
+                       isolation    = {},                            # isolations to use (set to {} for None)
+                       isoDeposits  = [],
+                       mcAs         = None                           # replicate MC match as the one used for Muons
+   )
 
 # process.patTrackCands.embedTrack = True
 
@@ -112,7 +112,7 @@ process.Onia2MuMuFilteredJpsi = cms.EDProducer('DiMuonFilter',
 )
 
 process.FourOnia2KKPhi = cms.EDProducer('FourOnia2KKPAT',
-    tracks                      = cms.InputTag('packedPFCandidates'),
+    tracks                      = cms.InputTag('patAODkaonTracks'),
     primaryVertexTag            = cms.InputTag('offlineSlimmedPrimaryVertices'),
     beamSpotTag                 = cms.InputTag('offlineBeamSpot'),
     higherPuritySelection       = cms.string(""),
