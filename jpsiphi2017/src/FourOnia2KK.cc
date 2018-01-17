@@ -27,9 +27,10 @@
 #include "TrackingTools/PatternTools/interface/ClosestApproachInRPhi.h"
 
 #include "DataFormats/PatCandidates/interface/PackedCandidate.h"
+#include "DataFormats/PatCandidates/interface/GenericParticle.h"
 
 FourOnia2KKPAT::FourOnia2KKPAT(const edm::ParameterSet& iConfig):
-trakCollection_(consumes<edm::View<pat::PackedCandidate>>(iConfig.getParameter<edm::InputTag>("tracks"))),
+trakCollection_(consumes<edm::View<pat::GenericParticle>>(iConfig.getParameter<edm::InputTag>("tracks"))),
 thebeamspot_(consumes<reco::BeamSpot>(iConfig.getParameter<edm::InputTag>("beamSpotTag"))),
 thePVs_(consumes<reco::VertexCollection>(iConfig.getParameter<edm::InputTag>("primaryVertexTag"))),
 higherPuritySelection_(iConfig.getParameter<std::string>("higherPuritySelection")),
