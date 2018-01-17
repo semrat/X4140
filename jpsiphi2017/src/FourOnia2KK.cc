@@ -188,7 +188,7 @@ FourOnia2KKPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
       if ((kTrack2->bestTrack()->chi2() / kTrack2->bestTrack()->ndof() > TrMaxNormChi2)  ||  kTrack2->pt() < TrMinPt) continue;
 
-      if (kTrack1->charge() * kTrack2->charge() > 0) //TODO CHECK IF phi->K0K0 ... ?
+      if (kTrack1->charge() * kTrack2->charge() > 0) continue;//TODO CHECK IF phi->K0K0 ... ?
 
       std::vector<reco::TransientTrack> phiTracks;
       phiTracks.push_back((*theTTBuilder).build(kTrack1->bestTrack()));
