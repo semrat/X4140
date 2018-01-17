@@ -73,50 +73,6 @@ UInt_t FourOnia2KKPAT::isTriggerMatched(pat::CompositeCandidate *diMuon_cand) {
     const pat::TriggerObjectStandAloneCollection mu2HLTMatches = muon2->triggerObjectMatchesByFilter(HLTFilters_[iTr]);
     if (!mu1HLTMatches.empty() && !mu2HLTMatches.empty()) matched += (1<<iTr);
   }
-  // const pat::TriggerObjectStandAloneCollection muon1Collection = muon1->triggerObjectMatches();
-  // const pat::TriggerObjectStandAloneCollection muon2Collection = muon2->triggerObjectMatches();
-  //
-  //
-  // for ( size_t i = 0; i < muon1Collection.size(); ++i )
-  // {
-  //   std::cout << "Muon1 collection : " << muon1->triggerObjectMatch(i)->collection() << std::endl;
-  //
-  //   std::cout << "Filters" << std::endl;
-  //   for ( size_t j = 0; j < muon1->triggerObjectMatch(i)->filterLabels().size(); ++j )
-  //     std::cout << (muon1->triggerObjectMatch(i)->filterLabels())[j] << std::endl;
-  //
-  //   std::cout << "Paths" << std::endl;
-  //   for ( size_t j = 0; j < muon1->triggerObjectMatch(i)->pathNames().size(); ++j )
-  //     std::cout << (muon1->triggerObjectMatch(i)->pathNames())[j] << std::endl;
-  //
-  //   std::cout << "Algos" << std::endl;
-  //   for ( size_t j = 0; j < muon1->triggerObjectMatch(i)->algorithmNames().size(); ++j )
-  //     std::cout << (muon1->triggerObjectMatch(i)->algorithmNames())[j] << std::endl;
-  //
-  //   std::cout << "Conditions" << std::endl;
-  //   for ( size_t j = 0; j < muon1->triggerObjectMatch(i)->conditionNames().size(); ++j )
-  //     std::cout << (muon1->triggerObjectMatch(i)->conditionNames())[j] << std::endl;
-  //
-  //   //std::cout << (muon1->triggerObjectMatch(i)->hasL3Filter())<< std::endl;
-  //
-  // }
-  //
-  // for ( size_t i = 0; i < muon2Collection.size(); ++i )
-  // {
-  //   std::cout << "Muon2 collection : " << muon2->triggerObjectMatch(i)->collection() << std::endl;
-  //
-  //   std::cout << "Filters" << std::endl;
-  //   for ( size_t j = 0; j < muon2->triggerObjectMatch(i)->filterLabels().size(); ++j )
-  //     std::cout << (muon2->triggerObjectMatch(i)->filterLabels())[j] << std::endl;
-  //   std::cout << "Paths" << std::endl;
-  //   for ( size_t j = 0; j < muon2->triggerObjectMatch(i)->pathNames().size(); ++j )
-  //     std::cout << (muon2->triggerObjectMatch(i)->pathNames())[j] << std::endl;
-  // }
-  //
-  //
-  //
-  // std::cout << "Triggers matched : " << matched << std::endl;
-  // std::cout << "Sizes : " << muon1Collection.size() << " - " << muon2Collection.size() << std::endl;
 
   return matched;
 }
@@ -179,93 +135,93 @@ FourOnia2KKPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   std::cout<<"M"<< std::endl;
 
-  // for(View<pat::PackedCandidate>::const_iterator kTrack1 = thePATTrackHandle->begin();kTrack1 != thePATTrackHandle->end(); ++kTrack1 )
-  // {
-  //   if(kTrack1->charge()==0) continue;
-  //   if ((kTrack1->bestTrack() ==  nullptr)) continue;
-  //   if ((kTrack1->bestTrack()->chi2() / kTrack1->bestTrack()->ndof() > TrMaxNormChi2)  ||  kTrack1->pt() < TrMinPt) continue;
-  //
-  //   std::cout << kTrack1->bestTrack()->pt() << " - " << kTrack1->pt() << std::endl;
-  //
-  //   for(View<pat::PackedCandidate>::const_iterator kTrack2 = kTrack1+1; kTrack2 != thePATTrackHandle->end(); ++kTrack2 )
-  //   {
-  //     if ((kTrack2->bestTrack() ==  nullptr)) continue;
-  //     if(kTrack1==kTrack2) continue;
-  //     if(kTrack2->charge()==0) continue;
-  //
-  //     if ((kTrack2->bestTrack()->chi2() / kTrack2->bestTrack()->ndof() > TrMaxNormChi2)  ||  kTrack2->pt() < TrMinPt) continue;
-  //
-  //     if (kTrack1->charge() * kTrack2->charge() > 0) continue;//TODO CHECK IF phi->K0K0 ... ?
-  //
-  //     std::vector<reco::TransientTrack> phiTracks;
-  //     phiTracks.push_back((*theTTBuilder).build(kTrack1->bestTrack()));
-  //     phiTracks.push_back((*theTTBuilder).build(kTrack2->bestTrack()));
-  //
-  //     KinematicParticleFactoryFromTransientTrack pFactory;
-  //     std::vector<RefCountedKinematicParticle> PhiParticles;
-  //     PhiParticles.push_back(pFactory.particle(phiTracks[0],kaon_mass,float(0),float(0),kaon_sigma));
-  //     PhiParticles.push_back(pFactory.particle(phiTracks[1],kaon_mass,float(0),float(0),kaon_sigma));
-  //
-  //     KinematicParticleVertexFitter fitter;
-  //     RefCountedKinematicTree phiVertexFitTree;
-  //     phiVertexFitTree = fitter.fit(PhiParticles);
-  //
-  //     if (!phiVertexFitTree->isValid())
-  //     {
-  //       edm::ParameterSet pSet;
-  //       pSet.addParameter<double>("maxDistance", 3);
-  //       pSet.addParameter<int>("maxNbrOfIterations", 10000);
-  //       KinematicParticleVertexFitter fitter2(pSet);
-  //       phiVertexFitTree = fitter2.fit(PhiParticles);
-  //     }
-  //
-  //
-  //     if (phiVertexFitTree->isValid())
-  //     {
-  //       KinematicParticleFitter fitterPhi;
-  //       KinematicConstraint * phi_const = new MassKinematicConstraint(phi_mass,phi_sigma);
-  //
-  //       phiVertexFitTree->movePointerToTheTop();
-  //
-  //       if(do_phimass_constrain)
-  //       phiVertexFitTree = fitterPhi.fit(phi_const,phiVertexFitTree);
-  //
-  //       if (phiVertexFitTree->isValid())
-  //       {
-  //
-  //         phiVertexFitTree->movePointerToTheTop();
-  //         RefCountedKinematicParticle kkCandFitted = phiVertexFitTree->currentParticle();
-  //         RefCountedKinematicVertex kkDecayVertex = phiVertexFitTree->currentDecayVertex();
-  //
-  //         float kkM_fit  = kkCandFitted->currentState().mass();
-  //         float kkPx_fit = kkCandFitted->currentState().kinematicParameters().momentum().x();
-  //         float kkPy_fit = kkCandFitted->currentState().kinematicParameters().momentum().y();
-  //         float kkPz_fit = kkCandFitted->currentState().kinematicParameters().momentum().z();
-  //         float kkVtxX_fit = kkDecayVertex->position().x();
-  //         float kkVtxY_fit = kkDecayVertex->position().y();
-  //         float kkVtxZ_fit = kkDecayVertex->position().z();
-  //         float kkVtxP_fit = ChiSquaredProbability((double)(kkDecayVertex->chiSquared()),
-  //         (double)(kkDecayVertex->degreesOfFreedom()));
-  //
-  //         reco::CompositeCandidate recoKKCand(0, math::XYZTLorentzVector(kkPx_fit, kkPy_fit, kkPz_fit,
-  //           sqrt(kkM_fit*kkM_fit + kkPx_fit*kkPx_fit + kkPy_fit*kkPy_fit +
-  //           kkPz_fit*kkPz_fit)), math::XYZPoint(kkVtxX_fit,
-  //           kkVtxY_fit, kkVtxZ_fit), 50551);
-  //
-  //         pat::CompositeCandidate patKKCand(recoKKCand);
-  //
-  //         patKKCand.addUserFloat("vProb",kkVtxP_fit);
-  //
-  //         phiOutput->push_back(patKKCand);
-  //
-  //       }
-  //
-  //     }
-  //
-  //
-  //
-  //   }
-  // }
+  for(View<pat::GenericParticle>::const_iterator kTrack1 = thePATTrackHandle->begin();kTrack1 != thePATTrackHandle->end(); ++kTrack1 )
+  {
+    if(kTrack1->charge()==0) continue;
+    if ((kTrack1->track()() ==  nullptr)) continue;
+    if ((kTrack1->track()()->chi2() / kTrack1->track()()->ndof() > TrMaxNormChi2)  ||  kTrack1->pt() < TrMinPt) continue;
+
+    std::cout << kTrack1->track()()->pt() << " - " << kTrack1->pt() << std::endl;
+
+    for(View<pat::GenericParticle>::const_iterator kTrack2 = kTrack1+1; kTrack2 != thePATTrackHandle->end(); ++kTrack2 )
+    {
+      if ((kTrack2->track()() ==  nullptr)) continue;
+      if(kTrack1==kTrack2) continue;
+      if(kTrack2->charge()==0) continue;
+
+      if ((kTrack2->track()()->chi2() / kTrack2->track()()->ndof() > TrMaxNormChi2)  ||  kTrack2->pt() < TrMinPt) continue;
+
+      if (kTrack1->charge() * kTrack2->charge() > 0) continue;//TODO CHECK IF phi->K0K0 ... ?
+
+      std::vector<reco::TransientTrack> phiTracks;
+      phiTracks.push_back((*theTTBuilder).build(kTrack1->track()()));
+      phiTracks.push_back((*theTTBuilder).build(kTrack2->track()()));
+
+      KinematicParticleFactoryFromTransientTrack pFactory;
+      std::vector<RefCountedKinematicParticle> PhiParticles;
+      PhiParticles.push_back(pFactory.particle(phiTracks[0],kaon_mass,float(0),float(0),kaon_sigma));
+      PhiParticles.push_back(pFactory.particle(phiTracks[1],kaon_mass,float(0),float(0),kaon_sigma));
+
+      KinematicParticleVertexFitter fitter;
+      RefCountedKinematicTree phiVertexFitTree;
+      phiVertexFitTree = fitter.fit(PhiParticles);
+
+      if (!phiVertexFitTree->isValid())
+      {
+        edm::ParameterSet pSet;
+        pSet.addParameter<double>("maxDistance", 3);
+        pSet.addParameter<int>("maxNbrOfIterations", 10000);
+        KinematicParticleVertexFitter fitter2(pSet);
+        phiVertexFitTree = fitter2.fit(PhiParticles);
+      }
+
+
+      if (phiVertexFitTree->isValid())
+      {
+        KinematicParticleFitter fitterPhi;
+        KinematicConstraint * phi_const = new MassKinematicConstraint(phi_mass,phi_sigma);
+
+        phiVertexFitTree->movePointerToTheTop();
+
+        if(do_phimass_constrain)
+        phiVertexFitTree = fitterPhi.fit(phi_const,phiVertexFitTree);
+
+        if (phiVertexFitTree->isValid())
+        {
+
+          phiVertexFitTree->movePointerToTheTop();
+          RefCountedKinematicParticle kkCandFitted = phiVertexFitTree->currentParticle();
+          RefCountedKinematicVertex kkDecayVertex = phiVertexFitTree->currentDecayVertex();
+
+          float kkM_fit  = kkCandFitted->currentState().mass();
+          float kkPx_fit = kkCandFitted->currentState().kinematicParameters().momentum().x();
+          float kkPy_fit = kkCandFitted->currentState().kinematicParameters().momentum().y();
+          float kkPz_fit = kkCandFitted->currentState().kinematicParameters().momentum().z();
+          float kkVtxX_fit = kkDecayVertex->position().x();
+          float kkVtxY_fit = kkDecayVertex->position().y();
+          float kkVtxZ_fit = kkDecayVertex->position().z();
+          float kkVtxP_fit = ChiSquaredProbability((double)(kkDecayVertex->chiSquared()),
+          (double)(kkDecayVertex->degreesOfFreedom()));
+
+          reco::CompositeCandidate recoKKCand(0, math::XYZTLorentzVector(kkPx_fit, kkPy_fit, kkPz_fit,
+            sqrt(kkM_fit*kkM_fit + kkPx_fit*kkPx_fit + kkPy_fit*kkPy_fit +
+            kkPz_fit*kkPz_fit)), math::XYZPoint(kkVtxX_fit,
+            kkVtxY_fit, kkVtxZ_fit), 50551);
+
+          pat::CompositeCandidate patKKCand(recoKKCand);
+
+          patKKCand.addUserFloat("vProb",kkVtxP_fit);
+
+          phiOutput->push_back(patKKCand);
+
+        }
+
+      }
+
+
+
+    }
+  }
 
   iEvent.put(std::move(phiOutput));
 
