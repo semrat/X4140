@@ -209,7 +209,7 @@ FourOnia2KKPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
         pSet.addParameter<double>("maxDistance", 3);
         pSet.addParameter<int>("maxNbrOfIterations", 10000);
         KinematicParticleVertexFitter fitter2(pSet);
-        photonVertexFitTree = fitter2.fit(PhiParticles);
+        phiVertexFitTree = fitter2.fit(PhiParticles);
       }
 
 
