@@ -378,6 +378,14 @@ void FourOniaProducer::produce(edm::Event& event, const edm::EventSetup& esetup)
 
             xCand.addUserData("commonVertex",Vertex(myVertex));
 
+            int pMatch = 0, jMatch = 0;
+
+            pMatch = phiCand->userData("isTriggerMatched");
+            jMatch = jpsiCand->userData("isTriggerMatched");
+
+            xCand.addUserInt("commonVertex",pMatch);
+            xCand.addUserInt("commonVertex",jMatch);
+
           } else {
             xCand.addUserFloat("vNChi2",-1);
             xCand.addUserFloat("vProb", -1);
