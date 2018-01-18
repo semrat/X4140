@@ -578,6 +578,19 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
 
         cosAlpha = x_.userFloat("cosAlpha");
         cosAlphaMuLess = x_.userFloat("cosAlphaMuLess");
+        cosAlphaBS = x_.userFloat("cosAlphaBS");
+        cosAlpha3D = x_.userFloat("cosAlpha3D");
+        cosAlphaBS3D = x_.userFloat("cosAlphaBS3D");
+
+        l_xy = x_.userFloat("l_xy");
+        l_xyBS = x_.userFloat("l_xyBS");
+        l_xyz = x_.userFloat("l_xyz");
+        l_xyzBS = x_.userFloat("l_xyzBS");
+
+        lErr_xy = x_.userFloat("lErr_xy");
+        lErr_xyBS = x_.userFloat("lErr_xyBS");
+        lErr_xyz = x_.userFloat("lErr_xyz");
+        lErr_xyzBS = x_.userFloat("lErr_xyzBS");
 
         MassErr = x_.userFloat("MassErr");
 
