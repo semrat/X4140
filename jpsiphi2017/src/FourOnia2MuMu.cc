@@ -197,6 +197,7 @@ FourOnia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
       // ---- apply the dimuon cut ----
       //std::cout << "Dimuon mass : " << mumu.M() << " - " << mumucand.mass() << std::endl;
       if(!dimuonSelection_(mumucand)) continue;
+      std::cout <<  mumucand.mass() << "-";
       //std::cout << "Dimuon selection passed !" << std::endl;
       // ---- fit vertex using Tracker tracks (if they have tracks) ----
       if (it->track().isNonnull() && it2->track().isNonnull()) {
