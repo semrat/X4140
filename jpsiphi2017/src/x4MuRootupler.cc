@@ -554,8 +554,8 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
         phiVertex = x_.daughter("phi")->vertex();
         jpsiVertex = x_.daughter("jpsi")->vertex();
 
-        jpsi_trigger = x_.daughter("jpsi")->userData("jpsi_isTriggerMatched");
-        phi_trigger = x_.daughter("phi")->userData("phi_isTriggerMatched");
+        jpsi_trigger = x_.userData("jpsi_isTriggerMatched");
+        phi_trigger = x_.userData("phi_isTriggerMatched");
         // PVwithmuons = (x_.userData<reco::Vertex>("PVwithmuons"))->Point();
         // muLessVertex = (x_.userData<reco::Vertex>("muonlessPV"));
         // commonVertex = (x_.userData<reco::Vertex>("commonVertex"));
