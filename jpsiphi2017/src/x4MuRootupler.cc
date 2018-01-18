@@ -75,6 +75,7 @@ class x4MuRootupler:public edm::EDAnalyzer {
   Double_t xM,jpsi_M,phi_M;
   Double_t cosAlpha, cosAlpha3D, cosAlphaMuLess, ctauErrPV, ctauPV, ctauPVMuLess, ctauErrPVMuLess;
   Double_t cosAlphaBS,cosAlphaBS3D, ctauErrBS, ctauBS, vNChi2, vProb, sumPTPV;
+  Double_t phi_deltaR, jpsi_deltaR;
   Double_t l_xy, l_xyBS, l_xyz, l_xyzBS;
   Double_t lErr_xy, lErr_xyBS, lErr_xyz, lErr_xyzBS;
   Double_t vertexWeight, dz, dz_jpsi, dz_phi;
@@ -94,7 +95,7 @@ class x4MuRootupler:public edm::EDAnalyzer {
 
   Double_t jM;
   Double_t j_cosAlpha,j_cosAlphaBS, j_cosAlphaBS3D, j_cosAlpha3D, j_vNChi2, j_vProb, j_dz;
-  Double_t j_l_xy, j_l_xyBS, j_l_xyz, j_l_xyzBS;
+  Double_t j_l_xy, j_l_xyBS, j_l_xyz, j_l_xyzBS, j_deltaR;
   Double_t j_lErr_xy, j_lErr_xyBS, j_lErr_xyz, j_lErr_xyzBS;
   Double_t j_ctauErrPV, j_ctauPV, j_ctauErrBS, j_ctauBS;
   UInt_t j_rank, j_muonM_type, j_muonP_type, j_triggerMatch;
@@ -107,7 +108,7 @@ class x4MuRootupler:public edm::EDAnalyzer {
   Double_t pM;
   Double_t p_cosAlpha, p_cosAlphaBS, p_cosAlphaBS3D, p_cosAlpha3D;
   Double_t p_ctauErrPV, p_ctauPV, p_ctauErrBS, p_ctauBS, p_vNChi2, p_vProb, p_dz;
-  Double_t p_l_xy, p_l_xyBS, p_l_xyz, p_l_xyzBS;
+  Double_t p_l_xy, p_l_xyBS, p_l_xyz, p_l_xyzBS, p_deltaR;
   Double_t p_lErr_xy, p_lErr_xyBS, p_lErr_xyz, p_lErr_xyzBS;
   UInt_t p_rank, p_muonM_type, p_muonP_type, p_triggerMatch;
   UInt_t p_muonM_isGlobal,p_muonM_isTracker, p_muonP_isGlobal,p_muonP_isTracker ;
@@ -186,6 +187,9 @@ isMC_(iConfig.getParameter < bool > ("isMC"))
     x_tree->Branch("jpsi_trigger", &jpsi_trigger, "jpsi_trigger/i");
     x_tree->Branch("phi_trigger", &phi_trigger, "phi_trigger/i");
 
+    x_tree->Branch("jpsi_deltaR", &jpsi_deltaR, "jpsi_deltaR/i");
+    x_tree->Branch("phi_deltaR", &phi_deltaR, "phi_deltaR/i");
+
     x_tree->Branch("countTksOfPV", &countTksOfPV, "countTksOfPV/i");
     x_tree->Branch("vertexWeight", &vertexWeight, "vertexWeight/D");
     x_tree->Branch("sumPTPV", &sumPTPV, "sumPTPV/D");
@@ -251,6 +255,8 @@ isMC_(iConfig.getParameter < bool > ("isMC"))
     j_tree->Branch("j_cosAlpha3D", &j_cosAlpha3D, "j_cosAlpha3D/D");
     j_tree->Branch("j_cosAlphaBS3D", &j_cosAlphaBS3D, "j_cosAlphaBS3D/D");
 
+    j_tree->Branch("j_deltaR", &j_deltaR, "j_deltaR/D");
+
     j_tree->Branch("j_l_xy", &j_l_xy, "j_l_xy/D");
     j_tree->Branch("j_l_xyBS", &j_l_xyBS, "j_l_xyBS/D");
     j_tree->Branch("j_l_xyz", &j_l_xyz, "j_l_xyz/D");
@@ -297,6 +303,8 @@ isMC_(iConfig.getParameter < bool > ("isMC"))
     p_tree->Branch("p_cosAlphaBS", &p_cosAlphaBS, "p_cosAlphaBS/D");
     p_tree->Branch("p_cosAlpha3D", &p_cosAlpha3D, "p_cosAlpha3D/D");
     p_tree->Branch("p_cosAlphaBS3D", &p_cosAlphaBS3D, "p_cosAlphaBS3D/D");
+
+    p_tree->Branch("p_deltaR", &p_deltaR, "p_deltaR/D");
 
     p_tree->Branch("p_l_xy", &p_l_xy, "p_l_xy/D");
     p_tree->Branch("p_l_xyBS", &p_l_xyBS, "p_l_xyBS/D");
@@ -455,6 +463,8 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
 
         j_triggerMatch = j_.userInt("isTriggerMatched");
 
+        j_deltaR = j_.userFloat("deltaR");
+
         j_tree->Fill();
 
       }
@@ -534,6 +544,8 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
 
         p_triggerMatch = p_.userInt("isTriggerMatched");
 
+        p_deltaR = p_.userFloat("deltaR");
+
         p_tree->Fill();
 
       }
@@ -556,6 +568,9 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
 
         jpsi_trigger = x_.userInt("jpsi_isTriggerMatched");
         phi_trigger = x_.userInt("phi_isTriggerMatched");
+
+        jpsi_deltaR = x_.daughter("phi")->userFloat("jpsi");
+        phi_deltaR = x_.daughter("phi")->userFloat("phi");
         // PVwithmuons = (x_.userData<reco::Vertex>("PVwithmuons"))->Point();
         // muLessVertex = (x_.userData<reco::Vertex>("muonlessPV"));
         // commonVertex = (x_.userData<reco::Vertex>("commonVertex"));
