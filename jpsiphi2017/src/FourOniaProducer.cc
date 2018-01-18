@@ -385,8 +385,8 @@ void FourOniaProducer::produce(edm::Event& event, const edm::EventSetup& esetup)
             pMatch = phiCand->userInt("phi_isTriggerMatched");
             jMatch = jpsiCand->userInt("jpsi_isTriggerMatched");
 
-            xCand.addUserInt("commonVertex",pMatch);
-            xCand.addUserInt("commonVertex",jMatch);
+            xCand.addUserInt("phi_isTriggerMatched",pMatch);
+            xCand.addUserInt("jpsi_isTriggerMatched",jMatch);
 
           } else {
             xCand.addUserFloat("vNChi2",-1);
