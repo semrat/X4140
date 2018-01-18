@@ -70,7 +70,7 @@ UInt_t FourOnia2MuMuPAT::isTriggerMatched(pat::CompositeCandidate *diMuon_cand) 
     const pat::TriggerObjectStandAloneCollection mu1HLTMatches = muon1->triggerObjectMatchesByFilter(HLTFilters_[iTr]);
     const pat::TriggerObjectStandAloneCollection mu2HLTMatches = muon2->triggerObjectMatchesByFilter(HLTFilters_[iTr]);
     if (!mu1HLTMatches.empty() && !mu2HLTMatches.empty()) matched += (1<<iTr);
-    if (!mu1HLTMatches.empty() && !mu2HLTMatches.empty()) std::cout << HLTFilters_[iTr] << std::endl;
+    // if (!mu1HLTMatches.empty() && !mu2HLTMatches.empty()) std::cout << HLTFilters_[iTr] << std::endl;
   }
   // const pat::TriggerObjectStandAloneCollection muon1Collection = muon1->triggerObjectMatches();
   // const pat::TriggerObjectStandAloneCollection muon2Collection = muon2->triggerObjectMatches();
@@ -196,7 +196,6 @@ FourOnia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
       // ---- apply the dimuon cut ----
 
       if(!dimuonSelection_(mumucand)) continue;
-      std::cout <<  mumucand.mass() << "-";
 
       // ---- fit vertex using Tracker tracks (if they have tracks) ----
       if (it->track().isNonnull() && it2->track().isNonnull()) {
