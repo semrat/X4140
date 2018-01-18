@@ -134,7 +134,9 @@ void FourOniaProducer::produce(edm::Event& event, const edm::EventSetup& esetup)
 
           vtx.SetXYZ(myVertex.position().x(),myVertex.position().y(),0);
           TVector3 pperp(xCand.px(), xCand.py(), 0);
+          TVector3 pperp3D(xCand.px(), xCand.py(), xCand.pz());
           AlgebraicVector3 vpperp(pperp.x(),pperp.y(),0);
+          AlgebraicVector3 vpperp3D(pperp.x(),pperp.y(),pperp.z());
 
           if (resolveAmbiguity_) {
 
