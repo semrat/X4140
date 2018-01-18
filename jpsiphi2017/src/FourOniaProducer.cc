@@ -127,6 +127,14 @@ void FourOniaProducer::produce(edm::Event& event, const edm::EventSetup& esetup)
         xCand.addUserInt("phi_isTriggerMatched",pMatch);
         xCand.addUserInt("jpsi_isTriggerMatched",jMatch);
 
+        float pDeltaR = 0.0, jDeltaR = 0.0;
+
+        pDeltaR = phiCand->userFloat("deltaR");
+        jDeltaR = jpsiCand->userFloat("deltaR");
+
+        xCand.addUserFloat("phi_deltaR",pDeltaR);
+        xCand.addUserFloat("jpsi_deltaR",jDeltaR);
+
         if (myVertex.isValid())
         {
           float vChi2 = myVertex.totalChiSquared();
