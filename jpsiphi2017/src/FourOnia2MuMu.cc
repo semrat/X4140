@@ -70,6 +70,7 @@ UInt_t FourOnia2MuMuPAT::isTriggerMatched(pat::CompositeCandidate *diMuon_cand) 
     const pat::TriggerObjectStandAloneCollection mu1HLTMatches = muon1->triggerObjectMatchesByFilter(HLTFilters_[iTr]);
     const pat::TriggerObjectStandAloneCollection mu2HLTMatches = muon2->triggerObjectMatchesByFilter(HLTFilters_[iTr]);
     if (!mu1HLTMatches.empty() && !mu2HLTMatches.empty()) matched += (1<<iTr);
+    if (!mu1HLTMatches.empty() && !mu2HLTMatches.empty()) std::cout << HLTFilters_[iTr] << std::endl;
   }
   // const pat::TriggerObjectStandAloneCollection muon1Collection = muon1->triggerObjectMatches();
   // const pat::TriggerObjectStandAloneCollection muon2Collection = muon2->triggerObjectMatches();
@@ -134,7 +135,8 @@ FourOnia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   muMasses.push_back( 0.1056583715 );
 
   std::unique_ptr<pat::CompositeCandidateCollection> oniaOutput(new pat::CompositeCandidateCollection);
-  //std::cout<<"Four muonia producer"<<std::endl;
+  std::cout<<"MuMu producer"<<std::endl;
+  std::cout<<dimuonSelection_<<std::endl;
   Vertex thePrimaryV;
   Vertex theBeamSpotV;
 
@@ -164,7 +166,7 @@ FourOnia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   KalmanVertexFitter vtxFitter(true);
   TrackCollection muonLess;
 
-  // JPsi candidates only from muons
+  // MuMu candidates only from muons
   for(View<pat::Muon>::const_iterator it = muons->begin(), itend = muons->end(); it != itend; ++it){
     // both must pass low quality
     if(!lowerPuritySelection_(*it)) continue;
@@ -188,7 +190,7 @@ FourOnia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
       mumucand.setP4(mumu);
       mumucand.setCharge(it->charge()+it2->charge());
 
-      float deltaRMuMu = reco::deltaR2(it->eta(),it->phi(),it2->eta(),it2->phi())
+      float deltaRMuMu = reco::deltaR2(it->eta(),it->phi(),it2->eta(),it2->phi());
 
       mumucand.addUserFloat("deltaR",deltaRMuMu);
 
