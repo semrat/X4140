@@ -113,7 +113,7 @@ class x4MuRootupler:public edm::EDAnalyzer {
   UInt_t p_muonM_isGlobal,p_muonM_isTracker, p_muonP_isGlobal,p_muonP_isTracker ;
 
   Point jVertex, pVertex;
-  Point xVertex, jpsVertex, phiVertex;
+  Point xVertex, jpsiVertex, phiVertex;
 
   reco::Vertex commonVertex;
   Point PVwithmuons;
@@ -179,9 +179,12 @@ isMC_(iConfig.getParameter < bool > ("isMC"))
     x_tree->Branch("xVertex",  "Point", &xVertex);
     x_tree->Branch("muLessVertex",  "reco::Vertex", &muLessVertex);
     x_tree->Branch("PVwithmuons",  "Point", &PVwithmuons);
-    x_tree->Branch("jpsVertex",  "Point", &jpsVertex);
+    x_tree->Branch("jpsiVertex",  "Point", &jpsiVertex);
     x_tree->Branch("phiVertex",  "Point", &phiVertex);
     x_tree->Branch("commonVertex",  "reco::Vertex", &commonVertex);
+
+    x_tree->Branch("jpsi_trigger", &jpsi_trigger, "jpsi_trigger/i");
+    x_tree->Branch("phi_trigger", &phi_trigger, "phi_trigger/i");
 
     x_tree->Branch("countTksOfPV", &countTksOfPV, "countTksOfPV/i");
     x_tree->Branch("vertexWeight", &vertexWeight, "vertexWeight/D");
@@ -498,10 +501,24 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
         p_ctauBS          = p_.userFloat("ctauBS");
         p_ctauErrBS       = p_.userFloat("ctauErrBS");
 
+
         p_ctauPV          = p_.userFloat("ctauPV");
         p_ctauErrPV       = p_.userFloat("ctauErrPV");
 
         p_cosAlpha = p_.userFloat("cosAlpha");
+        p_cosAlphaBS = p_.userFloat("cosAlphaBS");
+        p_cosAlpha3D = p_.userFloat("cosAlpha3D");
+        p_cosAlphaBS3D = p_.userFloat("cosAlphaBS3D");
+
+        p_l_xy = p_.userFloat("l_xy");
+        p_l_xyBS = p_.userFloat("l_xyBS");
+        p_l_xyz = p_.userFloat("l_xyz");
+        p_l_xyzBS = p_.userFloat("l_xyzBS");
+
+        p_lErr_xy = p_.userFloat("lErr_xy");
+        p_lErr_xyBS = p_.userFloat("lErr_xyBS");
+        p_lErr_xyz = p_.userFloat("lErr_xyz");
+        p_lErr_xyzBS = p_.userFloat("lErr_xyzBS");
 
         p_triggerMatch = p_.userInt("isTriggerMatched");
 
@@ -523,8 +540,10 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
 
         xVertex  = x_.vertex();
         phiVertex = x_.daughter("phi")->vertex();
-        jpsVertex = x_.daughter("jpsi")->vertex();
+        jpsiVertex = x_.daughter("jpsi")->vertex();
 
+        jpsi_trigger = x_.daughter("jpsi")->userData("isTriggerMatched");
+        phi_trigger = x_.daughter("phi")->userData("isTriggerMatched");
         // PVwithmuons = (x_.userData<reco::Vertex>("PVwithmuons"))->Point();
         // muLessVertex = (x_.userData<reco::Vertex>("muonlessPV"));
         // commonVertex = (x_.userData<reco::Vertex>("commonVertex"));
