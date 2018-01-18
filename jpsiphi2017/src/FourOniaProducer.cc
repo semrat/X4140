@@ -342,7 +342,7 @@ void FourOniaProducer::produce(edm::Event& event, const edm::EventSetup& esetup)
 
             pvtx.SetXYZ(theBeamSpotV.position().x(),theBeamSpotV.position().y(),0);
             vdiff = vtx - pvtx;
-            cosAlpha = vdiff.Dot(pperp)/(vdiff.Perp()*pperp.Perp());
+            cosAlphaBS = vdiff.Dot(pperp)/(vdiff.Perp()*pperp.Perp());
             distXY = vdistXY.distance(Vertex(myVertex), theBeamSpotV);
             //double ctauBS = distXY.value()*cosAlpha*3.09688/pperp.Perp();
 
