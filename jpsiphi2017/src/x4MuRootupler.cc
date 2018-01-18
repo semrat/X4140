@@ -73,13 +73,16 @@ class x4MuRootupler:public edm::EDAnalyzer {
   TLorentzVector muonP_phi_p4;
 
   Double_t xM,jpsi_M,phi_M;
-  Double_t cosAlpha, cosAlphaMuLess, ctauErrPV, ctauPV, ctauPVMuLess, ctauErrPVMuLess;
-  Double_t ctauErrBS, ctauBS, vNChi2, vProb, sumPTPV;
+  Double_t cosAlpha, cosAlpha3D, cosAlphaMuLess, ctauErrPV, ctauPV, ctauPVMuLess, ctauErrPVMuLess;
+  Double_t cosAlphaBS,cosAlphaBS3D, ctauErrBS, ctauBS, vNChi2, vProb, sumPTPV;
+  Double_t l_xy, l_xyBS, l_xyz, l_xyzBS;
+  Double_t lErr_xy, lErr_xyBS, lErr_xyz, lErr_xyzBS;
   Double_t vertexWeight, dz, dz_jpsi, dz_phi;
   Double_t MassErr;
 
   UInt_t jpsi_i,phi_i;
   UInt_t x_rank, jpsi_muonM_type, jpsi_muonP_type, phi_muonP_type, phi_muonM_type;
+  UInt_t jpsi_trigger, phi_trigger;
 
 	TTree *x_tree;
   TTree *j_tree;
@@ -90,7 +93,9 @@ class x4MuRootupler:public edm::EDAnalyzer {
   TLorentzVector j_muonM_p4, j_muonP_p4, j_p4;
 
   Double_t jM;
-  Double_t j_cosAlpha, j_vNChi2, j_vProb, j_dz;
+  Double_t j_cosAlpha,j_cosAlphaBS, j_cosAlphaBS3D, j_cosAlpha3D, j_vNChi2, j_vProb, j_dz;
+  Double_t j_l_xy, j_l_xyBS, j_l_xyz, j_l_xyzBS;
+  Double_t j_lErr_xy, j_lErr_xyBS, j_lErr_xyz, j_lErr_xyzBS;
   Double_t j_ctauErrPV, j_ctauPV, j_ctauErrBS, j_ctauBS;
   UInt_t j_rank, j_muonM_type, j_muonP_type, j_triggerMatch;
   UInt_t j_muonM_isGlobal,j_muonM_isTracker, j_muonP_isGlobal,j_muonP_isTracker;
@@ -100,8 +105,10 @@ class x4MuRootupler:public edm::EDAnalyzer {
   TLorentzVector p_muonM_p4, p_muonP_p4, p_p4;
 
   Double_t pM;
-  Double_t p_cosAlpha, p_vNChi2, p_vProb, p_dz;
-  Double_t p_ctauErrPV, p_ctauPV, p_ctauErrBS, p_ctauBS;
+  Double_t p_cosAlpha, p_cosAlphaBS, p_cosAlphaBS3D, p_cosAlpha3D;
+  Double_t p_ctauErrPV, p_ctauPV, p_ctauErrBS, p_ctauBS, p_vNChi2, p_vProb, p_dz;
+  Double_t p_l_xy, p_l_xyBS, p_l_xyz, p_l_xyzBS;
+  Double_t p_lErr_xy, p_lErr_xyBS, p_lErr_xyz, p_lErr_xyzBS;
   UInt_t p_rank, p_muonM_type, p_muonP_type, p_triggerMatch;
   UInt_t p_muonM_isGlobal,p_muonM_isTracker, p_muonP_isGlobal,p_muonP_isTracker ;
 
@@ -195,6 +202,20 @@ isMC_(iConfig.getParameter < bool > ("isMC"))
     x_tree->Branch("cosAlpha", &cosAlpha, "cosAlpha/D");
     x_tree->Branch("cosAlphaMuLess", &cosAlphaMuLess, "cosAlphaMuLess/D");
 
+    x_tree->Branch("cosAlphaBS", &cosAlphaBS, "cosAlphaBS/D");
+    x_tree->Branch("cosAlpha3D", &cosAlpha3D, "cosAlpha3D/D");
+    x_tree->Branch("cosAlphaBS3D", &cosAlphaBS3D, "cosAlphaBS3D/D");
+
+    x_tree->Branch("l_xy", &l_xy, "l_xy/D");
+    x_tree->Branch("l_xyBS", &l_xyBS, "l_xyBS/D");
+    x_tree->Branch("l_xyz", &l_xyz, "l_xyz/D");
+    x_tree->Branch("l_xyzBS", &l_xyzBS, "l_xyzBS/D");
+
+    x_tree->Branch("lErr_xy", &lErr_xy, "lErr_xy/D");
+    x_tree->Branch("lErr_xyBS", &lErr_xyBS, "lErr_xyBS/D");
+    x_tree->Branch("lErr_xyz", &lErr_xyz, "lErr_xyz/D");
+    x_tree->Branch("lErr_xyzBS", &lErr_xyzBS, "lErr_xyzBS/D");
+
     x_tree->Branch("x_rank", &x_rank, "x_rank/I");
 
     //jpsi tree
@@ -221,7 +242,21 @@ isMC_(iConfig.getParameter < bool > ("isMC"))
     j_tree->Branch("j_triggerMatch", &j_triggerMatch, "j_triggerMatch/I");
     // j_tree->Branch("j_dz", &j_dz, "j_dz/D");
     j_tree->Branch("j_vNChi2", &j_vNChi2, "j_vNChi2/D");
+
     j_tree->Branch("j_cosAlpha", &j_cosAlpha, "j_cosAlpha/D");
+    j_tree->Branch("j_cosAlphaBS", &j_cosAlphaBS, "j_cosAlphaBS/D");
+    j_tree->Branch("j_cosAlpha3D", &j_cosAlpha3D, "j_cosAlpha3D/D");
+    j_tree->Branch("j_cosAlphaBS3D", &j_cosAlphaBS3D, "j_cosAlphaBS3D/D");
+
+    j_tree->Branch("j_l_xy", &j_l_xy, "j_l_xy/D");
+    j_tree->Branch("j_l_xyBS", &j_l_xyBS, "j_l_xyBS/D");
+    j_tree->Branch("j_l_xyz", &j_l_xyz, "j_l_xyz/D");
+    j_tree->Branch("j_l_xyzBS", &j_l_xyzBS, "j_l_xyzBS/D");
+
+    j_tree->Branch("j_lErr_xy", &j_lErr_xy, "j_lErr_xy/D");
+    j_tree->Branch("j_lErr_xyBS", &j_lErr_xyBS, "j_lErr_xyBS/D");
+    j_tree->Branch("j_lErr_xyz", &j_lErr_xyz, "j_lErr_xyz/D");
+    j_tree->Branch("j_lErr_xyzBS", &j_lErr_xyzBS, "j_lErr_xyzBS/D");
 
     j_tree->Branch("j_ctauPV", &j_ctauPV, "j_ctauPV/D");
     j_tree->Branch("j_ctauErrPV", &j_ctauErrPV, "j_ctauErrPV/D");
@@ -254,7 +289,21 @@ isMC_(iConfig.getParameter < bool > ("isMC"))
     p_tree->Branch("p_triggerMatch", &p_triggerMatch, "p_triggerMatch/I");
     // p_tree->Branch("p_dz", &p_dz, "p_dz/D");
     p_tree->Branch("p_vNChi2", &p_vNChi2, "p_vNChi2/D");
+
     p_tree->Branch("p_cosAlpha", &p_cosAlpha, "p_cosAlpha/D");
+    p_tree->Branch("p_cosAlphaBS", &p_cosAlphaBS, "p_cosAlphaBS/D");
+    p_tree->Branch("p_cosAlpha3D", &p_cosAlpha3D, "p_cosAlpha3D/D");
+    p_tree->Branch("p_cosAlphaBS3D", &p_cosAlphaBS3D, "p_cosAlphaBS3D/D");
+
+    p_tree->Branch("p_l_xy", &p_l_xy, "p_l_xy/D");
+    p_tree->Branch("p_l_xyBS", &p_l_xyBS, "p_l_xyBS/D");
+    p_tree->Branch("p_l_xyz", &p_l_xyz, "p_l_xyz/D");
+    p_tree->Branch("p_l_xyzBS", &p_l_xyzBS, "p_l_xyzBS/D");
+
+    p_tree->Branch("p_lErr_xy", &p_lErr_xy, "p_lErr_xy/D");
+    p_tree->Branch("p_lErr_xyBS", &p_lErr_xyBS, "p_lErr_xyBS/D");
+    p_tree->Branch("p_lErr_xyz", &p_lErr_xyz, "p_lErr_xyz/D");
+    p_tree->Branch("p_lErr_xyzBS", &p_lErr_xyzBS, "p_lErr_xyzBS/D");
 
     p_tree->Branch("p_ctauPV", &p_ctauPV, "p_ctauPV/D");
     p_tree->Branch("p_ctauErrPV", &p_ctauErrPV, "p_ctauErrPV/D");
@@ -380,11 +429,11 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
         j_vProb           = j_.userFloat("vProb");
         j_vNChi2          = j_.userFloat("vNChi2");
 
-        j_ctauBS          = j_.userFloat("ppdlBS");
-        j_ctauErrBS       = j_.userFloat("ppdlErrBS");
+        j_ctauBS          = j_.userFloat("ctauBS");
+        j_ctauErrBS       = j_.userFloat("ctauErrBS");
 
-        j_ctauPV          = j_.userFloat("ppdlPV");
-        j_ctauErrPV       = j_.userFloat("ppdlErrPV");
+        j_ctauPV          = j_.userFloat("ctauPV");
+        j_ctauErrPV       = j_.userFloat("ctauErrPV");
 
         j_cosAlpha = j_.userFloat("cosAlpha");
 
@@ -446,11 +495,11 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
         p_vNChi2          = p_.userFloat("vNChi2");
         p_vProb           = p_.userFloat("vProb");
 
-        p_ctauBS          = p_.userFloat("ppdlBS");
-        p_ctauErrBS       = p_.userFloat("ppdlErrBS");
+        p_ctauBS          = p_.userFloat("ctauBS");
+        p_ctauErrBS       = p_.userFloat("ctauErrBS");
 
-        p_ctauPV          = p_.userFloat("ppdlPV");
-        p_ctauErrPV       = p_.userFloat("ppdlErrPV");
+        p_ctauPV          = p_.userFloat("ctauPV");
+        p_ctauErrPV       = p_.userFloat("ctauErrPV");
 
         p_cosAlpha = p_.userFloat("cosAlpha");
 
