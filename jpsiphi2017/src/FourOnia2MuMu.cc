@@ -9,7 +9,7 @@
 #include <DataFormats/HepMCCandidate/interface/GenParticle.h>
 #include <DataFormats/PatCandidates/interface/Muon.h>
 #include <DataFormats/VertexReco/interface/VertexFwd.h>
-include "DataFormats/Math/interface/deltaR.h"
+#include "DataFormats/Math/interface/deltaR.h"
 
 //Headers for services and tools
 #include "TrackingTools/TransientTrack/interface/TransientTrackBuilder.h"
