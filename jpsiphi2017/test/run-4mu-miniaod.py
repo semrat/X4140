@@ -22,8 +22,7 @@ process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(False))
 
 process.load("mmkk.mmkk.slimmedMuonsTriggerMatcher2017_cfi")
 
-hltList =
-[
+hltList = [
 #Phi
 'HLT_DoubleMu2_Jpsi_DoubleTkMu0_Phi',
 'HLT_DoubleMu2_Jpsi_DoubleTrk1_Phi',
@@ -38,7 +37,7 @@ hltList =
 'HLT_DoubleMu4_3_Jpsi_Displaced',
 'HLT_Dimuon20_Jpsi_Barrel_Seagulls',
 'HLT_Dimuon25_Jpsi',
-'HLT_Dimuon0_Jpsi',
+'HLT_Dimuon0_Jpsi'
 ]
 
 hltpaths = cms.vstring(hltList)
