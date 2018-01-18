@@ -372,7 +372,7 @@ FourOnia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
               AlgebraicSymMatrix33 vXYe = v1e.matrix()+ v2e.matrix();
               ctauErrPV = sqrt(ROOT::Math::Similarity(vpperp,vXYe))*mumucand.mass()/(pperp.Perp2());
 
-              TVector3 vDiff;
+              AlgebraicVector3 vDiff;
               vDiff[0] = vdiff.x(); vDiff[1] = vdiff.y(); vDiff[2] = 0 ;
               l_xy = vdiff.Perp();
               lErr_xy = sqrt(ROOT::Math::Similarity(vDiff,vXYe)) / vdiff.Perp();
@@ -382,6 +382,8 @@ FourOnia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
               TVector3 vdiff3D = vtx3D - pvtx3D;
               cosAlpha3D = vdiff3D.Dot(pperp3D)/(vdiff3D.Mag()*vdiff3D.Mag());
               l_xyz = vdiff3D.Mag();
+
+              AlgebraicVector3 vDiff3D;
               vDiff3D[0] = vdiff3D.x(); vDiff3D[1] = vdiff3D.y(); vDiff3D[2] = vdiff3D.z() ;
               lErr_xyz = sqrt(ROOT::Math::Similarity(vDiff3D,vXYe)) / vdiff3D.Mag();
 
