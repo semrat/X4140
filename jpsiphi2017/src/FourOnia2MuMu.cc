@@ -193,7 +193,7 @@ FourOnia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
       float deltaRMuMu = reco::deltaR2(it->eta(),it->phi(),it2->eta(),it2->phi());
 
       mumucand.addUserFloat("deltaR",deltaRMuMu);
-
+      std::cout << "Delta R : " << deltaRMuMu <<std::endl;
       // ---- apply the dimuon cut ----
       //std::cout << "Dimuon mass : " << mumu.M() << " - " << mumucand.mass() << std::endl;
       if(!dimuonSelection_(mumucand)) continue;
