@@ -136,7 +136,7 @@ FourOnia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   std::unique_ptr<pat::CompositeCandidateCollection> oniaOutput(new pat::CompositeCandidateCollection);
   std::cout<<"MuMu producer"<<std::endl;
-  std::cout<<dimuonSelection_<<std::endl;
+  //std::cout<<dimuonSelection_<<std::endl;
   Vertex thePrimaryV;
   Vertex theBeamSpotV;
 
