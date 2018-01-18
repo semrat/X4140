@@ -415,6 +415,12 @@ void FourOniaProducer::produce(edm::Event& event, const edm::EventSetup& esetup)
             xCand.addUserFloat("cosAlphaBS",-100);
             xCand.addUserFloat("cosAlphaBS3D",-100);
 
+            xCand.addUserFloat("l_xy",-100);
+            xCand.addUserFloat("lErr_xy",-100);
+
+            xCand.addUserFloat("l_xyz",-100);
+            xCand.addUserFloat("lErr_xyz",-100);
+
             xCand.addUserFloat("l_xyBS",-100);
             xCand.addUserFloat("lErr_xyBS",-100);
 

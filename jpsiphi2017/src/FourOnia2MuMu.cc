@@ -434,8 +434,8 @@ FourOnia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
               mumucand.addUserFloat("cosAlphaBS",cosAlphaBS);
               mumucand.addUserFloat("cosAlphaBS3D",cosAlphaBS3D);
 
-              mumucand.addUserFloat("l_xyBS",l_xyBS);
-              mumucand.addUserFloat("lErr_xyBS",lErr_xyBS);
+              mumucand.addUserFloat("l_xy",l_xy);
+              mumucand.addUserFloat("lErr_xy",lErr_xy);
 
               mumucand.addUserFloat("l_xyzBS",l_xyzBS);
               mumucand.addUserFloat("lErr_xyzBS",lErr_xyzBS);
