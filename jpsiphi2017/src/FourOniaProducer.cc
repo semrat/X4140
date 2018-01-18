@@ -121,8 +121,8 @@ void FourOniaProducer::produce(edm::Event& event, const edm::EventSetup& esetup)
 
         int pMatch = 0, jMatch = 0;
 
-        pMatch = phiCand->userInt("phi_isTriggerMatched");
-        jMatch = jpsiCand->userInt("jpsi_isTriggerMatched");
+        pMatch = phiCand->userInt("isTriggerMatched");
+        jMatch = jpsiCand->userInt("isTriggerMatched");
 
         xCand.addUserInt("phi_isTriggerMatched",pMatch);
         xCand.addUserInt("jpsi_isTriggerMatched",jMatch);
