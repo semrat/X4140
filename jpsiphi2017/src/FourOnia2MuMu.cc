@@ -135,8 +135,7 @@ FourOnia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   muMasses.push_back( 0.1056583715 );
 
   std::unique_ptr<pat::CompositeCandidateCollection> oniaOutput(new pat::CompositeCandidateCollection);
-  std::cout<<"MuMu producer"<<std::endl;
-  //std::cout<<dimuonSelection_<<std::endl;
+
   Vertex thePrimaryV;
   Vertex theBeamSpotV;
 
@@ -177,7 +176,7 @@ FourOnia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
       //std::cout << "Second muon quality flag" << std::endl;
       // one must pass tight quality
       if (!(higherPuritySelection_(*it) || higherPuritySelection_(*it2))) continue;
-      //std::cout << "High quality flags" << std::endl;
+
       pat::CompositeCandidate mumucand;
       vector<TransientVertex> pvs;
 
@@ -193,12 +192,12 @@ FourOnia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
       float deltaRMuMu = reco::deltaR2(it->eta(),it->phi(),it2->eta(),it2->phi());
 
       mumucand.addUserFloat("deltaR",deltaRMuMu);
-      std::cout << "Delta R : " << deltaRMuMu <<std::endl;
+
       // ---- apply the dimuon cut ----
-      //std::cout << "Dimuon mass : " << mumu.M() << " - " << mumucand.mass() << std::endl;
+
       if(!dimuonSelection_(mumucand)) continue;
       std::cout <<  mumucand.mass() << "-";
-      //std::cout << "Dimuon selection passed !" << std::endl;
+
       // ---- fit vertex using Tracker tracks (if they have tracks) ----
       if (it->track().isNonnull() && it2->track().isNonnull()) {
         //std::cout << "Tracker tracks: they exist !" << std::endl;

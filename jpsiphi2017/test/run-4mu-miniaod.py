@@ -22,18 +22,21 @@ process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(False))
 
 process.load("mmkk.mmkk.slimmedMuonsTriggerMatcher2017_cfi")
 
-hltpaths = cms.vstring('HLT_DoubleMu2_Jpsi_DoubleTkMu0_Phi', 'HLT_Mu20_TkMu0_Phi',
-                        'HLT_Dimuon14_Phi_Barrel_Seagulls','HLT_Mu25_TkMu0_Phi',
-                        'HLT_Dimuon24_Phi_noCorrL1')
+hltpaths = cms.vstring('HLT_DoubleMu2_Jpsi_DoubleTkMu0_Phi',
+                        'HLT_Mu20_TkMu0_Phi',
+                        'HLT_Dimuon14_Phi_Barrel_Seagulls',
+                        'HLT_Mu25_TkMu0_Phi',
+                        'HLT_Dimuon24_Phi_noCorrL1'
+                        )
 
 hltpathsV = cms.vstring('HLT_DoubleMu2_Jpsi_DoubleTkMu0_Phi', 'HLT_Mu20_TkMu0_Phi',
                         'HLT_Dimuon14_Phi_Barrel_Seagulls','HLT_Mu25_TkMu0_Phi',
                         'HLT_Dimuon24_Phi_noCorrL1')
 
 filters = cms.vstring(          #HLT_DoubleMu2_Jpsi_DoubleTkMu0_Phi
-                                'hltDiMuonGlbOrTrkFiltered0v2',
+                                'hltDiMuonGlbOrTrkFiltered0v2', #Phi
                                 'hltDiMuonGlbOrTrk0zFiltered0p2v2',
-                                'hltDoubleMu2JpsiL3Filtered',
+                                'hltDoubleMu2JpsiL3Filtered', ##JPsi
                                 'hltMumuVtxProducerDoubleMu2Jpsi',
                                 'hltMumuFilterDoubleMu2Jpsi',
                                 #HLT_Dimuon14_Phi_Barrel_Seagulls
