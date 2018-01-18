@@ -445,8 +445,17 @@ FourOnia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
             } else {
               mumucand.addUserFloat("vNChi2",-1);
               mumucand.addUserFloat("vProb", -1);
+
               mumucand.addUserFloat("ctauPV",-100);
               mumucand.addUserFloat("ctauErrPV",-100);
+              mumucand.addUserFloat("cosAlpha",-100);
+              mumucand.addUserFloat("cosAlpha3D",-100);
+
+              mumucand.addUserFloat("l_xy",-100);
+              mumucand.addUserFloat("lErr_xy",-100);
+
+              mumucand.addUserFloat("l_xyz",-100);
+              mumucand.addUserFloat("lErr_xyz",-100);
 
               mumucand.addUserFloat("ctauBS",-100);
               mumucand.addUserFloat("ctauErrBS",-100);
