@@ -9,6 +9,7 @@
 #include <DataFormats/HepMCCandidate/interface/GenParticle.h>
 #include <DataFormats/PatCandidates/interface/Muon.h>
 #include <DataFormats/VertexReco/interface/VertexFwd.h>
+include "DataFormats/Math/interface/deltaR.h"
 
 //Headers for services and tools
 #include "TrackingTools/TransientTrack/interface/TransientTrackBuilder.h"
@@ -186,6 +187,10 @@ FourOnia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
       LorentzVector mumu = it->p4() + it2->p4();
       mumucand.setP4(mumu);
       mumucand.setCharge(it->charge()+it2->charge());
+
+      float deltaRMuMu = reco::deltaR2(it->eta(),it->phi(),it2->eta(),it2->phi())
+
+      mumucand.addUserFloat("deltaR",deltaRMuMu);
 
       // ---- apply the dimuon cut ----
       //std::cout << "Dimuon mass : " << mumu.M() << " - " << mumucand.mass() << std::endl;
