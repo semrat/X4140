@@ -439,6 +439,19 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
         j_ctauErrPV       = j_.userFloat("ctauErrPV");
 
         j_cosAlpha = j_.userFloat("cosAlpha");
+        j_cosAlphaBS = j_.userFloat("cosAlphaBS");
+        j_cosAlpha3D = j_.userFloat("cosAlpha3D");
+        j_cosAlphaBS3D = j_.userFloat("cosAlphaBS3D");
+
+        j_l_xy = j_.userFloat("l_xy");
+        j_l_xyBS = j_.userFloat("l_xyBS");
+        j_l_xyz = j_.userFloat("l_xyz");
+        j_l_xyzBS = j_.userFloat("l_xyzBS");
+
+        j_lErr_xy = j_.userFloat("lErr_xy");
+        j_lErr_xyBS = j_.userFloat("lErr_xyBS");
+        j_lErr_xyz = j_.userFloat("lErr_xyz");
+        j_lErr_xyzBS = j_.userFloat("lErr_xyzBS");
 
         j_triggerMatch = j_.userInt("isTriggerMatched");
 
@@ -500,7 +513,6 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
 
         p_ctauBS          = p_.userFloat("ctauBS");
         p_ctauErrBS       = p_.userFloat("ctauErrBS");
-
 
         p_ctauPV          = p_.userFloat("ctauPV");
         p_ctauErrPV       = p_.userFloat("ctauErrPV");

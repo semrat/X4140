@@ -399,7 +399,7 @@ FourOnia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
               mumucand.addUserFloat("lErr_xyz",lErr_xyz);
 
               // lifetime using BS
-              double cosAlphaBS, cosAlphaBS3D, ctauBS, ctauErrBS, l_xyBS, lErr_xyBS, l_xyzBS, lErr_xyzBS;
+              float cosAlphaBS, cosAlphaBS3D, ctauBS, ctauErrBS, l_xyBS, lErr_xyBS, l_xyzBS, lErr_xyzBS;
 
               //2D
               pvtx.SetXYZ(theBeamSpotV.position().x(),theBeamSpotV.position().y(),0);
@@ -407,7 +407,9 @@ FourOnia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
               cosAlphaBS = vdiff.Dot(pperp)/(vdiff.Perp()*pperp.Perp());
               distXY = vdistXY.distance(Vertex(myVertex), theBeamSpotV);
               //double ctauBS = distXY.value()*cosAlpha*3.09688/pperp.Perp();
+
               ctauBS = distXY.value()*cosAlpha*mumucand.mass()/pperp.Perp();
+
               GlobalError v1eB = (Vertex(myVertex)).error();
               GlobalError v2eB = theBeamSpotV.error();
               AlgebraicSymMatrix33 vXYeB = v1eB.matrix()+ v2eB.matrix();
