@@ -119,6 +119,14 @@ void FourOniaProducer::produce(edm::Event& event, const edm::EventSetup& esetup)
 
         xCand.addUserFloat("MassErr",MassWErr.error());
 
+        int pMatch = 0, jMatch = 0;
+
+        pMatch = phiCand->userInt("phi_isTriggerMatched");
+        jMatch = jpsiCand->userInt("jpsi_isTriggerMatched");
+
+        xCand.addUserInt("phi_isTriggerMatched",pMatch);
+        xCand.addUserInt("jpsi_isTriggerMatched",jMatch);
+
         if (myVertex.isValid())
         {
           float vChi2 = myVertex.totalChiSquared();
@@ -380,22 +388,15 @@ void FourOniaProducer::produce(edm::Event& event, const edm::EventSetup& esetup)
 
             xCand.addUserData("commonVertex",Vertex(myVertex));
 
-            int pMatch = 0, jMatch = 0;
-
-            pMatch = phiCand->userInt("phi_isTriggerMatched");
-            jMatch = jpsiCand->userInt("jpsi_isTriggerMatched");
-
-            xCand.addUserInt("phi_isTriggerMatched",pMatch);
-            xCand.addUserInt("jpsi_isTriggerMatched",jMatch);
-
           } else {
             xCand.addUserFloat("vNChi2",-1);
             xCand.addUserFloat("vProb", -1);
             xCand.addUserFloat("ctauPV",-100);
             xCand.addUserFloat("ctauErrPV",-100);
-            xCand.addUserFloat("cosAlpha",-100);
+
             xCand.addUserFloat("ctauBS",-100);
             xCand.addUserFloat("ctauErrBS",-100);
+
             xCand.addUserInt("countTksOfPV", -1);
             xCand.addUserFloat("vertexWeight", -100.);
             xCand.addUserFloat("sumPTPV", -100.);
@@ -408,6 +409,17 @@ void FourOniaProducer::produce(edm::Event& event, const edm::EventSetup& esetup)
               xCand.addUserFloat("ctauErrPVMuLess",-100);
               xCand.addUserFloat("cosAlphaMuLess",-100);
             }
+
+            xCand.addUserFloat("cosAlpha",-100);
+            xCand.addUserFloat("cosAlpha3D",-100);
+            xCand.addUserFloat("cosAlphaBS",-100);
+            xCand.addUserFloat("cosAlphaBS3D",-100);
+
+            xCand.addUserFloat("l_xyBS",-100);
+            xCand.addUserFloat("lErr_xyBS",-100);
+
+            xCand.addUserFloat("l_xyzBS",-100);
+            xCand.addUserFloat("lErr_xyzBS",-100);
             xCand.addUserData("PVwithmuons",Vertex());
           }
 
