@@ -447,9 +447,18 @@ FourOnia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
               mumucand.addUserFloat("vProb", -1);
               mumucand.addUserFloat("ctauPV",-100);
               mumucand.addUserFloat("ctauErrPV",-100);
-              mumucand.addUserFloat("cosAlpha",-100);
+
               mumucand.addUserFloat("ctauBS",-100);
               mumucand.addUserFloat("ctauErrBS",-100);
+              mumucand.addUserFloat("cosAlphaBS",-100);
+              mumucand.addUserFloat("cosAlphaBS3D",-100);
+
+              mumucand.addUserFloat("l_xyBS",-100);
+              mumucand.addUserFloat("lErr_xyBS",-100);
+
+              mumucand.addUserFloat("l_xyzBS",-100);
+              mumucand.addUserFloat("lErr_xyzBS",-100);
+
               mumucand.addUserFloat("DCA", -1 );
 
               if (addCommonVertex_) {
