@@ -89,6 +89,25 @@ void FourOniaProducer::produce(edm::Event& event, const edm::EventSetup& esetup)
       //std::cout << "Jps muons trigger matched" << std::endl;
       if(isOverlappedMuons(&(*phiCand),&(*jpsiCand)))
       continue;
+
+      int pMatch = 0, jMatch = 0;
+
+      pMatch = phiCand->userInt("isTriggerMatched");
+      jMatch = jpsiCand->userInt("isTriggerMatched");
+
+      std::cout << phiCand->userInt("isTriggerMatched") << std::endl;
+
+      xCand.addUserInt("phi_isTriggerMatched",pMatch);
+      xCand.addUserInt("jpsi_isTriggerMatched",jMatch);
+
+      float pDeltaR = 0.0, jDeltaR = 0.0;
+
+      pDeltaR = phiCand->userFloat("deltaR");
+      jDeltaR = jpsiCand->userFloat("deltaR");
+
+      xCand.addUserFloat("phi_deltaR",pDeltaR);
+      xCand.addUserFloat("jpsi_deltaR",jDeltaR);
+
       //std::cout << "Not overlapping 4 muons" << std::endl;
       pat::CompositeCandidate xCand = makeCandidate(*phiCand, *jpsiCand);
 
@@ -118,24 +137,6 @@ void FourOniaProducer::produce(edm::Event& event, const edm::EventSetup& esetup)
         }
 
         xCand.addUserFloat("MassErr",MassWErr.error());
-
-        int pMatch = 0, jMatch = 0;
-
-        pMatch = phiCand->userInt("isTriggerMatched");
-        jMatch = jpsiCand->userInt("isTriggerMatched");
-
-        std::cout << phiCand->userInt("isTriggerMatched") << std::endl;
-
-        xCand.addUserInt("phi_isTriggerMatched",pMatch);
-        xCand.addUserInt("jpsi_isTriggerMatched",jMatch);
-
-        float pDeltaR = 0.0, jDeltaR = 0.0;
-
-        pDeltaR = phiCand->userFloat("deltaR");
-        jDeltaR = jpsiCand->userFloat("deltaR");
-
-        xCand.addUserFloat("phi_deltaR",pDeltaR);
-        xCand.addUserFloat("jpsi_deltaR",jDeltaR);
 
         if (myVertex.isValid())
         {
