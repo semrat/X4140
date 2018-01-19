@@ -92,7 +92,7 @@ class FourOniaProducer : public edm::EDProducer {
 
   bool cutdz(float dz){return dz<dzMax_; }
 
-  bool isOverlappedMuons(const pat::CompositeCandidate *phi,const pat::CompositeCandidate *jpsi);
+  bool areOverlappedMuons(const pat::CompositeCandidate *phi,const pat::CompositeCandidate *jpsi);
 
   edm::EDGetTokenT<reco::TrackCollection> revtxtrks_;
   edm::EDGetTokenT<reco::BeamSpot> revtxbs_;

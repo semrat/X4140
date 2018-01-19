@@ -196,18 +196,69 @@ process.xProducer = cms.EDProducer('FourOniaProducer',
     quadmuonSelection           = cms.string("4.0 < mass && mass < 6.0 && charge==0")
 )
 
+process.BkgOnia2MuMuPhi = cms.EDProducer('FourOnia2MuMuPAT',
+        muons                       = cms.InputTag('oniaSelectedMuons'),
+        primaryVertexTag            = cms.InputTag('offlineSlimmedPrimaryVertices'),
+        beamSpotTag                 = cms.InputTag('offlineBeamSpot'),
+        higherPuritySelection       = cms.string(""),
+        lowerPuritySelection        = cms.string(""),
+        dimuonSelection             = cms.string("0.6 < mass && mass < 1.2 && charge>0 "),
+        addCommonVertex             = cms.bool(True),
+        addMuonlessPrimaryVertex    = cms.bool(False),
+        addMCTruth                  = cms.bool(False),
+        resolvePileUpAmbiguity      = cms.bool(True),
+        HLTFilters                  = filters
+)
+
+process.BkgOnia2MuMuJPsi = cms.EDProducer('FourOnia2MuMuPAT',
+        muons                       = cms.InputTag('oniaSelectedMuons'),
+        primaryVertexTag            = cms.InputTag('offlineSlimmedPrimaryVertices'),
+        beamSpotTag                 = cms.InputTag('offlineBeamSpot'),
+        higherPuritySelection       = cms.string(""),
+        lowerPuritySelection        = cms.string(""),
+        dimuonSelection             = cms.string("2.9 < mass && mass < 3.3 && charge<0 "),
+        addCommonVertex             = cms.bool(True),
+        addMuonlessPrimaryVertex    = cms.bool(False),
+        addMCTruth                  = cms.bool(False),
+        resolvePileUpAmbiguity      = cms.bool(True),
+        HLTFilters                  = filters
+)
+
+process.bkgProducer = cms.EDProducer('FourOniaProducer',
+    phidimuons                  = cms.InputTag("BkgOnia2MuMuPhi"),
+    jpsidimuons                 = cms.InputTag("BkgOnia2MuMuJPsi"),
+    primaryVertexTag            = cms.InputTag('offlineSlimmedPrimaryVertices'),
+    beamSpotTag                 = cms.InputTag('offlineBeamSpot'),
+    dzmax                       = cms.double(20.0),
+    triggerMatch                = cms.bool(False),
+    addCommonVertex             = cms.bool(True),
+    addMuonlessPrimaryVertex    = cms.bool(True),
+    resolvePileUpAmbiguity      = cms.bool(True),
+    quadmuonSelection           = cms.string("4.0 < mass && mass < 6.0 && charge==0")
+)
+
 
 process.xCandSequence = cms.Sequence(
                    process.triggerSelection *
                    process.slimmedMuonsWithTriggerSequence *
 				   process.oniaSelectedMuons *
                    process.FourOnia2MuMuPhi *
-                   process.Onia2MuMuFilteredPhi *
-                   process.DiMuonCounterPhi *
+                  # process.Onia2MuMuFilteredPhi *
+                  # process.DiMuonCounterPhi *
 				   process.FourOnia2MuMuJPsi *
-                   process.Onia2MuMuFilteredJpsi *
-                   process.DiMuonCounterJPsi *
+                  # process.Onia2MuMuFilteredJpsi *
+                  # process.DiMuonCounterJPsi *
                    process.xProducer
+				   )
+
+process.xCandSequence = cms.Sequence(
+                   process.BkgOnia2MuMuPhi *
+                  # process.Onia2MuMuFilteredPhi *
+                  # process.DiMuonCounterPhi *
+				   process.BkgOnia2MuMuJPsi *
+                  # process.Onia2MuMuFilteredJpsi *
+                  # process.DiMuonCounterJPsi *
+                   process.BkgProducer
 				   )
 
 process.rootuple = cms.EDAnalyzer('x4MuRootupler',
@@ -215,7 +266,7 @@ process.rootuple = cms.EDAnalyzer('x4MuRootupler',
                           jpsidimuons = cms.InputTag("Onia2MuMuFilteredJpsi"),
                           HLTs = hltpaths,
 			              x_cand = cms.InputTag("xProducer"),
-
+                          bkg_cand = cms.InputTag("bkgProducer"),
                           primaryVertices = cms.InputTag("offlineSlimmedPrimaryVertices"),
                           TriggerResults  = cms.InputTag("TriggerResults", "", "HLT"),
                           isMC = cms.bool(False)
