@@ -246,18 +246,11 @@ process.xCandSequence = cms.Sequence(
                   # process.Onia2MuMuFilteredPhi *
                   # process.DiMuonCounterPhi *
 				   process.FourOnia2MuMuJPsi *
-                  # process.Onia2MuMuFilteredJpsi *
-                  # process.DiMuonCounterJPsi *
-                   process.xProducer
-				   )
-
-process.xCandSequence = cms.Sequence(
                    process.BkgOnia2MuMuPhi *
-                  # process.Onia2MuMuFilteredPhi *
-                  # process.DiMuonCounterPhi *
-				   process.BkgOnia2MuMuJPsi *
+                   process.BkgOnia2MuMuJPsi *
                   # process.Onia2MuMuFilteredJpsi *
                   # process.DiMuonCounterJPsi *
+                   process.xProducer*
                    process.BkgProducer
 				   )
 
@@ -266,7 +259,7 @@ process.rootuple = cms.EDAnalyzer('x4MuRootupler',
                           jpsidimuons = cms.InputTag("Onia2MuMuFilteredJpsi"),
                           HLTs = hltpaths,
 			              x_cand = cms.InputTag("xProducer"),
-                          #bkg_cand = cms.InputTag("bkgProducer"),
+                          bkg_cand = cms.InputTag("BkgProducer"),
                           primaryVertices = cms.InputTag("offlineSlimmedPrimaryVertices"),
                           TriggerResults  = cms.InputTag("TriggerResults", "", "HLT"),
                           isMC = cms.bool(False)
