@@ -224,7 +224,7 @@ process.BkgOnia2MuMuJPsi = cms.EDProducer('FourOnia2MuMuPAT',
         HLTFilters                  = filters
 )
 
-process.bkgProducer = cms.EDProducer('FourOniaProducer',
+process.BkgProducer = cms.EDProducer('FourOniaProducer',
     phidimuons                  = cms.InputTag("BkgOnia2MuMuPhi"),
     jpsidimuons                 = cms.InputTag("BkgOnia2MuMuJPsi"),
     primaryVertexTag            = cms.InputTag('offlineSlimmedPrimaryVertices'),
@@ -266,7 +266,7 @@ process.rootuple = cms.EDAnalyzer('x4MuRootupler',
                           jpsidimuons = cms.InputTag("Onia2MuMuFilteredJpsi"),
                           HLTs = hltpaths,
 			              x_cand = cms.InputTag("xProducer"),
-                          bkg_cand = cms.InputTag("bkgProducer"),
+                          #bkg_cand = cms.InputTag("bkgProducer"),
                           primaryVertices = cms.InputTag("offlineSlimmedPrimaryVertices"),
                           TriggerResults  = cms.InputTag("TriggerResults", "", "HLT"),
                           isMC = cms.bool(False)
