@@ -28,6 +28,8 @@
 #include <DataFormats/MuonReco/interface/MuonFwd.h>
 #include <DataFormats/MuonReco/interface/Muon.h>
 #include "DataFormats/PatCandidates/interface/Muon.h"
+#include "DataFormats/Math/interface/deltaR.h"
+
 #include <TLorentzVector.h>
 #include <vector>
 

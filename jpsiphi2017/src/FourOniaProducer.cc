@@ -92,16 +92,12 @@ void FourOniaProducer::produce(edm::Event& event, const edm::EventSetup& esetup)
       continue;
 
       int pMatch = 0, jMatch = 0;
+      float pDeltaR = 0.0, jDeltaR = 0.0;
 
       pMatch = phiCand->userInt("isTriggerMatched");
       jMatch = jpsiCand->userInt("isTriggerMatched");
 
-      std::cout << phiCand->userInt("isTriggerMatched") << std::endl;
-
-      float pDeltaR = 0.0, jDeltaR = 0.0;
-
-      pDeltaR = phiCand->userFloat("deltaR");
-      jDeltaR = jpsiCand->userFloat("deltaR");
+      // std::cout << phiCand->userInt("isTriggerMatched") << std::endl;
 
       pat::CompositeCandidate xCand;
 
@@ -116,6 +112,17 @@ void FourOniaProducer::produce(edm::Event& event, const edm::EventSetup& esetup)
 
         xCand.addUserInt("phi_isTriggerMatched",pMatch);
         xCand.addUserInt("jpsi_isTriggerMatched",jMatch);
+
+        jDeltaR = reco::deltaR2((dynamic_cast<const pat::Muon*>((*jpsiCand).daughter("muon1") )->track()).eta(),
+            (dynamic_cast<const pat::Muon*>((*jpsiCand).daughter("muon1") )->track()).phi(),
+            (dynamic_cast<const pat::Muon*>((*jpsiCand).daughter("muon2") )->track()).eta(),
+            (dynamic_cast<const pat::Muon*>((*jpsiCand).daughter("muon2") )->track()).phi());
+
+        pDeltaR = reco::deltaR2((dynamic_cast<const pat::Muon*>((*phiCand).daughter("muon1") )->track()).eta(),
+            (dynamic_cast<const pat::Muon*>((*phiCand).daughter("muon1") )->track()).phi(),
+            (dynamic_cast<const pat::Muon*>((*phiCand).daughter("muon2") )->track()).eta(),
+            (dynamic_cast<const pat::Muon*>((*phiCand).daughter("muon2") )->track()).phi());
+
         xCand.addUserFloat("phi_deltaR",pDeltaR);
         xCand.addUserFloat("jpsi_deltaR",jDeltaR);
 
