@@ -48,6 +48,7 @@ class x4MuRootupler:public edm::EDAnalyzer {
 
 	      std::string file_name;
         edm::EDGetTokenT<pat::CompositeCandidateCollection> xcand_;
+        edm::EDGetTokenT<pat::CompositeCandidateCollection> bkgcand_;
         edm::EDGetTokenT<pat::CompositeCandidateCollection> phi_dimuon_Label;
         edm::EDGetTokenT<pat::CompositeCandidateCollection> jpsi_dimuon_Label;
         edm::EDGetTokenT<reco::VertexCollection>            primaryVertices_;
@@ -55,6 +56,11 @@ class x4MuRootupler:public edm::EDAnalyzer {
         std::vector<std::string>                            HLTs_;
 
 	bool isMC_;
+
+  TTree *x_tree;
+  TTree *j_tree;
+  TTree *p_tree;
+  TTree *b_tree;
 
 	UInt_t run;
   ULong64_t event;
@@ -85,9 +91,13 @@ class x4MuRootupler:public edm::EDAnalyzer {
   UInt_t x_rank, jpsi_muonM_type, jpsi_muonP_type, phi_muonP_type, phi_muonM_type;
   UInt_t jpsi_trigger, phi_trigger;
 
-	TTree *x_tree;
-  TTree *j_tree;
-  TTree *p_tree;
+  //bkg tree variables
+	TLorentzVector x_p4Bkg;
+  Double_t xMBkg, deltaRBkg;
+
+  UInt_t jpsi_i,phi_i;
+  UInt_t x_rank, jpsi_muonM_type, jpsi_muonP_type, phi_muonP_type, phi_muonM_type;
+  UInt_t jpsi_trigger, phi_trigger;
 
   //jpsi tree variables
 
@@ -113,8 +123,10 @@ class x4MuRootupler:public edm::EDAnalyzer {
   UInt_t p_rank, p_muonM_type, p_muonP_type, p_triggerMatch;
   UInt_t p_muonM_isGlobal,p_muonM_isTracker, p_muonP_isGlobal,p_muonP_isTracker ;
 
+  //Verteces
   Point jVertex, pVertex;
   Point xVertex, jpsiVertex, phiVertex;
+  Point xVertexBkg, jpsiVertexBkg, phiVertexBkg;
 
   reco::Vertex commonVertex;
   Point PVwithmuons;
@@ -131,6 +143,7 @@ class x4MuRootupler:public edm::EDAnalyzer {
 x4MuRootupler::x4MuRootupler(const edm::ParameterSet & iConfig):
 // chi_(consumes<pat::CompositeCandidateCollection>(iConfig.getParameter < edm::InputTag > ("chi_cand"))),
 xcand_(consumes<pat::CompositeCandidateCollection>(iConfig.getParameter < edm::InputTag > ("x_cand"))),
+bkgcand_(consumes<pat::CompositeCandidateCollection>(iConfig.getParameter < edm::InputTag > ("bkg_cand"))),
 phi_dimuon_Label(consumes<pat::CompositeCandidateCollection>(iConfig.getParameter< edm::InputTag>("phidimuons"))),
 jpsi_dimuon_Label(consumes<pat::CompositeCandidateCollection>(iConfig.getParameter< edm::InputTag>("jpsidimuons"))),
 // refit1_(consumes<pat::CompositeCandidateCollection>(iConfig.getParameter < edm::InputTag > ("refit1S"))),
@@ -144,6 +157,19 @@ isMC_(iConfig.getParameter < bool > ("isMC"))
     x_tree = fs->make < TTree > ("xTree", "Tree of xs");
     j_tree = fs->make < TTree > ("jTree", "Tree of jpsis");
     p_tree = fs->make < TTree > ("pTree", "Tree of phis");
+    b_tree = fs->make < TTree > ("bTree", "Tree of bkg");
+
+    //bkg tree
+    b_tree->Branch("run", &run, "run/i");
+    b_tree->Branch("event", &event, "event/l");
+    x_tree->Branch("lumiblock",&lumiblock,"lumiblock/i");
+
+    b_tree->Branch("x_p4Bkg", "TLorentzVector", &x_p4Bkg);
+    b_tree->Branch("xMBkg",  &xMBkg, "xMBkg/D");
+
+    b_tree->Branch("deltaRBkg", &deltaRBkg, "deltaRBkg/D");
+
+    //signal tree
 
     x_tree->Branch("run", &run, "run/i");
     x_tree->Branch("event", &event, "event/l");
@@ -341,6 +367,9 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
   edm::Handle < pat::CompositeCandidateCollection >xcand_hand;
   iEvent.getByToken(xcand_, xcand_hand);
 
+  edm::Handle < pat::CompositeCandidateCollection >bkg_hand;
+  iEvent.getByToken(bkgcand_, bkg_hand);
+
   edm::Handle<pat::CompositeCandidateCollection> dimuonsPhi;
   iEvent.getByToken(phi_dimuon_Label,dimuonsPhi);
 
@@ -390,6 +419,25 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
     } else std::cout << "*** NO triggerResults found " << iEvent.id().run() << "," << iEvent.id().event() << std::endl;
 
     // bool bestCandidateOnly_ = false;
+
+    if (bkg_hand.isValid() && !bkg_hand->empty())
+    {
+
+      for (unsigned int i=0; i< bkg_hand->size(); i++)
+      {
+
+        pat::CompositeCandidate b_ = bkg_hand->at(i);
+
+        x_p4Bkg.SetPtEtaPhiM(b_.pt(), b_.eta(), b_.phi(), b_.mass());
+        xMBkg = x_p4Bkg.M();
+
+        deltaRBkg = b_.userFloat("deltaR");
+
+        b_tree->Fill();
+
+      }
+
+    }
 
     // std::cout << "JPsi " << dimuonsJPsi->size() << std::endl;
 
