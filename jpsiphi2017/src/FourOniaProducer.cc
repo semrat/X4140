@@ -97,21 +97,20 @@ void FourOniaProducer::produce(edm::Event& event, const edm::EventSetup& esetup)
 
       std::cout << phiCand->userInt("isTriggerMatched") << std::endl;
 
-      xCand.addUserInt("phi_isTriggerMatched",pMatch);
-      xCand.addUserInt("jpsi_isTriggerMatched",jMatch);
-
       float pDeltaR = 0.0, jDeltaR = 0.0;
 
       pDeltaR = phiCand->userFloat("deltaR");
-      jDeltaR = jpsiCand->userFloat("deltaR");
-
-      xCand.addUserFloat("phi_deltaR",pDeltaR);
-      xCand.addUserFloat("jpsi_deltaR",jDeltaR);
+      jDeltaR = jpsiCand->userFloat("deltaR")
 
       //std::cout << "Not overlapping 4 muons" << std::endl;
       pat::CompositeCandidate xCand = makeCandidate(*phiCand, *jpsiCand);
 
       if(!quadmuonSelection_(xCand)) continue;
+
+      xCand.addUserInt("phi_isTriggerMatched",pMatch);
+      xCand.addUserInt("jpsi_isTriggerMatched",jMatch);
+      xCand.addUserFloat("phi_deltaR",pDeltaR);
+      xCand.addUserFloat("jpsi_deltaR",jDeltaR);
 
       if (((dynamic_cast<const pat::Muon*>((*jpsiCand).daughter("muon1") )->track()).isNonnull())
       && ((dynamic_cast<const pat::Muon*>((*jpsiCand).daughter("muon2") )->track()).isNonnull())
