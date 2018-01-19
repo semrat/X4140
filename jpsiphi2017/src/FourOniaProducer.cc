@@ -119,7 +119,7 @@ void FourOniaProducer::produce(edm::Event& event, const edm::EventSetup& esetup)
             (dynamic_cast<const pat::Muon*>((*jpsiCand).daughter("muon2") )->track()).phi());
 
         pDeltaR = reco::deltaR2((dynamic_cast<const pat::Muon*>((*phiCand).daughter("muon1") )->track()).eta(),
-            (dynamic_cast<const pat::Muon*>((*phiCand).daughter("muon1") )->track()).phi(),
+            (dynamic_cast<const pat::Muon*>((*phiCand).daughter("muon1") )->track())->phi(),
             (dynamic_cast<const pat::Muon*>((*phiCand).daughter("muon2") )->track()).eta(),
             (dynamic_cast<const pat::Muon*>((*phiCand).daughter("muon2") )->track()).phi());
 
