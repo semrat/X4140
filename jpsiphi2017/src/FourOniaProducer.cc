@@ -13,6 +13,7 @@ addMuonlessPrimaryVertex_(iConfig.getParameter<bool>("addMuonlessPrimaryVertex")
 resolveAmbiguity_(iConfig.getParameter<bool>("resolvePileUpAmbiguity")),
 // addMCTruth_(iConfig.getParameter<bool>("addMCTruth")),
 triggerMatch_(iConfig.getParameter<bool>("triggerMatch"))
+//doCombinatorial(iConfig.existsAs<bool>("doCombinatorial") ? iConfig.getParameter<bool>("doCombinatorial") : false)
 {
   revtxtrks_ = consumes<reco::TrackCollection>((edm::InputTag)"generalTracks"); //if that is not true, we will raise an exception
   revtxbs_ = consumes<reco::BeamSpot>((edm::InputTag)"offlineBeamSpot");
@@ -87,7 +88,7 @@ void FourOniaProducer::produce(edm::Event& event, const edm::EventSetup& esetup)
       if (( triggerMatch_ ) && (  !jpsiCand->userInt("isTriggerMatched") ) )
       continue;
       //std::cout << "Jps muons trigger matched" << std::endl;
-      if(isOverlappedMuons(&(*phiCand),&(*jpsiCand)))
+      if(areOverlappedMuons(&(*phiCand),&(*jpsiCand)))
       continue;
 
       int pMatch = 0, jMatch = 0;
@@ -102,20 +103,21 @@ void FourOniaProducer::produce(edm::Event& event, const edm::EventSetup& esetup)
       pDeltaR = phiCand->userFloat("deltaR");
       jDeltaR = jpsiCand->userFloat("deltaR");
 
-      //std::cout << "Not overlapping 4 muons" << std::endl;
-      pat::CompositeCandidate xCand = makeCandidate(*phiCand, *jpsiCand);
+      pat::CompositeCandidate xCand;
+
+      xCand = makeCandidate(*phiCand, *jpsiCand);
 
       if(!quadmuonSelection_(xCand)) continue;
-
-      xCand.addUserInt("phi_isTriggerMatched",pMatch);
-      xCand.addUserInt("jpsi_isTriggerMatched",jMatch);
-      xCand.addUserFloat("phi_deltaR",pDeltaR);
-      xCand.addUserFloat("jpsi_deltaR",jDeltaR);
 
       if (((dynamic_cast<const pat::Muon*>((*jpsiCand).daughter("muon1") )->track()).isNonnull())
       && ((dynamic_cast<const pat::Muon*>((*jpsiCand).daughter("muon2") )->track()).isNonnull())
       && ((dynamic_cast<const pat::Muon*>((*phiCand).daughter("muon1") )->track()).isNonnull())
       && ((dynamic_cast<const pat::Muon*>((*phiCand).daughter("muon2") )->track()).isNonnull())){
+
+        xCand.addUserInt("phi_isTriggerMatched",pMatch);
+        xCand.addUserInt("jpsi_isTriggerMatched",jMatch);
+        xCand.addUserFloat("phi_deltaR",pDeltaR);
+        xCand.addUserFloat("jpsi_deltaR",jDeltaR);
 
         vector<TransientVertex> pvs;
 
@@ -512,7 +514,7 @@ void FourOniaProducer::produce(edm::Event& event, const edm::EventSetup& esetup)
   //   return matched;
   // }
 
-  bool FourOniaProducer::isOverlappedMuons(const pat::CompositeCandidate *phi,const pat::CompositeCandidate *jpsi) {
+  bool FourOniaProducer::areOverlappedMuons(const pat::CompositeCandidate *phi,const pat::CompositeCandidate *jpsi) {
 
     bool same = false;
 
