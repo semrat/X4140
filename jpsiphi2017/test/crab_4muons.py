@@ -34,6 +34,7 @@ runNumber = [
 #'273158',
 ]
 
+run = 'D'
 
 datasetName = datasetnames[run]
 runNum = runNumber[0]
@@ -46,7 +47,7 @@ timestamp = datetime.datetime.now().strftime("_%Y%m%d_%H%M%S")
 
 dataset = filter(None, datasetName.split('/'))
 
-jobdir = 'X4140_' + dataset
+jobdir = 'X4140_' + run
 
 if not os.path.exists(jobdir):
     os.makedirs(jobdir)
