@@ -93,7 +93,7 @@ class x4MuRootupler:public edm::EDAnalyzer {
 
   //bkg tree variables
 	TLorentzVector x_p4Bkg;
-  Double_t xMBkg, deltaRBkg;
+  Double_t xMBkg, jpsi_deltaRBkg, phi_deltaRBkg;
 
   //jpsi tree variables
 
@@ -163,7 +163,8 @@ isMC_(iConfig.getParameter < bool > ("isMC"))
     b_tree->Branch("x_p4Bkg", "TLorentzVector", &x_p4Bkg);
     b_tree->Branch("xMBkg",  &xMBkg, "xMBkg/D");
 
-    b_tree->Branch("deltaRBkg", &deltaRBkg, "deltaRBkg/D");
+    b_tree->Branch("jpsi_deltaRBkg", &jpsi_deltaRBkg, "jpsi_deltaRBkg/D");
+    b_tree->Branch("phi_deltaRBkg", &phi_deltaRBkg, "phi_deltaRBkg/D");
 
     //signal tree
 
@@ -428,6 +429,9 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
         xMBkg = x_p4Bkg.M();
 
         deltaRBkg = b_.userFloat("deltaR");
+
+        jpsi_deltaRBkg = b_.userFloat("jpsi_deltaR");
+        phi_deltaRBkg  = b_.userFloat("phi_deltaR");
 
         b_tree->Fill();
 
