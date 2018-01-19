@@ -95,10 +95,6 @@ class x4MuRootupler:public edm::EDAnalyzer {
 	TLorentzVector x_p4Bkg;
   Double_t xMBkg, deltaRBkg;
 
-  UInt_t jpsi_i,phi_i;
-  UInt_t x_rank, jpsi_muonM_type, jpsi_muonP_type, phi_muonP_type, phi_muonM_type;
-  UInt_t jpsi_trigger, phi_trigger;
-
   //jpsi tree variables
 
   TLorentzVector j_muonM_p4, j_muonP_p4, j_p4;
