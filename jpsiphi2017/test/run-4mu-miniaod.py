@@ -101,7 +101,7 @@ filters = cms.vstring(
                                 #'hltDisplacedmumuVtxProducerDimuon20JpsiBarrelnoCow',
                                 'hltDisplacedmumuFilterDimuon20JpsiBarrelnoCow',
                                 #HLT_Dimuon25_Jpsi
-                                'hltDisplacedmumuFilterDimuon25JpsiBarrelnoCow'
+                                'hltDisplacedmumuFilterDimuon25Jpsis'
                                 #HLT_Dimuon0_Jpsi
                                 #'hltDimuon0JpsiL3Filtered',
                                 #'hltDisplacedmumuVtxProducerDimuon0Jpsi',

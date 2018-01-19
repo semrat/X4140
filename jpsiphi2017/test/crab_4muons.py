@@ -16,6 +16,13 @@ if not os.path.exists(jobdir):
 
 datasetnames = {
 "F" : '/MuOnia/Run2017F-PromptReco-v1/MINIAOD',
+"A" : '/MuOnia/Run2017A-PromptReco-v1/MINIAOD',
+"B" : '/MuOnia/Run2017B-PromptReco-v1/MINIAOD',
+"B" : '/MuOnia/Run2017B-PromptReco-v2/MINIAOD',
+"C" : '/MuOnia/Run2017C-PromptReco-v1/MINIAOD',
+"C" : '/MuOnia/Run2017C-PromptReco-v2/MINIAOD',
+"C" : '/MuOnia/Run2017C-PromptReco-v3/MINIAOD',
+"E" : '/MuOnia/Run2017E-PromptReco-v1/MINIAOD',
 }
 
 runNumber = [
@@ -65,7 +72,7 @@ config.section_('Data')
 config.Data.inputDataset        = datasetName
 config.Data.inputDBS            = 'global'
 config.Data.totalUnits          = -1
-config.Data.unitsPerJob         = 1
+config.Data.unitsPerJob         = 10
 config.Data.splitting           = 'LumiBased'
 config.Data.runRange            = runNum
 config.Data.lumiMask            = lumi
