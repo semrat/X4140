@@ -11,13 +11,13 @@ config = Configuration()
 
 datasetnames = {
 "F" : '/MuOnia/Run2017F-PromptReco-v1/MINIAOD',
-"A" : '/MuOnia/Run2017A-PromptReco-v1/MINIAOD',
-"B" : '/MuOnia/Run2017B-PromptReco-v1/MINIAOD',
-"B" : '/MuOnia/Run2017B-PromptReco-v2/MINIAOD',
-"C" : '/MuOnia/Run2017C-PromptReco-v1/MINIAOD',
-"C" : '/MuOnia/Run2017C-PromptReco-v2/MINIAOD',
-"C" : '/MuOnia/Run2017C-PromptReco-v3/MINIAOD',
-"E" : '/MuOnia/Run2017E-PromptReco-v1/MINIAOD',
+"B1" : '/MuOnia/Run2017B-PromptReco-v1/MINIAOD',
+"B2" : '/MuOnia/Run2017B-PromptReco-v2/MINIAOD',
+"C1" : '/MuOnia/Run2017C-PromptReco-v1/MINIAOD',
+"C2" : '/MuOnia/Run2017C-PromptReco-v2/MINIAOD',
+"C3" : '/MuOnia/Run2017C-PromptReco-v3/MINIAOD',
+"D" : '/MuOnia/Run2017D-PromptReco-v1/MINIAOD',
+"E" : '/MuOnia/Run2017E-PromptReco-v1/MINIAOD'
 }
 
 runNumber = [
@@ -60,7 +60,7 @@ config.General.requestName      = 'fourMuons_phiJpsiTriggers_' + dataset[0]+'_'+
 config.General.transferLogs     = False
 
 config.section_('JobType')
-config.JobType.psetName         = '/lustre/home/adrianodif/CMSSW_9_2_2/src/mmkk/mmkk/test/run-4mu-miniaod.py'
+config.JobType.psetName         = '/lustre/home/adrianodif/CMSSW_9_2_13/src/mmkk/mmkk/test/run-4mu-miniaod.py'
 config.JobType.pluginName       = 'Analysis'
 config.JobType.maxMemoryMB      = 2500
 config.JobType.maxJobRuntimeMin = 2750
