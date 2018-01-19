@@ -2,17 +2,12 @@ import sys
 import os
 
 jsonFile="Cert_294927-306462_13TeV_PromptReco_Collisions17_JSON_MuonPhys.txt"
-run = "F"
 
 from WMCore.Configuration import Configuration
 config = Configuration()
 
 #print("Test = " + str(skipevt))
 
-jobdir = 'X4140_' + run
-
-if not os.path.exists(jobdir):
-    os.makedirs(jobdir)
 
 datasetnames = {
 "F" : '/MuOnia/Run2017F-PromptReco-v1/MINIAOD',
@@ -50,6 +45,11 @@ import datetime
 timestamp = datetime.datetime.now().strftime("_%Y%m%d_%H%M%S")
 
 dataset = filter(None, datasetName.split('/'))
+
+jobdir = 'X4140_' + dataset
+
+if not os.path.exists(jobdir):
+    os.makedirs(jobdir)
 
 config.section_('General')
 config.General.transferOutputs  = True
