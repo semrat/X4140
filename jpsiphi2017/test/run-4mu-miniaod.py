@@ -184,8 +184,8 @@ process.DiMuonCounterPhi = cms.EDFilter('CandViewCountFilter',
 )
 
 process.xProducer = cms.EDProducer('FourOniaProducer',
-    phidimuons                  = cms.InputTag("Onia2MuMuFilteredPhi"),
-    jpsidimuons                 = cms.InputTag("Onia2MuMuFilteredJpsi"),
+    phidimuons                  = cms.InputTag("FourOnia2MuMuPhi"),
+    jpsidimuons                 = cms.InputTag("FourOnia2MuMuJPsi"),
     primaryVertexTag            = cms.InputTag('offlineSlimmedPrimaryVertices'),
     beamSpotTag                 = cms.InputTag('offlineBeamSpot'),
     dzmax                       = cms.double(20.0),
