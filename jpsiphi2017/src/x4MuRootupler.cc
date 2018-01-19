@@ -428,8 +428,6 @@ void x4MuRootupler::analyze(const edm::Event & iEvent, const edm::EventSetup & i
         x_p4Bkg.SetPtEtaPhiM(b_.pt(), b_.eta(), b_.phi(), b_.mass());
         xMBkg = x_p4Bkg.M();
 
-        deltaRBkg = b_.userFloat("deltaR");
-
         jpsi_deltaRBkg = b_.userFloat("jpsi_deltaR");
         phi_deltaRBkg  = b_.userFloat("phi_deltaR");
 
