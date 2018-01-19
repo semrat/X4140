@@ -92,7 +92,7 @@ void FourOniaProducer::produce(edm::Event& event, const edm::EventSetup& esetup)
       continue;
 
       int pMatch = 0, jMatch = 0;
-      float pDeltaR = 0.0, jDeltaR = 0.0;
+      float pDeltaR = -1.0, jDeltaR = -1.0;
 
       pMatch = phiCand->userInt("isTriggerMatched");
       jMatch = jpsiCand->userInt("isTriggerMatched");
