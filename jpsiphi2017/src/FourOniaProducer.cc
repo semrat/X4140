@@ -100,7 +100,7 @@ void FourOniaProducer::produce(edm::Event& event, const edm::EventSetup& esetup)
       float pDeltaR = 0.0, jDeltaR = 0.0;
 
       pDeltaR = phiCand->userFloat("deltaR");
-      jDeltaR = jpsiCand->userFloat("deltaR")
+      jDeltaR = jpsiCand->userFloat("deltaR");
 
       //std::cout << "Not overlapping 4 muons" << std::endl;
       pat::CompositeCandidate xCand = makeCandidate(*phiCand, *jpsiCand);
