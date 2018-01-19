@@ -70,23 +70,23 @@ UInt_t FourOnia2MuMuPAT::isTriggerMatched(pat::CompositeCandidate *diMuon_cand) 
     const pat::TriggerObjectStandAloneCollection mu1HLTMatches = muon1->triggerObjectMatchesByFilter(HLTFilters_[iTr]);
     const pat::TriggerObjectStandAloneCollection mu2HLTMatches = muon2->triggerObjectMatchesByFilter(HLTFilters_[iTr]);
     if (!mu1HLTMatches.empty() && !mu2HLTMatches.empty()) matched += (1<<iTr);
-    if (!mu1HLTMatches.empty() && !mu2HLTMatches.empty()) std::cout << std::endl << HLTFilters_[iTr] << std::endl;
+    // if (!mu1HLTMatches.empty() && !mu2HLTMatches.empty()) std::cout << std::endl << HLTFilters_[iTr] << std::endl;
   }
-  const pat::TriggerObjectStandAloneCollection muon1Collection = muon1->triggerObjectMatches();
+  // const pat::TriggerObjectStandAloneCollection muon1Collection = muon1->triggerObjectMatches();
   // const pat::TriggerObjectStandAloneCollection muon2Collection = muon2->triggerObjectMatches();
   //
   //
-  for ( size_t i = 0; i < muon1Collection.size(); ++i )
-  {
+  // for ( size_t i = 0; i < muon1Collection.size(); ++i )
+  // {
   //   std::cout << "Muon1 collection : " << muon1->triggerObjectMatch(i)->collection() << std::endl;
   //
   //   std::cout << "Filters" << std::endl;
   //   for ( size_t j = 0; j < muon1->triggerObjectMatch(i)->filterLabels().size(); ++j )
   //     std::cout << (muon1->triggerObjectMatch(i)->filterLabels())[j] << std::endl;
   //
-    std::cout << "Paths" << std::endl;
-    for ( size_t j = 0; j < muon1->triggerObjectMatch(i)->pathNames().size(); ++j )
-      std::cout << (muon1->triggerObjectMatch(i)->pathNames())[j] << std::endl;
+    // std::cout << "Paths" << std::endl;
+    // for ( size_t j = 0; j < muon1->triggerObjectMatch(i)->pathNames().size(); ++j )
+    //   std::cout << (muon1->triggerObjectMatch(i)->pathNames())[j] << std::endl;
   //
   //   std::cout << "Algos" << std::endl;
   //   for ( size_t j = 0; j < muon1->triggerObjectMatch(i)->algorithmNames().size(); ++j )
@@ -98,7 +98,7 @@ UInt_t FourOnia2MuMuPAT::isTriggerMatched(pat::CompositeCandidate *diMuon_cand) 
   //
   //   //std::cout << (muon1->triggerObjectMatch(i)->hasL3Filter())<< std::endl;
   //
-  }
+  // }
   //
   // for ( size_t i = 0; i < muon2Collection.size(); ++i )
   // {
@@ -129,7 +129,7 @@ FourOnia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   using namespace std;
   using namespace reco;
   typedef Candidate::LorentzVector LorentzVector;
-  std::cout<<"TwoMuMu - "<<std::endl;
+  // std::cout<<"TwoMuMu - "<<std::endl;
   vector<double> muMasses;
   muMasses.push_back( 0.1056583715 );
   muMasses.push_back( 0.1056583715 );
@@ -196,7 +196,7 @@ FourOnia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
       // ---- apply the dimuon cut ----
 
       if(!dimuonSelection_(mumucand)) continue;
-      std::cout << mumu.M() << " - ";
+      // std::cout << mumu.M() << " - ";
       // ---- fit vertex using Tracker tracks (if they have tracks) ----
       if (it->track().isNonnull() && it2->track().isNonnull()) {
         //std::cout << "Tracker tracks: they exist !" << std::endl;
