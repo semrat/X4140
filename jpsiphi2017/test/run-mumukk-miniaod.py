@@ -115,7 +115,7 @@ process.Onia2MuMuFilteredJpsi = cms.EDProducer('DiMuonFilter',
 )
 
 process.FourOnia2KKPhi = cms.EDProducer('FourOnia2KKPAT',
-    tracks                      = cms.InputTag('cleanPatKaonTracks'),
+    # tracks                      = cms.InputTag('cleanPatKaonTracks'),
     primaryVertexTag            = cms.InputTag('offlineSlimmedPrimaryVertices'),
     beamSpotTag                 = cms.InputTag('offlineBeamSpot'),
     higherPuritySelection       = cms.string(""),
