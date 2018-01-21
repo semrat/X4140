@@ -62,7 +62,7 @@ makeTrackCandidates(process,
 
 l1cands = getattr(process, 'cleanPatKaonTracks')
 
-process.cleanPatKaonTracks.embedTrack = True
+#process.cleanPatKaonTracks.embedTrack = True
 
 process.oniaSelectedMuons = cms.EDFilter('PATMuonSelector',
    src = cms.InputTag('slimmedMuonsWithTrigger'),
