@@ -30,7 +30,7 @@
 #include "DataFormats/PatCandidates/interface/GenericParticle.h"
 
 FourOnia2KKPAT::FourOnia2KKPAT(const edm::ParameterSet& iConfig):
-// trakCollection_(consumes<std::vector<pat::GenericParticle>>(iConfig.getParameter<edm::InputTag>("tracks"))),
+trakCollection_(consumes<edm::View<pat::GenericParticle>>(iConfig.getParameter<edm::InputTag>("tracks"))),
 thebeamspot_(consumes<reco::BeamSpot>(iConfig.getParameter<edm::InputTag>("beamSpotTag"))),
 thePVs_(consumes<reco::VertexCollection>(iConfig.getParameter<edm::InputTag>("primaryVertexTag"))),
 higherPuritySelection_(iConfig.getParameter<std::string>("higherPuritySelection")),
@@ -120,11 +120,8 @@ FourOnia2KKPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     thePrimaryV = Vertex(bs.position(), bs.covariance3D());
   }
 
-  // edm::Handle< std::vector<pat::GenericParticle> > thePATTrackHandle;
-  // iEvent.getByToken(trakCollection_,thePATTrackHandle);
-
-  edm::Handle< vector<pat::GenericParticle> > thePATTrackHandle;
-  iEvent.getByToken((edm::InputTag)"cleanPatTrackCands", thePATTrackHandle);
+  edm::Handle< View<pat::GenericParticle> > thePATTrackHandle;
+  iEvent.getByToken(trakCollection_,thePATTrackHandle);
 
   edm::ESHandle<TransientTrackBuilder> theTTBuilder;
   iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder",theTTBuilder);
@@ -138,7 +135,7 @@ FourOnia2KKPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   std::cout<<"M"<< std::endl;
 
-  for(std::vector<pat::GenericParticle>::const_iterator kTrack1 = thePATTrackHandle->begin();kTrack1 != thePATTrackHandle->end(); ++kTrack1 )
+  for(View<pat::GenericParticle>::const_iterator kTrack1 = thePATTrackHandle->begin();kTrack1 != thePATTrackHandle->end(); ++kTrack1 )
   {
     if(kTrack1->charge()==0) continue;
 
@@ -147,7 +144,7 @@ FourOnia2KKPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
     std::cout << kTrack1->track()->pt() << " - " << kTrack1->pt() << std::endl;
 
-    for(std::vector<pat::GenericParticle>::const_iterator kTrack2 = kTrack1+1; kTrack2 != thePATTrackHandle->end(); ++kTrack2 )
+    for(View<pat::GenericParticle>::const_iterator kTrack2 = kTrack1+1; kTrack2 != thePATTrackHandle->end(); ++kTrack2 )
     {
       // if ((kTrack2->track() ==  nullptr)) continue;
       if(kTrack1==kTrack2) continue;

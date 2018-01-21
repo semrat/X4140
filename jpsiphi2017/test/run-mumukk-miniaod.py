@@ -50,7 +50,7 @@ process.triggerSelection = cms.EDFilter("TriggerResultsFilter",
 #
 from PhysicsTools.PatAlgos.tools.trackTools import makeTrackCandidates
 makeTrackCandidates(process,
-                       label        = 'KaonTracks',                  # output collection
+                       label        = 'kaonTracks',                  # output collection
                        tracks       = cms.InputTag('generalTracks'), # input track collection
                        particleType = 'K+',                           # particle type (for assigning a mass)
                        preselection = 'pt > 0.2',                    # preselection cut on candidates
@@ -60,7 +60,7 @@ makeTrackCandidates(process,
                        mcAs         = None                           # replicate MC match as the one used for Muons
    )
 
-l1cands = getattr(process, 'cleanPatKaonTracks')
+l1cands = getattr(process, 'cleanPatkaonTracks')
 
 #process.cleanPatKaonTracks.embedTrack = True
 
@@ -115,7 +115,7 @@ process.Onia2MuMuFilteredJpsi = cms.EDProducer('DiMuonFilter',
 )
 
 process.FourOnia2KKPhi = cms.EDProducer('FourOnia2KKPAT',
-    # tracks                      = cms.InputTag('cleanPatKaonTracks'),
+    tracks                      = cms.InputTag('cleankaonTracks'),
     primaryVertexTag            = cms.InputTag('offlineSlimmedPrimaryVertices'),
     beamSpotTag                 = cms.InputTag('offlineBeamSpot'),
     higherPuritySelection       = cms.string(""),
