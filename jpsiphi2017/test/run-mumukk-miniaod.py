@@ -49,7 +49,7 @@ process.triggerSelection = cms.EDFilter("TriggerResultsFilter",
 #    )
 #
 from PhysicsTools.PatAlgos.tools.trackTools import makeTrackCandidates
-process.trackcands = makeTrackCandidates(process,
+makeTrackCandidates(process,
                        label        = 'kaonTracks',                  # output collection
                        tracks       = cms.InputTag('generalTracks'), # input track collection
                        particleType = 'K+',                           # particle type (for assigning a mass)
@@ -141,7 +141,6 @@ process.FourOnia2KKPhi = cms.EDProducer('FourOnia2KKPAT',
 process.xCandSequence = cms.Sequence(
                    process.triggerSelection *
                    process.slimmedMuonsWithTriggerSequence *
-                   process.trackcands *
 				   process.oniaSelectedMuons *
 				   process.FourOnia2MuMuJPsi *
                    process.Onia2MuMuFilteredJpsi *
