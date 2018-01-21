@@ -5,8 +5,6 @@ input_filename = 'file:FABC2662-9AC8-E711-BF94-02163E019BB9.root'
 import FWCore.ParameterSet.Config as cms
 process = cms.Process("Rootuple")
 
-process.content = cms.EDAnalyzer("EventContentAnalyzer")
-
 process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
 process.load('Configuration.StandardSequences.MagneticField_38T_cff')
 process.load('Configuration.StandardSequences.Reconstruction_cff')
@@ -51,7 +49,7 @@ process.triggerSelection = cms.EDFilter("TriggerResultsFilter",
 #    )
 #
 from PhysicsTools.PatAlgos.tools.trackTools import makeTrackCandidates
-makeTrackCandidates(process,
+process.trackcands = makeTrackCandidates(process,
                        label        = 'kaonTracks',                  # output collection
                        tracks       = cms.InputTag('generalTracks'), # input track collection
                        particleType = 'K+',                           # particle type (for assigning a mass)
@@ -116,6 +114,8 @@ process.Onia2MuMuFilteredJpsi = cms.EDProducer('DiMuonFilter',
       HLTFilters          = filters
 )
 
+process.content = cms.EDAnalyzer("EventContentAnalyzer")
+
 process.FourOnia2KKPhi = cms.EDProducer('FourOnia2KKPAT',
     tracks                      = cms.InputTag('cleankaonTracks'),
     primaryVertexTag            = cms.InputTag('offlineSlimmedPrimaryVertices'),
@@ -141,6 +141,7 @@ process.FourOnia2KKPhi = cms.EDProducer('FourOnia2KKPAT',
 process.xCandSequence = cms.Sequence(
                    process.triggerSelection *
                    process.slimmedMuonsWithTriggerSequence *
+                   process.trackcands *
 				   process.oniaSelectedMuons *
 				   process.FourOnia2MuMuJPsi *
                    process.Onia2MuMuFilteredJpsi *
