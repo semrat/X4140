@@ -60,7 +60,7 @@ makeTrackCandidates(process,
                        mcAs         = None                           # replicate MC match as the one used for Muons
    )
 
-#l1cands = getattr(process, 'patkaonTracks')
+l1cands = getattr(process, 'cleanPatKaonTracks')
 
 process.cleanPatKaonTracks.embedTrack = True
 
