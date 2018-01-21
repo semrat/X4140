@@ -124,7 +124,7 @@ FourOnia2KKPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   // iEvent.getByToken(trakCollection_,thePATTrackHandle);
 
   edm::Handle< vector<pat::GenericParticle> > thePATTrackHandle;
-  iEvent.getByToken("cleanPatTrackCands", thePATTrackHandle);
+  iEvent.getByToken((edm::InputTag)"cleanPatTrackCands", thePATTrackHandle);
 
   edm::ESHandle<TransientTrackBuilder> theTTBuilder;
   iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder",theTTBuilder);
