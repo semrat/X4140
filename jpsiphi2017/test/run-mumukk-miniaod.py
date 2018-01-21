@@ -5,6 +5,8 @@ input_filename = 'file:FABC2662-9AC8-E711-BF94-02163E019BB9.root'
 import FWCore.ParameterSet.Config as cms
 process = cms.Process("Rootuple")
 
+process.content = cms.EDAnalyzer("EventContentAnalyzer")
+
 process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
 process.load('Configuration.StandardSequences.MagneticField_38T_cff')
 process.load('Configuration.StandardSequences.Reconstruction_cff')
@@ -143,6 +145,7 @@ process.xCandSequence = cms.Sequence(
 				   process.FourOnia2MuMuJPsi *
                    process.Onia2MuMuFilteredJpsi *
                    #process.DiMuonCounterJPsi *
+                   process.content *
                    process.FourOnia2KKPhi
                    #process.xFitter
 				   )
