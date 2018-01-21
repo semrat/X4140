@@ -72,7 +72,7 @@ class FourOnia2KKPAT : public edm::EDProducer {
   // ----------member data ---------------------------
  private:
 
-  edm::EDGetTokenT<std::vector<pat::GenericParticle>> trakCollection_;
+  // edm::EDGetTokenT<std::vector<pat::GenericParticle>> trakCollection_;
   edm::EDGetTokenT<reco::BeamSpot> thebeamspot_;
   edm::EDGetTokenT<reco::VertexCollection> thePVs_;
   edm::EDGetTokenT<reco::TrackCollection> revtxtrks_;

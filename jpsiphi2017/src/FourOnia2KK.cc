@@ -30,7 +30,7 @@
 #include "DataFormats/PatCandidates/interface/GenericParticle.h"
 
 FourOnia2KKPAT::FourOnia2KKPAT(const edm::ParameterSet& iConfig):
-trakCollection_(consumes<std::vector<pat::GenericParticle>>(iConfig.getParameter<edm::InputTag>("tracks"))),
+// trakCollection_(consumes<std::vector<pat::GenericParticle>>(iConfig.getParameter<edm::InputTag>("tracks"))),
 thebeamspot_(consumes<reco::BeamSpot>(iConfig.getParameter<edm::InputTag>("beamSpotTag"))),
 thePVs_(consumes<reco::VertexCollection>(iConfig.getParameter<edm::InputTag>("primaryVertexTag"))),
 higherPuritySelection_(iConfig.getParameter<std::string>("higherPuritySelection")),
@@ -120,8 +120,11 @@ FourOnia2KKPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     thePrimaryV = Vertex(bs.position(), bs.covariance3D());
   }
 
-  edm::Handle< std::vector<pat::GenericParticle> > thePATTrackHandle;
-  iEvent.getByToken(trakCollection_,thePATTrackHandle);
+  // edm::Handle< std::vector<pat::GenericParticle> > thePATTrackHandle;
+  // iEvent.getByToken(trakCollection_,thePATTrackHandle);
+
+  edm::Handle< vector<pat::GenericParticle> > thePATTrackHandle;
+  iEvent.getByToken("cleanPatTrackCands", thePATTrackHandle);
 
   edm::ESHandle<TransientTrackBuilder> theTTBuilder;
   iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder",theTTBuilder);
