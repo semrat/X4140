@@ -28,6 +28,7 @@
 #include "fourmuons.h"
 #include <TH2.h>
 #include <TStyle.h>
+#include <TProofOutputFile.h>
 
 void fourmuons::Begin(TTree * /*tree*/)
 {
@@ -45,6 +46,15 @@ void fourmuons::SlaveBegin(TTree * /*tree*/)
    // The tree argument is deprecated (on PROOF 0 is passed).
 
    TString option = GetOption();
+
+   std::string outputString = "mumumumu_tree.root";
+   OutFile = new TProofOutputFile( outputString.data() );
+   fOut = OutFile->OpenFile("RECREATE");
+
+   if (!(fOut=OutFile->OpenFile("RECREATE")))
+   {
+     Warning("SlaveBegin","Problems opening file: %s%s", OutFile->GetDir(), OutFile->GetFileName() );
+   }
 
 }
 
@@ -67,6 +77,8 @@ Bool_t fourmuons::Process(Long64_t entry)
    // The return value is currently not used.
 
    fReader.SetEntry(entry);
+
+   runNumber = run;
 
    return kTRUE;
 }

@@ -16,6 +16,9 @@
 #include <TTreeReaderValue.h>
 #include <TTreeReaderArray.h>
 
+#include <TProofOutputFile.h>
+#include <TFile.h>
+
 // Headers needed by this particular selector
 #include "TLorentzVector.h"
 
@@ -127,6 +130,11 @@ public :
    virtual TList  *GetOutputList() const { return fOutput; }
    virtual void    SlaveTerminate();
    virtual void    Terminate();
+
+   Float_t runNumber;
+
+   TProofOutputFile *OutFile;
+   TFile            *fOut;
 
    ClassDef(fourmuons,0);
 
