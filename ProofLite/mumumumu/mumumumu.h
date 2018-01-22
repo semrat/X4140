@@ -15,6 +15,7 @@
 #include <TTreeReader.h>
 #include <TTreeReaderValue.h>
 #include <TTreeReaderArray.h>
+#include <TNtuple.h>
 
 // Headers needed by this particular selector
 #include "TLorentzVector.h"
