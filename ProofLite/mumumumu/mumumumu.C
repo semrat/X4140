@@ -113,67 +113,67 @@ bool mumumumu::Process(Long64_t entry)
   // It can be passed to either Y4140::GetEntry() or TBranch::GetEntry()
   // to read either all or the required parts of the data. When processing
 
-  Float_t          run_out;
-  Float_t          evt_out;
-  Float_t          lum_out;
-  Float_t         X_mass;
-  Float_t         phi_mass;
-  Float_t         jpsi_mass;
-  Float_t         X_LFly;
-  Float_t         X_pt;
-  Float_t           X_eta;
-  Float_t            X_vtx;
-  Float_t            X_cosAlpha;
-  Float_t            X_chi2;
-  Float_t            X_dZ;
-  UInt_t             X_hlt;
-  UInt_t             p_hlt;
-  UInt_t             j_hlt;
-
-  TLorentzVector X_p4;
-
-  // #Phi
-  // 'HLT_DoubleMu2_Jpsi_DoubleTkMu0_Phi',
-  // 'HLT_DoubleMu2_Jpsi_DoubleTrk1_Phi',
-  // 'HLT_Mu20_TkMu0_Phi',
-  // 'HLT_Dimuon14_Phi_Barrel_Seagulls',
-  // 'HLT_Mu25_TkMu0_Phi',
-  // 'HLT_Dimuon24_Phi_noCorrL1',
-  // #JPsi
-  // 'HLT_DoubleMu4_JpsiTrkTrk_Displaced',
-  // 'HLT_DoubleMu4_JpsiTrk_Displaced',
-  // 'HLT_DoubleMu4_Jpsi_Displaced',
-  // 'HLT_DoubleMu4_3_Jpsi_Displaced',
-  // 'HLT_Dimuon20_Jpsi_Barrel_Seagulls',
-  // 'HLT_Dimuon25_Jpsi',
-  // 'HLT_Dimuon0_Jpsi'
-
-  std::cout << " Ciao " <<std::endl;
-  run_out = runNum;
-  evt_out = evtNum;
-  lum_out = lumiNum;
-
-  X_mass = xM;
-
-  X_hlt = trigFlag;
-
-  jpsi_mass = jPsiM;
-  phi_mass = phiM;
-  X_cosAlpha = cosAlpha;
-  X_LFly = lxy / lxyErr;
-  X_chi2 = vNChi2;
-  X_dZ = dz;
-  X_p4 = xP4;
-  std::cout << " Ciao " <<std::endl;
-  X_pt = X_p4.Pt();
-  X_eta = X_p4.Eta();
-
-  p_hlt = phiTrigger;
-  j_hlt = jpsiTrigger;
-  std::cout << " Ciao " <<std::endl;
-  // outTuple->Fill(run_out,evt_out,lum_out,X_mass,X_hlt,jpsi_mass,phi_mass,X_cosAlpha,X_LFly,X_chi2,X_dZ,X_pt,X_eta,p_hlt,j_hlt);
-  outTuple->Fill(run_out);
-  std::cout << " Ciao " <<std::endl;
+  // Float_t          run_out;
+  // Float_t          evt_out;
+  // Float_t          lum_out;
+  // Float_t         X_mass;
+  // Float_t         phi_mass;
+  // Float_t         jpsi_mass;
+  // Float_t         X_LFly;
+  // Float_t         X_pt;
+  // Float_t           X_eta;
+  // Float_t            X_vtx;
+  // Float_t            X_cosAlpha;
+  // Float_t            X_chi2;
+  // Float_t            X_dZ;
+  // UInt_t             X_hlt;
+  // UInt_t             p_hlt;
+  // UInt_t             j_hlt;
+  //
+  // TLorentzVector X_p4;
+  //
+  // // #Phi
+  // // 'HLT_DoubleMu2_Jpsi_DoubleTkMu0_Phi',
+  // // 'HLT_DoubleMu2_Jpsi_DoubleTrk1_Phi',
+  // // 'HLT_Mu20_TkMu0_Phi',
+  // // 'HLT_Dimuon14_Phi_Barrel_Seagulls',
+  // // 'HLT_Mu25_TkMu0_Phi',
+  // // 'HLT_Dimuon24_Phi_noCorrL1',
+  // // #JPsi
+  // // 'HLT_DoubleMu4_JpsiTrkTrk_Displaced',
+  // // 'HLT_DoubleMu4_JpsiTrk_Displaced',
+  // // 'HLT_DoubleMu4_Jpsi_Displaced',
+  // // 'HLT_DoubleMu4_3_Jpsi_Displaced',
+  // // 'HLT_Dimuon20_Jpsi_Barrel_Seagulls',
+  // // 'HLT_Dimuon25_Jpsi',
+  // // 'HLT_Dimuon0_Jpsi'
+  //
+  // std::cout << " Ciao " <<std::endl;
+  // run_out = runNum;
+  // evt_out = evtNum;
+  // lum_out = lumiNum;
+  //
+  // X_mass = xM;
+  //
+  // X_hlt = trigFlag;
+  //
+  // jpsi_mass = jPsiM;
+  // phi_mass = phiM;
+  // X_cosAlpha = cosAlpha;
+  // X_LFly = lxy / lxyErr;
+  // X_chi2 = vNChi2;
+  // X_dZ = dz;
+  // X_p4 = xP4;
+  // std::cout << " Ciao " <<std::endl;
+  // X_pt = X_p4.Pt();
+  // X_eta = X_p4.Eta();
+  //
+  // p_hlt = phiTrigger;
+  // j_hlt = jpsiTrigger;
+  // std::cout << " Ciao " <<std::endl;
+  // // outTuple->Fill(run_out,evt_out,lum_out,X_mass,X_hlt,jpsi_mass,phi_mass,X_cosAlpha,X_LFly,X_chi2,X_dZ,X_pt,X_eta,p_hlt,j_hlt);
+  // outTuple->Fill(run_out);
+  // std::cout << " Ciao " <<std::endl;
   return kTRUE;
 }
 
