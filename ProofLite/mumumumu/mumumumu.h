@@ -211,7 +211,7 @@ void mumumumu::Init(TTree *tree)
    fChain->SetBranchAddress("lErr_xy", &lxyErr, &b_lxyErr);
    fChain->SetBranchAddress("vNChi2", &vNChi2, &b_vNChi2);
    fChain->SetBranchAddress("dz", &dz, &b_dz);
-   fChain->SetBranchAddress("x_p4", &xP4, &b_xP4);
+   fChain->SetBranchAddress("x_p4", &xP4);
    fChain->SetBranchAddress("phi_trigger", &phiTrigger, &b_phiTrigger);
    fChain->SetBranchAddress("jpsi_trigger", &jpsiTrigger, &b_jpsiTrigger);
 
