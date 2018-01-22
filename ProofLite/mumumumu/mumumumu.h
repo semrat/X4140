@@ -199,21 +199,21 @@ void mumumumu::Init(TTree *tree)
    fChain->SetMakeClass(1);
 
    fChain->SetBranchAddress("event", &evtNum, &b_evtNum);
-   fChain->SetBranchAddress("run", &runNum, &b_runNum);
-   fChain->SetBranchAddress("lumiblock", &lumiNum, &b_lumiNum);
-   fChain->SetBranchAddress("trigger", &trigFlag, &b_trigFlag);
-   fChain->SetBranchAddress("xM", &xM, &b_xM);
-   fChain->SetBranchAddress("phi_M", &phiM, &b_phiM);
-   fChain->SetBranchAddress("jpsi_M", &jPsiM, &b_jPsiM);
-   fChain->SetBranchAddress("vProb", &vProb, &b_vProb);
-   fChain->SetBranchAddress("cosAlpha", &cosAlpha, &b_cosAlpha);
-   fChain->SetBranchAddress("l_xy", &lxy, &b_lxy);
-   fChain->SetBranchAddress("lErr_xy", &lxyErr, &b_lxyErr);
-   fChain->SetBranchAddress("vNChi2", &vNChi2, &b_vNChi2);
-   fChain->SetBranchAddress("dz", &dz, &b_dz);
-   fChain->SetBranchAddress("x_p4", &xP4);
-   fChain->SetBranchAddress("phi_trigger", &phiTrigger, &b_phiTrigger);
-   fChain->SetBranchAddress("jpsi_trigger", &jpsiTrigger, &b_jpsiTrigger);
+   // fChain->SetBranchAddress("run", &runNum, &b_runNum);
+   // fChain->SetBranchAddress("lumiblock", &lumiNum, &b_lumiNum);
+   // fChain->SetBranchAddress("trigger", &trigFlag, &b_trigFlag);
+   // fChain->SetBranchAddress("xM", &xM, &b_xM);
+   // fChain->SetBranchAddress("phi_M", &phiM, &b_phiM);
+   // fChain->SetBranchAddress("jpsi_M", &jPsiM, &b_jPsiM);
+   // fChain->SetBranchAddress("vProb", &vProb, &b_vProb);
+   // fChain->SetBranchAddress("cosAlpha", &cosAlpha, &b_cosAlpha);
+   // fChain->SetBranchAddress("l_xy", &lxy, &b_lxy);
+   // fChain->SetBranchAddress("lErr_xy", &lxyErr, &b_lxyErr);
+   // fChain->SetBranchAddress("vNChi2", &vNChi2, &b_vNChi2);
+   // fChain->SetBranchAddress("dz", &dz, &b_dz);
+   // fChain->SetBranchAddress("x_p4", &xP4);
+   // fChain->SetBranchAddress("phi_trigger", &phiTrigger, &b_phiTrigger);
+   // fChain->SetBranchAddress("jpsi_trigger", &jpsiTrigger, &b_jpsiTrigger);
 
 
 
