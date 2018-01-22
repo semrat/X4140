@@ -148,13 +148,13 @@ bool mumumumu::Process(Long64_t entry)
   // 'HLT_Dimuon25_Jpsi',
   // 'HLT_Dimuon0_Jpsi'
 
+  std::cout << " Ciao " <<std::endl;
   run_out = runNum;
   evt_out = evtNum;
   lum_out = lumiNum;
 
   X_mass = xM;
 
-  // std::bitset<13> bitsXHLT(0x0);
   X_hlt = trigFlag;
 
   jpsi_mass = jPsiM;
@@ -164,15 +164,15 @@ bool mumumumu::Process(Long64_t entry)
   X_chi2 = vNChi2;
   X_dZ = dz;
   X_p4 = xP4;
-
+  std::cout << " Ciao " <<std::endl;
   X_pt = X_p4.Pt();
   X_eta = X_p4.Eta();
 
   p_hlt = phiTrigger;
   j_hlt = jpsiTrigger;
-
+  std::cout << " Ciao " <<std::endl;
   outTuple->Fill(run_out,evt_out,lum_out,X_mass,X_hlt,jpsi_mass,phi_mass,X_cosAlpha,X_LFly,X_chi2,X_dZ,X_pt,X_eta,p_hlt,j_hlt);
-
+  std::cout << " Ciao " <<std::endl;
   return kTRUE;
 }
 
