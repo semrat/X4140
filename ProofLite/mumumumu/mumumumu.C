@@ -107,7 +107,7 @@ bool mumumumu::Process(Long64_t entry)
 {
   //std::cout << "PROCESS" << std::endl;
 
-  GetEntry(entry); /// ROOT event loop
+  fReader.SetEntry(entry);
 
   // The entry argument specifies which entry in the currently loaded tree is to be processed.
   // It can be passed to either Y4140::GetEntry() or TBranch::GetEntry()
