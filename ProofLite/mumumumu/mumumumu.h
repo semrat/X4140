@@ -76,7 +76,7 @@ public :
    UInt_t          phiTrigger;
    UInt_t          jpsiTrigger;
 
-   TLorentzVector xP4(0);
+   TLorentzVector xP4;
 
    // List of branches
 
