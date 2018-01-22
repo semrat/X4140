@@ -76,7 +76,7 @@ public :
    UInt_t          phiTrigger;
    UInt_t          jpsiTrigger;
 
-   TLorentzVector xP4;
+   TLorentzVector xP4(0);
 
    // List of branches
 
@@ -189,8 +189,6 @@ void mumumumu::Init(TTree *tree)
    lxyErr        = 0;
    vNChi2        = 0;
    dz        = 0;
-
-   xP4 = 0;
 
    phiTrigger = 0;
    jpsiTrigger = 0;
