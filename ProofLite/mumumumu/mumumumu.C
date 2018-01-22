@@ -165,8 +165,8 @@ bool mumumumu::Process(Long64_t entry)
   X_dZ = dz;
   X_p4 = xP4;
 
-  X_pt = X_p4.pt();
-  X_eta = X_p4.eta();
+  X_pt = X_p4.Pt();
+  X_eta = X_p4.Eta();
 
   p_hlt = phiTrigger;
   j_hlt = jpsiTrigger;
