@@ -26,7 +26,7 @@
 #include "mumumumu.h"
 
 /// SEMRA added
-#include <TCanvas.h>
+
 #include <TROOT.h>
 #include <TChain.h>
 #include <TFile.h>
@@ -53,7 +53,6 @@
 #include <string>
 #include <tuple>
 #include <map>
-#include "TSelectorCint.h"
 
 #include <iostream>
 #include <fstream>
