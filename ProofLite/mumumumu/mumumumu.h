@@ -94,7 +94,7 @@ public :
    TBranch*         b_lxyErr;
    TBranch*         b_vNChi2;
    TBranch*         b_dz;
-   TBranch*         b_xP4
+   TBranch*         b_xP4;
    TBranch*         b_phiTrigger;
    TBranch*         b_jpsiTrigger;
 
