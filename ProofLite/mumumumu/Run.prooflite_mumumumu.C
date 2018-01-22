@@ -10,7 +10,7 @@
 
   TDSet* dataset = new TDSet("TTree", "X_data", "mkcands");
   //
-  dataset->Add("/lustre/cms/store/user/adiflori/MuOniaParked/runB_resplit_Oct17/runB_split_00.root");
+  dataset->Add("/lustre/home/adrianodif/Git/X4140/ProofLite/mumumumu/phiJpsiTriggersBCDEF.root");
 
   // dataset->Add("/Users/adrianodiflorio/Documents/Git/X4140/ProofLite/Y4140_testrootuple.root");
   TString selector = "mumumumu";
