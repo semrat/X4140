@@ -78,7 +78,7 @@ Bool_t fourmuons::Process(Long64_t entry)
 
    fReader.SetEntry(entry);
 
-   runNumber = run.Get();
+   runNumber = *run;
 
    return kTRUE;
 }
