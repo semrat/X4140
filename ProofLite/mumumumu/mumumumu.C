@@ -186,7 +186,7 @@ void mumumumu::SlaveTerminate()
   if (fOut)
   {
     fOut->cd();
-    gStyle->SetOptStat(111111) ;
+    // gStyle->SetOptStat(111111) ;
 
 
     outTuple->Write();
