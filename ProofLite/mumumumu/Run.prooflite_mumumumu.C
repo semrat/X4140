@@ -13,8 +13,8 @@
   dataset->Add("/lustre/cms/store/user/adiflori/MuOniaParked/runB_resplit_Oct17/runB_split_00.root");
 
   // dataset->Add("/Users/adrianodiflorio/Documents/Git/X4140/ProofLite/Y4140_testrootuple.root");
-  TString selector = "mumukk";
-  TProof *p = TProof::Open("workers=1"); // 12 workers for qsub
+  TString selector = "mumumumu";
+  TProof *p = TProof::Open("workers=40"); // 12 workers for qsub
 
   // Processing
   cout << ">> Processing " << selector << " ... " << endl;
