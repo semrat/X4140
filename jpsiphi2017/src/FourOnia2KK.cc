@@ -27,7 +27,6 @@
 #include "TrackingTools/PatternTools/interface/ClosestApproachInRPhi.h"
 
 #include "DataFormats/PatCandidates/interface/PackedCandidate.h"
-#include "DataFormats/PatCandidates/interface/GenericParticle.h"
 
 FourOnia2KKPAT::FourOnia2KKPAT(const edm::ParameterSet& iConfig):
 trakCollection_(consumes<edm::View<pat::GenericParticle>>(iConfig.getParameter<edm::InputTag>("tracks"))),
@@ -135,7 +134,7 @@ FourOnia2KKPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   std::cout<<"M"<< std::endl;
 
-  for(View<pat::GenericParticle>::const_iterator kTrack1 = thePATTrackHandle->begin();kTrack1 != thePATTrackHandle->end(); ++kTrack1 )
+  for(edm::View<pat::GenericParticle>::const_iterator kTrack1 = thePATTrackHandle->begin();kTrack1 != thePATTrackHandle->end(); ++kTrack1 )
   {
     if(kTrack1->charge()==0) continue;
 
@@ -144,7 +143,7 @@ FourOnia2KKPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
     std::cout << kTrack1->track()->pt() << " - " << kTrack1->pt() << std::endl;
 
-    for(View<pat::GenericParticle>::const_iterator kTrack2 = kTrack1+1; kTrack2 != thePATTrackHandle->end(); ++kTrack2 )
+    for(edm::View<pat::GenericParticle>::const_iterator kTrack2 = kTrack1+1; kTrack2 != thePATTrackHandle->end(); ++kTrack2 )
     {
       // if ((kTrack2->track() ==  nullptr)) continue;
       if(kTrack1==kTrack2) continue;
