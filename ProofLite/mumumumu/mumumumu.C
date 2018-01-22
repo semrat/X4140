@@ -24,8 +24,6 @@
 //
 
 #include "mumumumu.h"
-#include <TH2.h>
-#include <TStyle.h>
 
 /// SEMRA added
 #include <TCanvas.h>
