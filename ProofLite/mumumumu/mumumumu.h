@@ -128,6 +128,45 @@ public :
    virtual void    SlaveTerminate();
    virtual void    Terminate();
 
+   TProofOutputFile *OutFile;
+   TFile            *fOut;
+
+   // TTree *outTree;
+   TNtuple *outTuple;
+   //
+   Float_t          run_out;
+   Float_t          evt_out;
+   Float_t          lum_out;
+   Float_t         X_mass;
+   Float_t         kk_mass;
+   Float_t         mumu_mass;
+   Float_t         X_LFly;
+   Float_t         X_pt;
+   Float_t         X_eta;
+   Float_t         X_vtx;
+   Float_t         X_cosAlpha;
+   Float_t         X_hlt;
+
+  //
+  // TBranch*      X_mass_b;
+  // TBranch*      kk_mass_b;
+  // TBranch*      mumu_mass_b;
+  // TBranch*      X_LFly_b;
+  // TBranch*      X_pt_b;
+  // TBranch*      X_eta_b;
+  // TBranch*      X_vtx_b;
+  // TBranch*      X_cosAlpha_b;
+  // TBranch*      X_hlt_b;
+  // TBranch*      X_run_b;
+  // TBranch*      X_evt_b;
+  // TBranch*      X_lum_b;
+
+   double JPsi_mass;
+   double Phi_mass,Phi_sigma,Phi_mean;
+   double Bs0_Low_Mass;
+   double Bs0_High_Mass;
+   double Y_High_Mass;
+
    ClassDef(mumumumu,0);
 
 };
