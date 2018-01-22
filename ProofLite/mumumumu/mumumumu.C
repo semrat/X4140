@@ -98,7 +98,7 @@ void mumumumu::SlaveBegin(TTree * /*tree*/)
   Phi_mean = 1.019723;
   Phi_sigma = 2.35607e-03;//2.28400e-03;
 
-  outTuple = new TNtuple("outuple","outuple","run:evt:lum:xHlt:xM:phiM:jPsiM:xL:xProb:xCos:xP4:phiTrigger:jpsiTrigger");
+  outTuple = new TNtuple("outuple","outuple","run_out:evt_out:lum_out:X_mass:X_hlt:jpsi_mass:phi_mass:X_cosAlpha:X_LFly:X_chi2:X_dZ:X_pt:X_eta:p_hlt:j_hlt");
 
 
 }

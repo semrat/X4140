@@ -8,7 +8,7 @@
 
   // INPUT DATA SAMPLE ON LOCAL DISK
 
-  TDSet* dataset = new TDSet("TTree", "X_data", "mkcands");
+  TDSet* dataset = new TDSet("TTree", "xTree", "rootuple");
   //
   dataset->Add("/lustre/cms/store/user/adiflori/MuOnia/phiJpsiTriggersBCDEF.root");
 
