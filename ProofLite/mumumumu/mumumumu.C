@@ -98,8 +98,8 @@ void mumumumu::SlaveBegin(TTree * /*tree*/)
   Phi_mean = 1.019723;
   Phi_sigma = 2.35607e-03;//2.28400e-03;
 
-  outTuple = new TNtuple("outuple","outuple","run_out:evt_out:lum_out:X_mass:X_hlt:jpsi_mass:phi_mass:X_cosAlpha:X_LFly:X_chi2:X_dZ:X_pt:X_eta:p_hlt:j_hlt");
-
+   // outTuple = new TNtuple("outuple","outuple","run_out:evt_out:lum_out:X_mass:X_hlt:jpsi_mass:phi_mass:X_cosAlpha:X_LFly:X_chi2:X_dZ:X_pt:X_eta:p_hlt:j_hlt");
+   outTuple = new TNtuple("outuple","outuple","run_out");
 
 }
 
@@ -171,7 +171,8 @@ bool mumumumu::Process(Long64_t entry)
   p_hlt = phiTrigger;
   j_hlt = jpsiTrigger;
   std::cout << " Ciao " <<std::endl;
-  outTuple->Fill(run_out,evt_out,lum_out,X_mass,X_hlt,jpsi_mass,phi_mass,X_cosAlpha,X_LFly,X_chi2,X_dZ,X_pt,X_eta,p_hlt,j_hlt);
+  // outTuple->Fill(run_out,evt_out,lum_out,X_mass,X_hlt,jpsi_mass,phi_mass,X_cosAlpha,X_LFly,X_chi2,X_dZ,X_pt,X_eta,p_hlt,j_hlt);
+  outTuple->Fill(run_out);
   std::cout << " Ciao " <<std::endl;
   return kTRUE;
 }

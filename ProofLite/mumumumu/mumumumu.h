@@ -199,7 +199,7 @@ void mumumumu::Init(TTree *tree)
    fChain->SetMakeClass(1);
 
    fChain->SetBranchAddress("event", &evtNum, &b_evtNum);
-   // fChain->SetBranchAddress("run", &runNum, &b_runNum);
+   fChain->SetBranchAddress("run", &runNum, &b_runNum);
    // fChain->SetBranchAddress("lumiblock", &lumiNum, &b_lumiNum);
    // fChain->SetBranchAddress("trigger", &trigFlag, &b_trigFlag);
    // fChain->SetBranchAddress("xM", &xM, &b_xM);
