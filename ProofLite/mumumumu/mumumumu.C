@@ -165,10 +165,13 @@ bool mumumumu::Process(Long64_t entry)
   X_dZ = dz;
   X_p4 = xP4;
 
+  X_pt = X_p4.pt();
+  X_eta = X_p4.eta();
+
   p_hlt = phiTrigger;
   j_hlt = jpsiTrigger;
 
-  outTuple->Fill(run_out,evt_out,lum_out,X_mass,X_hlt,jpsi_mass,phi_mass,X_cosAlpha,X_LFly,X_chi2,X_dZ,X_p4,p_hlt,j_hlt);
+  outTuple->Fill(run_out,evt_out,lum_out,X_mass,X_hlt,jpsi_mass,phi_mass,X_cosAlpha,X_LFly,X_chi2,X_dZ,X_pt,X_eta,p_hlt,j_hlt);
 
   return kTRUE;
 }
