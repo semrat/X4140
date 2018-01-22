@@ -130,7 +130,7 @@ bool mumumumu::Process(Long64_t entry)
   UInt_t             p_hlt;
   UInt_t             j_hlt;
 
-  LorentzVector X_p4;
+  TLorentzVector X_p4;
 
   // #Phi
   // 'HLT_DoubleMu2_Jpsi_DoubleTkMu0_Phi',
