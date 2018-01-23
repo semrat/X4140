@@ -15,8 +15,12 @@ int noHlts = 13;
 int colors[17] = {kRed,kBlue,kGreen,kMagenta,kBlack,kRed + 1,kBlue + 1,kGreen + 1,kMagenta + 1,kBlack + 1,
               kRed - 1,kBlue - 1,kGreen - 1,kMagenta - 1,kBlack - 1, kOrange, kOrange + 1};
 
-std::string hltsName[13] = {"HLT_DoubleMu2_Jpsi_DoubleTkMu0_Phi","HLT_Mu20_TkMu0_Phi",
-                            "HLT_Dimuon14_Phi_Barrel_Seagulls","HLT_Mu25_TkMu0_Phi","HLT_Dimuon24_Phi_noCorrL1",
+std::string hltsName[13] = {"HLT_DoubleMu2_Jpsi_DoubleTkMu0_Phi",
+                            "HLT_DoubleMu2_Jpsi_DoubleTrk1_Phi",
+                            "HLT_Mu20_TkMu0_Phi",
+                            "HLT_Dimuon14_Phi_Barrel_Seagulls",
+                            "HLT_Mu25_TkMu0_Phi",
+                            "HLT_Dimuon24_Phi_noCorrL1",
                             "HLT_DoubleMu4_JpsiTrkTrk_Displaced",
                             "HLT_DoubleMu4_JpsiTrk_Displaced",
                             "HLT_DoubleMu4_Jpsi_Displaced",
