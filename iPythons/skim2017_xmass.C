@@ -251,6 +251,9 @@ int drawXTree(std::string path = "/Users/adrianodiflorio/Documents/Git/X4140/iPy
    c.SaveAs("jpsitriggerCheck.eps");
    c.SaveAs("jpsitriggerCheck.root");
 
+   xHist->SetMinimum(1.0);
+   xHist->SetMaximum(10E5);
+
    xHist->SetLineColor(kBlue);
    xHist->Write();
    xHist->Draw();
