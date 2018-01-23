@@ -160,7 +160,7 @@ int drawXTree(std::string path = "/Users/adrianodiflorio/Documents/Git/X4140/iPy
      // TH1F* phi_triggrHist = new TH1F("phi_triggrHist","phi_triggrHist",600,0.6,1.2);
      TH1F* phiHist = new TH1F("phiHist","phiHist",1000,0.5,1.5);
      TH1F* jpsiHist = new TH1F("jpsiHist","jpsiHist",1000,2.5,3.5);
-     TH1F* xHist = new TH1F("xHist","xHist",2000,4.0,6.0);
+     TH1F* xHist = new TH1F("xHist","xHist",6000,2.0,8.0);
 
      std::vector<TH1F*> phiHists;
      std::vector<TH1F*> jpsiHists;
@@ -170,7 +170,7 @@ int drawXTree(std::string path = "/Users/adrianodiflorio/Documents/Git/X4140/iPy
      {
           phiHists.push_back(new TH1F((hltsName[i] + "_phi").data(),(hltsName[i] + "_phi").data(),1000,0.5,1.5));
           jpsiHists.push_back(new TH1F((hltsName[i] + "_jpsi").data(),(hltsName[i] + "_jpsi").data(),1000,2.5,3.5));
-          xHists.push_back(new TH1F((hltsName[i] + "_x").data(),(hltsName[i] + "_x").data(),2000,4.0,6.0));
+          xHists.push_back(new TH1F((hltsName[i] + "_x").data(),(hltsName[i] + "_x").data(),6000,2.0,8.0));
      }
 
 
