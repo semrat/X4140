@@ -151,63 +151,127 @@ int drawXTree(std::string path = "/Users/adrianodiflorio/Documents/Git/X4140/iPy
    TCanvas c("c","c",1200,1200);
 
    TFile *newfile = new TFile("drawSkim.root","RECREATE");
-
-
    // for(int j = 0; j < 1; j++)
    // {
 
      TTree *newtree = oldtree->CloneTree(0);
      // TH1F* phi_triggrHist = new TH1F("phi_triggrHist","phi_triggrHist",600,0.6,1.2);
-     TH1F* phi_allphiHist = new TH1F("phi_allphiHist","phi_allphiHist",1000,0.5,1.5);
-     std::vector<TH1F*> phiHists;
-     for (size_t i = 0; i < noHlts; i++)
-        phiHists.push_back(new TH1F(hltsName[i].data(),hltsName[i].data(),1000,0.5,1.5));
+     TH1F* phiHist = new TH1F("phiHist","phiHist",1000,0.5,1.5);
+     TH1F* jpsiHist = new TH1F("jpsiHist","jpsiHist",1000,2.5,3.5);
+     TH1F* xHist = new TH1F("xHist","xHist",2000,4.0,6.0);
 
-     float max = -1.0;
+     std::vector<TH1F*> phiHists;
+     std::vector<TH1F*> jpsiHists;
+     std::vector<TH1F*> xHists;
+
+     for (size_t i = 0; i < noHlts; i++)
+     {
+          phiHists.push_back(new TH1F((hltsName[i] + "_phi").data(),(hltsName[i] + "_phi").data(),1000,0.5,1.5));
+          jpsiHists.push_back(new TH1F((hltsName[i] + "_jpsi").data(),(hltsName[i] + "_jpsi").data(),1000,2.5,3.5));
+          xHists.push_back(new TH1F((hltsName[i] + "_x").data(),(hltsName[i] + "_x").data(),2000,4.0,6.0));
+     }
+
+
      for (Long64_t i=0;i<nentries; i++) {
         oldtree->GetEntry(i);
         std::bitset<16> tB(trigger);
-        std::bitset<16> pM(phiMType);
-        std::bitset<16> pP(phiPType);
-        max = std::max(max,float(trigger));
-
+        // std::bitset<16> pM(phiMType);
+        // std::bitset<16> pP(phiPType);
         for (int j = 0; j < noHlts; j++)
-          if (tB.test(j)) phiHists[j]->Fill(phiM);
+          if (tB.test(j))
+          {
+            phiHists[j]->Fill(phiM);
+            jpsiHists[j]->Fill(jPsiM);
+            xHists[j]->Fill(xM);
+          }
 
-        phi_allphiHist->Fill(phiM);
+        xHist->Fill(xM);
+        phiHist->Fill(phiM);
+        jpsiHist->Fill(jPsiM);
      }
 
-     std::cout << max << std::endl;
+
      //newtree->Draw("phi_M","","same");
    // }
-   phi_allphiHist->SetMinimum(1.0);
-   phi_allphiHist->SetMaximum(10E4);
+   phiHist->SetMinimum(1.0);
+   phiHist->SetMaximum(10E4);
    //oldtree->Draw("phi_M");
    // TH1F* phi_triggrHist = (TH1F*)gDirectory->Get("phi_triggrHist");
 
-   phi_allphiHist->SetLineColor(kBlue);
-   phi_allphiHist->Write();
-   phi_allphiHist->Draw();
+   phiHist->SetLineColor(kBlue);
+   phiHist->Write();
+   phiHist->Draw();
 
-   TLegend leg(0.1,0.7,0.48,0.9);
-   leg.AddEntry(phi_allphiHist,(phi_allphiHist->GetName()),"l");
+   TLegend leg* = new TLegend(0.1,0.7,0.48,0.9);
+   leg->AddEntry(phiHist,(phiHist->GetName()),"l");
    for (size_t i = 0; i < 13; i++)
     {
       phiHists[i]->SetLineColor(colors[i]);
       phiHists[i]->SetLineWidth(2);
       if(i>5) phiHists[i]->SetLineStyle(kDashed);
       phiHists[i]->Draw("same");
-      leg.AddEntry(phiHists[i],(phiHists[i]->GetName()),"l");
+      leg->AddEntry(phiHists[i],(phiHists[i]->GetName()),"l");
       phiHists[i]->Write();
     }
 
+    leg->Draw();
+    c.SetLogy(1);
+    c.SaveAs("phitriggerCheck.png");
+    c.SaveAs("phitriggerCheck.eps");
+    c.SaveAs("phitriggerCheck.root");
+
+    jpsiHist->SetMinimum(1.0);
+    jpsiHist->SetMaximum(10E4);
+    //oldtree->Draw("phi_M");
+    // TH1F* phi_triggrHist = (TH1F*)gDirectory->Get("phi_triggrHist");
+
+    jpsiHist->SetLineColor(kBlue);
+    jpsiHist->Write();
+    jpsiHist->Draw();
+
+    leg = new TLegend(0.1,0.7,0.48,0.9);
+    leg->AddEntry(phiHist,(phiHist->GetName()),"l");
+    for (size_t i = 0; i < 13; i++)
+     {
+       jpsiHists[i]->SetLineColor(colors[i]);
+       jpsiHists[i]->SetLineWidth(2);
+       if(i>5) jpsiHists[i]->SetLineStyle(kDashed);
+       jpsiHists[i]->Draw("same");
+       leg->AddEntry(jpsiHists[i],(jpsiHists[i]->GetName()),"l");
+       jpsiHists[i]->Write();
+     }
+
 
    // phi_triggrHist->Draw("same");
-   leg.Draw();
+   leg->Draw();
    c.SetLogy(1);
-   c.SaveAs("triggerCheck.png");
-   c.SaveAs("triggerCheck.eps");
-   c.SaveAs("triggerCheck.root");
+   c.SaveAs("jpsitriggerCheck.png");
+   c.SaveAs("jpsitriggerCheck.eps");
+   c.SaveAs("jpsitriggerCheck.root");
+
+   xHist->SetLineColor(kBlue);
+   xHist->Write();
+   xHist->Draw();
+
+   leg = new TLegend(0.1,0.7,0.48,0.9);
+   leg->AddEntry(phiHist,(phiHist->GetName()),"l");
+   for (size_t i = 0; i < 13; i++)
+    {
+      xHists[i]->SetLineColor(colors[i]);
+      xHists[i]->SetLineWidth(2);
+      if(i>5) xHists[i]->SetLineStyle(kDashed);
+      xHists[i]->Draw("same");
+      leg->AddEntry(xHists[i],(xHists[i]->GetName()),"l");
+      xHists[i]->Write();
+    }
+
+
+  // phi_triggrHist->Draw("same");
+  leg->Draw();
+  c.SetLogy(1);
+  c.SaveAs("xtriggerCheck.png");
+  c.SaveAs("xtriggerCheck.eps");
+  c.SaveAs("xtriggerCheck.root");
 
    return 0;
 
