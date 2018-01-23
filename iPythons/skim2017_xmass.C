@@ -161,12 +161,8 @@ int drawXTree(std::string path = "/Users/adrianodiflorio/Documents/Git/X4140/iPy
      TH1F* phi_allphiHist = new TH1F("phi_allphiHist","phi_allphiHist",1000,0.5,1.5);
      std::vector<TH1F*> phiHists;
      for (size_t i = 0; i < noHlts; i++)
-     {
-        //std::string name = "phi_allphiHist_" + std::to_string(i);
-
         phiHists.push_back(new TH1F(hltsName[i].data(),hltsName[i].data(),1000,0.5,1.5));
 
-     }
      float max = -1.0;
      for (Long64_t i=0;i<nentries; i++) {
         oldtree->GetEntry(i);
@@ -190,17 +186,19 @@ int drawXTree(std::string path = "/Users/adrianodiflorio/Documents/Git/X4140/iPy
    // TH1F* phi_triggrHist = (TH1F*)gDirectory->Get("phi_triggrHist");
 
    phi_allphiHist->SetLineColor(kBlue);
+   phi_allphiHist->Write();
    phi_allphiHist->Draw();
 
    TLegend leg(0.1,0.7,0.48,0.9);
    leg.AddEntry(phi_allphiHist,(phi_allphiHist->GetName()),"l");
-   for (size_t i = 0; i < noHlts; i++)
+   for (size_t i = 0; i < 13; i++)
     {
-      phiHists[i]->SetLineColor(colors[i]);
-      phiHists[i]->SetLineWidth(2);
+      // phiHists[i]->SetLineColor(colors[i]);
+      // phiHists[i]->SetLineWidth(2);
       if(i>5) phiHists[i]->SetLineStyle(kDashed);
       phiHists[i]->Draw("same");
       leg.AddEntry(phiHists[i],(phiHists[i]->GetName()),"l");
+      phiHists[i]->Write();
     }
 
 
@@ -209,6 +207,7 @@ int drawXTree(std::string path = "/Users/adrianodiflorio/Documents/Git/X4140/iPy
    c.SetLogy(1);
    c.SaveAs("triggerCheck.png");
    c.SaveAs("triggerCheck.eps");
+   c.SaveAs("triggerCheck.root");
 
    return 0;
 
