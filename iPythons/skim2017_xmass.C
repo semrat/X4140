@@ -105,10 +105,10 @@ int selectXTree()
 
 }
 
-int drawXTree()
+int drawXTree(std::string path = "/Users/adrianodiflorio/Documents/Git/X4140/iPythons/xTree.root")
 {
 
-   TFile *oldfile = TFile::Open("/Users/adrianodiflorio/Documents/Git/X4140/iPythons/xTree.root");
+   TFile *oldfile = TFile::Open(path.data());
    TTree *oldtree = (TTree*)oldfile->Get("xTree");
 
    Long64_t nentries = oldtree->GetEntries();
