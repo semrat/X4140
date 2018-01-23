@@ -173,21 +173,23 @@ int drawXTree(std::string path = "/Users/adrianodiflorio/Documents/Git/X4140/iPy
           xHists.push_back(new TH1F((hltsName[i] + "_x").data(),(hltsName[i] + "_x").data(),120,5.0,5.6));
      }
 
-
+ 
      for (Long64_t i=0;i<nentries; i++) {
         oldtree->GetEntry(i);
         std::bitset<16> tB(trigger);
         // std::bitset<16> pM(phiMType);
         // std::bitset<16> pP(phiPType);
-        for (int j = 0; j < 6; j++)
+       bool jpsimass = jPsiM < 3.15 && jPsiM > 3.0;
+       bool phimass = phiM < 1.06 && phiM > 0.98; 
+       for (int j = 0; j < 5; j++)
           if (tB.test(j) )
           {
             phiHists[j]->Fill(phiM);
             jpsiHists[j]->Fill(jPsiM);
-   	    if(cosA > 0.99 && vProb>0.05 && xyl/xylErr > 3.0)
+   	    if(phimass && jpsimass && cosA > 0.995 && vProb>0.02 && xyl/xylErr > 2.0)
             xHists[j]->Fill(xM);
           }
-	if(cosA > 0.99 && vProb>0.05 && xyl/xylErr > 3.0)
+	if(cosA > 0.995 && phimass && jpsimass && vProb>0.02 && xyl/xylErr > 2.0)
         xHist->Fill(xM);
         phiHist->Fill(phiM);
         jpsiHist->Fill(jPsiM);
@@ -253,7 +255,7 @@ int drawXTree(std::string path = "/Users/adrianodiflorio/Documents/Git/X4140/iPy
    c.SaveAs("jpsitriggerCheck.root");
 
    xHist->SetMinimum(1.0);
-   xHist->SetMaximum(5E3);
+   xHist->SetMaximum(2E2);
 
    xHist->SetLineColor(kBlue);
    xHist->Write();
@@ -274,7 +276,7 @@ int drawXTree(std::string path = "/Users/adrianodiflorio/Documents/Git/X4140/iPy
 
   // phi_triggrHist->Draw("same");
   leg->Draw();
-  c.SetLogy(1);
+  c.SetLogy(0);
   c.SaveAs("xtriggerCheck.png");
   c.SaveAs("xtriggerCheck.eps");
   c.SaveAs("xtriggerCheck.root");
