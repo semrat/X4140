@@ -116,6 +116,7 @@ int drawXTree(std::string path = "/Users/adrianodiflorio/Documents/Git/X4140/iPy
    TTree *oldtree = (TTree*)oldfile->Get("xTree");
 
    Long64_t nentries = oldtree->GetEntries();
+   Double_t xM = 0.0;
    Double_t xyl   = 0.0;
    Double_t xylErr   = 0.0;
    Double_t cosA  = 0.0;
@@ -131,6 +132,7 @@ int drawXTree(std::string path = "/Users/adrianodiflorio/Documents/Git/X4140/iPy
    Int_t phiMType = 0, phiPType = 0;
    UInt_t phi_trigger = 0, jpsi_trigger = 0, trigger = 0;
 
+   oldtree->SetBranchAddress("xM",&xM);
    oldtree->SetBranchAddress("vProb",&vProb);
    oldtree->SetBranchAddress("trigger",&trigger);
    oldtree->SetBranchAddress("l_xy",&xyl);
