@@ -184,9 +184,10 @@ int drawXTree(std::string path = "/Users/adrianodiflorio/Documents/Git/X4140/iPy
           {
             phiHists[j]->Fill(phiM);
             jpsiHists[j]->Fill(jPsiM);
+   	    if(cosA > 0.99 && vProb>0.05 && xyl/xylErr > 3.0)
             xHists[j]->Fill(xM);
           }
-
+	if(cosA > 0.99 && vProb>0.05 && xyl/xylErr > 3.0)
         xHist->Fill(xM);
         phiHist->Fill(phiM);
         jpsiHist->Fill(jPsiM);
@@ -223,7 +224,7 @@ int drawXTree(std::string path = "/Users/adrianodiflorio/Documents/Git/X4140/iPy
     c.SaveAs("phitriggerCheck.root");
 
     jpsiHist->SetMinimum(1.0);
-    jpsiHist->SetMaximum(10E4);
+    jpsiHist->SetMaximum(1E4);
     //oldtree->Draw("phi_M");
     // TH1F* phi_triggrHist = (TH1F*)gDirectory->Get("phi_triggrHist");
 
@@ -232,7 +233,7 @@ int drawXTree(std::string path = "/Users/adrianodiflorio/Documents/Git/X4140/iPy
     jpsiHist->Draw();
 
     leg = new TLegend(0.1,0.7,0.48,0.9);
-    leg->AddEntry(phiHist,(phiHist->GetName()),"l");
+    leg->AddEntry(jpsiHist,(phiHist->GetName()),"l");
     for (size_t i = 0; i < 13; i++)
      {
        jpsiHists[i]->SetLineColor(colors[i]);
@@ -252,14 +253,14 @@ int drawXTree(std::string path = "/Users/adrianodiflorio/Documents/Git/X4140/iPy
    c.SaveAs("jpsitriggerCheck.root");
 
    xHist->SetMinimum(1.0);
-   xHist->SetMaximum(10E5);
+   xHist->SetMaximum(5E3);
 
    xHist->SetLineColor(kBlue);
    xHist->Write();
    xHist->Draw();
 
    leg = new TLegend(0.1,0.7,0.48,0.9);
-   leg->AddEntry(phiHist,(phiHist->GetName()),"l");
+   leg->AddEntry(xHist,(phiHist->GetName()),"l");
    for (size_t i = 0; i < 13; i++)
     {
       xHists[i]->SetLineColor(colors[i]);
