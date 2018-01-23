@@ -13,8 +13,6 @@
 
 int noHlts = 13;
 
-int colors[13] = {1,2,3,6,7,8,30,40,46,38,29,34,9};
-
 std::string hltsName[13] = {"HLT_DoubleMu2_Jpsi_DoubleTkMu0_Phi",
                             "HLT_DoubleMu2_Jpsi_DoubleTrk1_Phi",
                             "HLT_Mu20_TkMu0_Phi",
@@ -111,6 +109,8 @@ int selectXTree()
 
 int drawXTree(std::string path = "/Users/adrianodiflorio/Documents/Git/X4140/iPythons/xTree.root")
 {
+
+  UInt_t colors[13] = {1,2,3,6,7,8,30,40,46,38,29,34,9};
 
    TFile *oldfile = TFile::Open(path.data());
    TTree *oldtree = (TTree*)oldfile->Get("xTree");
