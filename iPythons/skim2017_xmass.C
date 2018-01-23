@@ -105,7 +105,7 @@ int selectXTree()
 
 }
 
-int drawXTree(std::string path = "/Users/adrianodiflorio/Documents/Git/X4140/iPythons/xTree.root")
+int drawXTree(std::string path = "/Users/adrianodiflorio/Documents/Git/X4140/iPythons/xTree.root",)
 {
 
    TFile *oldfile = TFile::Open(path.data());
@@ -171,7 +171,7 @@ int drawXTree(std::string path = "/Users/adrianodiflorio/Documents/Git/X4140/iPy
         std::bitset<16> pP(phiPType);
         max = std::max(max,float(trigger));
         for (int j = 0; j < noHlts; j++)
-          if (tB.test(j) && pM.test(1) && pP.test(1)) phiHists[j]->Fill(phiM);
+          if (tB.test(j)) phiHists[j]->Fill(phiM);
 
         phi_allphiHist->Fill(phiM);
      }
@@ -199,7 +199,8 @@ int drawXTree(std::string path = "/Users/adrianodiflorio/Documents/Git/X4140/iPy
    // phi_triggrHist->Draw("same");
    leg.Draw();
    c.SetLogy(1);
-   c.SaveAs("triggerCheckTrakerMu.eps");
+   c.SaveAs("triggerCheck.png");
+   c.SaveAs("triggerCheck.eps");
 
    return 0;
 
