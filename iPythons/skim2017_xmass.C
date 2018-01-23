@@ -10,29 +10,20 @@
 #include <TStyle.h>
 #include <string>
 
+int noHlts = 13;
 
 int colors[17] = {kRed,kBlue,kGreen,kMagenta,kBlack,kRed + 1,kBlue + 1,kGreen + 1,kMagenta + 1,kBlack + 1,
               kRed - 1,kBlue - 1,kGreen - 1,kMagenta - 1,kBlack - 1, kOrange, kOrange + 1};
 
-std::string hltsName[5] = {"HLT_DoubleMu2_Jpsi_DoubleTkMu0_Phi","HLT_Mu20_TkMu0_Phi",
-                            "HLT_Dimuon14_Phi_Barrel_Seagulls","HLT_Mu25_TkMu0_Phi","HLT_Dimuon24_Phi_noCorrL1"};
-              // hltList = [
-              // #Phi
-              // 0 'HLT_DoubleMu2_Jpsi_DoubleTkMu0_Phi',
-              // 1 'HLT_DoubleMu2_Jpsi_DoubleTrk1_Phi',
-              // 2 'HLT_Mu20_TkMu0_Phi',
-              // 3 'HLT_Dimuon14_Phi_Barrel_Seagulls',
-              // 4 'HLT_Mu25_TkMu0_Phi',
-              // 5 'HLT_Dimuon24_Phi_noCorrL1',
-              // #JPsi
-              // 6 'HLT_DoubleMu4_JpsiTrkTrk_Displaced',
-              // 7 'HLT_DoubleMu4_JpsiTrk_Displaced',
-              // 8 'HLT_DoubleMu4_Jpsi_Displaced',
-              // 9 'HLT_DoubleMu4_3_Jpsi_Displaced',
-              // 10 'HLT_Dimuon20_Jpsi_Barrel_Seagulls',
-              // 11 'HLT_Dimuon25_Jpsi',
-              // 12 'HLT_Dimuon0_Jpsi'
-              // ]
+std::string hltsName[13] = {"HLT_DoubleMu2_Jpsi_DoubleTkMu0_Phi","HLT_Mu20_TkMu0_Phi",
+                            "HLT_Dimuon14_Phi_Barrel_Seagulls","HLT_Mu25_TkMu0_Phi","HLT_Dimuon24_Phi_noCorrL1",
+                            "HLT_DoubleMu4_JpsiTrkTrk_Displaced",
+                            "HLT_DoubleMu4_JpsiTrk_Displaced",
+                            "HLT_DoubleMu4_Jpsi_Displaced",
+                            "HLT_DoubleMu4_3_Jpsi_Displaced",
+                            "HLT_Dimuon20_Jpsi_Barrel_Seagulls",
+                            "HLT_Dimuon25_Jpsi",
+                            "HLT_Dimuon0_Jpsi"};
 
 int skimXTree()
 {
@@ -165,7 +156,7 @@ int drawXTree()
      // TH1F* phi_triggrHist = new TH1F("phi_triggrHist","phi_triggrHist",600,0.6,1.2);
      TH1F* phi_allphiHist = new TH1F("phi_allphiHist","phi_allphiHist",1000,0.5,1.5);
      std::vector<TH1F*> phiHists;
-     for (size_t i = 0; i < 5; i++)
+     for (size_t i = 0; i < noHlts; i++)
      {
         //std::string name = "phi_allphiHist_" + std::to_string(i);
 
@@ -179,7 +170,7 @@ int drawXTree()
         std::bitset<16> pM(phiMType);
         std::bitset<16> pP(phiPType);
         max = std::max(max,float(trigger));
-        for (int j = 0; j < 16; j++)
+        for (int j = 0; j < noHlts; j++)
           if (tB.test(j) && pM.test(1) && pP.test(1)) phiHists[j]->Fill(phiM);
 
         phi_allphiHist->Fill(phiM);
@@ -197,7 +188,7 @@ int drawXTree()
 
    TLegend leg(0.1,0.7,0.48,0.9);
 
-   for (size_t i = 0; i < 5; i++)
+   for (size_t i = 0; i < noHlts; i++)
     {
       phiHists[i]->SetLineColor(colors[i]);
       phiHists[i]->Draw("same");
