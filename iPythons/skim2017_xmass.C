@@ -204,7 +204,7 @@ int drawXTree(std::string path = "/Users/adrianodiflorio/Documents/Git/X4140/iPy
    phiHist->Write();
    phiHist->Draw();
 
-   TLegend leg* = new TLegend(0.1,0.7,0.48,0.9);
+   TLegend* leg = new TLegend(0.1,0.7,0.48,0.9);
    leg->AddEntry(phiHist,(phiHist->GetName()),"l");
    for (size_t i = 0; i < 13; i++)
     {
