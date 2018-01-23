@@ -25,10 +25,10 @@ std::string hltsName[13] = {"HLT_DoubleMu2_Jpsi_DoubleTkMu0_Phi","HLT_Mu20_TkMu0
                             "HLT_Dimuon25_Jpsi",
                             "HLT_Dimuon0_Jpsi"};
 
-int skimXTree()
+int skimXTree(std::string path = "/Users/adrianodiflorio/Documents/Git/X4140/iPythons/xTree.root")
 {
 
-   TFile *oldfile = TFile::Open("/Users/adrianodiflorio/Desktop/mmkk2017/phiJpsiTriggersBCDEF.root");
+   TFile *oldfile = TFile::Open(path.data());
    TDirectory *directory = (TDirectory*)oldfile->Get("rootuple");
    TTree *oldtree = (TTree*)directory->Get("xTree");
    Long64_t nentries = oldtree->GetEntries();
