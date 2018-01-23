@@ -170,6 +170,7 @@ int drawXTree(std::string path = "/Users/adrianodiflorio/Documents/Git/X4140/iPy
         std::bitset<16> pM(phiMType);
         std::bitset<16> pP(phiPType);
         max = std::max(max,float(trigger));
+
         for (int j = 0; j < noHlts; j++)
           if (tB.test(j)) phiHists[j]->Fill(phiM);
 
@@ -179,7 +180,8 @@ int drawXTree(std::string path = "/Users/adrianodiflorio/Documents/Git/X4140/iPy
      std::cout << max << std::endl;
      //newtree->Draw("phi_M","","same");
    // }
-   phi_allphiHist->SetMinimum(0.01);
+   phi_allphiHist->SetMinimum(1.0);
+   phi_allphiHist->SetMaximum(10E4);
    //oldtree->Draw("phi_M");
    // TH1F* phi_triggrHist = (TH1F*)gDirectory->Get("phi_triggrHist");
 
@@ -187,7 +189,7 @@ int drawXTree(std::string path = "/Users/adrianodiflorio/Documents/Git/X4140/iPy
    phi_allphiHist->Draw();
 
    TLegend leg(0.1,0.7,0.48,0.9);
-
+   leg.AddEntry(phi_allphiHist,(phi_allphiHist->GetName()),"l");
    for (size_t i = 0; i < noHlts; i++)
     {
       phiHists[i]->SetLineColor(colors[i]);
