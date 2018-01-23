@@ -9,11 +9,11 @@
 #include <TLegend.h>
 #include <TStyle.h>
 #include <string>
+#include <TColor.h>
 
 int noHlts = 13;
 
-int colors[17] = {kRed,kBlue,kGreen,kMagenta,kBlack,kRed + 1,kBlue + 1,kGreen + 1,kMagenta + 1,kBlack + 1,
-              kRed - 1,kBlue - 1,kGreen - 1,kMagenta - 1,kBlack - 1, kOrange, kOrange + 1};
+int colors[13] = {1,2,3,6,7,8,30,40,46,38,29,34,9};
 
 std::string hltsName[13] = {"HLT_DoubleMu2_Jpsi_DoubleTkMu0_Phi",
                             "HLT_DoubleMu2_Jpsi_DoubleTrk1_Phi",
@@ -193,7 +193,7 @@ int drawXTree(std::string path = "/Users/adrianodiflorio/Documents/Git/X4140/iPy
    leg.AddEntry(phi_allphiHist,(phi_allphiHist->GetName()),"l");
    for (size_t i = 0; i < 13; i++)
     {
-      // phiHists[i]->SetLineColor(colors[i]);
+      phiHists[i]->SetLineColor(colors[i]);
       // phiHists[i]->SetLineWidth(2);
       if(i>5) phiHists[i]->SetLineStyle(kDashed);
       phiHists[i]->Draw("same");
