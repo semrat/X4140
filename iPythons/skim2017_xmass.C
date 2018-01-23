@@ -179,8 +179,8 @@ int drawXTree(std::string path = "/Users/adrianodiflorio/Documents/Git/X4140/iPy
         std::bitset<16> tB(trigger);
         // std::bitset<16> pM(phiMType);
         // std::bitset<16> pP(phiPType);
-        for (int j = 0; j < noHlts; j++)
-          if (tB.test(j))
+        for (int j = 0; j < 6; j++)
+          if (tB.test(j) )
           {
             phiHists[j]->Fill(phiM);
             jpsiHists[j]->Fill(jPsiM);
