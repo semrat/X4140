@@ -105,7 +105,7 @@ int selectXTree()
 
 }
 
-int drawXTree(std::string path = "/Users/adrianodiflorio/Documents/Git/X4140/iPythons/xTree.root",)
+int drawXTree(std::string path = "/Users/adrianodiflorio/Documents/Git/X4140/iPythons/xTree.root")
 {
 
    TFile *oldfile = TFile::Open(path.data());
