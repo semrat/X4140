@@ -25,17 +25,17 @@ std::string hltsName[13] = {"HLT_DoubleMu2_Jpsi_DoubleTkMu0_Phi","HLT_Mu20_TkMu0
                             "HLT_Dimuon25_Jpsi",
                             "HLT_Dimuon0_Jpsi"};
 
-int skimXTree(std::string path = "/Users/adrianodiflorio/Documents/Git/X4140/iPythons/xTree.root")
+int skimXTree(std::string path, std::string filename, std::string treename = "xTree", std::string dirname = "rootuple")
 {
 
-   TFile *oldfile = TFile::Open(path.data());
-   TDirectory *directory = (TDirectory*)oldfile->Get("rootuple");
-   TTree *oldtree = (TTree*)directory->Get("xTree");
+   TFile *oldfile = TFile::Open((path+filename).data());
+   TDirectory *directory = (TDirectory*)oldfile->Get(dirname.data());
+   TTree *oldtree = (TTree*)directory->Get(treename.data());
    Long64_t nentries = oldtree->GetEntries();
    ULong64_t event   = 0;
    oldtree->SetBranchAddress("event",&event);
    //Create a new file + a clone of old tree in new file
-   TFile *newfile = new TFile("small.root","RECREATE");
+   TFile *newfile = new TFile((treename + "_skim_" + filename).data(),"RECREATE");
    TTree *newtree = oldtree->CloneTree();
 
    newtree->Print();
