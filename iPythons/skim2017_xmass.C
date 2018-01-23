@@ -193,6 +193,8 @@ int drawXTree(std::string path = "/Users/adrianodiflorio/Documents/Git/X4140/iPy
    for (size_t i = 0; i < noHlts; i++)
     {
       phiHists[i]->SetLineColor(colors[i]);
+      phiHists[i]->SetLineWidth(2);
+      if(i>5) phiHists[i]->SetLineStyle(kDashed);
       phiHists[i]->Draw("same");
       leg.AddEntry(phiHists[i],(phiHists[i]->GetName()),"l");
     }
