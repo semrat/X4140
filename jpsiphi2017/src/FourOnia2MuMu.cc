@@ -14,8 +14,16 @@
 //Headers for services and tools
 #include "TrackingTools/TransientTrack/interface/TransientTrackBuilder.h"
 #include "TrackingTools/Records/interface/TransientTrackRecord.h"
+
 #include "RecoVertex/KalmanVertexFit/interface/KalmanVertexFitter.h"
 #include "RecoVertex/VertexTools/interface/VertexDistanceXY.h"
+#include "RecoVertex/KinematicFit/interface/KinematicParticleVertexFitter.h"
+#include "RecoVertex/KinematicFit/interface/KinematicParticleFitter.h"
+#include "RecoVertex/KinematicFit/interface/MassKinematicConstraint.h"
+#include "RecoVertex/KinematicFitPrimitives/interface/RefCountedKinematicParticle.h"
+#include "RecoVertex/KinematicFitPrimitives/interface/TransientTrackKinematicParticle.h"
+#include "RecoVertex/KinematicFitPrimitives/interface/KinematicParticleFactoryFromTransientTrack.h"
+
 #include "TMath.h"
 #include "Math/VectorUtil.h"
 #include "TVector3.h"
@@ -174,6 +182,39 @@ FourOnia2MuMuPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
         mumucand.addUserFloat("MassErr",MassWErr.error());
 
         if (myVertex.isValid()) {
+
+          KinematicParticleFactoryFromTransientTrack pFactory;
+
+          vector<RefCountedKinematicParticle> muonParticles;
+
+          float kinChi = 0.;
+      	  float kinNdf = 0.;
+
+          ParticleMass muon_mass = 0.10565837; //pdg mass
+      	  //ParticleMass psi_mass = 3.096916;
+      	  float muon_sigma = muon_mass*1.e-6;
+
+          float refittedMass = -1.0;
+
+          try {
+      	    muonParticles.push_back(pFactory.particle(muon1TT,muon_mass,chi,ndf,muon_sigma));
+      	    muonParticles.push_back(pFactory.particle(muon2TT,muon_mass,chi,ndf,muon_sigma));
+
+            KinematicParticleVertexFitter fitter;
+
+        	  RefCountedKinematicTree psiVertexFitTree;
+        	  try {
+        	    psiVertexFitTree = fitter.fit(muonParticles);
+        	  }
+
+            psiVertexFitTree->movePointerToTheTop();
+
+        	  RefCountedKinematicParticle psi_vFit_noMC = psiVertexFitTree->currentParticle();
+
+            refittedMass = psi_vFit_noMC->currentState().mass();
+
+      	  }
+
           float vChi2 = myVertex.totalChiSquared();
           float vNDF  = myVertex.degreesOfFreedom();
           float vProb(TMath::Prob(vChi2,(int)vNDF));
