@@ -122,10 +122,6 @@ process.oniaSelectedMuons = cms.EDFilter('PATMuonSelector',
    filter = cms.bool(True)
 )
 
-hltpaths = cms.vstring('HLT_DoubleMu2_Jpsi_DoubleTkMu0_Phi', 'HLT_Mu20_TkMu0_Phi',
-                        'HLT_Dimuon14_Phi_Barrel_Seagulls','HLT_Mu25_TkMu0_Phi',
-                        'HLT_Dimuon24_Phi_noCorrL1')
-
 process.FourOnia2MuMuPhi = cms.EDProducer('FourOnia2MuMuPAT',
         muons                       = cms.InputTag('oniaSelectedMuons'),
         primaryVertexTag            = cms.InputTag('offlineSlimmedPrimaryVertices'),
