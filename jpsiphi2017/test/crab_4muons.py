@@ -20,6 +20,17 @@ datasetnames = {
 "E" : '/MuOnia/Run2017E-PromptReco-v1/MINIAOD'
 }
 
+globalTags = {
+"F" : '/MuOnia/Run2017F-PromptReco-v1/MINIAOD',
+"B1" : '/MuOnia/Run2017B-PromptReco-v1/MINIAOD',
+"B2" : '/MuOnia/Run2017B-PromptReco-v2/MINIAOD',
+"C1" : '/MuOnia/Run2017C-PromptReco-v1/MINIAOD',
+"C2" : '/MuOnia/Run2017C-PromptReco-v2/MINIAOD',
+"C3" : '/MuOnia/Run2017C-PromptReco-v3/MINIAOD',
+"D" : '/MuOnia/Run2017D-PromptReco-v1/MINIAOD',
+"E" : '/MuOnia/Run2017E-PromptReco-v1/MINIAOD'
+}
+
 runNumber = [
 #'274094-274240',
 '',

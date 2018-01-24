@@ -72,50 +72,6 @@ UInt_t FourOnia2MuMuPAT::isTriggerMatched(pat::CompositeCandidate *diMuon_cand) 
     if (!mu1HLTMatches.empty() && !mu2HLTMatches.empty()) matched += (1<<iTr);
     // if (!mu1HLTMatches.empty() && !mu2HLTMatches.empty()) std::cout << std::endl << HLTFilters_[iTr] << std::endl;
   }
-  // const pat::TriggerObjectStandAloneCollection muon1Collection = muon1->triggerObjectMatches();
-  // const pat::TriggerObjectStandAloneCollection muon2Collection = muon2->triggerObjectMatches();
-  //
-  //
-  // for ( size_t i = 0; i < muon1Collection.size(); ++i )
-  // {
-  //   std::cout << "Muon1 collection : " << muon1->triggerObjectMatch(i)->collection() << std::endl;
-  //
-  //   std::cout << "Filters" << std::endl;
-  //   for ( size_t j = 0; j < muon1->triggerObjectMatch(i)->filterLabels().size(); ++j )
-  //     std::cout << (muon1->triggerObjectMatch(i)->filterLabels())[j] << std::endl;
-  //
-    // std::cout << "Paths" << std::endl;
-    // for ( size_t j = 0; j < muon1->triggerObjectMatch(i)->pathNames().size(); ++j )
-    //   std::cout << (muon1->triggerObjectMatch(i)->pathNames())[j] << std::endl;
-  //
-  //   std::cout << "Algos" << std::endl;
-  //   for ( size_t j = 0; j < muon1->triggerObjectMatch(i)->algorithmNames().size(); ++j )
-  //     std::cout << (muon1->triggerObjectMatch(i)->algorithmNames())[j] << std::endl;
-  //
-  //   std::cout << "Conditions" << std::endl;
-  //   for ( size_t j = 0; j < muon1->triggerObjectMatch(i)->conditionNames().size(); ++j )
-  //     std::cout << (muon1->triggerObjectMatch(i)->conditionNames())[j] << std::endl;
-  //
-  //   //std::cout << (muon1->triggerObjectMatch(i)->hasL3Filter())<< std::endl;
-  //
-  // }
-  //
-  // for ( size_t i = 0; i < muon2Collection.size(); ++i )
-  // {
-  //   std::cout << "Muon2 collection : " << muon2->triggerObjectMatch(i)->collection() << std::endl;
-  //
-  //   std::cout << "Filters" << std::endl;
-  //   for ( size_t j = 0; j < muon2->triggerObjectMatch(i)->filterLabels().size(); ++j )
-  //     std::cout << (muon2->triggerObjectMatch(i)->filterLabels())[j] << std::endl;
-  //   std::cout << "Paths" << std::endl;
-  //   for ( size_t j = 0; j < muon2->triggerObjectMatch(i)->pathNames().size(); ++j )
-  //     std::cout << (muon2->triggerObjectMatch(i)->pathNames())[j] << std::endl;
-  // }
-  //
-  //
-  //
-  // std::cout << "Triggers matched : " << matched << std::endl;
-  // std::cout << "Sizes : " << muon1Collection.size() << " - " << muon2Collection.size() << std::endl;
 
   return matched;
 }
