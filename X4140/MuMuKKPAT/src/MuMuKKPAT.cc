@@ -89,7 +89,7 @@
 #include "Math/VectorUtil.h"
 
 /// useless so far
-//#include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"
+#include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"
 //#include "HepMC/GenVertex.h"
 //#include <HepMC/GenVertex.h>
 //#include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
@@ -109,6 +109,7 @@ const ParticleMass Phi_mass = 1.0194;
 
 /// Setting insignificant mass sigma to avoid singularities in the covariance matrix.
 float small_sigma = muon_mass*1.e-6;
+//float small_sigma = 1.e-6;
 //float small_sigma = kaon_mass*1.e-6; /// SEMRA
 
 ///
@@ -125,11 +126,14 @@ MuMuKKPAT::MuMuKKPAT(const edm::ParameterSet& iConfig) :
 
   doData( iConfig.getUntrackedParameter<bool>("DoDataAnalysis", true) ),
   doMC( iConfig.getUntrackedParameter<bool>("DoMonteCarloTree", true) ),
-  MCParticle( iConfig.getUntrackedParameter<int>("MonteCarloParticleId", 20443) ), /// 20443 X, 100443 Psi(2S), 9120443 X from B / decide later for X(4140)
+  //doGEN( iConfig.getUntrackedParameter<bool>("DoMonteCarloTree", true) ),
+  MCParticle( iConfig.getUntrackedParameter<int>("MonteCarloParticleId", 100443) ), /// 100443 Psi(2S) for the same Y(4140), 531 for Bs0
   MCExclusiveDecay( iConfig.getUntrackedParameter<bool>("MonteCarloExclusiveDecay", true) ),
-  MCMother( iConfig.getUntrackedParameter<int>("MonteCarloMotherId", 511) ), /// 511 B0 (=anti-B0), 531 B0 / decide later MCMotherId for X(4140)
-  MCDaughtersN( iConfig.getUntrackedParameter<int>(" MonteCarloDaughtersN", 3) ), /// will be same
-  doMuMuMassConst( iConfig.getUntrackedParameter<bool>("DoMuMuMassConstraint", true) ),
+  MCMother( iConfig.getUntrackedParameter<int>("MonteCarloMotherId", 100443) ), /// JPsi(2S): 100443 for Y(4140), Bs0: 531
+  //MCMotherB( iConfig.getUntrackedParameter<int>("MonteCarloMotherIdB", 531) ),
+  MCDaughtersN( iConfig.getUntrackedParameter<int>(" MonteCarloDaughtersN", 2) ), /// my daughter JPsi & Phi
+  MCDaughterID( iConfig.getUntrackedParameter<std::vector<unsigned int>>("MonteCarloDaughterID") ),
+  doMuMuMassConst( iConfig.getUntrackedParameter<bool>("DoMuMuMassConstraint", true) ), 
   skipJPsi(iConfig.getUntrackedParameter<bool>("SkipJPsi", false)),
 
   MuMinPixHits(iConfig.getUntrackedParameter<int>("MinNumMuPixHits", 0)),
@@ -179,20 +183,21 @@ MuMuKKPAT::MuMuKKPAT(const edm::ParameterSet& iConfig) :
   mu1Idx(0), mu2Idx(0), MuMuType(0), ka1Idx(0), ka2Idx(0),
   X_MuMuIdx(0), X_ka1Idx(0), X_ka2Idx(0),
   /// MC Analysis /// n_B0Ancestors & no for X
-  n_genEvtVtx(0), genEvtVtx_X(0), genEvtVtx_Y(0), genEvtVtx_Z(0), genEvtVtx_particles(0), n_XAncestors(0),
-  nMCAll(0), nMCX(0), /*nMCXVtx(0),*/ MCPdgIdAll(0), MCDanNumAll(0),
+  //MC truth
+  //n_genEvtVtx(0), genEvtVtx_X(0), genEvtVtx_Y(0), genEvtVtx_Z(0), genEvtVtx_particles(0), n_XAncestors(0),
+  nMCAll(0), 
+  nMCX(0), 
+  //nMCXVtx(0), 
+  MCPdgIdAll(0), MCDanNumAll(0),
   // Gen Primary Vertex
   PriVtxGen_X(0), PriVtxGen_Y(0), PriVtxGen_Z(0), PriVtxGen_EX(0), PriVtxGen_EY(0), PriVtxGen_EZ(0),
-  PriVtxGen_Chi2(0), PriVtxGen_CL(0), PriVtxGen_Ndof(0), PriVtxGen_tracks(0),
-  MCJPsiPx(0), MCJPsiPy(0), MCJPsiPz(0),
-  MCmupPx(0), MCmupPy(0), MCmupPz(0),
+  PriVtxGen_Chi2(0), PriVtxGen_CL(0), PriVtxGen_Ndof(0), PriVtxGen_tracks(0),  
+  MCJPsiPx(0), MCJPsiPy(0), MCJPsiPz(0), MCJPsiMass(0),
+  MCmupPx(0), MCmupPy(0), MCmupPz(0), 
   MCmumPx(0), MCmumPy(0), MCmumPz(0),
-  MCPhiPx(0), MCPhiPy(0), MCPhiPz(0),
+  MCPhiPx(0), MCPhiPy(0), MCPhiPz(0), MCPhiMass(0),
   MCkpPx(0), MCkpPy(0), MCkpPz(0),
   MCkmPx(0), MCkmPy(0), MCkmPz(0),
-  //MCpionPx(0), MCpionPy(0), MCpionPz(0),
-  //MCkaonPx(0), MCkaonPy(0), MCkaonPz(0),
-  //MCpionCh(0), MCkaonCh(0),
   MCPx(0), MCPy(0), MCPz(0),
   /// generic muons
   muPx(0), muPy(0), muPz(0), muCharge(0),
@@ -304,7 +309,6 @@ MuMuKKPAT::~MuMuKKPAT()
 {
   /// do anything here that needs to be done at desctruction time
   /// (e.g. close files, deallocate resources etc.)
-
 }
 
 
@@ -314,7 +318,7 @@ MuMuKKPAT::~MuMuKKPAT()
 
 /// ------------ method called to for each event  ------------
 void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
-{
+{ // start analyze function
   /// get event content information
   bool decayChainOK = false;
   runNum = iEvent.id().run();
@@ -533,27 +537,24 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     //genEvtVtx_NormChi2 = (primaryGenVtx->normalizedChi2()) ;
     //genEvtVtx_Chi2 = primaryGenVtx->chi2() ;
     //genEvtVtx_CL = ChiSquaredProbability( (double)(primaryGenVtx.chi2()), (double)(primaryGenVtx.ndof())) ;
-    genEvtVtx_particles->push_back( primaryGenVtx->particles_out_size() );
-    */
-
+    genEvtVtx_particles->push_back( primaryGenVtx->particles_out_size() ); */
+   
     Handle< vector< PileupSummaryInfo > >  PupInfo;
     iEvent.getByLabel("addPileupInfo", PupInfo);
     vector<PileupSummaryInfo>::const_iterator PVI;
     if (Debug_) cout <<"\nBunchXing multiplicity = " <<PupInfo->size() <<endl ;
     for (PVI = PupInfo->begin(); PVI != PupInfo->end(); ++PVI)
-      if (Debug_) cout <<"Pileup Information: bunchXing, nvtx: " <<PVI->getBunchCrossing() <<" " <<PVI->getPU_NumInteractions() <<endl;
+    if (Debug_) cout <<"Pileup Information: bunchXing, nvtx: " <<PVI->getBunchCrossing() <<" " <<PVI->getPU_NumInteractions() <<endl;
 
     Handle<GenParticleCollection> genParticles;
     iEvent.getByLabel("genParticles", genParticles);
     if (Debug_) cout << "############### GenParticles Analysis ###############" << endl;
-    float jpsiPx=0., jpsiPy=0., jpsiPz=0.;
+    float jpsiPx=0., jpsiPy=0., jpsiPz=0., jpsiMass=0.;
     float  mupPx=0., mupPy=0., mupPz=0., mumPx=0., mumPy=0., mumPz=0.;
-    float phiPx=0., phiPy=0., phiPz=0.;
+    float phiPx=0., phiPy=0., phiPz=0., phiMass=0;
     float  kpPx=0., kpPy=0., kpPz=0., kmPx=0., kmPy=0., kmPz=0.;
-    //float pionPx=0., pionPy=0., pionPz=0., kaonPx=0., kaonPy=0., kaonPz=0.;
-    //int pionCh=0, kaonCh=0 ;
 
-    for (size_t i = 0; i < genParticles->size(); ++ i) {
+    for (size_t i = 0; i < genParticles->size(); ++ i) { //  
       nMCAll++;
       const reco::GenParticle &p = (*genParticles)[i];
       int pdgid = p.pdgId() ;
@@ -561,85 +562,62 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       MCPdgIdAll->push_back( pdgid );
       MCDanNumAll->push_back( dauNum );
 
-      if ( MCExclusiveDecay ) {
-	/// check if there is a MCMother which has MCDaughtersN daughters
-	if ( abs(pdgid) == MCMother  &&  dauNum == MCDaughtersN ) {
+      if ( MCExclusiveDecay ) { // MCExclusiveDecay
+	if ( abs(pdgid) == MCMother  &&  dauNum == MCDaughtersN ) { // Mother & Daughter
 	  bool mumuOK = false;
           bool kkOK = false;
-          //bool pionOK = false, kaonOK = false;
 
-	  for (int j=0; j<dauNum; ++j) {
+
+	  for (int j=0; j<dauNum; ++j) { /// start loop on MCMother daughters
 	    const Candidate *dau = p.daughter(j);
 	    if (Debug_) cout << "dauPdgId = " << dau->pdgId() << endl;
-
-	    /// check if one of B0 daughters is a psi(nS) whitch has 2 muons as daughters /// SEMRA ask again !!!
-	    int mumuId = 0 ;
-	    if (skipJPsi) /// SEMRA cleaned skipPsi2S
-	      if (Debug_) cout <<"Skipping J/psi!" <<endl ; /// SEMRA cleaned skipPsi2S
-	    //else if (skipPsi2S) /// SEMRA
-	    //  mumuId = 443 ; /// SEMRA (JPsi ID)
-
-	    if ( ((skipJPsi) && (dau->pdgId() == mumuId)) ||
-		 ((!skipJPsi) && (dau->pdgId()%1000 == 443)) ) {
-	      jpsiPx = dau->px(); jpsiPy = dau->py(); jpsiPz = dau->pz();
-	      int jpsiDauNum = dau->numberOfDaughters();
-	      if (Debug_) cout << "jpsiDauNum = " << jpsiDauNum << endl;
-	      int muNum = 0;
-	      for (int k=0; k<jpsiDauNum; ++k) {
-		const Candidate *grandDau = dau->daughter(k);
-		if (Debug_)  cout << "grandDauPdgId = " << grandDau->pdgId() << endl;
-		if ( abs(grandDau->pdgId()) == 13 ) {
-		  muNum++;
+	    if (dau->pdgId()==443) { // for JPsi
+               jpsiPx = dau->px(); jpsiPy = dau->py(); jpsiPz = dau->pz(); jpsiMass = dau->mass();
+	       int jpsiDauNum = dau->numberOfDaughters();
+	       if (Debug_) cout << "jpsiDauNum = " << jpsiDauNum << endl;
+	       int muNum = 0;
+               for (int k=0; k<jpsiDauNum; ++k) {
+                 const Candidate *grandDau = dau->daughter(k);
+                 if (Debug_) cout << "grandDauPdgId = " << grandDau->pdgId() << endl;
+                 if ( abs(grandDau->pdgId()) == 13 ) {
+                  muNum++;
 		  if (grandDau->pdgId() < 0) {
-		    mupPx = grandDau->px(); mupPy = grandDau->py(); mupPz = grandDau->pz();
-		  } else {
-		    mumPx = grandDau->px(); mumPy = grandDau->py(); mumPz = grandDau->pz();
-		  }
-		}
-	      }
-	      if ( muNum == 2 ) mumuOK = true ;
-
-	    } /// end check if one of the MCMother daughters is a J/Psi or psi'
-
-	     /// for Phi
-              phiPx = dau->px(); phiPy = dau->py(); phiPz = dau->pz();
+                     mupPx = grandDau->px(); mupPy = grandDau->py(); mupPz = grandDau->pz();
+                   } else {
+                     mumPx = grandDau->px(); mumPy = grandDau->py(); mumPz = grandDau->pz();
+                  }
+                 }
+               }
+               if ( muNum == 2 ) mumuOK = true ;
+	    } // for JPsi	
+	    if (dau->pdgId()==333) { // for Phi
+              phiPx = dau->px(); phiPy = dau->py(); phiPz = dau->pz(); phiMass = dau->mass();
               int phiDauNum = dau->numberOfDaughters();
               if (Debug_) cout << "phiDauNum = " << phiDauNum << endl;
               int kNum = 0;
               for (int n=0; n<phiDauNum; ++n) {
                 const Candidate *grandDau = dau->daughter(n);
-                if (Debug_)  cout << "grandDauPdgId = " << grandDau->pdgId() << endl;
+                if (Debug_) cout << "grandDauPdgId = " << grandDau->pdgId() << endl;
                 if ( abs(grandDau->pdgId()) == 321 ) {
-                  kNum++;
-                  if (grandDau->pdgId() < 0) {
-                    kpPx = grandDau->px(); kpPy = grandDau->py(); kpPz = grandDau->pz();
-                  } else {
-                    kmPx = grandDau->px(); kmPy = grandDau->py(); kmPz = grandDau->pz();
-                  }
-                }
+                 kNum++;
+                 if (grandDau->pdgId() < 0) {
+                   kpPx = grandDau->px(); kpPy = grandDau->py(); kpPz = grandDau->pz();
+                 } else {
+                   kmPx = grandDau->px(); kmPy = grandDau->py(); kmPz = grandDau->pz();
+                 }
+               }
               }
-	      if ( kNum == 2 ) kkOK = true ;
-
-
-	    /*else if ( abs(dau->pdgId()) == 211 ) { // check if one of B0 daughters is a pion /// SEMRA ask again !!!
-	      pionPx = dau->px(); pionPy = dau->py(); pionPz = dau->pz();
-	      pionCh = (dau->pdgId() == 211)? 1 : -1;
-	      pionOK = true; /// SEMRA pions change with kaons for B0 ?
-	    } else if ( abs(dau->pdgId()) == 321 ) { // check if one of B0 daughters is a kaon /// SEMRA ask again !!!
-	      kaonPx = dau->px(); kaonPy=dau->py(); kaonPz=dau->pz();
-	      kaonCh = (dau->pdgId() == 321)? 1 : -1;
-	      kaonOK = true;
-	    }*/
-
-	  } /// end loop on MCMother daughters
+              if ( kNum == 2 ) kkOK = true ;
+	    } // for Phi
+	  } // end loop on MCMother daughters
 
 	  if (Debug_) cout << "mumuOK = " << mumuOK << ", kkOK = " << kkOK << endl;
 	  if ( mumuOK && kkOK ) {
 	    if (Debug_) {
 	      cout <<"\nnumber of X mothers = " <<p.numberOfMothers() <<endl ;
 	      cout <<"X mother pdgID = " <<p.mother(0)->pdgId() <<endl ;
-	    }
-	    ++nMCX ;
+	     }
+	     ++nMCX ;
 	      PriVtxGen_X->push_back( p.vx() ) ;
 	      PriVtxGen_Y->push_back( p.vy() ) ;
 	      PriVtxGen_Z->push_back( p.vz() ) ;
@@ -647,7 +625,7 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      PriVtxGen_Chi2->push_back( p.vertexChi2() ) ;
 	      PriVtxGen_Ndof->push_back( p.vertexNdof() ) ;
 
-	      Bool_t status = kTRUE ;
+	      /*Bool_t status = kTRUE ;
 	      const Candidate *x_ancestor = p.mother(0) ; /// a particle can have several mothers
 	      Int_t n_ancestors = 1 ;
 	      while ( status ) {
@@ -664,32 +642,27 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		  x_ancestor = x_ancestor->mother(0) ;
 		  n_ancestors++ ;
 		}
-	      }
+	      } */
 
-	    MCJPsiPx->push_back(jpsiPx); MCJPsiPy->push_back(jpsiPy); MCJPsiPz->push_back(jpsiPz);
+	    MCJPsiPx->push_back(jpsiPx); MCJPsiPy->push_back(jpsiPy); MCJPsiPz->push_back(jpsiPz); MCJPsiMass.push_back(jpsiMass);
 	    MCmupPx->push_back(mupPx); MCmupPy->push_back(mupPy); MCmupPz->push_back(mupPz);
 	    MCmumPx->push_back(mumPx); MCmumPy->push_back(mumPy); MCmumPz->push_back(mumPz);
-            MCPhiPx->push_back(phiPx); MCPhiPy->push_back(phiPy); MCPhiPz->push_back(phiPz);
+            MCPhiPx->push_back(phiPx); MCPhiPy->push_back(phiPy); MCPhiPz->push_back(phiPz); MCPhiMass.push_back(phiMass);
             MCkpPx->push_back(kpPx); MCkpPy->push_back(kpPy); MCkpPz->push_back(kpPz);
             MCkmPx->push_back(kmPx); MCkmPy->push_back(kmPy); MCkmPz->push_back(kmPz);
-	    //MCpionPx->push_back(pionPx); MCpionPy->push_back(pionPy); MCpionPz->push_back(pionPz);
-	    //MCkaonPx->push_back(kaonPx); MCkaonPy->push_back(kaonPy); MCkaonPz->push_back(kaonPz);
-	    //MCpionCh->push_back(pionCh) ; MCkaonCh->push_back(kaonCh) ;
 	    decayChainOK = true;
-	    MCPx->push_back( p.px() );
-	    MCPy->push_back( p.py() );
-	    MCPz->push_back( p.pz() );
+	    MCPx->push_back( p.px() );  MCPy->push_back( p.py() ); MCPz->push_back( p.pz() );
 	  }
 	  if (Debug_) cout << "decayChainOK = " << decayChainOK << endl;
-	} // if ( abs(pdgid) == MCMother  &&  dauNum == 3 )
-      } // if ( !MCExclusiveDecay )
 
+	} // Mother & Daughter
+      } // MCExclusiveDecay 
     } // for (size_t i = 0; i < genParticles->size(); ++ i)
-  } // if (doMC)
+  } // doMC
 
 
   /// reconstruction only for events with B decaying in psi(nS)+Pi+K /// SEMRA JPsiPhi !!!
-  if ( (doMC && !MCExclusiveDecay) || (doMC && (MCExclusiveDecay && decayChainOK)) || doData ) {
+  if ( (doMC && (MCExclusiveDecay && decayChainOK)) || doData ) {
 
     bool isEventWithInvalidMu = false;
 
@@ -697,7 +670,7 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
     if ((thePATMuonHandle->size()) * (thePATTrackHandle->size()) > 20000) {
       cout << "Too many Muons: " << thePATMuonHandle->size() << ", and Tracks: " << thePATTrackHandle->size() << endl;
-    } else //if (thePATMuonHandle->size() >= 2) { // check
+    } else //if (thePATMuonHandle->size() >= 2) 
       if (thePATMuonHandle->size() >= 2  && hasRequestedTrigger) {
 	if (Debug_) cout <<"============================  evt: " <<evtNum <<" Accept event with 2 mu and TRIGGER ==============================================" <<endl;
 
@@ -739,7 +712,7 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	}
 
 	/// get MuMu cands
-	for ( std::vector<pat::Muon>::const_iterator Muon1 = thePATMuonHandle->begin(); Muon1 != thePATMuonHandle->end(); ++Muon1 ) {
+	for ( std::vector<pat::Muon>::const_iterator Muon1 = thePATMuonHandle->begin(); Muon1 != thePATMuonHandle->end(); ++Muon1 ) { // first loop over muons (look for mu+)
 
 	  /// push back all muon information
 	  ++nMu;
@@ -875,7 +848,7 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  }
 
 	  ////////////////// check for muon2 //////////////////
-	  for ( std::vector<pat::Muon>::const_iterator Muon2 = Muon1+1; Muon2 != thePATMuonHandle->end(); ++Muon2) {
+	  for ( std::vector<pat::Muon>::const_iterator Muon2 = Muon1+1; Muon2 != thePATMuonHandle->end(); ++Muon2) { // 2nd loop over muons (look for mu-)
 	    if(Muon2->charge() * Muon1->charge() > 0)
 	      continue ;
 	    const reco::Muon* rmu2 = dynamic_cast<const reco::Muon *>(Muon2->originalObject()) ;
@@ -1064,7 +1037,7 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 
 	    ////////////////// check tracks for kaon1 for B0 //////////////////
-	    for ( vector<pat::GenericParticle>::const_iterator Track1 = theKaonRefittedPATTrackHandle->begin(); Track1 != theKaonRefittedPATTrackHandle->end(); ++Track1 ) {
+	    for ( vector<pat::GenericParticle>::const_iterator Track1 = theKaonRefittedPATTrackHandle->begin(); Track1 != theKaonRefittedPATTrackHandle->end(); ++Track1 ) { // 1st loop over track (look for k1)
 	      //cout<< "POINT 15" <<endl;
 	      /// check track doesn't overlap with the MuMu candidate tracks
 	      if (Track1->track().key() == rmu1->track().key()  ||  Track1->track().key() == rmu2->track().key())
@@ -1080,7 +1053,7 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 
 	   ////////////////// check tracks for kaon2 for B0 //////////////////
-	   for ( vector<pat::GenericParticle>::const_iterator Track2 = Track1+1; Track2 != theKaonRefittedPATTrackHandle->end(); ++Track2 ){
+	   for ( vector<pat::GenericParticle>::const_iterator Track2 = Track1+1; Track2 != theKaonRefittedPATTrackHandle->end(); ++Track2 ){ // 2nd loop over track (look for k2)
 
 	     /// check that this second track doesn't overlap with the the first track candidate
 	     if (Track2->track().key() == Track1->track().key())
@@ -1888,13 +1861,18 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    } // 1st loop over track (look for k1)
 	  } // 2nd loop over muons (look for mu-)
 	} //first loop over muons (look for mu+)
-      } // if (thePATMuonHandle->size() >= 2  && hasRequestedTrigger) {
+      } // if (thePATMuonHandle->size() >= 2  && hasRequestedTrigger) 
   } // if (doMC || doData)
   // AT THE END OF THE EVENT fill the tree and clear the vectors
   // ===========================================================
 
-  if (nX > 0)
-    X_One_Tree_->Fill() ;
+  //if (nX > 0) // for data
+    //X_One_Tree_->Fill() ;
+
+  if ( doMC ) { // MC
+    if ( nMCX > 0 )
+      X_One_Tree_->Fill() ;
+  } 
 
   /// trigger stuff
   trigRes->clear(); trigNames->clear(); L1TT->clear(); MatchTriggerNames->clear();
@@ -1911,12 +1889,14 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   /// MC Analysis
   if (doMC) {
-    // Gen Primary Vertex
-    n_genEvtVtx = 0;
-    genEvtVtx_X->clear(); genEvtVtx_Y->clear(); genEvtVtx_Z->clear();
-    genEvtVtx_particles->clear();
-    n_XAncestors->clear();
-    nMCAll = 0, nMCX = 0; //nMCXVtx = 0;
+    // MC truth
+    //n_genEvtVtx = 0;
+    //genEvtVtx_X->clear(); genEvtVtx_Y->clear(); genEvtVtx_Z->clear();
+    //genEvtVtx_particles->clear();
+    //n_XAncestors->clear();
+    nMCAll = 0;
+    nMCX = 0; 
+    //nMCXVtx = 0;
     // Gen Primary Vertex
     PriVtxGen_X->clear(); PriVtxGen_Y->clear(); PriVtxGen_Z->clear();
     PriVtxGen_EX->clear(); PriVtxGen_EY->clear(); PriVtxGen_EZ->clear();
@@ -1924,10 +1904,10 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     PriVtxGen_tracks->clear();
 
     MCPdgIdAll->clear(); MCDanNumAll->clear();
-    MCJPsiPx->clear(); MCJPsiPy->clear(); MCJPsiPz->clear();
+    MCJPsiPx->clear(); MCJPsiPy->clear(); MCJPsiPz->clear(); MCJPsiMass.clear();
     MCmupPx->clear(); MCmupPy->clear(); MCmupPz->clear();
     MCmumPx->clear(); MCmumPy->clear(); MCmumPz->clear();
-    MCPhiPx->clear(); MCPhiPy->clear(); MCPhiPz->clear();
+    MCPhiPx->clear(); MCPhiPy->clear(); MCPhiPz->clear(); MCPhiMass.clear();
     MCkpPx->clear(); MCkpPy->clear(); MCkpPz->clear();
     MCkmPx->clear(); MCkmPy->clear(); MCkmPz->clear();
     //MCpionPx->clear(); MCpionPy->clear(); MCpionPz->clear();
@@ -2041,8 +2021,8 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   tr_dedx_byHits->clear(); tr_dedxErr_byHits->clear(); tr_saturMeas_byHits->clear(); tr_Meas_byHits->clear();
 
   if (Debug_) cout <<"end of branches clear" <<endl ;
- }
-//}/// analyze
+ //}
+} // finish analyze function
 /// ------------ method called once each job just before starting event loop  ------------
 void MuMuKKPAT::beginRun(edm::Run const & iRun, edm::EventSetup const& iSetup)
 {
@@ -2074,12 +2054,12 @@ void MuMuKKPAT::beginJob()
   X_One_Tree_->Branch("priVtx_tracksPtSq", &priVtx_tracksPtSq, "priVtx_tracksPtSq/f");
   /// MC Analysis
   if (doMC) {
-    // Gen Primary Vertex
-    X_One_Tree_->Branch("genEvtVtx_X", &genEvtVtx_X);
-    X_One_Tree_->Branch("genEvtVtx_Y", &genEvtVtx_Y);
-    X_One_Tree_->Branch("genEvtVtx_Z", &genEvtVtx_Z);
-    X_One_Tree_->Branch("genEvtVtx_particles", &genEvtVtx_particles);
-    X_One_Tree_->Branch("n_XAncestors", &n_XAncestors);
+    // MC truth
+    //X_One_Tree_->Branch("genEvtVtx_X", &genEvtVtx_X);
+    //X_One_Tree_->Branch("genEvtVtx_Y", &genEvtVtx_Y);
+    //X_One_Tree_->Branch("genEvtVtx_Z", &genEvtVtx_Z);
+    //X_One_Tree_->Branch("genEvtVtx_particles", &genEvtVtx_particles);
+    //X_One_Tree_->Branch("n_XAncestors", &n_XAncestors);
     X_One_Tree_->Branch("nMCAll", &nMCAll, "nMCAll/i");
     X_One_Tree_->Branch("MCPdgIdAll", &MCPdgIdAll);
     X_One_Tree_->Branch("MCDanNumAll", &MCDanNumAll);
@@ -2098,6 +2078,7 @@ void MuMuKKPAT::beginJob()
     X_One_Tree_->Branch("MCJPsiPx",&MCJPsiPx);
     X_One_Tree_->Branch("MCJPsiPy",&MCJPsiPy);
     X_One_Tree_->Branch("MCJPsiPz",&MCJPsiPz);
+    X_One_Tree_->Branch("MCJPsiMass",&MCJPsiMass);
     X_One_Tree_->Branch("MCmupPx",&MCmupPx);
     X_One_Tree_->Branch("MCmupPy",&MCmupPy);
     X_One_Tree_->Branch("MCmupPz",&MCmupPz);
@@ -2107,20 +2088,13 @@ void MuMuKKPAT::beginJob()
     X_One_Tree_->Branch("MCPhiPx",&MCPhiPx);
     X_One_Tree_->Branch("MCPhiPy",&MCPhiPy);
     X_One_Tree_->Branch("MCPhiPz",&MCPhiPz);
+    X_One_Tree_->Branch("MCJPsiMass",&MCPhiMass);
     X_One_Tree_->Branch("MCkpPx",&MCkpPx);
     X_One_Tree_->Branch("MCkpPy",&MCkpPy);
     X_One_Tree_->Branch("MCkpPz",&MCkpPz);
     X_One_Tree_->Branch("MCkmPx",&MCkmPx);
     X_One_Tree_->Branch("MCkmPy",&MCkmPy);
     X_One_Tree_->Branch("MCkmPz",&MCkmPz);
-    //X_One_Tree_->Branch("MCpionPx",&MCpionPx);
-    //X_One_Tree_->Branch("MCpionPy",&MCpionPy);
-    //X_One_Tree_->Branch("MCpionPz",&MCpionPz);
-    //X_One_Tree_->Branch("MCpionCh",&MCpionCh);
-    //X_One_Tree_->Branch("MCkaonPx",&MCkaonPx);
-    //X_One_Tree_->Branch("MCkaonPy",&MCkaonPy);
-    //X_One_Tree_->Branch("MCkaonPz",&MCkaonPz);
-    //X_One_Tree_->Branch("MCkaonCh",&MCkaonCh);
     X_One_Tree_->Branch("MCPx", &MCPx);
     X_One_Tree_->Branch("MCPy", &MCPy);
     X_One_Tree_->Branch("MCPz", &MCPz);
@@ -2498,14 +2472,14 @@ void MuMuKKPAT::endJob() {
 
 bool MuMuKKPAT::isAbHadron(int pdgID) {
 
-    if (abs(pdgID) == 511 || abs(pdgID) == 521 || abs(pdgID) == 531 || abs(pdgID) == 5122) return true;
+    if (abs(pdgID) == 100443 || abs(pdgID) == 531) return true;
     return false;
 
 }
 
 bool MuMuKKPAT::isAMixedbHadron(int pdgID, int momPdgID) {
 
-    if ((abs(pdgID) == 511 && abs(momPdgID) == 511 && pdgID*momPdgID < 0) ||
+    if ((abs(pdgID) == 100443 && abs(momPdgID) == 100443 && pdgID*momPdgID < 0) ||
         (abs(pdgID) == 531 && abs(momPdgID) == 531 && pdgID*momPdgID < 0))
         return true;
     return false;
