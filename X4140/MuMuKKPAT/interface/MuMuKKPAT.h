@@ -125,9 +125,11 @@ private:
   edm::InputTag inputGEN_;
   std::string vtxSample;
   bool doData, doMC;
+  //bool doData, doGEN;
   int  MCParticle;
   bool MCExclusiveDecay;
   int  MCMother, MCDaughtersN;
+  vector<unsigned int> MCDaughterID;
   bool doMuMuMassConst;
   bool skipJPsi, skipPsi2S;
   int MuMinPixHits, MuMinSiHits;
@@ -170,11 +172,12 @@ private:
   vector<int>           *ka1Idx, *ka2Idx;
   vector<int>           *X_MuMuIdx, *X_ka1Idx, *X_ka2Idx; 
   /// MC Analysis
-  // Gen Primary Vertex
-  unsigned int          n_genEvtVtx;
+  // MC truth
+  /*unsigned int          n_genEvtVtx;
   vector<float>         *genEvtVtx_X, *genEvtVtx_Y, *genEvtVtx_Z; 
   vector<int>           *genEvtVtx_particles;
   vector<int>           *n_XAncestors; 
+  unsigned int          nMCXVtx;*/ 
   unsigned int          nMCAll, nMCX, nMCXVtx; 
   vector<int>           *MCPdgIdAll, *MCDanNumAll;
   // Gen Primary Vertex 
@@ -182,15 +185,12 @@ private:
   vector<double>        *PriVtxGen_EX, *PriVtxGen_EY, *PriVtxGen_EZ ;
   vector<float>	        *PriVtxGen_Chi2, *PriVtxGen_CL, *PriVtxGen_Ndof;
   vector<int>           *PriVtxGen_tracks ;
-  vector<float>         *MCJPsiPx, *MCJPsiPy, *MCJPsiPz;
+  vector<float>         *MCJPsiPx, *MCJPsiPy, *MCJPsiPz, MCJPsiMass;
   vector<float>         *MCmupPx, *MCmupPy, *MCmupPz;
   vector<float>         *MCmumPx, *MCmumPy, *MCmumPz;
-  vector<float>         *MCPhiPx, *MCPhiPy, *MCPhiPz;
+  vector<float>         *MCPhiPx, *MCPhiPy, *MCPhiPz, MCPhiMass;
   vector<float>         *MCkpPx, *MCkpPy, *MCkpPz;
   vector<float>         *MCkmPx, *MCkmPy, *MCkmPz;
-  //vector<float>         *MCpionPx, *MCpionPy, *MCpionPz;
-  //vector<float>         *MCkaonPx, *MCkaonPy, *MCkaonPz;
-  //vector<int>           *MCpionCh, *MCkaonCh;
   vector<float>         *MCPx, *MCPy, *MCPz;
   /// Generic Muons
   vector<float>         *muPx, *muPy, *muPz, *muCharge;
