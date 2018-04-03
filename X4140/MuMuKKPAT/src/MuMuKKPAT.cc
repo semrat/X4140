@@ -132,7 +132,7 @@ MuMuKKPAT::MuMuKKPAT(const edm::ParameterSet& iConfig) :
   MCMother( iConfig.getUntrackedParameter<int>("MonteCarloMotherId", 100443) ), /// JPsi(2S): 100443 for Y(4140), Bs0: 531
   //MCMotherB( iConfig.getUntrackedParameter<int>("MonteCarloMotherIdB", 531) ),
   MCDaughtersN( iConfig.getUntrackedParameter<int>(" MonteCarloDaughtersN", 2) ), /// my daughter JPsi & Phi
-  MCDaughterID( iConfig.getUntrackedParameter<std::vector<unsigned int>>("MonteCarloDaughterID") ),
+  //MCDaughterID( iConfig.getUntrackedParameter<std::vector<unsigned int>>("MonteCarloDaughterID") ),
   doMuMuMassConst( iConfig.getUntrackedParameter<bool>("DoMuMuMassConstraint", true) ), 
   skipJPsi(iConfig.getUntrackedParameter<bool>("SkipJPsi", false)),
 
@@ -192,13 +192,14 @@ MuMuKKPAT::MuMuKKPAT(const edm::ParameterSet& iConfig) :
   // Gen Primary Vertex
   PriVtxGen_X(0), PriVtxGen_Y(0), PriVtxGen_Z(0), PriVtxGen_EX(0), PriVtxGen_EY(0), PriVtxGen_EZ(0),
   PriVtxGen_Chi2(0), PriVtxGen_CL(0), PriVtxGen_Ndof(0), PriVtxGen_tracks(0),  
-  MCJPsiPx(0), MCJPsiPy(0), MCJPsiPz(0), MCJPsiMass(0),
+  MCJPsiPx(0), MCJPsiPy(0), MCJPsiPz(0), MCJPsiPt(0), MCJPsiMass(0),
   MCmupPx(0), MCmupPy(0), MCmupPz(0), 
   MCmumPx(0), MCmumPy(0), MCmumPz(0),
-  MCPhiPx(0), MCPhiPy(0), MCPhiPz(0), MCPhiMass(0),
+  MCPhiPx(0), MCPhiPy(0), MCPhiPz(0), MCPhiPt(0), MCPhiMass(0),
   MCkpPx(0), MCkpPy(0), MCkpPz(0),
   MCkmPx(0), MCkmPy(0), MCkmPz(0),
-  MCPx(0), MCPy(0), MCPz(0),
+  MCX4140Px(0), MCX4140Py(0), MCX4140Pz(0), MCX4140Pt(0), MCX4140Mass(0),
+  MCPx(0), MCPy(0), MCPz(0), 
   /// generic muons
   muPx(0), muPy(0), muPz(0), muCharge(0),
   muPhits(0), muShits(0), muLayersTr(0), muLayersPix(0),
@@ -549,10 +550,11 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     Handle<GenParticleCollection> genParticles;
     iEvent.getByLabel("genParticles", genParticles);
     if (Debug_) cout << "############### GenParticles Analysis ###############" << endl;
-    float jpsiPx=0., jpsiPy=0., jpsiPz=0., jpsiMass=0.;
-    float  mupPx=0., mupPy=0., mupPz=0., mumPx=0., mumPy=0., mumPz=0.;
-    float phiPx=0., phiPy=0., phiPz=0., phiMass=0;
-    float  kpPx=0., kpPy=0., kpPz=0., kmPx=0., kmPy=0., kmPz=0.;
+    float jpsiPx=0., jpsiPy=0., jpsiPz=0., jpsiPt=0, jpsiMass=0.;
+    float mupPx=0., mupPy=0., mupPz=0., mumPx=0., mumPy=0., mumPz=0.;
+    float phiPx=0., phiPy=0., phiPz=0., phiPt=0, phiMass=0;
+    float kpPx=0., kpPy=0., kpPz=0., kmPx=0., kmPy=0., kmPz=0.;
+    float x4140Px=0., x4140Py=0., x4140Pz=0., x4140Pt=0., x4140Mass=0.;
 
     for (size_t i = 0; i < genParticles->size(); ++ i) { //  
       nMCAll++;
@@ -563,16 +565,16 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       MCDanNumAll->push_back( dauNum );
 
       if ( MCExclusiveDecay ) { // MCExclusiveDecay
+
 	if ( abs(pdgid) == MCMother  &&  dauNum == MCDaughtersN ) { // Mother & Daughter
 	  bool mumuOK = false;
           bool kkOK = false;
-
-
-	  for (int j=0; j<dauNum; ++j) { /// start loop on MCMother daughters
+	  
+	  for (int j=0; j<dauNum; ++j) { /// start loop on MCMother daughtersi
 	    const Candidate *dau = p.daughter(j);
 	    if (Debug_) cout << "dauPdgId = " << dau->pdgId() << endl;
 	    if (dau->pdgId()==443) { // for JPsi
-               jpsiPx = dau->px(); jpsiPy = dau->py(); jpsiPz = dau->pz(); jpsiMass = dau->mass();
+               jpsiPx = dau->px(); jpsiPy = dau->py(); jpsiPz = dau->pz(); jpsiPt = dau->pt(); jpsiMass = dau->mass();
 	       int jpsiDauNum = dau->numberOfDaughters();
 	       if (Debug_) cout << "jpsiDauNum = " << jpsiDauNum << endl;
 	       int muNum = 0;
@@ -591,7 +593,7 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
                if ( muNum == 2 ) mumuOK = true ;
 	    } // for JPsi	
 	    if (dau->pdgId()==333) { // for Phi
-              phiPx = dau->px(); phiPy = dau->py(); phiPz = dau->pz(); phiMass = dau->mass();
+              phiPx = dau->px(); phiPy = dau->py(); phiPz = dau->pz(); phiPt = dau->pt(); phiMass = dau->mass();
               int phiDauNum = dau->numberOfDaughters();
               if (Debug_) cout << "phiDauNum = " << phiDauNum << endl;
               int kNum = 0;
@@ -624,7 +626,9 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      PriVtxGen_CL->push_back( p.vertexNormalizedChi2() ) ;
 	      PriVtxGen_Chi2->push_back( p.vertexChi2() ) ;
 	      PriVtxGen_Ndof->push_back( p.vertexNdof() ) ;
-
+	    
+	      x4140Px = p.mother(0)->px(); x4140Py = p.mother(0)->py(); x4140Pz = p.mother(0)->pz(); x4140Pt = p.mother(0)->pt(); x4140Mass = p.mother(0)->mass();	  	
+	    
 	      /*Bool_t status = kTRUE ;
 	      const Candidate *x_ancestor = p.mother(0) ; /// a particle can have several mothers
 	      Int_t n_ancestors = 1 ;
@@ -644,12 +648,13 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		}
 	      } */
 
-	    MCJPsiPx->push_back(jpsiPx); MCJPsiPy->push_back(jpsiPy); MCJPsiPz->push_back(jpsiPz); MCJPsiMass.push_back(jpsiMass);
+	    MCJPsiPx->push_back(jpsiPx); MCJPsiPy->push_back(jpsiPy); MCJPsiPz->push_back(jpsiPz); MCJPsiPt->push_back(jpsiPt); MCJPsiMass->push_back(jpsiMass);
 	    MCmupPx->push_back(mupPx); MCmupPy->push_back(mupPy); MCmupPz->push_back(mupPz);
 	    MCmumPx->push_back(mumPx); MCmumPy->push_back(mumPy); MCmumPz->push_back(mumPz);
-            MCPhiPx->push_back(phiPx); MCPhiPy->push_back(phiPy); MCPhiPz->push_back(phiPz); MCPhiMass.push_back(phiMass);
+            MCPhiPx->push_back(phiPx); MCPhiPy->push_back(phiPy); MCPhiPz->push_back(phiPz); MCPhiPt->push_back(phiPt); MCPhiMass->push_back(phiMass);
             MCkpPx->push_back(kpPx); MCkpPy->push_back(kpPy); MCkpPz->push_back(kpPz);
             MCkmPx->push_back(kmPx); MCkmPy->push_back(kmPy); MCkmPz->push_back(kmPz);
+	    MCX4140Px->push_back(x4140Px); MCX4140Py->push_back(x4140Py); MCX4140Pz->push_back(x4140Pz); MCX4140Pt->push_back(x4140Pt); MCX4140Mass->push_back(x4140Mass);
 	    decayChainOK = true;
 	    MCPx->push_back( p.px() );  MCPy->push_back( p.py() ); MCPz->push_back( p.pz() );
 	  }
@@ -1904,12 +1909,13 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     PriVtxGen_tracks->clear();
 
     MCPdgIdAll->clear(); MCDanNumAll->clear();
-    MCJPsiPx->clear(); MCJPsiPy->clear(); MCJPsiPz->clear(); MCJPsiMass.clear();
+    MCJPsiPx->clear(); MCJPsiPy->clear(); MCJPsiPz->clear(); MCJPsiPt->clear(); MCJPsiMass->clear();
     MCmupPx->clear(); MCmupPy->clear(); MCmupPz->clear();
     MCmumPx->clear(); MCmumPy->clear(); MCmumPz->clear();
-    MCPhiPx->clear(); MCPhiPy->clear(); MCPhiPz->clear(); MCPhiMass.clear();
+    MCPhiPx->clear(); MCPhiPy->clear(); MCPhiPz->clear(); MCPhiPt->clear(); MCPhiMass->clear();
     MCkpPx->clear(); MCkpPy->clear(); MCkpPz->clear();
     MCkmPx->clear(); MCkmPy->clear(); MCkmPz->clear();
+    MCX4140Px->clear(); MCX4140Py->clear(); MCX4140Pz->clear(); MCX4140Pt->clear(); MCX4140Mass->clear();
     //MCpionPx->clear(); MCpionPy->clear(); MCpionPz->clear();
     //MCkaonPx->clear(); MCkaonPy->clear(); MCkaonPz->clear();
     //MCpionCh->clear(); MCkaonCh->clear();
@@ -1970,10 +1976,16 @@ void MuMuKKPAT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   PriVtx_XCosAlpha_X->clear(); PriVtx_XCosAlpha_Y->clear(); PriVtx_XCosAlpha_Z->clear();
   PriVtx_XCosAlpha_EX->clear(); PriVtx_XCosAlpha_EY->clear(); PriVtx_XCosAlpha_EZ->clear();
   PriVtx_XCosAlpha_Chi2->clear(); PriVtx_XCosAlpha_CL->clear(); PriVtx_XCosAlpha_tracks->clear();
+  PriVtx_XCosAlpha3D_n->clear();
+  PriVtx_XCosAlpha3D_X->clear(); PriVtx_XCosAlpha3D_Y->clear(); PriVtx_XCosAlpha3D_Z->clear(); PriVtx_XCosAlpha3D_EX->clear(); PriVtx_XCosAlpha3D_EY->clear(); PriVtx_XCosAlpha3D_EZ->clear();
+  PriVtx_XCosAlpha3D_Chi2->clear(); PriVtx_XCosAlpha3D_CL->clear(); PriVtx_XCosAlpha3D_tracks->clear();
   PriVtxXLess_XCosAlpha_n->clear();
   PriVtxXLess_XCosAlpha_X->clear(); PriVtxXLess_XCosAlpha_Y->clear(); PriVtxXLess_XCosAlpha_Z->clear();
   PriVtxXLess_XCosAlpha_EX->clear(); PriVtxXLess_XCosAlpha_EY->clear(); PriVtxXLess_XCosAlpha_EZ->clear();
   PriVtxXLess_XCosAlpha_Chi2->clear(); PriVtxXLess_XCosAlpha_CL->clear(); PriVtxXLess_XCosAlpha_tracks->clear();
+  PriVtxXLess_XCosAlpha3D_n->clear();
+  PriVtxXLess_XCosAlpha3D_X->clear(); PriVtxXLess_XCosAlpha3D_Y->clear(); PriVtxXLess_XCosAlpha3D_Z->clear(); PriVtxXLess_XCosAlpha3D_EX->clear(); PriVtxXLess_XCosAlpha3D_EY->clear(); PriVtxXLess_XCosAlpha3D_EZ->clear();
+  PriVtxXLess_XCosAlpha3D_Chi2->clear(); PriVtxXLess_XCosAlpha3D_CL->clear(); PriVtxXLess_XCosAlpha3D_tracks->clear();
   /// Primary Vertex with "B0 correction" 
   PriVtxXCorr_n->clear();
   PriVtxXCorr_X->clear(); PriVtxXCorr_Y->clear(); PriVtxXCorr_Z->clear();
@@ -2078,6 +2090,7 @@ void MuMuKKPAT::beginJob()
     X_One_Tree_->Branch("MCJPsiPx",&MCJPsiPx);
     X_One_Tree_->Branch("MCJPsiPy",&MCJPsiPy);
     X_One_Tree_->Branch("MCJPsiPz",&MCJPsiPz);
+    X_One_Tree_->Branch("MCJPsiPt",&MCJPsiPt);
     X_One_Tree_->Branch("MCJPsiMass",&MCJPsiMass);
     X_One_Tree_->Branch("MCmupPx",&MCmupPx);
     X_One_Tree_->Branch("MCmupPy",&MCmupPy);
@@ -2088,13 +2101,19 @@ void MuMuKKPAT::beginJob()
     X_One_Tree_->Branch("MCPhiPx",&MCPhiPx);
     X_One_Tree_->Branch("MCPhiPy",&MCPhiPy);
     X_One_Tree_->Branch("MCPhiPz",&MCPhiPz);
-    X_One_Tree_->Branch("MCJPsiMass",&MCPhiMass);
+    X_One_Tree_->Branch("MCPhiPt",&MCPhiPt);
+    X_One_Tree_->Branch("MCPhiMass",&MCPhiMass);
     X_One_Tree_->Branch("MCkpPx",&MCkpPx);
     X_One_Tree_->Branch("MCkpPy",&MCkpPy);
     X_One_Tree_->Branch("MCkpPz",&MCkpPz);
     X_One_Tree_->Branch("MCkmPx",&MCkmPx);
     X_One_Tree_->Branch("MCkmPy",&MCkmPy);
     X_One_Tree_->Branch("MCkmPz",&MCkmPz);
+    X_One_Tree_->Branch("MCX4140Px",&MCX4140Px);
+    X_One_Tree_->Branch("MCX4140Py",&MCX4140Py);
+    X_One_Tree_->Branch("MCX4140Pz",&MCX4140Pz);
+    X_One_Tree_->Branch("MCX4140Pt",&MCX4140Pt);
+    X_One_Tree_->Branch("MCX4140Mass",&MCX4140Mass);
     X_One_Tree_->Branch("MCPx", &MCPx);
     X_One_Tree_->Branch("MCPy", &MCPy);
     X_One_Tree_->Branch("MCPz", &MCPz);
