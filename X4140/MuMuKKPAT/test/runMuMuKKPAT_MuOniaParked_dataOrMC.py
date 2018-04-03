@@ -18,7 +18,7 @@ if MC :
         #official = False
         official = True
 MCMotherId = 100443 # Y(4140)
-MCMotherId = 531 # Bs0
+#MCMotherId = 531 # Bs0
 if MCMotherId == 100443 : # Y(4140)
     MCExclusiveDecay = True
 elif MCMotherId == 531 : # Bs0
@@ -54,25 +54,23 @@ elif MC :
                                 #'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/5A7A64C1-C9C3-E411-99C8-C4346BC808B8.root',
                                 #'file:/lustre/cms/store/mc/Summer12DR53X/BdToPsi2SKPi_MSEL5_TuneZ2star_8TeV-pythia6/AODSIM/PU_RD2_START53_V19F-v1/10000/A8203BEC-BFC3-E411-BCE7-00266CFFC948.root'
 
-				#'/store/mc/Summer12DR53X/Y4140ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v2/50000/00AC758F-4558-E611-AF39-02163E014BCA.root',
-				#'/store/mc/Summer12DR53X/Y4140ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v2/50000/188EC304-1F58-E611-B1E5-FA163E7918CE.root'
-				#'/store/mc/Summer12DR53X/Y4140ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v2/50000/4018D9C2-2058-E611-A698-02163E00F483.root'
-				#'/store/mc/Summer12DR53X/Y4700ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v1/40000/0A5CD34A-51FF-E711-AC26-FA163EB89C43.root'
-				#'/store/mc/Summer12DR53X/Y4700ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v1/40000/0AEBCE6F-C5FE-E711-A0D5-FA163EF56069.root'				
-				'root://cms-xrd-global.cern.ch//store/mc/Summer12DR53X/Y4700ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v1/40000/0E064110-4804-E811-939E-02163E00C230.root'
-				#'/store/mc/Summer12DR53X/Y4700ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v1/40000/0EB2CFFC-6F00-E811-B945-FA163E795CFE.root'
-				#'/store/mc/Summer12DR53X/Y4300ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v1/40000/02A29428-60FF-E711-890A-FA163E4207B8.root'
-				#'/store/mc/Summer12DR53X/Y4300ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v1/40000/046C632E-5CFE-E711-9EA5-FA163ECA7B40.root'
-				#'/store/mc/Summer12DR53X/Y4300ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v1/40000/04748CFE-6700-E811-8A6E-FA163EAE0AE5.root'
-				#'/store/mc/Summer12DR53X/Y4300ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v1/40000/0499F198-81FE-E711-84A0-FA163EBB9798.root'
-				#'/store/mc/Summer12DR53X/Y4300ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v1/40000/04F1380B-84FE-E711-B278-FA163E42B283.root'
-                                #'root://cms-xrd-global.cern.ch//store/mc/Summer12DR53X/Y4300ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v1/40000/0855E514-51FF-E711-BFAD-FA163ED679E0.root'
-                                #'root://cms-xrd-global.cern.ch//store/mc/Summer12DR53X/Y4300ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v1/40000/0A072C76-6700-E811-B6DB-FA163E3084E5.root'
-				#'root://cms-xrd-global.cern.ch//store/mc/Summer12DR53X/Y4300ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v1/40000/0E4E7C64-6A00-E811-A39E-FA163E056376.root'
-                                #'root://cms-xrd-global.cern.ch//store/mc/Summer12DR53X/Y4300ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v1/40000/0EEDA64B-7FFE-E711-A972-FA163E9E291A.root'
-				#'root://cms-xrd-global.cern.ch//store/mc/Summer12DR53X/Y4300ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v1/40000/120BADCF-78FE-E711-95B8-FA163E2BE6D1.root'
-				#'root://cms-xrd-global.cern.ch//store/mc/Summer12DR53X/Y4300ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v1/40000/12DEB4D3-6CFE-E711-B5D8-FA163E94291A.root'
-				#'root://cms-xrd-global.cern.ch//store/mc/Summer12DR53X/Y4300ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v1/40000/14A88CFB-B9FE-E711-89EF-FA163E24A420.root'
+				#'root://cms-xrd-global.cern.ch//store/mc/Summer12DR53X/Y4140ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v2/50000/4018D9C2-2058-E611-A698-02163E00F483.root',
+				#'root://cms-xrd-global.cern.ch//store/mc/Summer12DR53X/Y4140ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v2/50000/00AC758F-4558-E611-AF39-02163E014BCA.root',
+				#'root://cms-xrd-global.cern.ch//store/mc/Summer12DR53X/Y4140ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v2/50000/188EC304-1F58-E611-B1E5-FA163E7918CE.root',	
+				#'root://cms-xrd-global.cern.ch//store/mc/Summer12DR53X/Y4140ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v2/50000/3C06A515-2258-E611-98CA-FA163E9AE9D0.root'
+	
+				'/store/mc/Summer12DR53X/Y4300ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v1/40000/02A29428-60FF-E711-890A-FA163E4207B8.root',
+                                '/store/mc/Summer12DR53X/Y4300ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v1/40000/046C632E-5CFE-E711-9EA5-FA163ECA7B40.root',
+                                '/store/mc/Summer12DR53X/Y4300ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v1/40000/04748CFE-6700-E811-8A6E-FA163EAE0AE5.root',
+                                '/store/mc/Summer12DR53X/Y4300ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v1/40000/0499F198-81FE-E711-84A0-FA163EBB9798.root',
+                                #'/store/mc/Summer12DR53X/Y4300ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v1/40000/04F1380B-84FE-E711-B278-FA163E42B283.root',
+                                #'/store/mc/Summer12DR53X/Y4300ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v1/40000/0855E514-51FF-E711-BFAD-FA163ED679E0.root',
+                                #'/store/mc/Summer12DR53X/Y4300ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v1/40000/0A072C76-6700-E811-B6DB-FA163E3084E5.root',
+                                #'/store/mc/Summer12DR53X/Y4300ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v1/40000/0E4E7C64-6A00-E811-A39E-FA163E056376.root',
+                                #'/store/mc/Summer12DR53X/Y4300ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v1/40000/0EEDA64B-7FFE-E711-A972-FA163E9E291A.root',
+                                #'/store/mc/Summer12DR53X/Y4300ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v1/40000/120BADCF-78FE-E711-95B8-FA163E2BE6D1.root',
+                                #'/store/mc/Summer12DR53X/Y4300ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v1/40000/12DEB4D3-6CFE-E711-B5D8-FA163E94291A.root',
+                                #'/store/mc/Summer12DR53X/Y4300ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v1/40000/14A88CFB-B9FE-E711-89EF-FA163E24A420.root' 
            )
 	elif MCMotherId == 531 : # Bs0
                 sourceFiles = cms.untracked.vstring(
@@ -80,7 +78,7 @@ elif MC :
 		#Bs0
 		#'/store/mc/Summer12DR53X/Y4300ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v1/40000/00D14AB2-6A00-E811-B9AB-FA163ED7B479.root'            
 		#'/store/mc/Summer12DR53X/Y4140ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v2/50000/3C06A515-2258-E611-98CA-FA163E9AE9D0.root',
-		'/store/mc/Summer12DR53X/Y4140ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v2/50000/4018D9C2-2058-E611-A698-02163E00F483.root'
+		#'/store/mc/Summer12DR53X/Y4140ToJpsiPhi_BFilter_TuneCUEP8M1_8TeV-Pythia8/AODSIM/PU_RD2_START53_V19F-v2/50000/4018D9C2-2058-E611-A698-02163E00F483.root'
 
 		)
 
@@ -94,7 +92,7 @@ process.source.inputCommands = cms.untracked.vstring(
 	)
 
 process.maxEvents = cms.untracked.PSet(
-        input = cms.untracked.int32( 50 ) # 256Kb in 2' for 100 events, 1Mb in 7' for 1k events, 6Mb in 50' for 8650 events, 11Mb in 66' for 10k events, 100Mb in 14h for 150k events, 1.4Gb in 4 days for 1.2M events of official MC
+        input = cms.untracked.int32( -1 ) # 256Kb in 2' for 100 events, 1Mb in 7' for 1k events, 6Mb in 50' for 8650 events, 11Mb in 66' for 10k events, 100Mb in 14h for 150k events, 1.4Gb in 4 days for 1.2M events of official MC
         #input = cms.untracked.int32( 1000 ) # 310Kb in 3' for 1k events of private MC
         #input = cms.untracked.int32( 100 ) # = 20Mb in 2h for 15k events, 2Mb in 10' for 1k events of Run2012C/MuOniaParked/AOD/22Jan2013-v1
 	#input = cms.untracked.int32( 1000 ) # = 3Mb for 6546 events, 85Kb for 100, 800kb for 1k events of BsToPsiMuMu
@@ -112,9 +110,9 @@ process.load("Configuration.StandardSequences.Reconstruction_cff") # from Lucia
 process.load("Configuration.StandardSequences.MagneticField_cff") # for using TransientTrackBuilder
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff") # for using TransientTrackBuilder
 #process.GlobalTag.globaltag = 'FT_53_V6_AN3::All' # for using TransientTrackBuilder
-#process.GlobalTag.globaltag = 'START53_V19F::All' # from CMSdas my MC dataset information
+process.GlobalTag.globaltag = 'START53_V19F::All' # from CMSdas my MC dataset information
 #process.GlobalTag.globaltag = 'START53_V7C::All'
-process.GlobalTag.globaltag = 'FT_R_53_V18::All' #Global tag for 2012B data
+#process.GlobalTag.globaltag = 'FT_R_53_V18::All' #Global tag for 2012B data
 #process.GlobalTag.globaltag = 'FT53_V21A_AN6::All' #Global tag for 2012C data
 #process.GlobalTag.globaltag = 'START53_V27::All",' # from Leonardo
 process.load('Configuration/EventContent/EventContent_cff')
@@ -315,7 +313,7 @@ process.mkcands = cms.EDAnalyzer("MuMuKKPAT",
                                  VtxSample   = cms.untracked.string('offlinePrimaryVertices'),
                                  SameSign = cms.untracked.bool(False),
                                  DoMonteCarloTree = cms.untracked.bool( MC ),
-                                 MonteCarloParticleId = cms.untracked.int32(100443), #20443
+                                 MonteCarloParticleId = cms.untracked.int32(100443), #20443, 100443
                                  MonteCarloExclusiveDecay = cms.untracked.bool( MCExclusiveDecay ),
                                  MonteCarloMotherId = cms.untracked.int32( MCMotherId ),
                                  MonteCarloDaughtersN = cms.untracked.int32( 2 ), # my daughter JPsi & Phi
