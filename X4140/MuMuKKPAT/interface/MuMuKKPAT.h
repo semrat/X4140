@@ -185,12 +185,13 @@ private:
   vector<double>        *PriVtxGen_EX, *PriVtxGen_EY, *PriVtxGen_EZ ;
   vector<float>	        *PriVtxGen_Chi2, *PriVtxGen_CL, *PriVtxGen_Ndof;
   vector<int>           *PriVtxGen_tracks ;
-  vector<float>         *MCJPsiPx, *MCJPsiPy, *MCJPsiPz, MCJPsiMass;
+  vector<float>         *MCJPsiPx, *MCJPsiPy, *MCJPsiPz, *MCJPsiPt, *MCJPsiMass;
   vector<float>         *MCmupPx, *MCmupPy, *MCmupPz;
   vector<float>         *MCmumPx, *MCmumPy, *MCmumPz;
-  vector<float>         *MCPhiPx, *MCPhiPy, *MCPhiPz, MCPhiMass;
+  vector<float>         *MCPhiPx, *MCPhiPy, *MCPhiPz, *MCPhiPt, *MCPhiMass;
   vector<float>         *MCkpPx, *MCkpPy, *MCkpPz;
   vector<float>         *MCkmPx, *MCkmPy, *MCkmPz;
+  vector<float>         *MCX4140Px, *MCX4140Py, *MCX4140Pz, *MCX4140Pt, *MCX4140Mass;
   vector<float>         *MCPx, *MCPy, *MCPz;
   /// Generic Muons
   vector<float>         *muPx, *muPy, *muPz, *muCharge;
